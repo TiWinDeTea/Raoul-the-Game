@@ -1,3 +1,4 @@
+'You may preview the uml using www.planttext.com/planttext
 @startuml
 title LP24 - Dungeon of Legends
 skinparam {
@@ -111,11 +112,13 @@ Pot -[hidden]right- Scroll
 Consumable <|.. (Pot, Scroll)
 
 abstract class LivingThing{
+    - maxHitPoints: int
     - hitPoints: int
     - attackPower: int
     - defensePower: int
     - position: Vector2i
     + print(): void
+    + getMaxHitPoints(): int
     + getHitPoints(): int
     + getAttackPower(): int
     + getDefensePower: int
