@@ -1,0 +1,199 @@
+@startuml
+title LP24 - Dungeon of Legends
+skinparam {
+    nodesep 30
+    ranksep 50
+}
+
+enum ConsumableType{
+__
+    Pot
+    Scroll
+}
+
+enum EquipementType{
+__
+    Armor
+    Gloves
+    Helmet
+    Boots
+    Pants
+    Sword
+}
+
+enum StorableObjectType{
+    Consumable
+    Equipement
+}
+
+enum LivingThingType{
+    Player
+    Mob
+}
+
+enum Tile{
+    Wall
+    Room
+    Corridor
+    Door
+    StairUp
+    StairDown
+}
+
+LivingThingType -[hidden]right- ConsumableType
+ConsumableType -[hidden]left- StorableObjectType
+
+
+interface StorableObject{
+    + getType(): StorableObjectType
+    + toString(): String
+}
+
+
+interface Consumable{
+    - String name
+    + toString(): String
+    + trigger(livingThing: LivingThing): void
+    + nextTick(): boolean
+    + getConsumableType(): ConsumableType
+}
+StorableObject <|-- Consumable
+
+
+class Armor{
+    - armorModifier: int
+    - damageModifier: int
+    - type: EquipementType
+    + Armor(armorModifier, ...)
+    + getArmorModifier(): int
+    + getDamageModifier(): int
+    + getEquipementType(): EquipementType
+}
+Armor -[hidden]up-> StorableObject
+Consumable -[hidden]right- Armor
+StorableObject <|.. Armor
+
+class Weapon{
+    - damageModifier: int
+    - range: byte
+    - manaCost: byte
+    - type: EquipementType
+    + Weapon(damageModifier, ...)
+    + getEquipementType(): EquipementType
+    + getDamageModifier(): int
+    + getRange(): byte
+    + getManaCost(): byte
+}
+StorableObject <|.. Weapon
+
+class Scroll{
+    - byte turns
+    - int healthModifierPerTick
+    - int healthModifierModifierPerTick
+    + Scroll(turns, ...)
+    + Scroll(turns, ...)
+
+    'For saving purposes
+    + getHealthMPT(): int
+    + getHealthMMPT(): int
+}
+
+class Pot{
+    - int healthModifier
+    + Pot(healthModifier,...)
+
+    'For saving purposes
+    + getHM(): int
+}
+Pot -[hidden]up-> Consumable
+Scroll -[hidden]up-> Consumable
+Pot -[hidden]right- Scroll
+Consumable <|.. (Pot, Scroll)
+
+abstract class LivingThing{
+    - hitPoints: int
+    - attackPower: int
+    - defensePower: int
+    - position: Vector2i
+    + print(): void
+    + getHitPoints(): int
+    + getAttackPower(): int
+    + getDefensePower: int
+    + getPosition(): Vector2i
+    + damage(): void
+    + isAlive(): boolean
+    + live()
+    + getType(): LivingThingType
+}
+
+class Player{
+    - maxStorageCapacity: int
+    - level: int
+    - name: String
+    + Player(name, ...)
+    + addToInventory(storable: StorableObject)
+    - equipWith(equiment: Equipement)
+}
+
+Player *-right-> StorableObject
+Player -[hidden]up-> LivingThing
+
+class Mob{
+    + Mob(attackPower, ...)
+    - keepPatroling(): void
+    - chase(): void
+    - wander(): void
+}
+Mob *-left-> State
+Mob -[hidden]right- Player
+Mob -[hidden]up-> LivingThing
+LivingThing <|-- (Mob, Player)
+
+class Game{
+    + launch(numberOfPlayers: byte, ...): void
+    - nextTick(): void
+    - loadSave(): boolean
+    - save(): void
+}
+Game *-up-> Mob
+Game *-up-> Player
+Game *--> Map
+Game *-> HUD
+
+class Map{
+    - seed: int
+    - mapGenerator: Random
+    - Map(seed: int, ...)
+    - Map()
+    + print(): void
+    + triggerTile(position: Vector2i, target: Creature): void
+    + getSeed(): int
+    + getTile(position: Vector2i): Tile
+    + getAreaAround(position: Vector2i, range: byte): Tile[][]
+    + generate(): void
+}
+Map *--> InteractiveObject
+Map *-left-> Tile
+
+enum State{
+__
+    patrol
+    standing
+    asleep
+    wandering
+    chasing
+}
+
+class HUD{
+    - players: Player[]
+    + print(): void
+}
+
+class InteractiveObject{
+    - isTrap: boolean
+    + InteractiveObject(isTrap: boolean): void
+    + triger(LivingThing: LivingThing): void
+    + isActivable(): boolean
+    + print(): void
+}
+@enduml
