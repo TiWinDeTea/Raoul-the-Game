@@ -1,30 +1,41 @@
 'You may preview the uml using www.planttext.com/planttext
 @startuml
 title LP24 - Dungeon of Legends
+
 skinparam {
     nodesep 30
     ranksep 51
+    backgroundcolor #888888
 }
 
 enum ConsumableType{
-__
     Pot
     Scroll
+    toString(): String
 }
 
-enum EquipementType{
-__
-    Armor
+enum WeaponType{
+    Bow
+    Sword
+    Wand
+    Fist
+    toString(): String
+}
+
+enum ArmorType{
+    BreastPlate
     Gloves
     Helmet
     Boots
     Pants
-    Sword
+    toInt(): int
+    fromInt(a: int): ArmorType
+    toString(): String
 }
-
 enum StorableObjectType{
+    Weapon
+    Armor
     Consumable
-    Equipement
 }
 
 enum LivingThingType{
@@ -41,9 +52,10 @@ enum Tile{
     StairDown
 }
 
-LivingThingType -[hidden]right- ConsumableType
-ConsumableType -[hidden]left- StorableObjectType
-
+LivingThingType -[hidden]right- StorableObjectType
+ArmorType -[hidden]left- StorableObjectType
+WeaponType -[hidden]left- ArmorType
+WeaponType -[hidden]right- ConsumableType
 
 interface StorableObject{
     + getType(): StorableObjectType
@@ -53,7 +65,7 @@ interface StorableObject{
 
 interface Consumable{
     - String name
-    + toString(): String
+    - byte turns
     + trigger(livingThing: LivingThing): void
     + nextTick(): boolean
     + getConsumableType(): ConsumableType
@@ -62,49 +74,52 @@ StorableObject <|-- Consumable
 
 
 class Armor{
-    - armorModifier: int
-    - damageModifier: int
-    - type: EquipementType
-    + Armor(armorModifier, ...)
-    + getArmorModifier(): int
-    + getDamageModifier(): int
-    + getEquipementType(): EquipementType
+    - defensePowerModifier: int
+    - attackPowerModifier: int
+    - type: ArmorType
+    + Armor(defensePowerModifier, ...)
+    + getDefensePowerModifier(): int
+    + getAttackPowerModifier(): int
+    + getArmorType(): ArmorType
 }
 Armor -[hidden]up-> StorableObject
 Consumable -[hidden]right- Armor
 StorableObject <|.. Armor
 
 class Weapon{
-    - damageModifier: int
+    - attackPowerModifier: int
     - range: byte
     - manaCost: byte
-    - type: EquipementType
+    - type: WeaponType
     + Weapon(damageModifier, ...)
-    + getEquipementType(): EquipementType
-    + getDamageModifier(): int
+    + getWeaponType(): WeaponType
+    + getAttackPowerModifier(): int
     + getRange(): byte
     + getManaCost(): byte
 }
 StorableObject <|.. Weapon
 
 class Scroll{
-    - byte turns
     - int healthModifierPerTick
     - int healthModifierModifierPerTick
     + Scroll(turns, ...)
     + Scroll(turns, ...)
 
     'For saving purposes
-    + getHealthMPT(): int
-    + getHealthMMPT(): int
+    + getHMPT(): int
+    + getHMMPT(): int
 }
 
 class Pot{
     - int healthModifier
+    - int defensePowerModifier
+    - int attackPowerModifier
     + Pot(healthModifier,...)
 
     'For saving purposes
     + getHM(): int
+    + getDPM(): int
+    + getAPM(): int
 }
 Pot -[hidden]up-> Consumable
 Scroll -[hidden]up-> Consumable
@@ -112,30 +127,42 @@ Pot -[hidden]right- Scroll
 Consumable <|.. (Pot, Scroll)
 
 abstract class LivingThing{
+    - level: int
     - maxHitPoints: int
     - hitPoints: int
     - attackPower: int
     - defensePower: int
     - position: Vector2i
     + print(): void
+    + getLevel(): int
     + getMaxHitPoints(): int
     + getHitPoints(): int
     + getAttackPower(): int
-    + getDefensePower: int
+    + getDefensePower(): int
     + getPosition(): Vector2i
     + damage(): void
     + isAlive(): boolean
-    + live()
+    + live(): void
     + getType(): LivingThingType
 }
 
 class Player{
     - maxStorageCapacity: int
-    - level: int
+    - maxMana: int
+    - mana: int
+    - armor[5]: Armor
+    - weapon: Weapon
     - name: String
     + Player(name, ...)
+    + getMana(): int
     + addToInventory(storable: StorableObject)
+    + useMana(consumption: int): boolean
     - equipWith(equiment: Equipement)
+
+    'For saving purposes
+    + getEquipedArmor(): Armor[5]
+    + getEquipedWeapon(): Weapon
+    + getInventory(): StorableObject[]
 }
 
 Player *-right-> StorableObject
@@ -152,8 +179,9 @@ Mob -[hidden]right- Player
 Mob -[hidden]up-> LivingThing
 LivingThing <|-- (Mob, Player)
 
-class Game{
+class Game << (S, #FF7700) >>{
     + launch(numberOfPlayers: byte, ...): void
+    - Game()
     - nextTick(): void
     - loadSave(): boolean
     - save(): void
@@ -161,16 +189,17 @@ class Game{
 Game *-up-> Mob
 Game *-up-> Player
 Game *--> Map
-Game *-> HUD
+Game *-left-> HUD
 
-class Map{
-    - seed: int
+class Map << (S, #FF7700) >>{
+    - currentSeed: int
+    - nextSeed: int
     - mapGenerator: Random
-    - Map(seed: int, ...)
     - Map()
+    + setNextSeed(seed: int)
     + print(): void
     + triggerTile(position: Vector2i, target: Creature): void
-    + getSeed(): int
+    + getCurrentSeed(): int
     + getTile(position: Vector2i): Tile
     + getAreaAround(position: Vector2i, range: byte): Tile[][]
     + generate(): void
@@ -179,24 +208,28 @@ Map *--> InteractiveObject
 Map *-left-> Tile
 
 enum State{
-__
-    patrol
+    patroling
     standing
-    asleep
+    sleeping
     wandering
     chasing
 }
 
-class HUD{
+class HUD << (S, #FF7700) >>{
     - players: Player[]
     + print(): void
+    + setPlayers(players: Player[]): void
 }
 
 class InteractiveObject{
     - isTrap: boolean
-    + InteractiveObject(isTrap: boolean): void
+    - manaModifier: int
+    - hpModifier: int
+    - loot: StorableObject
+    - target: LivingThingType
+    + InteractiveObject(isTrap: boolean)
     + triger(LivingThing: LivingThing): void
-    + isActivable(): boolean
+    + isActivableOn(type: LivingThingType): boolean
     + print(): void
 }
 @enduml
