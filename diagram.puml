@@ -3,7 +3,7 @@
 title LP24 - Dungeon of Legends
 skinparam {
     nodesep 30
-    ranksep 50
+    ranksep 51
 }
 
 enum ConsumableType{
