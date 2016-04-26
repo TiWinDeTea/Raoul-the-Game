@@ -8,6 +8,12 @@ skinparam {
     backgroundcolor #888888
 }
 
+enum direction{
+    up
+    down
+    left
+    right
+}
 enum ConsumableType{
     Pot
     Scroll
@@ -64,8 +70,6 @@ interface StorableObject{
 
 
 interface Consumable{
-    - String name
-    - byte turns
     + trigger(livingThing: LivingThing): void
     + nextTick(): boolean
     + getConsumableType(): ConsumableType
@@ -100,9 +104,10 @@ class Weapon{
 StorableObject <|.. Weapon
 
 class Scroll{
-    - int healthModifierPerTick
-    - int healthModifierModifierPerTick
-    + Scroll(turns, ...)
+    - healthModifierPerTick: int
+    - healthModifierModifierPerTick: int
+    - name: String
+    - turns: byte
     + Scroll(turns, ...)
 
     'For saving purposes
@@ -111,9 +116,11 @@ class Scroll{
 }
 
 class Pot{
-    - int healthModifier
-    - int defensePowerModifier
-    - int attackPowerModifier
+    - healthModifier: int
+    - defensePowerModifier: int
+    - attackPowerModifier: int
+    - name: String
+    - turns: byte
     + Pot(healthModifier,...)
 
     'For saving purposes
@@ -127,12 +134,15 @@ Pot -[hidden]right- Scroll
 Consumable <|.. (Pot, Scroll)
 
 abstract class LivingThing{
+    - sight: Tile[]
     - level: int
     - maxHitPoints: int
     - hitPoints: int
     - attackPower: int
     - defensePower: int
     - position: Vector2i
+    - requestedAttack: Direction
+    - requestedMove: Direction
     + print(): void
     + getLevel(): int
     + getMaxHitPoints(): int
@@ -140,6 +150,9 @@ abstract class LivingThing{
     + getAttackPower(): int
     + getDefensePower(): int
     + getPosition(): Vector2i
+    + getRequestedAttack(): Direction
+    + getRequestedMove(): Direction
+    + setPosition()
     + damage(): void
     + isAlive(): boolean
     + live(): void
@@ -170,6 +183,7 @@ Player -[hidden]up-> LivingThing
 
 class Mob{
     + Mob(attackPower, ...)
+    + updateSight(newSight: Tile[]): void
     - keepPatroling(): void
     - chase(): void
     - wander(): void
@@ -179,7 +193,7 @@ Mob -[hidden]right- Player
 Mob -[hidden]up-> LivingThing
 LivingThing <|-- (Mob, Player)
 
-class Game << (S, #FF7700) >>{
+class Game {
     + launch(numberOfPlayers: byte, ...): void
     - Game()
     - nextTick(): void
@@ -191,7 +205,7 @@ Game *-up-> Player
 Game *--> Map
 Game *-left-> HUD
 
-class Map << (S, #FF7700) >>{
+class Map {
     - currentSeed: int
     - nextSeed: int
     - mapGenerator: Random
@@ -215,7 +229,7 @@ enum State{
     chasing
 }
 
-class HUD << (S, #FF7700) >>{
+class HUD {
     - players: Player[]
     + print(): void
     + setPlayers(players: Player[]): void
@@ -232,4 +246,18 @@ class InteractiveObject{
     + isActivableOn(type: LivingThingType): boolean
     + print(): void
 }
+
+class Vector2i{
+    + x: int
+    + y: int
+    + Vector2i(x: int, y: int)
+    + Vector2i()
+    + Vector2i(v: Vector2i)
+    + set(x: int, y: int): void
+    + equals(vect: Vector2i): boolean
+    + add(dir: Direction): void
+    + x(): int
+    + y(): int
+}
+Vector2i *-[hidden]right-> LivingThing
 @enduml

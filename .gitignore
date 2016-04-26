@@ -13,3 +13,7 @@ hs_err_pid*
 
 # IDE
 .idea/*
+.gitignore
+pom.xml
+DungeonOfLegends.iml
+
