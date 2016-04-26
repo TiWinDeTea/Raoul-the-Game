@@ -1,3 +1,5 @@
+package com.github.tiwindetea.dungeonoflegend;
+
 /**
  * Created by organic-code on 4/17/16.
  */

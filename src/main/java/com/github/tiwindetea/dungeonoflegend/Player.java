@@ -1,3 +1,5 @@
+package com.github.tiwindetea.dungeonoflegend;
+
 import java.util.List;
 
 /**
