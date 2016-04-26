@@ -9,53 +9,52 @@ skinparam {
 }
 
 enum direction{
-    up
-    down
-    left
-    right
+    UP
+    DOWN
+    LEFT
+    RIGHT
 }
 enum ConsumableType{
-    Pot
-    Scroll
+    POT
+    SCROLL
     toString(): String
 }
 
 enum WeaponType{
-    Bow
-    Sword
-    Wand
-    Fist
+    BOW
+    SWORD
+    WAND
     toString(): String
 }
 
 enum ArmorType{
-    BreastPlate
-    Gloves
-    Helmet
-    Boots
-    Pants
+    BREAST_PLATE
+    GLOVES
+    HELMET
+    BOOTS
+    PANTS
     toInt(): int
     fromInt(a: int): ArmorType
     toString(): String
 }
 enum StorableObjectType{
-    Weapon
-    Armor
-    Consumable
+    WEAPON
+    ARMOR
+    CONSUMABLE
 }
 
 enum LivingThingType{
-    Player
-    Mob
+    PLAYER
+    MOB
 }
 
 enum Tile{
-    Wall
-    Room
-    Corridor
-    Door
-    StairUp
-    StairDown
+    WALL
+    ROOM
+    CORRIDOR
+    DOOR
+    STAIR_UP
+    STAIR_DOWN
 }
 
 LivingThingType -[hidden]right- StorableObjectType
@@ -147,7 +146,7 @@ abstract class LivingThing{
     + getLevel(): int
     + getMaxHitPoints(): int
     + getHitPoints(): int
-    + getAttackPower(): int
+    + getDamagePower(): int
     + getDefensePower(): int
     + getPosition(): Vector2i
     + getRequestedAttack(): Direction
@@ -163,9 +162,11 @@ class Player{
     - maxStorageCapacity: int
     - maxMana: int
     - mana: int
+    - abilityPower: int
     - armor[5]: Armor
     - weapon: Weapon
     - name: String
+    + passedStairs: boolean
     + Player(name, ...)
     + getMana(): int
     + addToInventory(storable: StorableObject)
@@ -188,7 +189,7 @@ class Mob{
     - chase(): void
     - wander(): void
 }
-Mob *-left-> State
+Mob -left-> State
 Mob -[hidden]right- Player
 Mob -[hidden]up-> LivingThing
 LivingThing <|-- (Mob, Player)
@@ -201,32 +202,48 @@ class Game {
     - save(): void
 }
 Game *-up-> Mob
-Game *-up-> Player
-Game *--> Map
-Game *-left-> HUD
+Game "1,2" *-up-> Player
+Game --> Map
+Game -left-> HUD
 
 class Map {
-    - currentSeed: int
-    - nextSeed: int
+    - seed: Seed
     - mapGenerator: Random
-    - Map()
-    + setNextSeed(seed: int)
+    - stairsUpPosition: Vector2i
+    - stairsDownPosition: Vector2i
+    + Map()
+    + Map(seed: Seed, stairsUpPosition: Vector2i)
     + print(): void
     + triggerTile(position: Vector2i, target: Creature): void
-    + getCurrentSeed(): int
+    + getStairsUpPosition(): Vector2i
+    + getStairsDownPosition(): Vector2i
+    + getAlphaSeed(): int
+    + getBetaSeed(): int
     + getTile(position: Vector2i): Tile
     + getAreaAround(position: Vector2i, range: byte): Tile[][]
-    + generate(): void
+    + generateNextLevel(): void
 }
 Map *--> InteractiveObject
 Map *-left-> Tile
+Map --> Seed
+
+class Seed {
+    - alphaSeed: int
+    - betaSeed: int
+    - level: int
+    + Seed()
+    + Seed(alphaSeed: int, betaSeed: int, level: int)
+    + getAlphaSeed(): int
+    + getBetaSeed(): int
+    + nextRandomizer(): Random
+}
 
 enum State{
-    patroling
-    standing
-    sleeping
-    wandering
-    chasing
+    PATROLING
+    STANDING
+    SLEEPING
+    WANDERING
+    CHASING
 }
 
 class HUD {
