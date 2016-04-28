@@ -17,5 +17,9 @@ hs_err_pid*
 pom.xml
 DungeonOfLegends.iml
 
+#SublimeText
+*.sublime-workspace
+*.sublime-project
+
 # Other
 DungeonOfLegends_pgs
