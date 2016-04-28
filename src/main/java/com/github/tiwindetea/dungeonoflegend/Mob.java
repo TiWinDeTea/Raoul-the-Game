@@ -21,4 +21,14 @@ public class Mob extends LivingThing {
 	private void wander() {
 		//TODO
 	}
+
+	@Override
+	public void live() {
+		//TODO
+	}
+
+	@Override
+	public LivingThingType getType() {
+		return LivingThingType.MOB;
+	}
 }

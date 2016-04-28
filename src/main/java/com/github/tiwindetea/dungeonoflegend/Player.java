@@ -32,9 +32,9 @@ public class Player extends LivingThing {
 		return false;
 	}
 
-	public void equipWith(Equipement equiment) {
+	/*public void equipWith(Equipement equiment) {
 		//TODO
-	}
+	}*/
 
 	public Armor[] getEquipedArmor() {
 		//TODO
@@ -49,5 +49,15 @@ public class Player extends LivingThing {
 	public StorableObject[] getInventory() {
 		//TODO
 		return new StorableObject[0];
+	}
+
+	@Override
+	public void live() {
+		//TODO
+	}
+
+	@Override
+	public LivingThingType getType() {
+		return LivingThingType.PLAYER;
 	}
 }

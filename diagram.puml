@@ -8,7 +8,7 @@ skinparam {
     backgroundcolor #888888
 }
 
-enum direction{
+enum Direction{
     UP
     DOWN
     LEFT
@@ -133,7 +133,7 @@ Pot -[hidden]right- Scroll
 Consumable <|.. (Pot, Scroll)
 
 abstract class LivingThing{
-    - sight: Tile[]
+    - sight: Tile[][]
     - level: int
     - maxHitPoints: int
     - hitPoints: int
@@ -143,6 +143,8 @@ abstract class LivingThing{
     - requestedAttack: Direction
     - requestedMove: Direction
     + print(): void
+    + updateSight(newSight: Tile[][]): void
+    + getSight(): Tile[][]
     + getLevel(): int
     + getMaxHitPoints(): int
     + getHitPoints(): int
@@ -184,7 +186,6 @@ Player -[hidden]up-> LivingThing
 
 class Mob{
     + Mob(attackPower, ...)
-    + updateSight(newSight: Tile[]): void
     - keepPatroling(): void
     - chase(): void
     - wander(): void
