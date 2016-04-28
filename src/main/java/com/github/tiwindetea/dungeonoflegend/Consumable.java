@@ -5,10 +5,6 @@ package com.github.tiwindetea.dungeonoflegend;
  */
 public interface Consumable {
 
-	//TODO
-	//private String name;
-	//private byte turns;
-
 	void trigger(LivingThing livingThing);
 
 	boolean nextTick();

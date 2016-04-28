@@ -19,16 +19,18 @@ public class Player extends LivingThing {
 	}
 
 	public int getMana() {
-		//TODO
-		return 0;
+		return this.mana;
 	}
 
 	public void addToInventory(StorableObject storable) {
-		//TODO
+		this.storableObjects.add(storable);
 	}
 
 	public boolean useMana(int consumption) {
-		//TODO
+		if(this.mana > consumption) {
+			this.mana -= consumption;
+			return true;
+		}
 		return false;
 	}
 
@@ -37,18 +39,15 @@ public class Player extends LivingThing {
 	}*/
 
 	public Armor[] getEquipedArmor() {
-		//TODO
-		return new Armor[0];
+		return this.armor;
 	}
 
 	public Weapon getEquipedWeapon() {
-		//TODO
-		return null;
+		return this.weapon;
 	}
 
 	public StorableObject[] getInventory() {
-		//TODO
-		return new StorableObject[0];
+		return (StorableObject[]) this.storableObjects.toArray();
 	}
 
 	@Override

@@ -5,21 +5,22 @@ package com.github.tiwindetea.dungeonoflegend;
  */
 public class Scroll implements Consumable {
 
+	private byte turns;
 	private int healthModifierPerTick;
 	private int healthModifierModifierPerTick;
 
-	public Scroll() {
-		//TODO
+	public Scroll(byte turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
+		this.turns = turns;
+		this.healthModifierPerTick = healthModifierPerTick;
+		this.healthModifierModifierPerTick = healthModifierModifierPerTick;
 	}
 
 	public int getHMPT() {
-		//TODO
-		return 0;
+		return this.healthModifierModifierPerTick;
 	}
 
 	public int getHMMPT() {
-		//TODO
-		return 0;
+		return this.healthModifierModifierPerTick;
 	}
 
 	@Override

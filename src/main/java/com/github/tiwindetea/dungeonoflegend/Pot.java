@@ -5,27 +5,28 @@ package com.github.tiwindetea.dungeonoflegend;
  */
 public class Pot implements Consumable {
 
+	private byte turns;
 	private int healthModifier;
 	private int defensePowerModifier;
 	private int attackPowerModifier;
 
-	public Pot() {
-		//TODO
+	public Pot(byte turns, int healthModifier, int defensePowerModifier, int attackPowerModifier) {
+		this.turns = turns;
+		this.healthModifier = healthModifier;
+		this.defensePowerModifier = defensePowerModifier;
+		this.attackPowerModifier = attackPowerModifier;
 	}
 
 	public int getHM() {
-		//TODO
-		return 0;
+		return this.healthModifier;
 	}
 
 	public int getDPM() {
-		//TODO
-		return 0;
+		return this.defensePowerModifier;
 	}
 
 	public int getAPM() {
-		//TODO
-		return 0;
+		return this.attackPowerModifier;
 	}
 
 	@Override

@@ -28,4 +28,26 @@ public class Vector2i {
     public boolean equals(Vector2i vect) {
         return this.x == vect.x && this.y == vect.y;
     }
+
+	public void add(Vector2i vect) {
+		this.x += vect.x;
+		this.y += vect.y;
+	}
+
+	public void add(Direction dir) {
+		switch(dir) {
+		case UP:
+			--this.y;
+			break;
+		case DOWN:
+			++this.y;
+			break;
+		case LEFT:
+			--this.x;
+			break;
+		case RIGHT:
+			++this.x;
+			break;
+		}
+	}
 }

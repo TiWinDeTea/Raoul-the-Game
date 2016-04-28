@@ -12,7 +12,7 @@ public class InteractiveObject {
 	private LivingThingType target;
 
 	public InteractiveObject(boolean isTrap) {
-		//TODO
+		this.isTrap = isTrap;
 	}
 
 	public void triger(LivingThing livingThing) {
