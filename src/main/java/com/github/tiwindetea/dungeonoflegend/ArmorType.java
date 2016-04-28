@@ -14,7 +14,12 @@ public enum ArmorType {
 
 		@Override
 		public String toString() {
-			return resourceBundle.getString("breast-plate");
+			return resourceBundle.getString("breast-plate.name");
+		}
+
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("breast-plate.sprite.position.x")),
+			  Integer.parseInt(resourceBundle.getString("breast-plate.sprite.position.y")));
 		}
 	},
 	GLOVES {
@@ -24,7 +29,12 @@ public enum ArmorType {
 
 		@Override
 		public String toString() {
-			return resourceBundle.getString("gloves");
+			return resourceBundle.getString("gloves.name");
+		}
+
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("gloves.sprite.position.x")),
+			  Integer.parseInt(resourceBundle.getString("gloves.sprite.position.y")));
 		}
 	},
 	HELMET {
@@ -34,7 +44,12 @@ public enum ArmorType {
 
 		@Override
 		public String toString() {
-			return resourceBundle.getString("helmet");
+			return resourceBundle.getString("helmet.name");
+		}
+
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("helmet.sprite.position.x")),
+			  Integer.parseInt(resourceBundle.getString("helmet.sprite.position.y")));
 		}
 	},
 	BOOTS {
@@ -44,7 +59,12 @@ public enum ArmorType {
 
 		@Override
 		public String toString() {
-			return resourceBundle.getString("boots");
+			return resourceBundle.getString("boots.name");
+		}
+
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("boots.sprite.position.x")),
+			  Integer.parseInt(resourceBundle.getString("boots.sprite.position.y")));
 		}
 	},
 	PANTS {
@@ -54,7 +74,12 @@ public enum ArmorType {
 
 		@Override
 		public String toString() {
-			return resourceBundle.getString("plants");
+			return resourceBundle.getString("pants.name");
+		}
+
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("pants.sprite.position.x")),
+			  Integer.parseInt(resourceBundle.getString("pants.sprite.position.y")));
 		}
 	};
 
@@ -68,6 +93,10 @@ public enum ArmorType {
 
 	@Override
 	public String toString() {
+		return null;
+	}
+
+	public Vector2i getSpritePosition() {
 		return null;
 	}
 
