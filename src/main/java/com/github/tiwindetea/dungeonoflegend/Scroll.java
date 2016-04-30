@@ -23,18 +23,15 @@ public class Scroll implements Consumable {
 		return this.healthModifierModifierPerTick;
 	}
 
-	@Override
 	public void trigger(LivingThing livingThing) {
 		//TODO
 	}
 
-	@Override
 	public boolean nextTick() {
 		//TODO
 		return false;
 	}
 
-	@Override
 	public ConsumableType getConsumableType() {
 		//TODO
 		return null;

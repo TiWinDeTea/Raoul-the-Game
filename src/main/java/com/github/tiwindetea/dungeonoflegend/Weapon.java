@@ -34,7 +34,6 @@ public class Weapon implements StorableObject {
 		return 0;
 	}
 
-	@Override
 	public StorableObjectType getType() {
 		//TODO
 		return null;

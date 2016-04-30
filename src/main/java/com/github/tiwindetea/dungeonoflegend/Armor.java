@@ -27,7 +27,6 @@ public class Armor implements StorableObject {
 		return this.type;
 	}
 
-	@Override
 	public StorableObjectType getType() {
 		return StorableObjectType.ARMOR;
 	}

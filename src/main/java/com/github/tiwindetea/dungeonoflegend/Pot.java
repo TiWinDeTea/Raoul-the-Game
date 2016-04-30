@@ -29,18 +29,15 @@ public class Pot implements Consumable {
 		return this.attackPowerModifier;
 	}
 
-	@Override
 	public void trigger(LivingThing livingThing) {
 		//TODO
 	}
 
-	@Override
 	public boolean nextTick() {
 		//TODO
 		return false;
 	}
 
-	@Override
 	public ConsumableType getConsumableType() {
 		//TODO
 		return null;

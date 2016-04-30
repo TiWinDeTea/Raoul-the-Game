@@ -55,11 +55,12 @@ public abstract class LivingThing {
 	}
 
 	public void damage(int damages) {
-		this.hitPoints -= damages;
+		if (damages > 0)
+			this.hitPoints -= damages;
 	}
 
 	public boolean isAlive() {
-		return (this.hitPoints <= 0);
+		return (this.hitPoints > 0);
 	}
 
 	public void print() {
