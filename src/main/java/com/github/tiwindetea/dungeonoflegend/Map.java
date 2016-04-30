@@ -64,30 +64,34 @@ public class Map {
         map.map[2][5] = Tile.WALL;
         Tile[][] LOS = map.getLOS(new Vector2i(4, 4), 4);
 
-        for (Tile[] tiles : LOS) {
-            for (Tile tile : tiles) {
-                switch (tile) {
-                    case WALL:
-                        System.out.print("#");
-                        break;
-                    case GROUND:
-                        System.out.print(".");
-                        break;
-                    case OPENED_DOOR:
-                        System.out.print("O");
-                        break;
-                    case CLOSED_DOOR:
-                        System.out.print("C");
-                        break;
-                    case STAIR_UP:
-                        break;
-                    case STAIR_DOWN:
-                        break;
-                    case UNKNOWN:
-                        System.out.print("?");
-                        break;
-                    default:
-                        System.out.print("-");
+        for (int i = 0; i < LOS.length; i++) {
+            for (int j = 0; j < LOS[i].length; j++) {
+                if (i == LOS.length / 2 && j == LOS[i].length / 2) {
+                    System.out.print("\033[35m@\033[0m");
+                } else {
+                    switch (LOS[i][j]) {
+                        case WALL:
+                            System.out.print("#");
+                            break;
+                        case GROUND:
+                            System.out.print(".");
+                            break;
+                        case OPENED_DOOR:
+                            System.out.print("O");
+                            break;
+                        case CLOSED_DOOR:
+                            System.out.print("X");
+                            break;
+                        case STAIR_UP:
+                            break;
+                        case STAIR_DOWN:
+                            break;
+                        case UNKNOWN:
+                            System.out.print("~");
+                            break;
+                        default:
+                            System.out.print("-");
+                    }
                 }
             }
             System.out.println();
@@ -95,10 +99,10 @@ public class Map {
     }
 
     public void triggerTile(Vector2i position, LivingThing target) {
-        for (int i = 0; i < interactiveObjects.size(); i++) {
-            if (interactiveObjects.get(i).getPosition().equals(position)) {
-                if (interactiveObjects.get(i).trigger(target)) {
-                    interactiveObjects.remove(i);
+        for (int i = 0; i < this.interactiveObjects.size(); i++) {
+            if (this.interactiveObjects.get(i).getPosition().equals(position)) {
+                if (this.interactiveObjects.get(i).trigger(target)) {
+                    this.interactiveObjects.remove(i);
                 }
             }
         }
@@ -134,6 +138,8 @@ public class Map {
         int j_start = Math.max(position.y - visionRange, 0);
         int j_end = Math.min(position.y + visionRange, this.map[0].length);
         int squaredVisionRange = (int) Math.pow(visionRange, 2);
+        int xlos_shift = position.x - visionRange - i_start;
+        int ylos_shift = position.y - visionRange - j_start;
 
         for (int i = 0; i < LOS.length; i++) {
             for (int j = 0; j < LOS[i].length; j++) {
@@ -145,7 +151,7 @@ public class Map {
             for (int j = j_start; j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
                     if (this.isVisibleFrom(new Vector2i(i, j), position)) {
-                        LOS[i][j] = this.map[i][j];
+                        LOS[i - xlos_shift][j - ylos_shift] = this.map[i][j];
                     }
                 }
             }
