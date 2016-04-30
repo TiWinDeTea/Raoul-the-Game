@@ -52,9 +52,11 @@ enum Tile{
     WALL
     ROOM
     CORRIDOR
-    DOOR
+    OPENED_DOOR
+    CLOSED_DOOR
     STAIR_UP
     STAIR_DOWN
+    UNKNOWN
 }
 
 LivingThingType -[hidden]right- StorableObjectType
@@ -208,35 +210,43 @@ Game --> Map
 Game -left-> HUD
 
 class Map {
+    + MIN_ROOM_WIDTH: final int
+    + MAX_ROOM_WIDTH: final int
+    + MIN_ROOM_HEIGHT: final int
+    + MAX_ROOM_HEIGHT: final int
+    + MIN_LEVEL_HEIGHT: final int;
+    + MAX_LEVEL_HEIGHT: final int;
     - seed: Seed
-    - mapGenerator: Random
     - stairsUpPosition: Vector2i
     - stairsDownPosition: Vector2i
+    - map: Tile[][]
     + Map()
     + Map(seed: Seed, stairsUpPosition: Vector2i)
-    + print(): void
-    + triggerTile(position: Vector2i, target: Creature): void
+    + triggerTile(position: Vector2i, target: LivingThing): void
     + getStairsUpPosition(): Vector2i
     + getStairsDownPosition(): Vector2i
     + getAlphaSeed(): int
     + getBetaSeed(): int
     + getTile(position: Vector2i): Tile
-    + getAreaAround(position: Vector2i, range: byte): Tile[][]
-    + generateNextLevel(): void
+    + getLOS(position: Vector2i, visionRange: byte): Tile[][]
+    + getSize(): Vector2i
+    + generateLevel(level: int): void
+    + restoreLevel(level: int): void
+    - isVisibleFrom(tilePosition: Vector2i,watcherPosition: Vector2i) : boolean
+    - generateLevel(level: int, withEntities: boolean): void
 }
 Map *--> InteractiveObject
 Map *-left-> Tile
 Map --> Seed
 
 class Seed {
-    - alphaSeed: int
-    - betaSeed: int
-    - level: int
+    - alphaSeed: long
+    - betaSeed: long
     + Seed()
-    + Seed(alphaSeed: int, betaSeed: int, level: int)
+    + Seed(alphaSeed: int, betaSeed: int)
     + getAlphaSeed(): int
     + getBetaSeed(): int
-    + nextRandomizer(): Random
+    + getRandomizer(level: int): Random
 }
 
 enum State{
@@ -259,7 +269,9 @@ class InteractiveObject{
     - hpModifier: int
     - loot: StorableObject
     - target: LivingThingType
+    - position: Vector2i
     + InteractiveObject(isTrap: boolean)
+    + getPosition(): Vector2i
     + triger(LivingThing: LivingThing): void
     + isActivableOn(type: LivingThingType): boolean
     + print(): void
