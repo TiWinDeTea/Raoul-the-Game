@@ -23,3 +23,5 @@ DungeonOfLegends.iml
 
 # Other
 DungeonOfLegends_pgs
+target/*
+out/*

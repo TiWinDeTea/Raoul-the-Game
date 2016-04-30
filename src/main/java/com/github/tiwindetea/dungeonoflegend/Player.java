@@ -6,7 +6,7 @@ import java.util.List;
  * Created by maxime on 4/23/16.
  */
 public class Player extends LivingThing {
-	private List<StorableObject> storableObjects;
+	private List<StorableObject> inventory;
 	private int maxStorageCapacity;
 	private int maxMana;
 	private int mana;
@@ -23,7 +23,7 @@ public class Player extends LivingThing {
 	}
 
 	public void addToInventory(StorableObject storable) {
-		this.storableObjects.add(storable);
+		this.inventory.add(storable);
 	}
 
 	public boolean useMana(int consumption) {
@@ -47,7 +47,7 @@ public class Player extends LivingThing {
 	}
 
 	public StorableObject[] getInventory() {
-		return (StorableObject[]) this.storableObjects.toArray();
+		return this.inventory.toArray(new StorableObject[this.inventory.size()]);
 	}
 
 	@Override
