@@ -10,21 +10,36 @@ public class InteractiveObject {
 	private int hpModifier;
 	private StorableObject loot;
 	private LivingThingType target;
+    private Vector2i position;
 
-	public InteractiveObject(boolean isTrap) {
-		this.isTrap = isTrap;
-	}
+    public InteractiveObject(boolean isTrap, Vector2i position) {
+        this.isTrap = isTrap;
+        this.position = position;
+    }
 
-	public void triger(LivingThing livingThing) {
-		//TODO
-	}
+    public boolean trigger(LivingThing livingThing) {
+        if (this.isTrap) {
+            livingThing.damage(this.hpModifier);
+            if (livingThing.getType() == LivingThingType.PLAYER)
+                ((Player) livingThing).useMana(this.manaModifier);
+            return true;
+        } else if (livingThing.getType() == LivingThingType.PLAYER) {
+            ((Player) livingThing).addToInventory(this.loot);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public boolean isActivableOn(LivingThingType type) {
-		//TODO
-		return false;
-	}
+    public boolean isActivableOn(LivingThingType type) {
+        return this.isTrap || type == LivingThingType.PLAYER;
+    }
 
-	public void print() {
-		//TODO
-	}
+    public Vector2i getPosition() {
+        return this.position;
+    }
+
+    public void print() {
+        //TODO
+    }
 }

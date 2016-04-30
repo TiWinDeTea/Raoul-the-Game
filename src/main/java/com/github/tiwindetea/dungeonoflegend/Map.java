@@ -95,10 +95,11 @@ public class Map {
     }
 
     public void triggerTile(Vector2i position, LivingThing target) {
-        for (InteractiveObject interactiveObject : this.interactiveObjects) {
-            if (interactiveObject.getPosition().equals(position)) {
-                interactiveObject.trigger(target);
-                return;
+        for (int i = 0; i < interactiveObjects.size(); i++) {
+            if (interactiveObjects.get(i).getPosition().equals(position)) {
+                if (interactiveObjects.get(i).trigger(target)) {
+                    interactiveObjects.remove(i);
+                }
             }
         }
     }

@@ -270,9 +270,9 @@ class InteractiveObject{
     - loot: StorableObject
     - target: LivingThingType
     - position: Vector2i
-    + InteractiveObject(isTrap: boolean)
+    + InteractiveObject(isTrap: boolean, position: Vector2i)
     + getPosition(): Vector2i
-    + triger(LivingThing: LivingThing): void
+    + trigger(LivingThing: LivingThing): boolean
     + isActivableOn(type: LivingThingType): boolean
     + print(): void
 }

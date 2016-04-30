@@ -23,7 +23,9 @@ public class Player extends LivingThing {
 	}
 
 	public void addToInventory(StorableObject storable) {
-		this.inventory.add(storable);
+		if (this.inventory.size() < this.maxStorageCapacity) {
+			this.inventory.add(storable);
+		}
 	}
 
 	public boolean useMana(int consumption) {
