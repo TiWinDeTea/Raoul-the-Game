@@ -131,15 +131,19 @@ public class Map {
     }
 
     public Tile[][] getLOS(Vector2i position, int visionRange) {
+        if (visionRange < 0) {
+            throw new IllegalArgumentException("visionRange should not be negative (value : " + visionRange);
+        }
+        if (position.x < 0 || position.y < 0 || position.x > this.map.length || position.y > this.map[0].length) {
+            throw new IllegalArgumentException("Watcher outside of the map !");
+        }
 
         Tile[][] LOS = new Tile[2 * visionRange + 1][2 * visionRange + 1];
-        int i_start = Math.max(position.x - visionRange, 0);
+        int squaredVisionRange = visionRange * visionRange;
+        int xlos_shift = position.x - visionRange - Math.max(position.x - visionRange, 0);
+        int ylos_shift = position.y - visionRange - Math.max(position.y - visionRange, 0);
         int i_end = Math.min(position.x + visionRange, this.map.length);
-        int j_start = Math.max(position.y - visionRange, 0);
         int j_end = Math.min(position.y + visionRange, this.map[0].length);
-        int squaredVisionRange = (int) Math.pow(visionRange, 2);
-        int xlos_shift = position.x - visionRange - i_start;
-        int ylos_shift = position.y - visionRange - j_start;
 
         for (int i = 0; i < LOS.length; i++) {
             for (int j = 0; j < LOS[i].length; j++) {
@@ -147,8 +151,8 @@ public class Map {
             }
         }
 
-        for (int i = i_start; i < i_end; ++i) {
-            for (int j = j_start; j < j_end; ++j) {
+        for (int i = Math.max(position.x - visionRange, 0); i < i_end; ++i) {
+            for (int j = Math.max(position.y - visionRange, 0); j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
                     if (this.isVisibleFrom(new Vector2i(i, j), position)) {
                         LOS[i - xlos_shift][j - ylos_shift] = this.map[i][j];
@@ -164,25 +168,30 @@ public class Map {
     }
 
     private boolean isVisibleFrom(Vector2i tilePosition, Vector2i watcherPosition) {
-
-        int distance = (int) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
+        float distance = (float) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
                 + Math.pow(tilePosition.y - watcherPosition.y, 2));
-        float xShifting = (watcherPosition.x - tilePosition.x);
-        float yShifting = (watcherPosition.y - tilePosition.y);
-        xShifting /= distance;
-        yShifting /= distance;
-        float x = tilePosition.x + 0.4f + xShifting;
-        float y = tilePosition.y + 0.4f + yShifting;
-        --distance;
 
-        for (int i = 0; i < distance; i++) {
-            if (this.map[(int) x][(int) y] == Tile.WALL || this.map[(int) x][(int) y] == Tile.CLOSED_DOOR)
-                return false;
-            x += xShifting;
-            y += yShifting;
+        if (distance != 0) {
+            float xShifting = (tilePosition.x - watcherPosition.x) / distance;
+            float yShifting = (tilePosition.y - watcherPosition.y) / distance;
+            float currentX = watcherPosition.x;
+            float currentY = watcherPosition.y;
+            int x, y;
+            float a = 0;
+
+            for (int i = (int) (Math.floor(distance)); i > 0; --i) {
+                currentX += xShifting;
+                currentY += yShifting;
+                x = Math.round(currentX);
+                y = Math.round(currentY);
+                if ((this.map[x][y] == Tile.WALL || this.map[x][y] == Tile.CLOSED_DOOR)
+                        && !tilePosition.equals(new Vector2i(x, y)))
+                    return false;
+            }
         }
         return true;
     }
+
 
     public void generateLevel(int level) {
         generateLevel(level, true);

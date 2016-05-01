@@ -50,4 +50,12 @@ public class Vector2i {
 			break;
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "Vector2i{" +
+				"x=" + x +
+				", y=" + y +
+				'}';
+	}
 }
