@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.Model;
+package com.github.tiwindetea.dungeonoflegend.model;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -67,9 +67,8 @@ public class Map {
         this.map[3][6] = Tile.WALL_TOP;
     }
 
-    public Map(Seed seed, Vector2i stairsUpPosition) {
+    public Map(Seed seed) {
         this.seed = seed;
-        this.stairsUpPosition = stairsUpPosition;
     }
 
     public static void main(String[] args) {
@@ -225,7 +224,6 @@ public class Map {
         return true;
     }
 
-
     public void generateLevel(int level) {
         generateLevel(level, true);
     }
@@ -239,7 +237,6 @@ public class Map {
         this.map = new Tile[random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) + MIN_LEVEL_WIDTH]
                 [random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) + MIN_LEVEL_HEIGHT];
 
-        //TODO: Generate the map
 
         if (withEntities) {
             //TODO: Generate the entities

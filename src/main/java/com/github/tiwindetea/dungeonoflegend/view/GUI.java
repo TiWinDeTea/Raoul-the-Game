@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.View;
+package com.github.tiwindetea.dungeonoflegend.view;
 
 /**
  * Created by maxime on 5/2/16.

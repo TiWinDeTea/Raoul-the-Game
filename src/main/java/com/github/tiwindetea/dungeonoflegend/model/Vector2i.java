@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.Model;
+package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
  * Created by organic-code on 4/17/16.

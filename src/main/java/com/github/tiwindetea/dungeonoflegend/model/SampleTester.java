@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.Model;
+package com.github.tiwindetea.dungeonoflegend.model;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -15,7 +15,6 @@ import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 
-import static com.github.tiwindetea.dungeonoflegend.Model.Tile.*;
 import static java.lang.Thread.sleep;
 
 /**
@@ -39,9 +38,9 @@ public class SampleTester extends Application {
             wallDownRight = Tile.WALL_DOWNRIGHT.getSpritePosition().multiply(this.xsize),
             ground = Tile.GROUND.getSpritePosition().multiply(this.xsize),
             unknown = Tile.UNKNOWN.getSpritePosition().multiply(this.xsize),
-            closedDoor = CLOSED_DOOR.getSpritePosition().multiply(this.xsize),
-            openedDoor = OPENED_DOOR.getSpritePosition().multiply(this.xsize),
-            stairUp = STAIR_UP.getSpritePosition().multiply(this.xsize),
+            closedDoor = Tile.CLOSED_DOOR.getSpritePosition().multiply(this.xsize),
+            openedDoor = Tile.OPENED_DOOR.getSpritePosition().multiply(this.xsize),
+            stairUp = Tile.STAIR_UP.getSpritePosition().multiply(this.xsize),
             stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize);
     double zoom = 1;
     Image objectTextures = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("objects.file"));

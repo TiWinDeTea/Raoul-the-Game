@@ -1,9 +1,11 @@
-package com.github.tiwindetea.dungeonoflegend.Model;
+package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
  * Created by maxime on 4/23/16.
  */
 public abstract class LivingThing {
+	Direction requestedAttack;
+	Direction requestedMove;
 	private Tile[][] sight;
 	private int level;
 	private int maxHitPoints;
@@ -11,8 +13,6 @@ public abstract class LivingThing {
 	private int attackPower;
 	private int defensePower;
 	private Vector2i position;
-	Direction requestedAttack;
-	Direction requestedMove;
 
 	public void updateSight(Tile[][] sight) {
 		this.sight = sight;
