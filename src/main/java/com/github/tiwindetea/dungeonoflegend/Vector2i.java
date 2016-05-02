@@ -29,12 +29,13 @@ public class Vector2i {
         return this.x == vect.x && this.y == vect.y;
     }
 
-	public void add(Vector2i vect) {
+	public Vector2i add(Vector2i vect) {
 		this.x += vect.x;
 		this.y += vect.y;
+		return this;
 	}
 
-	public void add(Direction dir) {
+	public Vector2i add(Direction dir) {
 		switch(dir) {
 		case UP:
 			--this.y;
@@ -49,13 +50,20 @@ public class Vector2i {
 			++this.x;
 			break;
 		}
+		return this;
+	}
+
+	public Vector2i multiply(int a) {
+		this.x *= a;
+		this.y *= a;
+		return this;
 	}
 
 	@Override
 	public String toString() {
 		return "Vector2i{" +
-				"x=" + x +
-				", y=" + y +
+				"x=" + this.x +
+				", y=" + this.y +
 				'}';
 	}
 }

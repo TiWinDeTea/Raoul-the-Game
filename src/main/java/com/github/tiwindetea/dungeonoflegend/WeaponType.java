@@ -32,7 +32,7 @@ public enum WeaponType {
 		}
 	};
 
-	private final static String bundleName = Package.name + ".WeaponType";
+	private final static String bundleName = MainPackage.name + ".WeaponType";
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 

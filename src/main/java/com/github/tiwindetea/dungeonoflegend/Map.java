@@ -19,7 +19,7 @@ public class Map {
     private Seed seed;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
-    private ArrayList<InteractiveObject> interactiveObjects;
+    private ArrayList<InteractiveObject> interactiveObjects = new ArrayList();
     private Tile[][] map;
 
     public Map() {
@@ -27,6 +27,44 @@ public class Map {
 
         Random rand = new Random();
         this.stairsUpPosition = new Vector2i(rand.nextInt(MIN_LEVEL_WIDTH - 10) + 5, rand.nextInt(MIN_LEVEL_HEIGHT - 10) + 5);
+        /* Sample test map, to be removed in further versions (TODO) */
+        this.map = new Tile[11][11];
+        this.map[0][0] = Tile.WALL_DOWNRIGHT;
+        this.map[this.map.length - 1][0] = Tile.WALL_TOPRIGHT;
+        this.map[this.map.length - 1][this.map[0].length - 1] = Tile.WALL_TOPLEFT;
+        this.map[0][this.map[0].length - 1] = Tile.WALL_DOWNLEFT;
+        for (int i = 1; i < this.map[0].length - 1; i++) {
+            this.map[0][i] = Tile.WALL_DOWN;
+            this.map[this.map.length - 1][i] = Tile.WALL_TOP;
+        }
+        for (int i = 1; i < this.map.length - 1; i++) {
+            this.map[i][0] = Tile.WALL_RIGHT;
+            this.map[i][this.map[0].length - 1] = Tile.WALL_LEFT;
+        }
+        for (int i = 1; i < this.map.length - 1; i++) {
+            for (int j = 1; j < this.map[i].length - 1; j++) {
+                this.map[i][j] = Tile.GROUND;
+            }
+        }
+
+        this.map[1][3] = Tile.WALL_DOWNLEFT;
+        this.map[2][3] = Tile.WALL_LEFT;
+        this.map[3][3] = Tile.WALL_LEFT;
+        this.map[4][1] = Tile.CLOSED_DOOR;
+        this.map[4][3] = Tile.WALL_TOPLEFT;
+        this.map[4][2] = Tile.WALL_TOP;
+        this.map[5][3] = Tile.CLOSED_DOOR;
+        this.map[6][2] = Tile.WALL_DOWN;
+        this.map[6][3] = Tile.WALL_DOWN;
+        this.map[6][4] = Tile.WALL_DOWN;
+        this.map[6][5] = Tile.WALL_RIGHT;
+        this.map[7][5] = Tile.CLOSED_DOOR;
+        this.map[8][5] = Tile.WALL_TOPRIGHT;
+        this.map[8][6] = Tile.WALL_TOP;
+        this.map[8][7] = Tile.WALL_TOP;
+        this.map[7][8] = Tile.WALL_TOP;
+        this.map[7][9] = Tile.WALL_TOP;
+        this.map[3][6] = Tile.WALL_TOP;
     }
 
     public Map(Seed seed, Vector2i stairsUpPosition) {
@@ -35,77 +73,72 @@ public class Map {
     }
 
     public static void main(String[] args) {
-        Map map = new Map();
-        map.map = new Tile[9][9];
-        for (int i = 0; i < map.map.length; i++) {
-            for (int j = 0; j < map.map[i].length; j++) {
-                map.map[i][j] = Tile.GROUND;
-            }
-        }
+        Map world = new Map();
 
-        map.map[0][0] = Tile.WALL;
-        map.map[0][1] = Tile.WALL;
-        map.map[0][2] = Tile.WALL;
-        map.map[1][2] = Tile.WALL;
-        map.map[2][2] = Tile.WALL;
-        map.map[3][2] = Tile.WALL;
-        map.map[3][1] = Tile.WALL;
-        map.map[4][1] = Tile.OPENED_DOOR;
-        map.map[5][1] = Tile.WALL;
-        map.map[5][2] = Tile.WALL;
-        map.map[5][3] = Tile.CLOSED_DOOR;
-        map.map[5][4] = Tile.WALL;
-        map.map[6][4] = Tile.WALL;
-        map.map[7][4] = Tile.WALL;
-        map.map[7][5] = Tile.WALL;
-        map.map[7][6] = Tile.WALL;
-        map.map[6][7] = Tile.WALL;
-        map.map[6][8] = Tile.WALL;
-        map.map[2][5] = Tile.WALL;
-        Tile[][] LOS = map.getLOS(new Vector2i(4, 4), 4);
+        Vector2i pos = new Vector2i(1, 1);
 
-        for (int i = 0; i < LOS.length; i++) {
-            for (int j = 0; j < LOS[i].length; j++) {
-                if (i == LOS.length / 2 && j == LOS[i].length / 2) {
-                    System.out.print("\033[35m@\033[0m");
-                } else {
-                    switch (LOS[i][j]) {
-                        case WALL:
+        for (pos.x = 0; pos.x < 9; ++pos.x) {
+            for (pos.y = 0; pos.y < 9; ++pos.y) {
+                System.out.println("position = " + pos);
+                Tile[][] LOS = world.getLOS(pos, 8);
+
+                for (int i = 0; i < LOS.length; i++) {
+                    for (int j = 0; j < LOS[i].length; j++) {
+                        if (i == LOS.length / 2 && j == LOS[i].length / 2) {
+                            System.out.print("\033[35m@\033[0m");
+                        } else if (Tile.isObstructed(LOS[i][j])) {
                             System.out.print("#");
-                            break;
-                        case GROUND:
-                            System.out.print(".");
-                            break;
-                        case OPENED_DOOR:
-                            System.out.print("O");
-                            break;
-                        case CLOSED_DOOR:
-                            System.out.print("X");
-                            break;
-                        case STAIR_UP:
-                            break;
-                        case STAIR_DOWN:
-                            break;
-                        case UNKNOWN:
-                            System.out.print("~");
-                            break;
-                        default:
-                            System.out.print("-");
+                        } else {
+                            switch (LOS[i][j]) {
+                                case GROUND:
+                                    System.out.print(".");
+                                    break;
+                                case OPENED_DOOR:
+                                    System.out.print("O");
+                                    break;
+                                case CLOSED_DOOR:
+                                    System.out.print("X");
+                                    break;
+                                case STAIR_UP:
+                                    System.out.print("*");
+                                    break;
+                                case STAIR_DOWN:
+                                    System.out.print(" ");
+                                    break;
+                                case UNKNOWN:
+                                    System.out.print("~");
+                                    break;
+                                default:
+                                    System.out.print("-");
+                            }
+                        }
                     }
+                    System.out.println("");
                 }
+                System.out.println("\n\n");
             }
-            System.out.println();
+            System.out.println("\n\n");
         }
     }
 
     public void triggerTile(Vector2i position, LivingThing target) {
-        for (int i = 0; i < this.interactiveObjects.size(); i++) {
-            if (this.interactiveObjects.get(i).getPosition().equals(position)) {
-                if (this.interactiveObjects.get(i).trigger(target)) {
-                    this.interactiveObjects.remove(i);
+        if (this.map[position.x][position.y] == Tile.CLOSED_DOOR) {
+            this.map[position.x][position.y] = Tile.OPENED_DOOR;
+        } else if (this.map[position.x][position.y] == Tile.OPENED_DOOR) {
+            this.map[position.x][position.y] = Tile.CLOSED_DOOR;
+        } else {
+            for (int i = 0; i < this.interactiveObjects.size(); i++) {
+                if (this.interactiveObjects.get(i).getPosition().equals(position)) {
+                    if (this.interactiveObjects.get(i).trigger(target)) {
+                        this.interactiveObjects.remove(i);
+                    }
                 }
             }
         }
+    }
+
+    public Tile[][] getMapCopy() {
+        return this.map.clone();
     }
 
     public Vector2i getStairsUpPosition() {
@@ -140,10 +173,10 @@ public class Map {
 
         Tile[][] LOS = new Tile[2 * visionRange + 1][2 * visionRange + 1];
         int squaredVisionRange = visionRange * visionRange;
-        int xlos_shift = position.x - visionRange - Math.max(position.x - visionRange, 0);
-        int ylos_shift = position.y - visionRange - Math.max(position.y - visionRange, 0);
-        int i_end = Math.min(position.x + visionRange, this.map.length);
-        int j_end = Math.min(position.y + visionRange, this.map[0].length);
+        int xlos_shift = position.x - visionRange;
+        int ylos_shift = position.y - visionRange;
+        int i_end = Math.min(position.x + visionRange + 1, this.map.length);
+        int j_end = Math.min(position.y + visionRange + 1, this.map[0].length);
 
         for (int i = 0; i < LOS.length; i++) {
             for (int j = 0; j < LOS[i].length; j++) {
@@ -184,7 +217,7 @@ public class Map {
                 currentY += yShifting;
                 x = Math.round(currentX);
                 y = Math.round(currentY);
-                if ((this.map[x][y] == Tile.WALL || this.map[x][y] == Tile.CLOSED_DOOR)
+                if (Tile.isObstructed(this.map[x][y])
                         && !tilePosition.equals(new Vector2i(x, y)))
                     return false;
             }

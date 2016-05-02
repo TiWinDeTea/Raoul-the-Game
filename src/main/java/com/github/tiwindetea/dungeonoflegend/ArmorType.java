@@ -83,7 +83,7 @@ public enum ArmorType {
 		}
 	};
 
-	private final static String bundleName = Package.name + ".ArmorType";
+	private final static String bundleName = MainPackage.name + ".ArmorType";
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 

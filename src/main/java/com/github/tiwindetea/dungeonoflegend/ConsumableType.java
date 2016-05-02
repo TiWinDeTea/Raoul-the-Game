@@ -30,7 +30,7 @@ public enum ConsumableType {
 		}
 	};
 
-	private final static String bundleName = Package.name + ".ConsumableType";
+	private final static String bundleName = MainPackage.name + ".ConsumableType";
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
