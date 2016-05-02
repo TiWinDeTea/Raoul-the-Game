@@ -1,13 +1,30 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.model.events.MoveEvent;
+import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by maxime on 4/24/16.
  */
 public class Game {
-	private static Game ourInstance = new Game();
+	private final List<EntityListener> listeners = new ArrayList<>();
 
-	public static Game getInstance() {
-		return ourInstance;
+	public void addEntityListener(EntityListener event) {
+		this.listeners.add(event);
+	}
+
+	public EntityListener[] getEntityListeners() {
+		return this.listeners.toArray(new EntityListener[this.listeners.size()]);
+	}
+
+	private void fireEntityMoved(int entityId, Vector2i oldPosition, Vector2i newPosition) {
+		MoveEvent event = new MoveEvent(entityId, oldPosition, newPosition);
+		for(EntityListener listener : this.listeners) {
+			listener.moveEntity(event);
+		}
 	}
 
 	private Game() {
