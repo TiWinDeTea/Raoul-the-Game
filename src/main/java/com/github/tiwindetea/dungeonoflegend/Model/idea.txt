@@ -1,0 +1,3 @@
+getSpritePosition(int level){
+    get("armor"+level+".sprite.position");
+}

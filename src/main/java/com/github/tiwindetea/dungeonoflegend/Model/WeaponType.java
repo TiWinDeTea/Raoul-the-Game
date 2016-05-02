@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend;
+package com.github.tiwindetea.dungeonoflegend.Model;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

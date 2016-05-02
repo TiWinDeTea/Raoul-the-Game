@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend;
+package com.github.tiwindetea.dungeonoflegend.Model;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -19,7 +19,7 @@ public class Map {
     private Seed seed;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
-    private ArrayList<InteractiveObject> interactiveObjects = new ArrayList();
+    private ArrayList<InteractiveObject> interactiveObjects = new ArrayList<>();
     private Tile[][] map;
 
     public Map() {

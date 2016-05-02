@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend;
+package com.github.tiwindetea.dungeonoflegend.Model;
 
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -15,7 +15,7 @@ import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
 
-import static com.github.tiwindetea.dungeonoflegend.Tile.*;
+import static com.github.tiwindetea.dungeonoflegend.Model.Tile.*;
 import static java.lang.Thread.sleep;
 
 /**
