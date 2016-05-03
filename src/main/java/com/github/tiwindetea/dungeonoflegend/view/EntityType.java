@@ -10,186 +10,160 @@ import java.util.ResourceBundle;
  * Created by maxime on 5/2/16.
  */
 public enum EntityType {
-	PLAYER {
+	PLAYER1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("player");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("player.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("player.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("player.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("player1.string");
 		}
 	},
-	HELMET {
+	PLAYER2 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("helmet");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("helmet.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("helmet.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("helmet.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("player2.string");
 		}
 	},
-	BREAST_PLATE {
+	HELMET1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("breast-plate");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("plate.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("plate.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("plate.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("helmet1.string");
 		}
 	},
-	PANTS {
+	HELMET2 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("pants");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("pants.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("pants.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("pants.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("helmet2.string");
 		}
 	},
-	BOOTS {
+	BREAST_PLATE1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("boots");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("boots.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("boots.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("boots.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("breast-plate1.string");
 		}
 	},
-	GLOVES {
+	BREAST_PLATE2 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("gloves");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("gloves.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("gloves.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("gloves.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("breast-plate2.string");
 		}
 	},
-	BOW {
+	PANTS1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("bow");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("bow.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("bow.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("bow.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("pants1.string");
 		}
 	},
-	SWORD {
+	PANTS2 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("sword");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("sword.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("sword.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("sword.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("pants2.string");
 		}
 	},
-	WAND {
+	BOOTS1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("wand");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("wand.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("wand.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("wand.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("boots1.string");
 		}
 	},
-	POT {
+	BOOTS2 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("pot");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("pot.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("pot.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("pot.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("boots2.string");
 		}
 	},
-	SCROLL {
+	GLOVES1 {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("scroll");
+			return resourceBundle.getString("gloves1.string");
 		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("scroll.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("scroll.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("scroll.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+	},
+	GLOVES2 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("gloves2.string");
+		}
+	},
+	BOW1 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("bow1.string");
+		}
+	},
+	BOW2 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("bow2.string");
+		}
+	},
+	SWORD1 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("sword1.string");
+		}
+	},
+	SWORD2 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("sword2.string");
+		}
+	},
+	WAND1 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("wand1.string");
+		}
+	},
+	WAND2 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("wand2.string");
+		}
+	},
+	HEALING_POT {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("healing-pot.string");
+		}
+	},
+	MANA_POT {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("mana-pot.string");
+		}
+	},
+	SUPER_POT {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("super-pot.string");
+		}
+	},
+	SCROLL1 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("scroll1.string");
+		}
+	},
+	SCROLL2 {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("scroll2.string");
 		}
 	},
 	TRAP {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("trap");
+			return resourceBundle.getString("trap.string");
 		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("trap.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("trap.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("trap.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+	},
+	ACTIVATED_TRAP {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("activated-trap.string");
 		}
 	},
 	CHEST {
 		@Override
 		public String toString() {
-			return resourceBundle.getString("chest");
-		}
-
-		public Vector2i getSpritePosition(int spriteVersion) {
-			if(spriteVersion <= Integer.parseInt(resourceBundle.getString("chest.versions")) && spriteVersion > 0) {
-				return new Vector2i(Integer.parseInt(resourceBundle.getString("chest.v" + spriteVersion + ".sprite.position.x")),
-				  Integer.parseInt(resourceBundle.getString("chest.v" + spriteVersion + ".sprite.position.y")));
-			}
-			return null;
+			return resourceBundle.getString("chest.string");
 		}
 	};
 
@@ -202,7 +176,25 @@ public enum EntityType {
 		return null;
 	}
 
-	public Vector2i getSpritePosition(int versionNumber) {
-		return null;
+	public Vector2i getSpritesPosition() {
+		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.position.x")),
+		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.position.y")));
+	}
+
+	public int getSpritesNumber() {
+		return Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.number"));
+	}
+
+	public int getAnimationSpeed() {
+		if(this.getSpritesNumber() > 1)
+			return Integer.parseInt(resourceBundle.getString(this.toString() + ".animation.speed.millseconds"));
+		return -1;
+	}
+
+	public static void main(String[] args) {
+		EntityType ent = EntityType.SUPER_POT;
+		System.out.println(ent.getSpritesPosition());
+		System.out.println(ent.getSpritesNumber());
+		System.out.println(ent.getAnimationSpeed());
 	}
 }
