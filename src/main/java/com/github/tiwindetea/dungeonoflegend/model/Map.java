@@ -223,9 +223,116 @@ public class Map {
                 && (retries < RETRIES_NBR || rooms.size() < MIN_ROOM_NUMBER || corridors.size() < MIN_CORRIDOR_NBR)
                 && retries < 5 * Byte.MAX_VALUE);
 
+        for (int i = 0; i < rooms.size(); ++i) {
+            for (int j = i + 1; j < rooms.size(); ++j) {
+                if (REBIND_ROOM_TO_ROOM_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                    rebind(rooms.get(i), rooms.get(j), true);
+                }
+            }
+            for (Room corridor1 : corridors) {
+                if (REBIND_ROOM_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                    rebind(rooms.get(i), corridor1, true);
+                }
+            }
+        }
+        for (int i = 0; i < corridors.size(); ++i) {
+            for (int j = i + 1; j < corridors.size(); ++j) {
+                if (REBIND_CORRIDOR_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                    rebind(corridors.get(i), corridors.get(j), false);
+                }
+            }
+        }
+
+
         if (withEntities) {
             //TODO: Generate the entities ?
         }
+    }
+
+    private void rebind(Room source, Room target, boolean door) {
+        int min, max, tmp, nbr;
+        Tile tile = door ? Tile.CLOSED_DOOR : Tile.GROUND;
+        if (source.top.y - 2 == target.bottom.y) {
+            if (source.top.x < target.bottom.x && source.bottom.x >= target.top.x) {
+                min = Math.max(source.top.x, target.top.x);
+                tmp = Math.min(source.bottom.x, target.bottom.x);
+                max = Math.max(min, tmp);
+                min = min + tmp - max;
+                tmp = source.top.y - 1;
+                for (int i = min; i <= max; ++i) {
+                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                        return;
+                }
+                if (max != min) {
+                    nbr = this.random.nextInt(max - min) + min;
+                } else {
+                    nbr = min;
+                }
+                this.map[nbr][tmp] = tile;
+                reconstrucWalls(source, target, new Vector2i(nbr, tmp));
+            }
+        } else if (source.bottom.y + 2 == target.top.y) {
+            if (source.top.x < target.bottom.x && source.bottom.x >= target.top.x) {
+                min = Math.max(source.top.x, target.top.x);
+                tmp = Math.min(source.bottom.x, target.bottom.x);
+                max = Math.max(min, tmp);
+                min = min + tmp - max;
+                tmp = source.bottom.y + 1;
+                for (int i = min; i <= max; ++i) {
+                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                        return;
+                }
+                if (max != min) {
+                    nbr = this.random.nextInt(max - min) + min;
+                } else {
+                    nbr = min;
+                }
+                this.map[min][tmp] = tile;
+                reconstrucWalls(source, target, new Vector2i(nbr, tmp));
+            }
+        } else if (source.top.x - 2 == target.bottom.x) {
+            if (source.top.y < target.bottom.y && source.bottom.y >= target.top.y) {
+                min = Math.max(source.top.y, target.top.y);
+                tmp = Math.min(source.bottom.y, target.bottom.y);
+                max = Math.max(min, tmp);
+                min = min + tmp - max;
+                tmp = source.top.x - 1;
+                for (int i = min; i <= max; ++i) {
+                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                        return;
+                }
+                if (max != min) {
+                    nbr = this.random.nextInt(max - min) + min;
+                } else {
+                    nbr = min;
+                }
+                this.map[tmp][nbr] = tile;
+                reconstrucWalls(source, target, new Vector2i(tmp, nbr));
+            }
+        } else if (source.bottom.x + 2 == target.top.x) {
+            if (source.top.y < target.bottom.y && source.bottom.y >= target.top.y) {
+                min = Math.max(source.top.y, target.top.y);
+                tmp = Math.min(source.bottom.y, target.bottom.y);
+                max = Math.max(min, tmp);
+                min = min + tmp - max;
+                tmp = source.bottom.x + 1;
+                for (int i = min; i <= max; ++i) {
+                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                        return;
+                }
+                if (max != min) {
+                    nbr = this.random.nextInt(max - min) + min;
+                } else {
+                    nbr = min;
+                }
+                this.map[tmp][nbr] = tile;
+                reconstrucWalls(source, target, new Vector2i(tmp, nbr));
+            }
+        }
+    }
+
+    private void reconstrucWalls(Room source1, Room source2, Vector2i replacedTile) {
+        // TODO
     }
 
     private boolean isPlaceable(Room room) {
@@ -336,7 +443,7 @@ public class Map {
             this.map[doorX][doorY] = Tile.CLOSED_DOOR;
         } else {
             this.map[doorX][doorY] = Tile.GROUND;
-            // TODO : remettre les murs comme il faut
+            reconstrucWalls(link, room, new Vector2i(doorX, doorY));
         }
         return room;
     }
