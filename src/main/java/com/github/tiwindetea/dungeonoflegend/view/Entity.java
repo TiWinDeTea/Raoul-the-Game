@@ -14,18 +14,18 @@ import javafx.util.Duration;
 public class Entity {
 	private static final Vector2i spriteSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution")));
 	private EntityType entityType;
-	private Image texture;
-	private ImageView sprite = new ImageView();
+	private Image image;
+	private ImageView imageView = new ImageView();
 	private Vector2i position;
 	private boolean animated;
 	private Animation animation;
 
 	public Entity(EntityType entityType, Vector2i position) {
-		this.position = position;
+		this.setPosition(position);
 		this.entityType = entityType;
 		Image texture = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("players.file"));
-		this.sprite.setImage(texture);
-		this.sprite.setViewport(new Rectangle2D(entityType.getSpritesPosition().x * spriteSize.x, entityType.getSpritesPosition().y * spriteSize.y, spriteSize.x, spriteSize.y));
+		this.imageView.setImage(texture);
+		this.imageView.setViewport(new Rectangle2D(entityType.getSpritesPosition().x * spriteSize.x, entityType.getSpritesPosition().y * spriteSize.y, spriteSize.x, spriteSize.y));
 
 		if(entityType.getSpritesNumber() > 1) {
 			this.animate();
@@ -34,8 +34,22 @@ public class Entity {
 
 	private void animate() {
 		this.animated = true;
-		this.animation = new SpriteAnimation(this.sprite, this.entityType.getSpritesNumber(), this.entityType.getSpritesPosition(), spriteSize, Duration.millis(this.entityType.getAnimationSpeed()));
+		this.animation = new SpriteAnimation(this.imageView, this.entityType.getSpritesNumber(), this.entityType.getSpritesPosition(), spriteSize, Duration.millis(this.entityType.getAnimationSpeed()));
 		this.animation.setCycleCount(Animation.INDEFINITE);
 		this.animation.play();
+	}
+
+	public Vector2i getPosition() {
+		return this.position;
+	}
+
+	public void setPosition(Vector2i position) {
+		this.position = new Vector2i(position);
+		this.imageView.setTranslateX(position.x);
+		this.imageView.setTranslateY(position.y);
+	}
+
+	public ImageView getImageView() {
+		return this.imageView;
 	}
 }
