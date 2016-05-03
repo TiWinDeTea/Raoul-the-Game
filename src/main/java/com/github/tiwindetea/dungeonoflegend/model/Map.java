@@ -11,12 +11,25 @@ public class Map {
     public static final int MAX_ROOM_WIDTH = 12;
     public static final int MIN_ROOM_HEIGHT = 3;
     public static final int MAX_ROOM_HEIGHT = 12;
-    public static final int MIN_LEVEL_WIDTH = 80;
-    public static final int MAX_LEVEL_WIDTH = 120;
-    public static final int MIN_LEVEL_HEIGHT = 80;
-    public static final int MAX_LEVEL_HEIGHT = 120;
+    public static final int MIN_LEVEL_WIDTH = 40;
+    public static final int MAX_LEVEL_WIDTH = 60;
+    public static final int MIN_LEVEL_HEIGHT = 30;
+    public static final int MAX_LEVEL_HEIGHT = 34;
+    public static final int MIN_ROOM_NUMBER = 5;
+    public static final int MAX_ROOM_NUMBER = 12;
+    public static final int MIN_CORRIDOR_NBR = 4;
+    public static final int MAX_CORRIDOR_NBR = 7;
+    public static final int MIN_CORRIDOR_LENGTH = 3;
+    public static final int MAX_CORRIDOR_LENGTH = 6;
+    public static final int RETRIES_NBR = 100;
+    public static final int PROBABILITY_UNIT = 100;
+    public static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
+    public static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 10;
+    public static final int PILLAR_PROBABILITY = 75;
+    public static final int MAX_PILLAR_NBR_PER_ROOM = 5;
 
     private Seed seed;
+    private Random random;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
     private ArrayList<InteractiveObject> interactiveObjects = new ArrayList<>();
@@ -99,6 +112,8 @@ public class Map {
                                     System.out.print("X");
                                     break;
                                 case STAIR_UP:
+
+
                                     System.out.print("*");
                                     break;
                                 case STAIR_DOWN:
@@ -200,6 +215,7 @@ public class Map {
     }
 
     private boolean isVisibleFrom(Vector2i tilePosition, Vector2i watcherPosition) {
+        ArrayList<String> test;
         float distance = (float) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
                 + Math.pow(tilePosition.y - watcherPosition.y, 2));
 
@@ -233,13 +249,303 @@ public class Map {
     }
 
     private void generateLevel(int level, boolean withEntities) {
-        Random random = this.seed.getRandomizer(level);
-        this.map = new Tile[random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) + MIN_LEVEL_WIDTH]
-                [random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) + MIN_LEVEL_HEIGHT];
+        ArrayList<Room> rooms = new ArrayList<>();
+        ArrayList<Room> corridors = new ArrayList<>();
+        int retries = 0;
 
+        this.random = this.seed.getRandomizer(level);
+        this.map = new Tile[this.random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) + MIN_LEVEL_WIDTH]
+                [this.random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) + MIN_LEVEL_HEIGHT];
+        for (int i = 0; i < this.map.length; i++) {
+            for (int j = 0; j < this.map[i].length; j++) {
+                this.map[i][j] = Tile.UNKNOWN;
+            }
+        }
+
+        int roomNbr = this.random.nextInt(MAX_ROOM_NUMBER - MIN_ROOM_NUMBER) + MIN_ROOM_NUMBER;
+        int corridorNbr = this.random.nextInt(MAX_CORRIDOR_NBR - MIN_CORRIDOR_NBR) + MIN_CORRIDOR_NBR;
+        int x, y, width, height;
+        Room room, corridor;
+
+        do {
+            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
+            x = this.random.nextInt(this.map.length / 2 - 5 - width) + 10 - height;
+            y = this.random.nextInt(this.map.length / 2 - 5 - height) + 10 + height;
+            room = new Room(x, y, x + width, y + height);
+        } while (!isPlaceable(room));
+
+        rooms.add(room);
+        room.print();
+        do {
+            corridor = generateCorridor(room);
+        } while (corridor == null);
+        corridors.add(corridor);
+
+        do {
+            ++retries;
+            if (this.random.nextInt(roomNbr - rooms.size() + corridorNbr - corridors.size()) < (corridorNbr - corridors.size())) {
+                if (CORRIDOR_BINDED_TO_CORRIDOR_CHANCE >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
+                    corridor = generateCorridor(corridors.get(this.random.nextInt(corridors.size())));
+                } else {
+                    corridor = generateCorridor(rooms.get(this.random.nextInt(rooms.size())));
+                }
+                if (corridor != null) {
+                    retries = 0;
+                    corridors.add(corridor);
+                }
+            } else {
+                if (ROOM_BINDED_TO_CORRIDOR_CHANCE >= this.random.nextInt(PROBABILITY_UNIT)) {
+                    room = generateRoom(corridors.get(this.random.nextInt(corridors.size())));
+                } else {
+                    room = generateRoom(rooms.get(this.random.nextInt(rooms.size())));
+                }
+                if (room != null) {
+                    retries = 0;
+                    rooms.add(room);
+                }
+            }
+        }
+        while ((rooms.size() < roomNbr || corridors.size() < corridorNbr)
+                && (retries < RETRIES_NBR || rooms.size() < MIN_ROOM_NUMBER || corridors.size() < MIN_CORRIDOR_NBR)
+                && retries < 5 * Byte.MAX_VALUE);
 
         if (withEntities) {
-            //TODO: Generate the entities
+            //TODO: Generate the entities ?
+        }
+    }
+
+    private boolean isPlaceable(Room room) {
+        if (room.top.x < 1 || room.top.y < 1 || room.bottom.x >= this.map.length - 1 || room.bottom.y >= this.map[0].length - 1)
+            return false;
+        for (int i = room.top.x; i <= room.bottom.x; ++i) {
+            for (int j = room.top.y; j <= room.bottom.y; ++j) {
+                if (this.map[i][j] != Tile.UNKNOWN) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private Room generateCorridor(Room link) {
+        int x, y;
+        int doorX, doorY;
+        int height = 0, width = 0;
+        Room corridor;
+        switch (this.random.nextInt(4)) {
+            case 0:
+                x = link.bottom.x + 1;
+                if (link.bottom.y == link.top.y) {
+                    y = link.top.y;
+                } else {
+                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
+                }
+                doorX = x - 1;
+                doorY = y;
+                width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                break;
+            case 1:
+                x = link.top.x - 2;
+                if (link.bottom.y == link.top.y) {
+                    y = link.top.y;
+                } else {
+                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
+                }
+                doorX = x + 1;
+                doorY = y;
+                width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                x -= width;
+                break;
+            case 2:
+                if (link.bottom.x == link.top.x) {
+                    x = link.top.x;
+                } else {
+                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
+                }
+                y = link.bottom.y + 1;
+                doorX = x;
+                doorY = y - 1;
+                height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                break;
+            case 3:
+                /* Falls through */
+            default:
+                if (link.bottom.x == link.top.x) {
+                    x = link.top.x;
+                } else {
+                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
+                }
+                y = link.top.y - 2;
+                doorX = x;
+                doorY = y + 1;
+                height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                y -= height;
+                break;
+        }
+        corridor = new Room(x, y, x + width, y + height);
+        int a = 0;
+        a++;
+        if (!isPlaceable(corridor)) {
+            return null;
+        }
+        corridor.print();
+        this.map[doorX][doorY] = Tile.CLOSED_DOOR;
+        return corridor;
+    }
+
+    private Room generateRoom(Room link) {
+        Room room;
+        int x, y, tmp;
+        int doorX, doorY;
+        int height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
+        int width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+        tmp = this.random.nextInt(4);
+        switch (tmp) {
+            case 0:
+                x = link.bottom.x + 1;
+                if (link.bottom.y == link.top.y) {
+                    y = link.top.y;
+                } else {
+                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
+                }
+                doorX = x - 1;
+                doorY = y;
+                if (this.random.nextBoolean()) {
+                    y -= height;
+                }
+                break;
+            case 1:
+                x = link.top.x - 2;
+                if (link.bottom.y == link.top.y) {
+                    y = link.top.y;
+                } else {
+                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
+                }
+                doorX = x + 1;
+                doorY = y;
+                x -= width;
+                if (this.random.nextBoolean()) {
+                    y -= height;
+                }
+                break;
+            case 2:
+                if (link.bottom.x == link.top.x) {
+                    x = link.top.x;
+                } else {
+                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
+                }
+                y = link.bottom.y + 1;
+                doorX = x;
+                doorY = y - 1;
+                if (this.random.nextBoolean()) {
+                    x -= width;
+                }
+                break;
+            case 3:
+                /* Falls through */
+            default:
+                if (link.bottom.x == link.top.x) {
+                    x = link.top.x;
+                } else {
+                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
+                }
+                y = link.top.y - 2;
+                doorX = x;
+                doorY = y + 1;
+                y -= height;
+                if (this.random.nextBoolean()) {
+                    x -= width;
+                }
+                break;
+        }
+        room = new Room(x, y, x + width, y + height);
+        if (!isPlaceable(room)) {
+            return null;
+        }
+        room.print();
+        this.map[doorX][doorY] = Tile.CLOSED_DOOR;
+        return room;
+    }
+
+    private class Room {
+        private Vector2i top;
+        private Vector2i bottom;
+
+        public Room(Vector2i top, Vector2i bottom) {
+            this.top = top;
+            this.bottom = bottom;
+        }
+
+        public Room(int x1, int y1, int x2, int y2) {
+            this(new Vector2i(x1, y1), new Vector2i(x2, y2));
+        }
+
+        public void print() {
+            for (int i = this.top.x; i <= this.bottom.x; ++i) {
+                Map.this.map[i][this.top.y - 1] = Tile.WALL_DOWN;
+                Map.this.map[i][this.bottom.y + 1] = Tile.WALL_TOP;
+                for (int j = this.top.y; j <= this.bottom.y; ++j) {
+                    Map.this.map[i][j] = Tile.GROUND;
+                }
+            }
+            for (int i = this.top.y; i <= this.bottom.y; ++i) {
+                Map.this.map[this.top.x - 1][i] = Tile.WALL_RIGHT;
+                Map.this.map[this.bottom.x + 1][i] = Tile.WALL_LEFT;
+            }
+            Map.this.map[this.top.x - 1][this.top.y - 1] = Tile.WALL_DOWNRIGHT;
+            Map.this.map[this.top.x - 1][this.bottom.y + 1] = Tile.WALL_TOPRIGHT;
+            Map.this.map[this.bottom.x + 1][this.top.y - 1] = Tile.WALL_DOWNLEFT;
+            Map.this.map[this.bottom.x + 1][this.bottom.y + 1] = Tile.WALL_TOPLEFT;
+
+            int minimum = Math.min(this.bottom.x - this.top.x, this.bottom.y - this.top.y);
+            if (minimum > 2) {
+                for (int i = 0; i < MAX_PILLAR_NBR_PER_ROOM; ++i) {
+                    if (minimum > 2 + i && PILLAR_PROBABILITY >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
+                        this.randomPillar();
+                    }
+                }
+            }
+        }
+
+        private void randomPillar() {
+            int x, y;
+            do {
+                x = Map.this.random.nextInt(this.bottom.x - this.top.x - 2) + this.top.x + 1;
+                y = Map.this.random.nextInt(this.bottom.y - this.top.y - 2) + this.top.y + 1;
+            } while (Map.this.map[x][y] != Tile.GROUND);
+            switch (Map.this.random.nextInt(4)) {
+                case 0:
+                    Map.this.map[x][y] = Tile.WALL_TOP;
+                    break;
+                case 1:
+                    Map.this.map[x][y] = Tile.WALL_RIGHT;
+                    break;
+                case 2:
+                    Map.this.map[x][y] = Tile.WALL_LEFT;
+                    break;
+                case 3:
+                    /* Falls through */
+                default:
+                    Map.this.map[x][y] = Tile.WALL_DOWN;
+                    break;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "Room{" +
+                    "top=" + this.top +
+                    ", bottom=" + this.bottom +
+                    '}';
+        }
+
+        public Vector2i top() {
+            return this.top;
+        }
+
+        public Vector2i bottom() {
+            return this.bottom;
         }
     }
 }

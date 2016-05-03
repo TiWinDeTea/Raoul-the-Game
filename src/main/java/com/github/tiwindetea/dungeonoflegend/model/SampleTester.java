@@ -54,6 +54,14 @@ public class SampleTester extends Application {
 
     @Override
     public void start(final Stage primaryStage) throws Exception {
+        this.world.generateLevel(0);
+        while (this.world.getTile(this.pos) != Tile.GROUND) {
+            ++this.pos.x;
+            if (this.pos.x >= this.world.getSize().x) {
+                this.pos.x = 1;
+                ++this.pos.y;
+            }
+        }
         primaryStage.initStyle(StageStyle.UNDECORATED);
         this.heroe.setSmooth(false);
         final Scene scene = new Scene(this.root, this.xsize * (2 * this.los + 1), this.ysize * (2 * this.los + 1), Color.GRAY);
@@ -89,8 +97,8 @@ public class SampleTester extends Application {
                 if (input.contains("LEFT")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(96, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.y > 0)
-                        SampleTester.this.pos.y--;
+                    if (SampleTester.this.pos.x > 0)
+                        SampleTester.this.pos.x--;
                     if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
                         in = true;
                     else
@@ -101,8 +109,8 @@ public class SampleTester extends Application {
                 if (input.contains("RIGHT")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(64, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.y < SampleTester.this.world.getSize().y - 1)
-                        SampleTester.this.pos.y++;
+                    if (SampleTester.this.pos.x < SampleTester.this.world.getSize().x - 1)
+                        SampleTester.this.pos.x++;
                     if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
                         in = true;
                     else
@@ -112,8 +120,8 @@ public class SampleTester extends Application {
                 if (input.contains("UP")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(32, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.x > 0)
-                        SampleTester.this.pos.x--;
+                    if (SampleTester.this.pos.y > 0)
+                        SampleTester.this.pos.y--;
                     if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
                         in = true;
                     else
@@ -147,8 +155,8 @@ public class SampleTester extends Application {
                 if (input.contains("DOWN")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(0, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.x < SampleTester.this.world.getSize().x - 1)
-                        SampleTester.this.pos.x++;
+                    if (SampleTester.this.pos.y < SampleTester.this.world.getSize().y - 1)
+                        SampleTester.this.pos.y++;
                     if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
                         in = true;
                     else
@@ -213,8 +221,8 @@ public class SampleTester extends Application {
                     SampleTester.this.heroe.setFitHeight(SampleTester.this.ysize * SampleTester.this.zoom);
                     SampleTester.this.heroe.setFitWidth(SampleTester.this.xsize * SampleTester.this.zoom);
                     if (SampleTester.this.allVisible) {
-                        SampleTester.this.heroe.setTranslateY(SampleTester.this.pos.x * SampleTester.this.xsize * SampleTester.this.zoom);
-                        SampleTester.this.heroe.setTranslateX(SampleTester.this.pos.y * SampleTester.this.ysize * SampleTester.this.zoom);
+                        SampleTester.this.heroe.setTranslateX(SampleTester.this.pos.x * SampleTester.this.xsize * SampleTester.this.zoom);
+                        SampleTester.this.heroe.setTranslateY(SampleTester.this.pos.y * SampleTester.this.ysize * SampleTester.this.zoom);
                     } else {
                         SampleTester.this.heroe.setTranslateY((primaryStage.getHeight() - SampleTester.this.ysize * SampleTester.this.zoom) / 2);
                         SampleTester.this.heroe.setTranslateX((primaryStage.getWidth() - SampleTester.this.xsize * SampleTester.this.zoom) / 2);
@@ -231,8 +239,8 @@ public class SampleTester extends Application {
 
         this.drawEnvironement();
         if (this.allVisible) {
-            this.heroe.setTranslateY(this.pos.x * this.xsize);
-            this.heroe.setTranslateX(this.pos.y * this.ysize);
+            this.heroe.setTranslateX(this.pos.x * this.xsize);
+            this.heroe.setTranslateY(this.pos.y * this.ysize);
         } else {
             this.heroe.setTranslateY((scene.getHeight() - this.ysize) / 2);
             this.heroe.setTranslateX((scene.getWidth() - this.xsize) / 2);
@@ -311,8 +319,8 @@ public class SampleTester extends Application {
                 sprite.setViewport(new Rectangle2D(place.x, place.y, this.xsize, this.ysize));
                 sprite.setFitWidth(SampleTester.this.xsize * SampleTester.this.zoom);
                 sprite.setFitHeight(SampleTester.this.ysize * SampleTester.this.zoom);
-                sprite.setTranslateX(j * this.xsize * this.zoom);
-                sprite.setTranslateY(i * this.ysize * this.zoom);
+                sprite.setTranslateY(j * this.xsize * this.zoom);
+                sprite.setTranslateX(i * this.ysize * this.zoom);
                 this.root.getChildren().add(sprite);
             }
         }

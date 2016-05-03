@@ -1,0 +1,6 @@
+1- Lumière(s) à éteindre à chaque niveau, avant de pouvoir accéder aux escaliers
+2- Système de scoring
+3- Sauvegarde
+4- Inventaire partagé
+5- LOS par entités (en tableau de booléens ~ bonus)
+6- L'ampoule à éteindre à une LOS
