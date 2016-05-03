@@ -54,6 +54,12 @@ public enum Tile {
 					Integer.parseInt(resourceBundle.getString("wall-downright.sprite.position.y")));
 		}
 	},
+	PILLAR {
+		public Vector2i getSpritePosition() {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("pillar.sprite.position.x")),
+					Integer.parseInt(resourceBundle.getString("pillar.sprite.position.y")));
+		}
+	},
 	GROUND {
 		public Vector2i getSpritePosition() {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("ground.sprite.position.x")),
@@ -106,6 +112,7 @@ public enum Tile {
 			case WALL_DOWNLEFT:
 			case WALL_DOWNRIGHT:
 			case CLOSED_DOOR:
+			case PILLAR:
 				return true;
 			case GROUND:
 			case OPENED_DOOR:

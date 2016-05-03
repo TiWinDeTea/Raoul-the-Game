@@ -1,15 +1,20 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.sun.javafx.tk.FontLoader;
+import com.sun.javafx.tk.Toolkit;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -27,6 +32,7 @@ public class SampleTester extends Application {
     boolean allVisible = false;
     int player = 0;
     int los = 5;
+    int level = 0;
     Vector2i pos = new Vector2i(1, 1);
     Vector2i wallDown = Tile.WALL_DOWN.getSpritePosition().multiply(this.xsize),
             wallUp = Tile.WALL_TOP.getSpritePosition().multiply(this.xsize),
@@ -41,10 +47,11 @@ public class SampleTester extends Application {
             closedDoor = Tile.CLOSED_DOOR.getSpritePosition().multiply(this.xsize),
             openedDoor = Tile.OPENED_DOOR.getSpritePosition().multiply(this.xsize),
             stairUp = Tile.STAIR_UP.getSpritePosition().multiply(this.xsize),
-            stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize);
+            stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize),
+            pillar = Tile.PILLAR.getSpritePosition().multiply(this.xsize);
     double zoom = 1;
     Image objectTextures = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("objects.file"));
-    Map world = new Map();
+    Map world = new Map(new Seed(10, 10));
     Group root = new Group();
     ImageView heroe = new ImageView();
 
@@ -54,7 +61,7 @@ public class SampleTester extends Application {
 
     @Override
     public void start(final Stage primaryStage) throws Exception {
-        this.world.generateLevel(0);
+        this.world.generateLevel(this.level);
         while (this.world.getTile(this.pos) != Tile.GROUND) {
             ++this.pos.x;
             if (this.pos.x >= this.world.getSize().x) {
@@ -215,6 +222,28 @@ public class SampleTester extends Application {
                     }
                 }
 
+                if (input.contains("N")) {
+                    ++SampleTester.this.level;
+                    SampleTester.this.world.generateLevel(SampleTester.this.level);
+                    SampleTester.this.world.generateLevel(SampleTester.this.level);
+                    SampleTester.this.pos = new Vector2i(0, 0);
+                    while (SampleTester.this.world.getTile(SampleTester.this.pos) != Tile.GROUND) {
+                        ++SampleTester.this.pos.x;
+                        if (SampleTester.this.pos.x >= SampleTester.this.world.getSize().x) {
+                            SampleTester.this.pos.x = 1;
+                            ++SampleTester.this.pos.y;
+                        }
+                    }
+                    if (SampleTester.this.allVisible) {
+                        primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * SampleTester.this.world.getSize().x);
+                        primaryStage.setHeight(SampleTester.this.zoom * SampleTester.this.ysize * SampleTester.this.world.getSize().y);
+                    } else {
+                        primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * (2 * SampleTester.this.los + 1));
+                        primaryStage.setHeight(SampleTester.this.zoom * SampleTester.this.ysize * (2 * SampleTester.this.los + 1));
+                    }
+                    in = true;
+                }
+
                 if (in) {
                     SampleTester.this.root.getChildren().clear();
                     SampleTester.this.drawEnvironement();
@@ -223,6 +252,18 @@ public class SampleTester extends Application {
                     if (SampleTester.this.allVisible) {
                         SampleTester.this.heroe.setTranslateX(SampleTester.this.pos.x * SampleTester.this.xsize * SampleTester.this.zoom);
                         SampleTester.this.heroe.setTranslateY(SampleTester.this.pos.y * SampleTester.this.ysize * SampleTester.this.zoom);
+                        Label lbl = new Label("Level: " + SampleTester.this.level);
+                        Label seed = new Label("Seed: " + SampleTester.this.world.getAlphaSeed() + " ; " + SampleTester.this.world.getBetaSeed());
+                        lbl.setFont(Font.font("Liberation", FontWeight.BOLD, 15));
+                        seed.setFont(Font.font("Liberation", FontWeight.BOLD, 15));
+                        lbl.setTextFill(Color.WHITE);
+                        seed.setTextFill(Color.WHITE);
+                        SampleTester.this.root.getChildren().addAll(lbl, seed);
+                        FontLoader font = Toolkit.getToolkit().getFontLoader();
+                        lbl.setTranslateX(primaryStage.getWidth() - font.computeStringWidth(seed.getText(), seed.getFont()));
+                        lbl.setTranslateY(primaryStage.getHeight() - 50);
+                        seed.setTranslateX(primaryStage.getWidth() - font.computeStringWidth(seed.getText(), seed.getFont()));
+                        seed.setTranslateY(primaryStage.getHeight() - 25);
                     } else {
                         SampleTester.this.heroe.setTranslateY((primaryStage.getHeight() - SampleTester.this.ysize * SampleTester.this.zoom) / 2);
                         SampleTester.this.heroe.setTranslateX((primaryStage.getWidth() - SampleTester.this.xsize * SampleTester.this.zoom) / 2);
@@ -312,6 +353,9 @@ public class SampleTester extends Application {
                         break;
                     case UNKNOWN:
                         place = this.unknown;
+                        break;
+                    case PILLAR:
+                        place = this.pillar;
                         break;
                     default:
                         place = this.unknown;

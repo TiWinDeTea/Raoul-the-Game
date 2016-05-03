@@ -11,22 +11,26 @@ public class Map {
     public static final int MAX_ROOM_WIDTH = 12;
     public static final int MIN_ROOM_HEIGHT = 3;
     public static final int MAX_ROOM_HEIGHT = 12;
-    public static final int MIN_LEVEL_WIDTH = 40;
-    public static final int MAX_LEVEL_WIDTH = 60;
-    public static final int MIN_LEVEL_HEIGHT = 30;
-    public static final int MAX_LEVEL_HEIGHT = 34;
-    public static final int MIN_ROOM_NUMBER = 5;
-    public static final int MAX_ROOM_NUMBER = 12;
-    public static final int MIN_CORRIDOR_NBR = 4;
-    public static final int MAX_CORRIDOR_NBR = 7;
-    public static final int MIN_CORRIDOR_LENGTH = 3;
-    public static final int MAX_CORRIDOR_LENGTH = 6;
-    public static final int RETRIES_NBR = 100;
+    public static final int MIN_LEVEL_WIDTH = 75;
+    public static final int MAX_LEVEL_WIDTH = 125;
+    public static final int MIN_LEVEL_HEIGHT = 75;
+    public static final int MAX_LEVEL_HEIGHT = 125;
+    public static final int MIN_ROOM_NUMBER = 60;
+    public static final int MAX_ROOM_NUMBER = 61;
+    public static final int MIN_CORRIDOR_NBR = 20;
+    public static final int MAX_CORRIDOR_NBR = 30;
+    public static final int MIN_CORRIDOR_LENGTH = 6;
+    public static final int MAX_CORRIDOR_LENGTH = 18;
+    public static final int RETRIES_NBR = 5000;
+
     public static final int PROBABILITY_UNIT = 100;
     public static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
-    public static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 10;
-    public static final int PILLAR_PROBABILITY = 75;
+    public static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;
+    public static final int PILLAR_PROBABILITY = 40;
     public static final int MAX_PILLAR_NBR_PER_ROOM = 5;
+    public static final int REBIND_CORRIDOR_TO_CORRIDOR_CHANCE = 30;
+    public static final int REBIND_ROOM_TO_CORRIDOR_CHANCE = 15;
+    public static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
 
     private Seed seed;
     private Random random;
@@ -37,102 +41,11 @@ public class Map {
 
     public Map() {
         this.seed = new Seed();
-
         Random rand = new Random();
-        this.stairsUpPosition = new Vector2i(rand.nextInt(MIN_LEVEL_WIDTH - 10) + 5, rand.nextInt(MIN_LEVEL_HEIGHT - 10) + 5);
-        /* Sample test map, to be removed in further versions (TODO) */
-        this.map = new Tile[11][11];
-        this.map[0][0] = Tile.WALL_DOWNRIGHT;
-        this.map[this.map.length - 1][0] = Tile.WALL_TOPRIGHT;
-        this.map[this.map.length - 1][this.map[0].length - 1] = Tile.WALL_TOPLEFT;
-        this.map[0][this.map[0].length - 1] = Tile.WALL_DOWNLEFT;
-        for (int i = 1; i < this.map[0].length - 1; i++) {
-            this.map[0][i] = Tile.WALL_DOWN;
-            this.map[this.map.length - 1][i] = Tile.WALL_TOP;
-        }
-        for (int i = 1; i < this.map.length - 1; i++) {
-            this.map[i][0] = Tile.WALL_RIGHT;
-            this.map[i][this.map[0].length - 1] = Tile.WALL_LEFT;
-        }
-        for (int i = 1; i < this.map.length - 1; i++) {
-            for (int j = 1; j < this.map[i].length - 1; j++) {
-                this.map[i][j] = Tile.GROUND;
-            }
-        }
-
-        this.map[1][3] = Tile.WALL_DOWNLEFT;
-        this.map[2][3] = Tile.WALL_LEFT;
-        this.map[3][3] = Tile.WALL_LEFT;
-        this.map[4][1] = Tile.CLOSED_DOOR;
-        this.map[4][3] = Tile.WALL_TOPLEFT;
-        this.map[4][2] = Tile.WALL_TOP;
-        this.map[5][3] = Tile.CLOSED_DOOR;
-        this.map[6][2] = Tile.WALL_DOWN;
-        this.map[6][3] = Tile.WALL_DOWN;
-        this.map[6][4] = Tile.WALL_DOWN;
-        this.map[6][5] = Tile.WALL_RIGHT;
-        this.map[7][5] = Tile.CLOSED_DOOR;
-        this.map[8][5] = Tile.WALL_TOPRIGHT;
-        this.map[8][6] = Tile.WALL_TOP;
-        this.map[8][7] = Tile.WALL_TOP;
-        this.map[7][8] = Tile.WALL_TOP;
-        this.map[7][9] = Tile.WALL_TOP;
-        this.map[3][6] = Tile.WALL_TOP;
     }
 
     public Map(Seed seed) {
         this.seed = seed;
-    }
-
-    public static void main(String[] args) {
-        Map world = new Map();
-
-        Vector2i pos = new Vector2i(1, 1);
-
-        for (pos.x = 0; pos.x < 9; ++pos.x) {
-            for (pos.y = 0; pos.y < 9; ++pos.y) {
-                System.out.println("position = " + pos);
-                Tile[][] LOS = world.getLOS(pos, 8);
-
-                for (int i = 0; i < LOS.length; i++) {
-                    for (int j = 0; j < LOS[i].length; j++) {
-                        if (i == LOS.length / 2 && j == LOS[i].length / 2) {
-                            System.out.print("\033[35m@\033[0m");
-                        } else if (Tile.isObstructed(LOS[i][j])) {
-                            System.out.print("#");
-                        } else {
-                            switch (LOS[i][j]) {
-                                case GROUND:
-                                    System.out.print(".");
-                                    break;
-                                case OPENED_DOOR:
-                                    System.out.print("O");
-                                    break;
-                                case CLOSED_DOOR:
-                                    System.out.print("X");
-                                    break;
-                                case STAIR_UP:
-
-
-                                    System.out.print("*");
-                                    break;
-                                case STAIR_DOWN:
-                                    System.out.print(" ");
-                                    break;
-                                case UNKNOWN:
-                                    System.out.print("~");
-                                    break;
-                                default:
-                                    System.out.print("-");
-                            }
-                        }
-                    }
-                    System.out.println("");
-                }
-                System.out.println("\n\n");
-            }
-            System.out.println("\n\n");
-        }
     }
 
     public void triggerTile(Vector2i position, LivingThing target) {
@@ -270,15 +183,15 @@ public class Map {
         do {
             width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
             height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
-            x = this.random.nextInt(this.map.length / 2 - 5 - width) + 10 - height;
-            y = this.random.nextInt(this.map.length / 2 - 5 - height) + 10 + height;
+            x = this.random.nextInt((this.map.length - width) / 2 - 5) + 10 + width;
+            y = this.random.nextInt((this.map[0].length - height) / 2 - 5) + 10 + height;
             room = new Room(x, y, x + width, y + height);
         } while (!isPlaceable(room));
 
         rooms.add(room);
         room.print();
         do {
-            corridor = generateCorridor(room);
+            corridor = generateRoom(room, true, true);
         } while (corridor == null);
         corridors.add(corridor);
 
@@ -286,9 +199,9 @@ public class Map {
             ++retries;
             if (this.random.nextInt(roomNbr - rooms.size() + corridorNbr - corridors.size()) < (corridorNbr - corridors.size())) {
                 if (CORRIDOR_BINDED_TO_CORRIDOR_CHANCE >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
-                    corridor = generateCorridor(corridors.get(this.random.nextInt(corridors.size())));
+                    corridor = generateRoom(corridors.get(this.random.nextInt(corridors.size())), true, false);
                 } else {
-                    corridor = generateCorridor(rooms.get(this.random.nextInt(rooms.size())));
+                    corridor = generateRoom(rooms.get(this.random.nextInt(rooms.size())), true, true);
                 }
                 if (corridor != null) {
                     retries = 0;
@@ -296,9 +209,9 @@ public class Map {
                 }
             } else {
                 if (ROOM_BINDED_TO_CORRIDOR_CHANCE >= this.random.nextInt(PROBABILITY_UNIT)) {
-                    room = generateRoom(corridors.get(this.random.nextInt(corridors.size())));
+                    room = generateRoom(corridors.get(this.random.nextInt(corridors.size())), false, true);
                 } else {
-                    room = generateRoom(rooms.get(this.random.nextInt(rooms.size())));
+                    room = generateRoom(rooms.get(this.random.nextInt(rooms.size())), false, true);
                 }
                 if (room != null) {
                     retries = 0;
@@ -328,14 +241,21 @@ public class Map {
         return true;
     }
 
-    private Room generateCorridor(Room link) {
+    private Room generateRoom(Room link, boolean isCorridor, boolean withDoor) {
+        Room room;
         int x, y;
         int doorX, doorY;
-        int height = 0, width = 0;
-        Room corridor;
+        int height, width;
+        if (isCorridor) {
+            height = 0;
+            width = 0;
+        } else {
+            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
+            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+        }
         switch (this.random.nextInt(4)) {
             case 0:
-                x = link.bottom.x + 1;
+                x = link.bottom.x + 2;
                 if (link.bottom.y == link.top.y) {
                     y = link.top.y;
                 } else {
@@ -343,76 +263,12 @@ public class Map {
                 }
                 doorX = x - 1;
                 doorY = y;
-                width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
-                break;
-            case 1:
-                x = link.top.x - 2;
-                if (link.bottom.y == link.top.y) {
-                    y = link.top.y;
+                if (isCorridor) {
+                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
                 } else {
-                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
-                }
-                doorX = x + 1;
-                doorY = y;
-                width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
-                x -= width;
-                break;
-            case 2:
-                if (link.bottom.x == link.top.x) {
-                    x = link.top.x;
-                } else {
-                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
-                }
-                y = link.bottom.y + 1;
-                doorX = x;
-                doorY = y - 1;
-                height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
-                break;
-            case 3:
-                /* Falls through */
-            default:
-                if (link.bottom.x == link.top.x) {
-                    x = link.top.x;
-                } else {
-                    x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
-                }
-                y = link.top.y - 2;
-                doorX = x;
-                doorY = y + 1;
-                height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
-                y -= height;
-                break;
-        }
-        corridor = new Room(x, y, x + width, y + height);
-        int a = 0;
-        a++;
-        if (!isPlaceable(corridor)) {
-            return null;
-        }
-        corridor.print();
-        this.map[doorX][doorY] = Tile.CLOSED_DOOR;
-        return corridor;
-    }
-
-    private Room generateRoom(Room link) {
-        Room room;
-        int x, y, tmp;
-        int doorX, doorY;
-        int height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
-        int width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
-        tmp = this.random.nextInt(4);
-        switch (tmp) {
-            case 0:
-                x = link.bottom.x + 1;
-                if (link.bottom.y == link.top.y) {
-                    y = link.top.y;
-                } else {
-                    y = this.random.nextInt(link.bottom.y - link.top.y) + link.top.y;
-                }
-                doorX = x - 1;
-                doorY = y;
-                if (this.random.nextBoolean()) {
-                    y -= height;
+                    if (this.random.nextBoolean()) {
+                        y -= height;
+                    }
                 }
                 break;
             case 1:
@@ -424,10 +280,14 @@ public class Map {
                 }
                 doorX = x + 1;
                 doorY = y;
-                x -= width;
-                if (this.random.nextBoolean()) {
-                    y -= height;
+                if (isCorridor) {
+                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                } else {
+                    if (this.random.nextBoolean()) {
+                        y -= height;
+                    }
                 }
+                x -= width;
                 break;
             case 2:
                 if (link.bottom.x == link.top.x) {
@@ -435,11 +295,15 @@ public class Map {
                 } else {
                     x = this.random.nextInt(link.bottom.x - link.top.x) + link.top.x;
                 }
-                y = link.bottom.y + 1;
+                y = link.bottom.y + 2;
                 doorX = x;
                 doorY = y - 1;
-                if (this.random.nextBoolean()) {
-                    x -= width;
+                if (isCorridor) {
+                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                } else {
+                    if (this.random.nextBoolean()) {
+                        x -= width;
+                    }
                 }
                 break;
             case 3:
@@ -453,10 +317,14 @@ public class Map {
                 y = link.top.y - 2;
                 doorX = x;
                 doorY = y + 1;
-                y -= height;
-                if (this.random.nextBoolean()) {
-                    x -= width;
+                if (isCorridor) {
+                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                } else {
+                    if (this.random.nextBoolean()) {
+                        x -= width;
+                    }
                 }
+                y -= height;
                 break;
         }
         room = new Room(x, y, x + width, y + height);
@@ -464,7 +332,12 @@ public class Map {
             return null;
         }
         room.print();
-        this.map[doorX][doorY] = Tile.CLOSED_DOOR;
+        if (withDoor) {
+            this.map[doorX][doorY] = Tile.CLOSED_DOOR;
+        } else {
+            this.map[doorX][doorY] = Tile.GROUND;
+            // TODO : remettre les murs comme il faut
+        }
         return room;
     }
 
@@ -514,22 +387,7 @@ public class Map {
                 x = Map.this.random.nextInt(this.bottom.x - this.top.x - 2) + this.top.x + 1;
                 y = Map.this.random.nextInt(this.bottom.y - this.top.y - 2) + this.top.y + 1;
             } while (Map.this.map[x][y] != Tile.GROUND);
-            switch (Map.this.random.nextInt(4)) {
-                case 0:
-                    Map.this.map[x][y] = Tile.WALL_TOP;
-                    break;
-                case 1:
-                    Map.this.map[x][y] = Tile.WALL_RIGHT;
-                    break;
-                case 2:
-                    Map.this.map[x][y] = Tile.WALL_LEFT;
-                    break;
-                case 3:
-                    /* Falls through */
-                default:
-                    Map.this.map[x][y] = Tile.WALL_DOWN;
-                    break;
-            }
+            Map.this.map[x][y] = Tile.PILLAR;
         }
 
         @Override
