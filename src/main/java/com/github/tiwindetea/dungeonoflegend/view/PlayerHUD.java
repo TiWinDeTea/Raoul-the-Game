@@ -22,8 +22,9 @@ public class PlayerHUD {
 	public static final Color actualHealthRectangleColor = Color.RED;
 	public static final Color maxManaRectangleColor = Color.DARKBLUE;
 	public static final Color actualManaRectangleColor = Color.BLUE;
+	public static final Color backGroundColor = Color.PURPLE;
 
-	public static final Duration duration = Duration.millis(1000);
+	private static final Duration duration = Duration.millis(1000);
 
 	private final Group mainGroup = new Group();
 	private final ImageView playerPicture;
@@ -31,6 +32,7 @@ public class PlayerHUD {
 	private final Rectangle actualHealthRectangle = new Rectangle();
 	private final Rectangle maxManaRectangle = new Rectangle();
 	private final Rectangle actualManaRectangle = new Rectangle();
+	private final Rectangle backGroundRectangle = new Rectangle(mainPaneSize.x, mainPaneSize.y, backGroundColor);
 
 	private int maxHealth;
 	private int actualHealth;
@@ -47,8 +49,7 @@ public class PlayerHUD {
 	}
 
 	private void init() {
-		Rectangle rect = new Rectangle(mainPaneSize.x, mainPaneSize.y, Color.PURPLE);
-		this.mainGroup.getChildren().add(rect);
+		this.mainGroup.getChildren().add(this.backGroundRectangle);
 
 		this.mainGroup.getChildren().add(this.playerPicture);
 		double originalWidth = this.playerPicture.getViewport().getWidth();
@@ -127,5 +128,21 @@ public class PlayerHUD {
 	public void setActualMana(int actualMana) {
 		this.actualMana = actualMana;
 		this.updateMana();
+	}
+
+	public int getActualMana() {
+		return this.actualMana;
+	}
+
+	public int getMaxHealth() {
+		return this.maxHealth;
+	}
+
+	public int getActualHealth() {
+		return this.actualHealth;
+	}
+
+	public int getMaxMana() {
+		return this.maxMana;
 	}
 }

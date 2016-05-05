@@ -6,14 +6,15 @@ import com.github.tiwindetea.dungeonoflegend.model.events.EntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.EntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -43,17 +44,13 @@ public class GUI implements EntityListener {
 
 		this.rPane.setBackground(new Background(new BackgroundFill(Color.CRIMSON, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rPane.setMaxWidth(300);
-		//rPane.setMaxHeight(300);
 		this.rPane.setMinHeight(100);
-		this.rPane.setMinWidth(100);
-		this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		this.rPane.setMinWidth(300);
+		//this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		Rectangle rect = new Rectangle(50, 50, Color.BLACK);
 		this.rPane.getChildren().add(rect);
-		//this.rGroup.getChildren().add(rPane);
 		this.borderPane.setRight(this.rPane);
-		//this.borderPane.setRight(this.rGroup);
-		this.bPane.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-		//bPane.setMinHeight(300);
+		this.bPane.setBackground(new Background(new BackgroundFill(Color.PURPLE, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.borderPane.setBottom(this.bPane);
 		this.cPane.setBackground(new Background(new BackgroundFill(Color.BROWN, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.borderPane.setCenter(this.cPane);
@@ -62,28 +59,39 @@ public class GUI implements EntityListener {
 		//center: map -> caneva, TilePane ?
 		//right: inventory
 		//bottom: life and mana
-		SplitPane splitPane = new SplitPane();
-		splitPane.setOrientation(Orientation.HORIZONTAL);
 
 		PlayerHUD player1HUD = new PlayerHUD(new Entity(EntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
-		//bPane.getChildren().add(player1HUD.getMainGroup());
 		PlayerHUD player2HUD = new PlayerHUD(new Entity(EntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
-		//bPane.getChildren().add(player2HUD.getMainGroup());
-		splitPane.getItems().addAll(player1HUD.getMainGroup(), player2HUD.getMainGroup());
-		this.bPane.getChildren().add(splitPane);
+
+		TilePane tilePane = new TilePane();
+		tilePane.getChildren().addAll(player1HUD.getMainGroup(), player2HUD.getMainGroup());
+
+		Pane miniMapPain = new Pane();
+		miniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+		miniMapPain.setMinWidth(300);
+		miniMapPain.setMaxWidth(300);
+
+		HBox hBox = new HBox();
+		hBox.getChildren().addAll(tilePane, miniMapPain);
+		hBox.setMinWidth(2 * PlayerHUD.getSize().x + miniMapPain.getMinWidth());
+		this.bPane.getChildren().add(hBox);
 
 		this.bPane.widthProperty().addListener(e -> {
 			if((this.bPane.getWidth() - this.rPane.getWidth()) < (2 * PlayerHUD.getSize().x)) {
-				splitPane.setOrientation(Orientation.VERTICAL);
 				player1HUD.setActualHealth(10);
 				player1HUD.setActualMana(10);
-
+				player2HUD.setActualHealth(100);
+				player2HUD.setActualMana(100);
+				this.bPane.setMinHeight(2 * PlayerHUD.getSize().y);
 			}
 			else {
-				splitPane.setOrientation(Orientation.HORIZONTAL);
 				player1HUD.setActualHealth(100);
 				player1HUD.setActualMana(100);
+				player2HUD.setActualHealth(10);
+				player2HUD.setActualMana(10);
+				this.bPane.setMinHeight(PlayerHUD.getSize().y);
 			}
+			tilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
 		});
 	}
 
