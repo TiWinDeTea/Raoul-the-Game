@@ -113,12 +113,12 @@ public enum Tile {
 			case WALL_DOWNRIGHT:
 			case CLOSED_DOOR:
 			case PILLAR:
+			case UNKNOWN:
 				return true;
 			case GROUND:
 			case OPENED_DOOR:
 			case STAIR_UP:
 			case STAIR_DOWN:
-			case UNKNOWN:
 			default:
 				return false;
 		}

@@ -1,7 +1,11 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
+import java.util.Stack;
+
+import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
 
 /**
  * Created by maxime on 4/24/16.
@@ -22,6 +26,7 @@ public class Map {
     public static final int MIN_CORRIDOR_LENGTH = 6;
     public static final int MAX_CORRIDOR_LENGTH = 18;
     public static final int RETRIES_NBR = 5000;
+    public static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
 
     public static final int PROBABILITY_UNIT = 100;
     public static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
@@ -31,6 +36,7 @@ public class Map {
     public static final int REBIND_CORRIDOR_TO_CORRIDOR_CHANCE = 30;
     public static final int REBIND_ROOM_TO_CORRIDOR_CHANCE = 15;
     public static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
+    public static final int DOOR_CHANCE = 70;
 
     private Seed seed;
     private Random random;
@@ -145,7 +151,7 @@ public class Map {
                 currentY += yShifting;
                 x = Math.round(currentX);
                 y = Math.round(currentY);
-                if (Tile.isObstructed(this.map[x][y])
+                if (isObstructed(this.map[x][y])
                         && !tilePosition.equals(new Vector2i(x, y)))
                     return false;
             }
@@ -251,7 +257,7 @@ public class Map {
 
     private void rebind(Room source, Room target, boolean door) {
         int min, max, tmp, nbr;
-        Tile tile = door ? Tile.CLOSED_DOOR : Tile.GROUND;
+        Tile tile = door ? DEFAULT_DOOR : Tile.GROUND;
         if (source.top.y - 2 == target.bottom.y) {
             if (source.top.x < target.bottom.x && source.bottom.x >= target.top.x) {
                 min = Math.max(source.top.x, target.top.x);
@@ -260,7 +266,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.top.y - 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                    if (!isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -279,7 +285,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.bottom.y + 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                    if (!isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -298,7 +304,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.top.x - 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                    if (!isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -317,7 +323,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.bottom.x + 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                    if (!isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -440,7 +446,11 @@ public class Map {
         }
         room.print();
         if (withDoor) {
-            this.map[doorX][doorY] = Tile.CLOSED_DOOR;
+            if (DOOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                this.map[doorX][doorY] = DEFAULT_DOOR;
+            } else {
+                this.map[doorX][doorY] = Tile.GROUND;
+            }
         } else {
             this.map[doorX][doorY] = Tile.GROUND;
             reconstrucWalls(link, room, new Vector2i(doorX, doorY));
@@ -511,6 +521,71 @@ public class Map {
 
         public Vector2i bottom() {
             return this.bottom;
+        }
+    }
+
+    public Stack<Vector2i> getPath(Vector2i departure, Vector2i arrival, boolean mobs) {
+        if (departure.equals(arrival) || Tile.isObstructed(this.map[arrival.x][arrival.y]))
+            return null;
+        ArrayList<Node> closedList = new ArrayList<>();
+        NodePriorityQueue openList = new NodePriorityQueue(new NodeComparator());
+        boolean notDone = true;
+
+        Node dep = new Node(departure, heuristic(departure, arrival), 0, null);
+        Node arr = null;
+        closedList.add(dep);
+        Node node = null;
+        Node openListNode;
+        Vector2i next = null;
+        Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
+
+        openList.add(dep);
+        do {
+            node = openList.poll();
+            closedList.add(node);
+            for (Direction direction : directions) {
+                next = node.pos.copy().add(direction);
+                if (next.equals(arrival)) {
+                    notDone = false;
+                    arr = new Node(next.copy(), node);
+                } else if (!isObstructed(this.map[next.x][next.y]) /*&& (!considerEntites || !game.isThereEntity(next)*/) { // TODO
+                    openListNode = openList.find(next);
+                    if (openListNode != null) {
+                        computeDistance(node, openListNode);
+                    } else if (!closedList.contains(new Node(next))) {
+                        openList.add(new Node(next, heuristic(next, arrival), node.distance + 1, node));
+                    }
+                }
+            }
+        } while (notDone && openList.size() != 0);
+
+        if (arr == null) {
+            return null;
+        }
+        Stack<Vector2i> path = new Stack<>();
+        do {
+            path.add(arr.pos);
+            arr = arr.parent;
+        } while (arr.parent != null);
+        return path;
+    }
+
+    private int heuristic(Vector2i departure, Vector2i arrival) {
+        return Math.abs(departure.x - arrival.x) + Math.abs(departure.y - arrival.y);
+    }
+
+    private void computeDistance(Node parent, Node neighbour) {
+        int distance = parent.distance + 1;
+        if (distance < neighbour.distance) {
+            neighbour.distance = distance;
+            neighbour.parent = parent;
+        }
+    }
+
+    private class NodeComparator implements Comparator<Node> {
+        @Override
+        public int compare(Node o1, Node o2) {
+            return Integer.compare(o1.sum(), o2.sum());
         }
     }
 }

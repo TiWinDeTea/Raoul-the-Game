@@ -59,6 +59,10 @@ public class Vector2i {
 		return this;
 	}
 
+	public Vector2i copy() {
+		return new Vector2i(this);
+	}
+
 	@Override
 	public String toString() {
 		return "Vector2i{" +

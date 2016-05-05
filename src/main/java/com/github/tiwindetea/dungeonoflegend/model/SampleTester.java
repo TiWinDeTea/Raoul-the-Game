@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -19,6 +20,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import static java.lang.Thread.sleep;
 
@@ -33,7 +35,8 @@ public class SampleTester extends Application {
     int player = 0;
     int los = 5;
     int level = 0;
-    Vector2i pos = new Vector2i(1, 1);
+    Vector2i pos = new Vector2i(1, 1),
+            click;
     Vector2i wallDown = Tile.WALL_DOWN.getSpritePosition().multiply(this.xsize),
             wallUp = Tile.WALL_TOP.getSpritePosition().multiply(this.xsize),
             wallRight = Tile.WALL_RIGHT.getSpritePosition().multiply(this.xsize),
@@ -49,6 +52,7 @@ public class SampleTester extends Application {
             stairUp = Tile.STAIR_UP.getSpritePosition().multiply(this.xsize),
             stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize),
             pillar = Tile.PILLAR.getSpritePosition().multiply(this.xsize);
+    Stack<Vector2i> path = new Stack<>();
     double zoom = 1;
     Image objectTextures = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("objects.file"));
     Map world = new Map(new Seed(10, 10));
@@ -88,6 +92,7 @@ public class SampleTester extends Application {
                         // only add once... prevent duplicates
                         if (!input.contains(code))
                             input.add(code);
+                        System.out.println("code = " + code);
                     }
                 });
 
@@ -98,9 +103,35 @@ public class SampleTester extends Application {
                         input.remove(code);
                     }
                 });
+        scene.setOnMouseClicked(
+                new EventHandler<MouseEvent>() {
+                    @Override
+                    public void handle(MouseEvent event) {
+                        if (SampleTester.this.allVisible && !input.contains("CLICK"))
+                            input.add("CLICK");
+                        SampleTester.this.click = new Vector2i((int) (event.getX() / (32 * SampleTester.this.zoom)), (int) (event.getY() / (32 * SampleTester.this.zoom)));
+                    }
+                }
+        );
         new AnimationTimer() {
             public void handle(long currentNanoTime) {
                 boolean in = false;
+                if (SampleTester.this.path == null) {
+                    SampleTester.this.path = new Stack<>();
+                }
+                if (SampleTester.this.path.size() > 0) {
+                    in = true;
+                    Vector2i ppos = SampleTester.this.pos, tmp;
+                    SampleTester.this.pos = SampleTester.this.path.pop();
+                    Direction[] directions = {Direction.DOWN, Direction.RIGHT, Direction.UP, Direction.LEFT};
+                    int[] lol = {0, 64, 32, 96};
+                    for (int i = 0; i < directions.length; ++i) {
+                        tmp = ppos.copy().add(directions[i]);
+                        if (tmp.equals(SampleTester.this.pos)) {
+                            SampleTester.this.heroe.setViewport(new Rectangle2D(lol[i], SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
+                        }
+                    }
+                }
                 if (input.contains("LEFT")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(96, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
@@ -116,19 +147,36 @@ public class SampleTester extends Application {
                 if (input.contains("RIGHT")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(64, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.x < SampleTester.this.world.getSize().x - 1)
+                    if (SampleTester.this.pos.x < SampleTester.this.world.getSize().x - 1) {
                         SampleTester.this.pos.x++;
-                    if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
+                    }
+                    if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos))) {
                         in = true;
-                    else
+                    } else {
                         SampleTester.this.pos = previousPos;
+                }
                 }
 
                 if (input.contains("UP")) {
                     Vector2i previousPos = new Vector2i(SampleTester.this.pos);
                     SampleTester.this.heroe.setViewport(new Rectangle2D(32, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.y > 0)
+                    if (SampleTester.this.pos.y > 0) {
                         SampleTester.this.pos.y--;
+                    }
+                    if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos))) {
+                        in = true;
+                    } else {
+                        SampleTester.this.pos = previousPos;
+                    }
+                }
+
+                if (input.contains("DOWN"))
+
+                {
+                    Vector2i previousPos = new Vector2i(SampleTester.this.pos);
+                    SampleTester.this.heroe.setViewport(new Rectangle2D(0, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
+                    if (SampleTester.this.pos.y < SampleTester.this.world.getSize().y - 1)
+                        SampleTester.this.pos.y++;
                     if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
                         in = true;
                     else
@@ -136,7 +184,7 @@ public class SampleTester extends Application {
                 }
 
                 if (input.contains("P")) {
-                    SampleTester.this.zoom += 0.2;
+                    SampleTester.this.zoom += 0.1;
                     if (SampleTester.this.allVisible) {
                         primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * SampleTester.this.world.getSize().x);
                         primaryStage.setHeight(SampleTester.this.zoom * SampleTester.this.ysize * SampleTester.this.world.getSize().y);
@@ -148,7 +196,7 @@ public class SampleTester extends Application {
                 }
 
                 if (input.contains("M")) {
-                    SampleTester.this.zoom -= 0.2;
+                    SampleTester.this.zoom -= 0.1;
                     if (SampleTester.this.allVisible) {
                         primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * SampleTester.this.world.getSize().x);
                         primaryStage.setHeight(SampleTester.this.zoom * SampleTester.this.ysize * SampleTester.this.world.getSize().y);
@@ -159,25 +207,18 @@ public class SampleTester extends Application {
                     in = true;
                 }
 
-                if (input.contains("DOWN")) {
-                    Vector2i previousPos = new Vector2i(SampleTester.this.pos);
-                    SampleTester.this.heroe.setViewport(new Rectangle2D(0, SampleTester.this.ysize * SampleTester.this.player, SampleTester.this.xsize, SampleTester.this.ysize));
-                    if (SampleTester.this.pos.y < SampleTester.this.world.getSize().y - 1)
-                        SampleTester.this.pos.y++;
-                    if (!Tile.isObstructed(SampleTester.this.world.getTile(SampleTester.this.pos)))
-                        in = true;
-                    else
-                        SampleTester.this.pos = previousPos;
-                }
+                if ((input.contains("PLUS") || input.contains("ADD")) && !SampleTester.this.allVisible)
 
-                if (input.contains("PLUS") && !SampleTester.this.allVisible) {
+                {
                     ++SampleTester.this.los;
                     primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * (2 * SampleTester.this.los + 1));
                     primaryStage.setHeight(SampleTester.this.zoom * SampleTester.this.ysize * (2 * SampleTester.this.los + 1));
                     in = true;
                 }
 
-                if (input.contains("MINUS") && !SampleTester.this.allVisible) {
+                if ((input.contains("MINUS") || input.contains("SUBTRACT")) && !SampleTester.this.allVisible)
+
+                {
                     if (SampleTester.this.los > 0) {
                         --SampleTester.this.los;
                         primaryStage.setWidth(SampleTester.this.zoom * SampleTester.this.xsize * (2 * SampleTester.this.los + 1));
@@ -220,6 +261,13 @@ public class SampleTester extends Application {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+
+                if (input.contains("CLICK"))
+
+                {
+                    SampleTester.this.path = SampleTester.this.world.getPath(SampleTester.this.pos, SampleTester.this.click, false);
+                    in = true;
                 }
 
                 if (input.contains("N")) {
@@ -287,6 +335,7 @@ public class SampleTester extends Application {
             this.heroe.setTranslateX((scene.getWidth() - this.xsize) / 2);
         }
         this.root.getChildren().add(this.heroe);
+
         primaryStage.setWidth(SampleTester.this.xsize * (2 * SampleTester.this.los + 1));
         primaryStage.setHeight(SampleTester.this.ysize * (2 * SampleTester.this.los + 1));
         primaryStage.setTitle("~ Dungeon Of Legends test ~");
