@@ -2,6 +2,7 @@ package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import javafx.scene.image.Image;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -189,6 +190,18 @@ public enum EntityType {
 		if(this.getSpritesNumber() > 1)
 			return Integer.parseInt(resourceBundle.getString(this.toString() + ".animation.speed.millseconds"));
 		return -1;
+	}
+
+	public Image getImage() {
+		switch(resourceBundle.getString(this.toString() + ".sprites.file")) {
+		case "Objects.png":
+			return ViewPackage.objectsImage;
+		case "Players.png":
+			return ViewPackage.playersImage;
+		default:
+			return ViewPackage.playersImage; // for tests
+		//return null;
+		}
 	}
 
 	public static void main(String[] args) {
