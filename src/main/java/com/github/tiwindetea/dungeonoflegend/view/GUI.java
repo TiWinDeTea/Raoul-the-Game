@@ -16,11 +16,13 @@ import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.Static
 import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-import com.github.tiwindetea.dungeonoflegend.view.listeners.entities.EntityListener;
-import com.github.tiwindetea.dungeonoflegend.view.listeners.map.MapListener;
+import com.github.tiwindetea.dungeonoflegend.view.listeners.GameListener;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -37,7 +39,7 @@ import java.util.Map;
 /**
  * Created by maxime on 5/2/16.
  */
-public class GUI implements EntityListener, MapListener {
+public class GUI implements GameListener {
 	private Map<Integer, StaticEntity> entityMap = new HashMap<>();
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
@@ -47,6 +49,9 @@ public class GUI implements EntityListener, MapListener {
 	private final SplitPane bSplitPane = new SplitPane();
 
 	private final Pane cPane = new Pane();
+
+	private PlayerHUD player1HUD;
+	private PlayerHUD player2HUD;
 
 	public GUI() {
 		this.init();
@@ -63,7 +68,6 @@ public class GUI implements EntityListener, MapListener {
 		Rectangle rect = new Rectangle(50, 50, Color.BLACK);
 		this.rPane.getChildren().add(rect);
 		this.borderPane.setRight(this.rPane);
-		this.bPane.setBackground(new Background(new BackgroundFill(Color.PURPLE, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.borderPane.setBottom(this.bPane);
 		this.cPane.setBackground(new Background(new BackgroundFill(Color.BROWN, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.borderPane.setCenter(this.cPane);
@@ -73,11 +77,11 @@ public class GUI implements EntityListener, MapListener {
 		//right: inventory
 		//bottom: life and mana
 
-		PlayerHUD player1HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
-		PlayerHUD player2HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
+		this.player1HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
+		this.player2HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
 
 		TilePane tilePane = new TilePane();
-		tilePane.getChildren().addAll(player1HUD.getMainGroup(), player2HUD.getMainGroup());
+		tilePane.getChildren().addAll(this.player1HUD.getMainGroup(), this.player2HUD.getMainGroup());
 
 		Pane miniMapPain = new Pane();
 		miniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -89,19 +93,43 @@ public class GUI implements EntityListener, MapListener {
 		hBox.setMinWidth(2 * PlayerHUD.getSize().x + miniMapPain.getMinWidth());
 		this.bPane.getChildren().add(hBox);
 
+		this.bPane.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+
+		this.bPane.setMinHeight(2 * PlayerHUD.getSize().y);
+
+		this.player1HUD.getMainGroup().setOnMouseClicked(
+		  new EventHandler<MouseEvent>() {
+			  @Override
+			  public void handle(MouseEvent event) {
+				  if(event.getButton() == MouseButton.PRIMARY) {
+					  changePlayerStat(new PlayerStatEvent((byte) 1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 100));
+				  }
+				  else if(event.getButton() == MouseButton.SECONDARY) {
+					  changePlayerStat(new PlayerStatEvent((byte) 1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 10));
+				  }
+			  }
+		  }
+		);
+
+		this.player2HUD.getMainGroup().setOnMouseClicked(
+		  new EventHandler<MouseEvent>() {
+			  @Override
+			  public void handle(MouseEvent event) {
+				  if(event.getButton() == MouseButton.PRIMARY) {
+					  changePlayerStat(new PlayerStatEvent((byte) 2, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 100));
+				  }
+				  else if(event.getButton() == MouseButton.SECONDARY) {
+					  changePlayerStat(new PlayerStatEvent((byte) 2, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 10));
+				  }
+			  }
+		  }
+		);
+
 		this.bPane.widthProperty().addListener(e -> {
 			if((this.bPane.getWidth() - this.rPane.getWidth()) < (2 * PlayerHUD.getSize().x)) {
-				player1HUD.setActualHealth(10);
-				player1HUD.setActualMana(10);
-				player2HUD.setActualHealth(100);
-				player2HUD.setActualMana(100);
 				this.bPane.setMinHeight(2 * PlayerHUD.getSize().y);
 			}
 			else {
-				player1HUD.setActualHealth(100);
-				player1HUD.setActualMana(100);
-				player2HUD.setActualHealth(10);
-				player2HUD.setActualMana(10);
 				this.bPane.setMinHeight(PlayerHUD.getSize().y);
 			}
 			tilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
@@ -154,7 +182,33 @@ public class GUI implements EntityListener, MapListener {
 
 	@Override
 	public void changePlayerStat(PlayerStatEvent e) {
-
+		//for tests
+		//TODO
+		PlayerHUD[] playersHUD = new PlayerHUD[2];
+		playersHUD[0] = this.player1HUD;
+		playersHUD[1] = this.player2HUD;
+		switch(e.statType) {
+		case HEALTH:
+			switch(e.valueType) {
+			case ACTUAL:
+				playersHUD[e.playerNumber - 1].setActualHealth(e.value);
+				break;
+			case MAX:
+				playersHUD[e.playerNumber - 1].setMaxHealth(e.value);
+				break;
+			}
+			break;
+		case MANA:
+			switch(e.valueType) {
+			case ACTUAL:
+				playersHUD[e.playerNumber - 1].setActualMana(e.value);
+				break;
+			case MAX:
+				playersHUD[e.playerNumber - 1].setMaxMana(e.value);
+				break;
+			}
+			break;
+		}
 	}
 
 	@Override
