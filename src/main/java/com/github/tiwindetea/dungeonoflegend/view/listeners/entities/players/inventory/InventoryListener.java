@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.view.listeners.players.inventory;
+package com.github.tiwindetea.dungeonoflegend.view.listeners.entities.players.inventory;
 
 /**
  * Created by maxime on 5/6/16.

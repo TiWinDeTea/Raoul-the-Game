@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.view.listeners.static_entities;
+package com.github.tiwindetea.dungeonoflegend.view.listeners.entities.static_entities;
 
 import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityCreationEvent;
 

@@ -6,6 +6,7 @@ import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.Living
 import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryAdditionEvent;
@@ -15,7 +16,8 @@ import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.Static
 import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
+import com.github.tiwindetea.dungeonoflegend.view.listeners.entities.EntityListener;
+import com.github.tiwindetea.dungeonoflegend.view.listeners.map.MapListener;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
@@ -35,7 +37,7 @@ import java.util.Map;
 /**
  * Created by maxime on 5/2/16.
  */
-public class GUI implements EntityListener {
+public class GUI implements EntityListener, MapListener {
 	private Map<Integer, StaticEntity> entityMap = new HashMap<>();
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
@@ -167,6 +169,11 @@ public class GUI implements EntityListener {
 
 	@Override
 	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
+
+	}
+
+	@Override
+	public void createMap(MapCreationEvent e) {
 
 	}
 }
