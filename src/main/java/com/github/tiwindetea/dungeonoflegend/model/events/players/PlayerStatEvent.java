@@ -4,7 +4,7 @@ package com.github.tiwindetea.dungeonoflegend.model.events.players;
  * Created by maxime on 5/5/16.
  */
 public class PlayerStatEvent extends PlayerEvent {
-	public enum InformationType {
+	public enum StatType {
 		HEALTH,
 		MANA
 	}
@@ -14,13 +14,13 @@ public class PlayerStatEvent extends PlayerEvent {
 		MAX
 	}
 
-	public InformationType informationType;
+	public StatType statType;
 	public ValueType valueType;
 	public int value;
 
-	public PlayerStatEvent(byte playerNumber, InformationType informationType, ValueType valueType, int value) {
+	public PlayerStatEvent(byte playerNumber, StatType statType, ValueType valueType, int value) {
 		super(playerNumber);
-		this.informationType = informationType;
+		this.statType = statType;
 		this.valueType = valueType;
 		this.value = value;
 	}

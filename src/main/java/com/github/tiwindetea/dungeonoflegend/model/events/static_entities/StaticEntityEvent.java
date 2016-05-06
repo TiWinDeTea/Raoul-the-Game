@@ -5,7 +5,7 @@ import com.github.tiwindetea.dungeonoflegend.model.events.Event;
 /**
  * Created by maxime on 5/3/16.
  */
-public class StaticEntityEvent extends Event {
+public abstract class StaticEntityEvent extends Event {
 	public int entityId;
 
 	public StaticEntityEvent(int entityId) {
