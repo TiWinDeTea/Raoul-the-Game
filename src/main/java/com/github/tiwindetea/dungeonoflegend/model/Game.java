@@ -1,19 +1,25 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSDefinitionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSModificationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.map.MapCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryAdditionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityLOSDefinitionEvent;
-import com.github.tiwindetea.dungeonoflegend.view.listeners.GameListener;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.moves.ComplexMoveRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.moves.SimpleMoveRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +27,11 @@ import java.util.List;
 /**
  * Created by maxime on 4/24/16.
  */
-public class Game {
+public class Game implements RequestListener {
 	private final List<GameListener> listeners = new ArrayList<>();
 
-	public void addGameListener(GameListener event) {
-		this.listeners.add(event);
+	public void addGameListener(GameListener listener) {
+		this.listeners.add(listener);
 	}
 
 	public GameListener[] getGameListeners() {
@@ -108,6 +114,31 @@ public class Game {
 		for(GameListener listener : this.getGameListeners()) {
 			listener.defineStaticEntityLOS(event);
 		}
+	}
+
+	@Override
+	public void requestComplexMove(ComplexMoveRequestEvent e) {
+
+	}
+
+	@Override
+	public void requestDrop(DropRequestEvent e) {
+
+	}
+
+	@Override
+	public void requestInteraction(InteractionRequestEvent e) {
+
+	}
+
+	@Override
+	public void requestSimpleMove(SimpleMoveRequestEvent e) {
+
+	}
+
+	@Override
+	public void requestUsage(UsageRequestEvent e) {
+
 	}
 
 	public Game() {

@@ -1,22 +1,28 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.moves.ComplexMoveRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.moves.SimpleMoveRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSDefinitionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSModificationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.map.MapCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryAdditionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-import com.github.tiwindetea.dungeonoflegend.view.listeners.GameListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -33,14 +39,19 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by maxime on 5/2/16.
  */
 public class GUI implements GameListener {
+	private final List<RequestListener> listeners = new ArrayList<>();
+
 	private Map<Integer, StaticEntity> entityMap = new HashMap<>();
+
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
 	private final Pane rPane = new Pane();
@@ -138,6 +149,44 @@ public class GUI implements GameListener {
 
 	public Scene getScene() {
 		return this.scene;
+	}
+
+	public void addRequestListener(RequestListener listener) {
+		this.listeners.add(listener);
+	}
+
+	public RequestListener[] getRequestListener() {
+		return this.listeners.toArray(new RequestListener[this.listeners.size()]);
+	}
+
+	private void fireDropRequestEvent(DropRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestDrop(event);
+		}
+	}
+
+	private void fireUsageRequestEvent(UsageRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestUsage(event);
+		}
+	}
+
+	private void fireComplexMoveRequestEvent(ComplexMoveRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestComplexMove(event);
+		}
+	}
+
+	private void fireSimpleMoveRequestEvent(SimpleMoveRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestSimpleMove(event);
+		}
+	}
+
+	private void fireInteractionRequestEvent(InteractionRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestInteraction(event);
+		}
 	}
 
 	@Override

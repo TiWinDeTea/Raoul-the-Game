@@ -18,7 +18,8 @@ public class Main extends Application {
 		primaryStage.setScene(GUI.getScene());
 		primaryStage.show();
 		Game game = new Game();
-		game.addEntityListener(GUI);
+		game.addGameListener(GUI);
+		GUI.addRequestListener(game);
 		game.launch((byte) 1);
 	}
 
