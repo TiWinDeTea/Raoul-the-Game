@@ -6,6 +6,10 @@ package com.github.tiwindetea.dungeonoflegend.model;
 public class Mob extends LivingThing {
 	private State state;
 
+	public Mob(Vector2i pos) {
+		this.position = pos;
+	}
+
 	public Mob() {
 		//TODO
 	}

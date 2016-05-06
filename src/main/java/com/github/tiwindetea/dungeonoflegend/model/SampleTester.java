@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -32,9 +33,10 @@ public class SampleTester extends Application {
     final int xsize = Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")),
             ysize = Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution"));
     boolean allVisible = false;
+    boolean ignoreDoor = false;
     int player = 0;
     int los = 5;
-    int level = 0;
+    int level = -10;
     Vector2i pos = new Vector2i(1, 1),
             click;
     Vector2i wallDown = Tile.WALL_DOWN.getSpritePosition().multiply(this.xsize),
@@ -51,7 +53,8 @@ public class SampleTester extends Application {
             openedDoor = Tile.OPENED_DOOR.getSpritePosition().multiply(this.xsize),
             stairUp = Tile.STAIR_UP.getSpritePosition().multiply(this.xsize),
             stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize),
-            pillar = Tile.PILLAR.getSpritePosition().multiply(this.xsize);
+            pillar = Tile.PILLAR.getSpritePosition().multiply(this.xsize),
+            hole = Tile.HOLE.getSpritePosition().multiply(this.xsize);
     Stack<Vector2i> path = new Stack<>();
     double zoom = 1;
     Image objectTextures = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("objects.file"));
@@ -107,9 +110,10 @@ public class SampleTester extends Application {
                 new EventHandler<MouseEvent>() {
                     @Override
                     public void handle(MouseEvent event) {
-                        if (SampleTester.this.allVisible && !input.contains("CLICK"))
+                        if (!input.contains("CLICK"))
                             input.add("CLICK");
-                        SampleTester.this.click = new Vector2i((int) (event.getX() / (32 * SampleTester.this.zoom)), (int) (event.getY() / (32 * SampleTester.this.zoom)));
+                        SampleTester.this.ignoreDoor = event.getButton().equals(MouseButton.SECONDARY);
+                        SampleTester.this.click = new Vector2i((int) event.getX(), (int) event.getY());
                     }
                 }
         );
@@ -235,7 +239,7 @@ public class SampleTester extends Application {
                 if (input.contains("SPACE")) {
                     for (int i = SampleTester.this.pos.x - 1; i <= SampleTester.this.pos.x + 1; i++) {
                         for (int j = SampleTester.this.pos.y - 1; j <= SampleTester.this.pos.y + 1; j++) {
-                            SampleTester.this.world.triggerTile(new Vector2i(i, j), new Mob());
+                            SampleTester.this.world.triggerTile(new Vector2i(i, j));
                         }
                     }
                     in = true;
@@ -263,10 +267,18 @@ public class SampleTester extends Application {
                     }
                 }
 
-                if (input.contains("CLICK"))
-
-                {
-                    SampleTester.this.path = SampleTester.this.world.getPath(SampleTester.this.pos, SampleTester.this.click, false);
+                if (input.contains("CLICK")) {
+                    input.remove("CLICK");
+                    if (SampleTester.this.allVisible) {
+                        SampleTester.this.click.x /= (32 * SampleTester.this.zoom);
+                        SampleTester.this.click.y /= (32 * SampleTester.this.zoom);
+                    } else {
+                        System.out.println("click = " + SampleTester.this.click);
+                        SampleTester.this.click.x /= (primaryStage.getWidth() - 64 * SampleTester.this.zoom / SampleTester.this.pos.x);
+                        SampleTester.this.click.y /= (primaryStage.getHeight() - 64 * SampleTester.this.zoom / SampleTester.this.pos.y);
+                    }
+                    System.out.println("click = " + SampleTester.this.click);
+                    SampleTester.this.path = SampleTester.this.world.getPath(SampleTester.this.pos, SampleTester.this.click, SampleTester.this.ignoreDoor, null);
                     in = true;
                 }
 
@@ -405,6 +417,9 @@ public class SampleTester extends Application {
                         break;
                     case PILLAR:
                         place = this.pillar;
+                        break;
+                    case HOLE:
+                        place = this.hole;
                         break;
                     default:
                         place = this.unknown;

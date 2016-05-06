@@ -4,15 +4,15 @@ package com.github.tiwindetea.dungeonoflegend.model;
  * Created by maxime on 4/23/16.
  */
 public abstract class LivingThing {
-	Direction requestedAttack;
-	Direction requestedMove;
-	private Tile[][] sight;
-	private int level;
-	private int maxHitPoints;
-	private int hitPoints;
-	private int attackPower;
-	private int defensePower;
-	private Vector2i position;
+	protected Direction requestedAttack;
+	protected Direction requestedMove;
+	protected Tile[][] sight;
+	protected int level;
+	protected int maxHitPoints;
+	protected int hitPoints;
+	protected int attackPower;
+	protected int defensePower;
+	protected Vector2i position;
 
 	public void updateSight(Tile[][] sight) {
 		this.sight = sight;
@@ -70,4 +70,13 @@ public abstract class LivingThing {
 	public abstract void live();
 
 	public abstract LivingThingType getType();
+
+	public boolean equals(Object o) {
+		/* Asserting o to be a LivingThing */
+		return this.equals((LivingThing) o);
+	}
+
+	public boolean equals(LivingThing livingThing) {
+		return this.position.equals(livingThing.position);
+	}
 }

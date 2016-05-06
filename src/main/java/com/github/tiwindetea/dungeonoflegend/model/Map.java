@@ -1,101 +1,171 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Random;
-import java.util.Stack;
+import java.util.*;
 
 import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
 
+
 /**
- * Created by maxime on 4/24/16.
+ * The type Map.
+ */
+/*
+ * Map
+ * This class manages a map, by generating it through a procedural algorithm and calculating paths from point A to B.
+ *
+ *
+ *
+ *
+ * @author Lucas LAZARE
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 public class Map {
-    public static final int MIN_ROOM_WIDTH = 3;
-    public static final int MAX_ROOM_WIDTH = 12;
-    public static final int MIN_ROOM_HEIGHT = 3;
-    public static final int MAX_ROOM_HEIGHT = 12;
-    public static final int MIN_LEVEL_WIDTH = 75;
-    public static final int MAX_LEVEL_WIDTH = 125;
-    public static final int MIN_LEVEL_HEIGHT = 75;
-    public static final int MAX_LEVEL_HEIGHT = 125;
-    public static final int MIN_ROOM_NUMBER = 60;
-    public static final int MAX_ROOM_NUMBER = 61;
-    public static final int MIN_CORRIDOR_NBR = 20;
-    public static final int MAX_CORRIDOR_NBR = 30;
-    public static final int MIN_CORRIDOR_LENGTH = 6;
-    public static final int MAX_CORRIDOR_LENGTH = 18;
-    public static final int RETRIES_NBR = 5000;
-    public static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
 
-    public static final int PROBABILITY_UNIT = 100;
-    public static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
-    public static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;
-    public static final int PILLAR_PROBABILITY = 40;
-    public static final int MAX_PILLAR_NBR_PER_ROOM = 5;
-    public static final int REBIND_CORRIDOR_TO_CORRIDOR_CHANCE = 30;
-    public static final int REBIND_ROOM_TO_CORRIDOR_CHANCE = 15;
-    public static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
-    public static final int DOOR_CHANCE = 70;
+    /*
+     * Tuning parameters for the map generation
+     */
+    private static final int MIN_ROOM_WIDTH = 3;
+    private static final int MAX_ROOM_WIDTH = 12;
+    private static final int MIN_ROOM_HEIGHT = 3;
+    private static final int MAX_ROOM_HEIGHT = 12;
+    private static final int MIN_LEVEL_WIDTH = 75;
+    private static final int MAX_LEVEL_WIDTH = 125;
+    private static final int MIN_LEVEL_HEIGHT = 75;
+    private static final int MAX_LEVEL_HEIGHT = 125;
+    private static final int MIN_ROOM_NUMBER = 60;
+    private static final int MAX_ROOM_NUMBER = 61;
+    private static final int MIN_CORRIDOR_NBR = 20;
+    private static final int MAX_CORRIDOR_NBR = 30;
+    private static final int MIN_CORRIDOR_LENGTH = 6;
+    private static final int MAX_CORRIDOR_LENGTH = 18;
+    private static final int RETRIES_NBR = 5000;
+    private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
+
+    private static final int PROBABILITY_UNIT = 100;
+    private static final int MIN_HOLE_COVERAGE = 25;
+    private static final int MAX_HOLE_COVERAGE = 65;
+    private static final int HOLE_CHANCE = 5;
+    private static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
+    private static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;
+    private static final int PILLAR_PROBABILITY = 40;
+    private static final int MAX_PILLAR_NBR_PER_ROOM = 5;
+    private static final int REBIND_CORRIDOR_TO_CORRIDOR_CHANCE = 30;
+    private static final int REBIND_ROOM_TO_CORRIDOR_CHANCE = 15;
+    private static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
+    private static final int DOOR_CHANCE = 70;
 
     private Seed seed;
     private Random random;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
+    private Vector2i bulbPosition;
     private ArrayList<InteractiveObject> interactiveObjects = new ArrayList<>();
     private Tile[][] map;
 
+    /**
+     * Instantiates a new Map.
+     */
     public Map() {
         this.seed = new Seed();
-        Random rand = new Random();
     }
 
+    /**
+     * Gets seed.
+     *
+     * @return the seed
+     */
+    public Seed getSeed() {
+        return this.seed;
+    }
+
+    /**
+     * Instantiates a new Map.
+     *
+     * @param seed the seed
+     */
     public Map(Seed seed) {
         this.seed = seed;
     }
 
-    public void triggerTile(Vector2i position, LivingThing target) {
+    /**
+     * Trigers doors (opens it if it is closed, and vice-versa).<!-- --> If there is no door, does nothing.
+     *
+     * @param position Position of the tile to trigger.
+     */
+    public void triggerTile(Vector2i position) {
         if (this.map[position.x][position.y] == Tile.CLOSED_DOOR) {
             this.map[position.x][position.y] = Tile.OPENED_DOOR;
         } else if (this.map[position.x][position.y] == Tile.OPENED_DOOR) {
             this.map[position.x][position.y] = Tile.CLOSED_DOOR;
-        } else {
-            for (int i = 0; i < this.interactiveObjects.size(); i++) {
-                if (this.interactiveObjects.get(i).getPosition().equals(position)) {
-                    if (this.interactiveObjects.get(i).trigger(target)) {
-                        this.interactiveObjects.remove(i);
-                    }
-                }
-            }
         }
     }
 
+    /**
+     * Gets map copy.
+     *
+     * @return A copy of the tile map
+     */
     public Tile[][] getMapCopy() {
         return this.map.clone();
     }
 
+    /**
+     * Gets stairs up position.
+     *
+     * @return The position of the upgoing stairs
+     */
     public Vector2i getStairsUpPosition() {
         return this.stairsUpPosition;
     }
 
+    /**
+     * Gets stairs down position.
+     *
+     * @return The position of the downgoing stairs
+     */
     public Vector2i getStairsDownPosition() {
         return this.stairsDownPosition;
     }
 
+    /**
+     * Gets the alpha of the seed.
+     *
+     * @return The alpha of the Seed
+     */
     public long getAlphaSeed() {
         return this.seed.getAlphaSeed();
     }
 
+    /**
+     * Gets the beta of the seed.
+     *
+     * @return The beta of the seed
+     */
     public long getBetaSeed() {
         return this.seed.getBetaSeed();
     }
 
+    /**
+     * Getter for a Tile.<!-- --> Returns null if the given position is not in the map
+     *
+     * @param position Position of the tile
+     * @return The tile present at the given position. null if position is out of the map
+     */
     public Tile getTile(Vector2i position) {
         if (position.x < 0 || position.x > this.map.length || position.y < 0 || position.y > this.map[0].length)
             return null;
         return this.map[position.x][position.y];
     }
 
+    /**
+     * Get the los of an entity, given its position and its vision range.
+     *
+     * @param position    the position
+     * @param visionRange the vision range
+     * @return the LOS
+     */
     public Tile[][] getLOS(Vector2i position, int visionRange) {
         if (visionRange < 0) {
             throw new IllegalArgumentException("visionRange should not be negative (value : " + visionRange);
@@ -129,6 +199,11 @@ public class Map {
         return LOS;
     }
 
+    /**
+     * Gets size of the map.
+     *
+     * @return the width (Vector2i.x) and the height (Vector2i.y) of the map
+     */
     public Vector2i getSize() {
         return new Vector2i(this.map.length, this.map[0].length);
     }
@@ -159,15 +234,12 @@ public class Map {
         return true;
     }
 
+    /**
+     * Generates a level using a procedural algorithm and tuning parameters defined hereinabove
+     *
+     * @param level The level to generate
+     */
     public void generateLevel(int level) {
-        generateLevel(level, true);
-    }
-
-    public void restoreLevel(int level) {
-        generateLevel(level, false);
-    }
-
-    private void generateLevel(int level, boolean withEntities) {
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Room> corridors = new ArrayList<>();
         int retries = 0;
@@ -248,13 +320,15 @@ public class Map {
                 }
             }
         }
-
-
-        if (withEntities) {
-            //TODO: Generate the entities ?
-        }
     }
 
+    /**
+     * Demolishes a wall between two rooms to link them, if possible
+     *
+     * @param source Source room
+     * @param target Target room
+     * @param door   True to put a door, false to put some ground
+     */
     private void rebind(Room source, Room target, boolean door) {
         int min, max, tmp, nbr;
         Tile tile = door ? DEFAULT_DOOR : Tile.GROUND;
@@ -337,10 +411,29 @@ public class Map {
         }
     }
 
-    private void reconstrucWalls(Room source1, Room source2, Vector2i replacedTile) {
-        // TODO
+    /**
+     * Reconstructs the wall to remove door's artifact
+     *
+     * @param source1 First room
+     * @param source2 Second room
+     * @param tile    Position where the door was
+     */
+    private void reconstrucWalls(Room source1, Room source2, Vector2i tile) {
+        if (source1.top.y == source2.top.y && source2.bottom.y == source2.bottom.y) {
+            this.map[tile.x][tile.y - 1] = Tile.WALL_DOWN;
+            this.map[tile.x][tile.y + 1] = Tile.WALL_TOP;
+        } else if (source1.top.x == source2.top.x && source1.bottom.x == source2.bottom.x) {
+            this.map[tile.x - 1][tile.y] = Tile.WALL_RIGHT;
+            this.map[tile.x + 1][tile.y] = Tile.WALL_LEFT;
+        }
     }
 
+    /**
+     * Tells if a room can be placed in the map
+     *
+     * @param room Concerned room
+     * @return True if the the room can be placed
+     */
     private boolean isPlaceable(Room room) {
         if (room.top.x < 1 || room.top.y < 1 || room.bottom.x >= this.map.length - 1 || room.bottom.y >= this.map[0].length - 1)
             return false;
@@ -354,6 +447,14 @@ public class Map {
         return true;
     }
 
+    /**
+     * Generate a room
+     *
+     * @param link       Room linked to the room to generate
+     * @param isCorridor Indicates if the new room should be a corridor
+     * @param withDoor   Indicates if the link should have a door or not
+     * @return The generated room. null if the generation process failed
+     */
     private Room generateRoom(Room link, boolean isCorridor, boolean withDoor) {
         Room room;
         int x, y;
@@ -458,19 +559,51 @@ public class Map {
         return room;
     }
 
+    /**
+     * Gets bulb position.
+     *
+     * @return the bulb position
+     */
+    public Vector2i getBulbPosition() {
+        return this.bulbPosition;
+    }
+
+
+    /**
+     * Room
+     *
+     * @author Lucas LAZARE
+     */
     private class Room {
         private Vector2i top;
         private Vector2i bottom;
 
+        /**
+         * Instantiates a new Room.
+         *
+         * @param top    the top
+         * @param bottom the bottom
+         */
         public Room(Vector2i top, Vector2i bottom) {
             this.top = top;
             this.bottom = bottom;
         }
 
+        /**
+         * Instantiates a new Room.
+         *
+         * @param x1 the x 1
+         * @param y1 the y 1
+         * @param x2 the x 2
+         * @param y2 the y 2
+         */
         public Room(int x1, int y1, int x2, int y2) {
             this(new Vector2i(x1, y1), new Vector2i(x2, y2));
         }
 
+        /**
+         * Prints the room in the map, with or without pillar, with or without holes, according to the tunning  parameters defined hereinabove
+         */
         public void print() {
             for (int i = this.top.x; i <= this.bottom.x; ++i) {
                 Map.this.map[i][this.top.y - 1] = Tile.WALL_DOWN;
@@ -490,6 +623,51 @@ public class Map {
 
             int minimum = Math.min(this.bottom.x - this.top.x, this.bottom.y - this.top.y);
             if (minimum > 2) {
+                if (HOLE_CHANCE > Map.this.random.nextInt(PROBABILITY_UNIT)) {
+                    int holesNbr = Map.this.random.nextInt(MAX_HOLE_COVERAGE - MIN_HOLE_COVERAGE) + MIN_HOLE_COVERAGE;
+                    holesNbr = (holesNbr * (this.top.x - this.bottom.x) * (this.top.y - this.bottom.y)) / PROBABILITY_UNIT;
+                    Vector2i start = this.top.copy();
+                    Vector2i end = this.bottom.copy();
+                    start.x++;
+                    start.y++;
+                    end.x--;
+                    end.y--;
+                    switch (Map.this.random.nextInt(4)) {
+                        case 0:
+                            break;
+                        case 1: {
+                            Vector2i tmp;
+                            tmp = start;
+                            start = end;
+                            end = tmp;
+                            break;
+                        }
+                        case 2: {
+                            int tmp;
+                            tmp = start.x;
+                            start.x = end.x;
+                            end.x = tmp;
+                            break;
+                        }
+                        case 3:
+                            /* Falls through */
+                        default: {
+                            int tmp = start.y;
+                            start.y = end.y;
+                            end.y = tmp;
+                            break;
+                        }
+                    }
+                    int i_dir = (int) Math.signum(end.y - start.y);
+                    int j_dir = (int) Math.signum(end.x - start.x);
+                    int vol = 0;
+                    for (int i = start.y; i != end.y && vol < holesNbr; i += i_dir) {
+                        for (int j = start.x; j != end.x && vol < holesNbr; j += j_dir) {
+                            Map.this.map[j][i] = Tile.HOLE;
+                            ++vol;
+                        }
+                    }
+                }
                 for (int i = 0; i < MAX_PILLAR_NBR_PER_ROOM; ++i) {
                     if (minimum > 2 + i && PILLAR_PROBABILITY >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
                         this.randomPillar();
@@ -498,12 +676,15 @@ public class Map {
             }
         }
 
+        /**
+         * Generates a pillar at a random place, in the map
+         */
         private void randomPillar() {
             int x, y;
             do {
                 x = Map.this.random.nextInt(this.bottom.x - this.top.x - 2) + this.top.x + 1;
                 y = Map.this.random.nextInt(this.bottom.y - this.top.y - 2) + this.top.y + 1;
-            } while (Map.this.map[x][y] != Tile.GROUND);
+            } while (Map.this.map[x][y] != Tile.GROUND && Map.this.map[x][y] != Tile.HOLE);
             Map.this.map[x][y] = Tile.PILLAR;
         }
 
@@ -514,29 +695,34 @@ public class Map {
                     ", bottom=" + this.bottom +
                     '}';
         }
-
-        public Vector2i top() {
-            return this.top;
-        }
-
-        public Vector2i bottom() {
-            return this.bottom;
-        }
     }
 
-    public Stack<Vector2i> getPath(Vector2i departure, Vector2i arrival, boolean mobs) {
+    /**
+     * Gets path.
+     *
+     * @param departure  the departure
+     * @param arrival    the arrival
+     * @param ignoreDoor true if the algorithm should consider all doors to be open
+     * @param entities   the entities
+     * @return the path
+     */
+    public Stack<Vector2i> getPath(Vector2i departure, Vector2i arrival, boolean ignoreDoor, Collection<LivingThing> entities) {
         if (departure.equals(arrival) || Tile.isObstructed(this.map[arrival.x][arrival.y]))
             return null;
         ArrayList<Node> closedList = new ArrayList<>();
         NodePriorityQueue openList = new NodePriorityQueue(new NodeComparator());
         boolean notDone = true;
+        if (entities == null) {
+            entities = new ArrayList<>();
+        }
 
         Node dep = new Node(departure, heuristic(departure, arrival), 0, null);
         Node arr = null;
         closedList.add(dep);
-        Node node = null;
+        Node node;
         Node openListNode;
-        Vector2i next = null;
+        Vector2i next;
+        int i;
         Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
 
         openList.add(dep);
@@ -548,7 +734,9 @@ public class Map {
                 if (next.equals(arrival)) {
                     notDone = false;
                     arr = new Node(next.copy(), node);
-                } else if (!isObstructed(this.map[next.x][next.y]) /*&& (!considerEntites || !game.isThereEntity(next)*/) { // TODO
+                } else if (((!isObstructed(this.map[next.x][next.y]))
+                        || (this.map[next.x][next.y] == Tile.CLOSED_DOOR && ignoreDoor))
+                        && !entities.contains(new Mob(next))) {
                     openListNode = openList.find(next);
                     if (openListNode != null) {
                         computeDistance(node, openListNode);
@@ -570,10 +758,16 @@ public class Map {
         return path;
     }
 
+    /**
+     * Computes the heuristic. (Path finding)
+     */
     private int heuristic(Vector2i departure, Vector2i arrival) {
         return Math.abs(departure.x - arrival.x) + Math.abs(departure.y - arrival.y);
     }
 
+    /**
+     * Computes the distance. (Path finding)
+     */
     private void computeDistance(Node parent, Node neighbour) {
         int distance = parent.distance + 1;
         if (distance < neighbour.distance) {
@@ -582,6 +776,9 @@ public class Map {
         }
     }
 
+    /**
+     * Compares two nodes. (Path finding)
+     */
     private class NodeComparator implements Comparator<Node> {
         @Override
         public int compare(Node o1, Node o2) {

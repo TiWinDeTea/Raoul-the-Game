@@ -38,8 +38,4 @@ public class InteractiveObject {
     public Vector2i getPosition() {
         return this.position;
     }
-
-    public void print() {
-        //TODO
-    }
 }
