@@ -21,14 +21,13 @@ import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntity
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
+import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
-import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
-import javafx.scene.control.SplitPane;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -37,12 +36,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by maxime on 5/2/16.
@@ -50,19 +46,26 @@ import java.util.Map;
 public class GUI implements GameListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
-	private Map<Integer, StaticEntity> entityMap = new HashMap<>();
+	public static final Color bottomBackgroundColor = Color.GREEN;
+	public static final Color rightBackgroundColor = Color.CRIMSON;
+	public static final Color centerBackgroundColor = Color.BLACK;
 
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
 	private final Pane rPane = new Pane();
-
-	private final Pane bPane = new Pane();
-	private final SplitPane bSplitPane = new SplitPane();
-
 	private final Pane cPane = new Pane();
 
-	private PlayerHUD player1HUD;
-	private PlayerHUD player2HUD;
+	private final Pane bPane = new Pane();
+	private final HBox bHBox = new HBox();
+	private final TilePane blTilePane = new TilePane();
+	private final Pane brMiniMapPain = new Pane();
+
+	private final List<LivingEntity> enemies = new ArrayList<>();
+	private final List<LivingEntity> players = new ArrayList<>();
+	private final List<StaticEntity> staticEntities = new ArrayList<>();
+
+	private final List<PlayerHUD> playersHUD = new ArrayList<>();
+	private final int maxPlayersNumber = 2;
 
 	public GUI() {
 		this.init();
@@ -70,80 +73,42 @@ public class GUI implements GameListener {
 
 	private void init() {
 
-
-		this.rPane.setBackground(new Background(new BackgroundFill(Color.CRIMSON, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.rPane.setMaxWidth(300);
-		this.rPane.setMinHeight(100);
-		this.rPane.setMinWidth(300);
+		//Main pane
 		//this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		Rectangle rect = new Rectangle(50, 50, Color.BLACK);
-		this.rPane.getChildren().add(rect);
 		this.borderPane.setRight(this.rPane);
 		this.borderPane.setBottom(this.bPane);
-		this.cPane.setBackground(new Background(new BackgroundFill(Color.BROWN, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.borderPane.setCenter(this.cPane);
 		this.borderPane.setMinWidth(500);
 		this.borderPane.setMinHeight(500);
-		//center: map -> caneva, TilePane ?
-		//right: inventory
-		//bottom: life and mana
 
-		this.player1HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
-		this.player2HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
+		//Center pane
+		this.cPane.setBackground(new Background(new BackgroundFill(Color.BROWN, CornerRadii.EMPTY, Insets.EMPTY)));
 
-		TilePane tilePane = new TilePane();
-		tilePane.getChildren().addAll(this.player1HUD.getMainGroup(), this.player2HUD.getMainGroup());
+		//Right pane
+		this.rPane.setBackground(new Background(new BackgroundFill(Color.CRIMSON, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rPane.setMaxWidth(300);
+		this.rPane.setMinWidth(300);
 
-		Pane miniMapPain = new Pane();
-		miniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
-		miniMapPain.setMinWidth(300);
-		miniMapPain.setMaxWidth(300);
+		this.brMiniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.brMiniMapPain.setMinWidth(300);
+		this.brMiniMapPain.setMaxWidth(300);
 
-		HBox hBox = new HBox();
-		hBox.getChildren().addAll(tilePane, miniMapPain);
-		hBox.setMinWidth(2 * PlayerHUD.getSize().x + miniMapPain.getMinWidth());
-		this.bPane.getChildren().add(hBox);
+		this.bHBox.getChildren().addAll(this.blTilePane, this.brMiniMapPain);
+		this.bHBox.setMinWidth(2 * PlayerHUD.getSize().x + this.brMiniMapPain.getMinWidth());
 
 		this.bPane.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		this.bPane.setMinHeight(2 * PlayerHUD.getSize().y);
-
-		this.player1HUD.getMainGroup().setOnMouseClicked(
-		  new EventHandler<MouseEvent>() {
-			  @Override
-			  public void handle(MouseEvent event) {
-				  if(event.getButton() == MouseButton.PRIMARY) {
-					  changePlayerStat(new PlayerStatEvent((byte) 1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 100));
-				  }
-				  else if(event.getButton() == MouseButton.SECONDARY) {
-					  changePlayerStat(new PlayerStatEvent((byte) 1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 10));
-				  }
-			  }
-		  }
-		);
-
-		this.player2HUD.getMainGroup().setOnMouseClicked(
-		  new EventHandler<MouseEvent>() {
-			  @Override
-			  public void handle(MouseEvent event) {
-				  if(event.getButton() == MouseButton.PRIMARY) {
-					  changePlayerStat(new PlayerStatEvent((byte) 2, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 100));
-				  }
-				  else if(event.getButton() == MouseButton.SECONDARY) {
-					  changePlayerStat(new PlayerStatEvent((byte) 2, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 10));
-				  }
-			  }
-		  }
-		);
-
+		this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
+		this.bPane.getChildren().add(this.bHBox);
 		this.bPane.widthProperty().addListener(e -> {
-			if((this.bPane.getWidth() - this.rPane.getWidth()) < (2 * PlayerHUD.getSize().x)) {
-				this.bPane.setMinHeight(2 * PlayerHUD.getSize().y);
+			if(this.playersHUD.size() > 1) {
+				if((this.bPane.getWidth() - this.rPane.getWidth()) < (this.playersHUD.size() * PlayerHUD.getSize().x)) {
+					this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
+				}
+				else {
+					this.bPane.setMinHeight(PlayerHUD.getSize().y);
+				}
 			}
-			else {
-				this.bPane.setMinHeight(PlayerHUD.getSize().y);
-			}
-			tilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
+			this.blTilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
 		});
 	}
 
@@ -191,92 +156,158 @@ public class GUI implements GameListener {
 
 	@Override
 	public void addInventory(InventoryAdditionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void deleteInventory(InventoryDeletionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void createLivingEntity(LivingEntityCreationEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void deleteLivingEntity(LivingEntityDeletionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void moveLivingEntity(LivingEntityMoveEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void createPlayer(PlayerCreationEvent e) {
+		if(e == null) {
+			return;
+		}
+		if(this.players.size() < this.maxPlayersNumber) {
+			LivingEntityType livingEntityType;
+			if(e.playerNumber == 2) {
+				livingEntityType = LivingEntityType.PLAYER2;
+			}
+			else {
+				livingEntityType = LivingEntityType.PLAYER1;
+			}
+			this.players.add(new LivingEntity(livingEntityType, e.position, e.direction));
 
+			ImageView imageView = new ImageView(livingEntityType.getImage());
+			Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
+			imageView.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+			PlayerHUD playerHUD = new PlayerHUD(imageView, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
+			this.playersHUD.add(playerHUD);
+			this.blTilePane.getChildren().add(playerHUD.getMainGroup());
+			if(this.playersHUD.size() > 1) {
+				if((this.bPane.getWidth() - this.rPane.getWidth()) < (this.playersHUD.size() * PlayerHUD.getSize().x)) {
+					this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
+				}
+				else {
+					this.bPane.setMinHeight(PlayerHUD.getSize().y);
+				}
+			}
+
+			//TODO: inventory
+		}
 	}
 
 	@Override
 	public void changePlayerStat(PlayerStatEvent e) {
-		//for tests
-		//TODO
-		PlayerHUD[] playersHUD = new PlayerHUD[2];
-		playersHUD[0] = this.player1HUD;
-		playersHUD[1] = this.player2HUD;
-		switch(e.statType) {
-		case HEALTH:
-			switch(e.valueType) {
-			case ACTUAL:
-				playersHUD[e.playerNumber - 1].setActualHealth(e.value);
+		if(e == null) {
+			return;
+		}
+		if(e.playerNumber > 0 && e.playerNumber <= this.players.size()) {
+			int value = e.value;
+			if(value < 0) {
+				value = 0;
+			}
+			switch(e.statType) {
+			case HEALTH:
+				switch(e.valueType) {
+				case ACTUAL:
+					this.playersHUD.get(e.playerNumber - 1).setActualHealth(value);
+					break;
+				case MAX:
+					this.playersHUD.get(e.playerNumber - 1).setMaxHealth(value);
+					break;
+				}
 				break;
-			case MAX:
-				playersHUD[e.playerNumber - 1].setMaxHealth(e.value);
+			case MANA:
+				switch(e.valueType) {
+				case ACTUAL:
+					this.playersHUD.get(e.playerNumber - 1).setActualMana(value);
+					break;
+				case MAX:
+					this.playersHUD.get(e.playerNumber - 1).setMaxMana(value);
+					break;
+				}
 				break;
 			}
-			break;
-		case MANA:
-			switch(e.valueType) {
-			case ACTUAL:
-				playersHUD[e.playerNumber - 1].setActualMana(e.value);
-				break;
-			case MAX:
-				playersHUD[e.playerNumber - 1].setMaxMana(e.value);
-				break;
-			}
-			break;
 		}
 	}
 
 	@Override
 	public void createStaticEntity(StaticEntityCreationEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void deleteStaticEntity(StaticEntityDeletionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void createMap(MapCreationEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 }

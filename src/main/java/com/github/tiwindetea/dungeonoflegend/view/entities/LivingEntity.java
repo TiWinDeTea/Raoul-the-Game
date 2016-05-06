@@ -11,8 +11,9 @@ public class LivingEntity extends Entity {
 	private LivingEntityType livingEntityType;
 	private Direction direction;
 
-	public LivingEntity(LivingEntityType livingEntityType, Direction direction) {
+	public LivingEntity(LivingEntityType livingEntityType, Vector2i position, Direction direction) {
 		this.livingEntityType = livingEntityType;
+		this.setPosition(position);
 		this.imageView.setImage(livingEntityType.getImage());
 		this.setDirection(direction);
 	}
@@ -32,23 +33,7 @@ public class LivingEntity extends Entity {
 	public void setDirection(Direction direction) {
 		if(direction != this.direction) {
 			this.direction = direction;
-			Vector2i spritePosition;
-			switch(this.direction) {
-			case UP:
-				spritePosition = this.livingEntityType.getSpriteUpPosition();
-				break;
-			case LEFT:
-				spritePosition = this.livingEntityType.getSpriteLeftPosition();
-				break;
-			case RIGHT:
-				spritePosition = this.livingEntityType.getSpriteRightPosition();
-				break;
-			case DOWN:
-			/* Falls through */
-			default:
-				spritePosition = this.livingEntityType.getSpriteDownPosition();
-				break;
-			}
+			Vector2i spritePosition = this.livingEntityType.getSpritePosition(this.direction);
 			this.imageView.setViewport(new Rectangle2D(spritePosition.x * spriteSize.x, spritePosition.y * spriteSize.y, spriteSize.x, spriteSize.y));
 		}
 	}

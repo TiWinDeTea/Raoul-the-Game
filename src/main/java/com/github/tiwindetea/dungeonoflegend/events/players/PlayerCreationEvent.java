@@ -12,7 +12,7 @@ public class PlayerCreationEvent extends PlayerEvent {
 	public int maxHealth;
 	public int maxMana;
 
-	public PlayerCreationEvent(byte playerNumber, Vector2i position, Direction direction, int maxHealth, int maxMana) {
+	public PlayerCreationEvent(int playerNumber, Vector2i position, Direction direction, int maxHealth, int maxMana) {
 		super(playerNumber);
 		this.position = position;
 		this.direction = direction;

@@ -18,7 +18,7 @@ public class PlayerStatEvent extends PlayerEvent {
 	public ValueType valueType;
 	public int value;
 
-	public PlayerStatEvent(byte playerNumber, StatType statType, ValueType valueType, int value) {
+	public PlayerStatEvent(int playerNumber, StatType statType, ValueType valueType, int value) {
 		super(playerNumber);
 		this.statType = statType;
 		this.valueType = valueType;

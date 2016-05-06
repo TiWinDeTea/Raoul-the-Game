@@ -12,18 +12,6 @@ import java.util.ResourceBundle;
  * Created by maxime on 5/2/16.
  */
 public enum StaticEntityType {
-	PLAYER1 {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("player1.string");
-		}
-	},
-	PLAYER2 {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("player2.string");
-		}
-	},
 	HELMET1 {
 		@Override
 		public String toString() {

@@ -11,18 +11,18 @@ import javafx.util.Duration;
  * Created by maxime on 5/5/16.
  */
 public class PlayerHUD {
-	public static final Vector2i mainPaneSize = new Vector2i(400, 100);
-	public static final Vector2i playerPictureSize = new Vector2i(64, 64);
-	public static final int healthRectanglesHeight = 20;
-	public static final int manaRectanglesHeight = 15;
-	public static final double manaRectanglesWidth = 0.75; //relative to healthRectangleWidth (auto computed)
-	public static final int space = 20;
+	private static final Vector2i mainPaneSize = new Vector2i(400, 100);
+	private static final Vector2i playerPictureSize = new Vector2i(64, 64);
+	private static final int healthRectanglesHeight = 20;
+	private static final int manaRectanglesHeight = 15;
+	private static final double manaRectanglesWidth = 0.75; //relative to healthRectangleWidth (auto computed)
+	private static final int space = 20;
 
-	public static final Color maxHealthRectangleColor = Color.DARKRED;
-	public static final Color actualHealthRectangleColor = Color.RED;
-	public static final Color maxManaRectangleColor = Color.DARKBLUE;
-	public static final Color actualManaRectangleColor = Color.BLUE;
-	public static final Color backGroundColor = Color.PURPLE;
+	private static final Color maxHealthRectangleColor = Color.DARKRED;
+	private static final Color actualHealthRectangleColor = Color.RED;
+	private static final Color maxManaRectangleColor = Color.DARKBLUE;
+	private static final Color actualManaRectangleColor = Color.BLUE;
+	private static final Color backGroundColor = Color.PURPLE;
 
 	private static final Duration duration = Duration.millis(1000);
 

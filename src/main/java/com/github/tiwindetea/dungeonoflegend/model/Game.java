@@ -118,27 +118,42 @@ public class Game implements RequestListener {
 
 	@Override
 	public void requestComplexMove(ComplexMoveRequestEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void requestSimpleMove(SimpleMoveRequestEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-
+		if(e == null) {
+			return;
+		}
+		//TODO
 	}
 
 	public Game() {

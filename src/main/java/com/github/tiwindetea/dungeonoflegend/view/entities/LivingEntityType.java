@@ -1,5 +1,6 @@
 package com.github.tiwindetea.dungeonoflegend.view.entities;
 
+import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
@@ -85,7 +86,7 @@ public enum LivingEntityType {
 		}
 	};
 
-	private final static String bundleName = MainPackage.name + ".Player";
+	private final static String bundleName = MainPackage.name + ".LivingEntity";
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
@@ -112,6 +113,21 @@ public enum LivingEntityType {
 	public Vector2i getSpriteLeftPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.left.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.left.position.y")));
+	}
+
+	public Vector2i getSpritePosition(Direction direction) {
+		switch(direction) {
+		case UP:
+			return this.getSpriteUpPosition();
+		case LEFT:
+			return this.getSpriteLeftPosition();
+		case RIGHT:
+			return this.getSpriteRightPosition();
+		case DOWN:
+			/* Falls through */
+		default:
+			return this.getSpriteDownPosition();
+		}
 	}
 
 	public Image getImage() {

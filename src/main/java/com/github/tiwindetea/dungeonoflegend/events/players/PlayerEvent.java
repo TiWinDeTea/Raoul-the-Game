@@ -6,9 +6,9 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
  * Created by maxime on 5/5/16.
  */
 public abstract class PlayerEvent extends Event {
-	public byte playerNumber;
+	public int playerNumber;
 
-	public PlayerEvent(byte playerNumber) {
+	public PlayerEvent(int playerNumber) {
 		this.playerNumber = playerNumber;
 	}
 }
