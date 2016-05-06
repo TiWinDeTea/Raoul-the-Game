@@ -1,7 +1,8 @@
-package com.github.tiwindetea.dungeonoflegend.view;
+package com.github.tiwindetea.dungeonoflegend.view.entities;
 
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.scene.image.Image;
 
 import java.util.Locale;
@@ -10,7 +11,7 @@ import java.util.ResourceBundle;
 /**
  * Created by maxime on 5/2/16.
  */
-public enum EntityType {
+public enum StaticEntityType {
 	PLAYER1 {
 		@Override
 		public String toString() {
@@ -168,7 +169,7 @@ public enum EntityType {
 		}
 	};
 
-	private final static String bundleName = MainPackage.name + ".Entity";
+	private final static String bundleName = MainPackage.name + ".StaticEntity";
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
@@ -198,16 +199,11 @@ public enum EntityType {
 			return ViewPackage.objectsImage;
 		case "Players.png":
 			return ViewPackage.playersImage;
+		case "Enemies.png":
+			return ViewPackage.enemiesImage;
 		default:
 			return ViewPackage.playersImage; // for tests
 		//return null;
 		}
-	}
-
-	public static void main(String[] args) {
-		EntityType ent = EntityType.SUPER_POT;
-		System.out.println(ent.getSpritesPosition());
-		System.out.println(ent.getSpritesNumber());
-		System.out.println(ent.getAnimationSpeed());
 	}
 }

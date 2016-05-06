@@ -1,6 +1,8 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -14,7 +16,7 @@ public class SandboxFX extends Application {
 
 	public void start(Stage primaryStage) {
 
-		/*EntityType ent = EntityType.PLAYER1;
+		/*StaticEntityType ent = StaticEntityType.PLAYER1;
 
 		final ImageView imageView = new ImageView(ent.getImage());
 		imageView.setViewport(new Rectangle2D(ent.getSpritesPosition().x, ent.getSpritesPosition().y, Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution"))));
@@ -26,7 +28,7 @@ public class SandboxFX extends Application {
 		primaryStage.setScene(new Scene(new Group(imageView)));
 		primaryStage.show();*/
 
-		Entity ent = new Entity(EntityType.SUPER_POT, new Vector2i());
+		StaticEntity ent = new StaticEntity(StaticEntityType.SUPER_POT, new Vector2i());
 		primaryStage.setScene(new Scene(new Group(ent.getImageView())));
 		primaryStage.show();
 	}

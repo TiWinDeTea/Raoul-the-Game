@@ -4,6 +4,8 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.model.events.EntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.EntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.model.events.EntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -25,7 +27,7 @@ import java.util.Map;
  * Created by maxime on 5/2/16.
  */
 public class GUI implements EntityListener {
-	private Map<Integer, Entity> entityMap = new HashMap<>();
+	private Map<Integer, StaticEntity> entityMap = new HashMap<>();
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
 	private final Pane rPane = new Pane();
@@ -60,8 +62,8 @@ public class GUI implements EntityListener {
 		//right: inventory
 		//bottom: life and mana
 
-		PlayerHUD player1HUD = new PlayerHUD(new Entity(EntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
-		PlayerHUD player2HUD = new PlayerHUD(new Entity(EntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
+		PlayerHUD player1HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER1, new Vector2i()).getImageView(), 100, 70, 100, 30);
+		PlayerHUD player2HUD = new PlayerHUD(new StaticEntity(StaticEntityType.PLAYER2, new Vector2i()).getImageView(), 100, 70, 100, 30);
 
 		TilePane tilePane = new TilePane();
 		tilePane.getChildren().addAll(player1HUD.getMainGroup(), player2HUD.getMainGroup());
@@ -106,9 +108,9 @@ public class GUI implements EntityListener {
 
 	@Override
 	public void createEntity(EntityCreationEvent e) {
-		Entity newEntity = new Entity(e.type, e.position);
-		this.entityMap.put(e.entityId, newEntity);
-		//this.root.getChildren().add(newEntity.getImageView());
+		StaticEntity newStaticEntity = new StaticEntity(e.type, e.position);
+		this.entityMap.put(e.entityId, newStaticEntity);
+		//this.root.getChildren().add(newStaticEntity.getImageView());
 	}
 
 	@Override

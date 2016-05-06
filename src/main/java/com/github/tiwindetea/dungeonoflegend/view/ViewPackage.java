@@ -14,4 +14,5 @@ public class ViewPackage {
 	public final static ResourceBundle spriteSheetBundle = ResourceBundle.getBundle(bundleName);
 	public final static Image objectsImage = new Image(path + "/" + spriteSheetBundle.getString("objects.file"));
 	public final static Image playersImage = new Image(path + "/" + spriteSheetBundle.getString("players.file"));
+	public final static Image enemiesImage = new Image(path + "/" + spriteSheetBundle.getString("enemies.file"));
 }
