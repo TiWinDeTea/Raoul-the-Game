@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.model.events;
+package com.github.tiwindetea.dungeonoflegend.model.events.players;
 
 /**
  * Created by maxime on 5/5/16.

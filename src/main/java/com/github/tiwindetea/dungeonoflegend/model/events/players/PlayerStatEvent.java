@@ -1,9 +1,9 @@
-package com.github.tiwindetea.dungeonoflegend.model.events;
+package com.github.tiwindetea.dungeonoflegend.model.events.players;
 
 /**
  * Created by maxime on 5/5/16.
  */
-public class PlayerInformationEvent extends PlayerEvent {
+public class PlayerStatEvent extends PlayerEvent {
 	public enum InformationType {
 		HEALTH,
 		MANA
@@ -18,7 +18,7 @@ public class PlayerInformationEvent extends PlayerEvent {
 	public ValueType valueType;
 	public int value;
 
-	public PlayerInformationEvent(byte playerNumber, InformationType informationType, ValueType valueType, int value) {
+	public PlayerStatEvent(byte playerNumber, InformationType informationType, ValueType valueType, int value) {
 		super(playerNumber);
 		this.informationType = informationType;
 		this.valueType = valueType;
