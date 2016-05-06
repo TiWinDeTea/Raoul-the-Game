@@ -1,6 +1,5 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import com.github.tiwindetea.dungeonoflegend.model.events.EntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
 
 import java.util.ArrayList;
@@ -20,12 +19,12 @@ public class Game {
 		return this.listeners.toArray(new EntityListener[this.listeners.size()]);
 	}
 
-	private void fireEntityMoved(int entityId, Vector2i oldPosition, Vector2i newPosition) {
+	/*private void fireEntityMoved(int entityId, Vector2i oldPosition, Vector2i newPosition) {
 		EntityMoveEvent event = new EntityMoveEvent(entityId, oldPosition, newPosition);
 		for(EntityListener listener : this.listeners) {
 			listener.moveEntity(event);
 		}
-	}
+	}*/
 
 	public Game() {
 		//TODO

@@ -200,7 +200,7 @@ public enum StaticEntityType {
 		case "Players.png":
 			return ViewPackage.playersImage;
 		case "Enemies.png":
-			return ViewPackage.enemiesImage;
+			//return ViewPackage.enemiesImage;
 		default:
 			return ViewPackage.playersImage; // for tests
 		//return null;

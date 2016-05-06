@@ -1,9 +1,18 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
-import com.github.tiwindetea.dungeonoflegend.model.events.EntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.EntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.model.events.EntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.model.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.listeners.EntityListener;
@@ -102,21 +111,62 @@ public class GUI implements EntityListener {
 	}
 
 	@Override
-	public void moveEntity(EntityMoveEvent e) {
-		this.entityMap.get(e.entityId).setPosition(e.newPosition);
+	public void addInventory(InventoryAdditionEvent e) {
+
 	}
 
 	@Override
-	public void createEntity(EntityCreationEvent e) {
-		StaticEntity newStaticEntity = new StaticEntity(e.type, e.position);
-		this.entityMap.put(e.entityId, newStaticEntity);
-		//this.root.getChildren().add(newStaticEntity.getImageView());
+	public void deleteInventory(InventoryDeletionEvent e) {
+
 	}
 
 	@Override
-	public void deleteEntity(EntityDeletionEvent e) {
-		//this.root.getChildren().remove(this.entityMap.get(e.entityId).getImageView());
-		this.entityMap.remove(e.entityId);
+	public void createLivingEntity(LivingEntityCreationEvent e) {
+
 	}
 
+	@Override
+	public void deleteLivingEntity(LivingEntityDeletionEvent e) {
+
+	}
+
+	@Override
+	public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
+
+	}
+
+	@Override
+	public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
+
+	}
+
+	@Override
+	public void moveLivingEntity(LivingEntityMoveEvent e) {
+
+	}
+
+	@Override
+	public void createPlayer(PlayerCreationEvent e) {
+
+	}
+
+	@Override
+	public void changePlayerStat(PlayerStatEvent e) {
+
+	}
+
+	@Override
+	public void createStaticEntity(StaticEntityCreationEvent e) {
+
+	}
+
+	@Override
+	public void deleteStaticEntity(StaticEntityDeletionEvent e) {
+
+	}
+
+	@Override
+	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
+
+	}
 }
