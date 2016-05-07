@@ -1,7 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
-import javafx.scene.Group;
+import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -10,7 +10,7 @@ import javafx.util.Duration;
 /**
  * Created by maxime on 5/5/16.
  */
-public class PlayerHUD {
+public class PlayerHUD extends Parent {
 	private static final Vector2i mainPaneSize = new Vector2i(400, 100);
 	private static final Vector2i playerPictureSize = new Vector2i(64, 64);
 	private static final int healthRectanglesHeight = 20;
@@ -26,7 +26,6 @@ public class PlayerHUD {
 
 	private static final Duration duration = Duration.millis(1000);
 
-	private final Group mainGroup = new Group();
 	private final ImageView playerPicture;
 	private final Rectangle maxHealthRectangle = new Rectangle();
 	private final Rectangle actualHealthRectangle = new Rectangle();
@@ -49,9 +48,9 @@ public class PlayerHUD {
 	}
 
 	private void init() {
-		this.mainGroup.getChildren().add(this.backGroundRectangle);
+		this.getChildren().add(this.backGroundRectangle);
 
-		this.mainGroup.getChildren().add(this.playerPicture);
+		this.getChildren().add(this.playerPicture);
 		double originalWidth = this.playerPicture.getViewport().getWidth();
 		double originalHeight = this.playerPicture.getViewport().getHeight();
 		this.playerPicture.setScaleX(playerPictureSize.x / this.playerPicture.getViewport().getWidth());
@@ -61,37 +60,33 @@ public class PlayerHUD {
 		this.playerPicture.setTranslateX(space);
 		this.playerPicture.setTranslateY((mainPaneSize.y - playerPictureSize.y) / 2.0);
 
-		this.mainGroup.getChildren().add(this.maxHealthRectangle);
+		this.getChildren().add(this.maxHealthRectangle);
 		this.maxHealthRectangle.setTranslateX(2 * space + playerPictureSize.x);
 		this.maxHealthRectangle.setTranslateY((mainPaneSize.y - healthRectanglesHeight - manaRectanglesHeight) / 2);
 		this.maxHealthRectangle.setWidth(mainPaneSize.x - 3 * space - playerPictureSize.x);
 		this.maxHealthRectangle.setHeight(healthRectanglesHeight);
 		this.maxHealthRectangle.setFill(maxHealthRectangleColor);
 
-		this.mainGroup.getChildren().add(this.actualHealthRectangle);
+		this.getChildren().add(this.actualHealthRectangle);
 		this.actualHealthRectangle.setTranslateX(this.maxHealthRectangle.getTranslateX());
 		this.actualHealthRectangle.setTranslateY(this.maxHealthRectangle.getTranslateY());
 		this.actualHealthRectangle.setWidth((double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth());
 		this.actualHealthRectangle.setHeight(healthRectanglesHeight);
 		this.actualHealthRectangle.setFill(actualHealthRectangleColor);
 
-		this.mainGroup.getChildren().add(this.maxManaRectangle);
+		this.getChildren().add(this.maxManaRectangle);
 		this.maxManaRectangle.setTranslateX(2 * space + playerPictureSize.x);
 		this.maxManaRectangle.setTranslateY((mainPaneSize.y - healthRectanglesHeight - manaRectanglesHeight) / 2 + healthRectanglesHeight);
 		this.maxManaRectangle.setWidth(manaRectanglesWidth * this.maxHealthRectangle.getWidth());
 		this.maxManaRectangle.setHeight(manaRectanglesHeight);
 		this.maxManaRectangle.setFill(maxManaRectangleColor);
 
-		this.mainGroup.getChildren().add(this.actualManaRectangle);
+		this.getChildren().add(this.actualManaRectangle);
 		this.actualManaRectangle.setTranslateX(this.maxManaRectangle.getTranslateX());
 		this.actualManaRectangle.setTranslateY(this.maxManaRectangle.getTranslateY());
 		this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
 		this.actualManaRectangle.setHeight(manaRectanglesHeight);
 		this.actualManaRectangle.setFill(actualManaRectangleColor);
-	}
-
-	public Group getMainGroup() {
-		return this.mainGroup;
 	}
 
 	public static Vector2i getSize() {

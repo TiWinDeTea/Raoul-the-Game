@@ -75,14 +75,16 @@ public class GUI implements GameListener {
 
 		//Main pane
 		//this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
+		this.borderPane.setCenter(this.cPane);
 		this.borderPane.setRight(this.rPane);
 		this.borderPane.setBottom(this.bPane);
-		this.borderPane.setCenter(this.cPane);
 		this.borderPane.setMinWidth(500);
 		this.borderPane.setMinHeight(500);
 
 		//Center pane
-		this.cPane.setBackground(new Background(new BackgroundFill(Color.BROWN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.cPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
+		TileMap tileMap = new TileMap();
+		this.cPane.getChildren().add(tileMap);
 
 		//Right pane
 		this.rPane.setBackground(new Background(new BackgroundFill(Color.CRIMSON, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -230,7 +232,7 @@ public class GUI implements GameListener {
 			imageView.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
 			PlayerHUD playerHUD = new PlayerHUD(imageView, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
 			this.playersHUD.add(playerHUD);
-			this.blTilePane.getChildren().add(playerHUD.getMainGroup());
+			this.blTilePane.getChildren().add(playerHUD);
 			if(this.playersHUD.size() > 1) {
 				if((this.bPane.getWidth() - this.rPane.getWidth()) < (this.playersHUD.size() * PlayerHUD.getSize().x)) {
 					this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
