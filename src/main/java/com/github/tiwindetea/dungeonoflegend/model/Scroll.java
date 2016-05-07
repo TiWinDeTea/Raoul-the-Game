@@ -8,6 +8,7 @@ public class Scroll implements Consumable {
 	private byte turns;
 	private int healthModifierPerTick;
 	private int healthModifierModifierPerTick;
+	private LivingThing target;
 
 	public Scroll(byte turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
 		this.turns = turns;
@@ -15,25 +16,19 @@ public class Scroll implements Consumable {
 		this.healthModifierModifierPerTick = healthModifierModifierPerTick;
 	}
 
-	public int getHMPT() {
-		return this.healthModifierModifierPerTick;
-	}
-
-	public int getHMMPT() {
-		return this.healthModifierModifierPerTick;
-	}
-
 	public void trigger(LivingThing livingThing) {
-		//TODO
+		this.target = livingThing;
+		livingThing.damage(this.healthModifierPerTick);
 	}
 
 	public boolean nextTick() {
-		//TODO
-		return false;
+		--this.turns;
+		this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
+		this.target.damage(this.healthModifierPerTick);
+		return this.turns < 0;
 	}
 
 	public ConsumableType getConsumableType() {
-		//TODO
-		return null;
+		return ConsumableType.SCROLL;
 	}
 }

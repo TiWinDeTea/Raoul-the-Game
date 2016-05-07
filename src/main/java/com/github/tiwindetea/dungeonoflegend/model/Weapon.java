@@ -6,36 +6,40 @@ package com.github.tiwindetea.dungeonoflegend.model;
 public class Weapon implements StorableObject {
 
 	private int attackPowerModifier;
-	private byte range;
-	private byte manaCost;
+	private int range;
+	private int manaCost;
 	private WeaponType type;
 
-	public Weapon() {
-		//TODO
+	public Weapon(int attackPowerModifier, int range, int manaCost) {
+		this.attackPowerModifier = attackPowerModifier;
+		this.range = range;
+		this.manaCost = manaCost;
+		if (manaCost != 0) {
+			this.type = WeaponType.WAND;
+		} else if (range != 0) {
+			this.type = WeaponType.BOW;
+		} else {
+			this.type = WeaponType.SWORD;
+		}
 	}
 
 	public WeaponType getWeaponType() {
-		//TODO
-		return null;
+		return this.type;
 	}
 
 	public int getAttackPowerModifier() {
-		//TODO
-		return 0;
+		return this.attackPowerModifier;
 	}
 
-	public byte getRange() {
-		//TODO
-		return 0;
+	public int getRange() {
+		return this.range;
 	}
 
-	public byte getManaCost() {
-		//TODO
-		return 0;
+	public int getManaCost() {
+		return this.manaCost;
 	}
 
 	public StorableObjectType getType() {
-		//TODO
-		return null;
+		return StorableObjectType.WEAPON;
 	}
 }

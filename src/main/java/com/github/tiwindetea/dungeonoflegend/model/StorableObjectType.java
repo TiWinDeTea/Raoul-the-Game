@@ -6,5 +6,19 @@ package com.github.tiwindetea.dungeonoflegend.model;
 public enum StorableObjectType {
 	WEAPON,
 	ARMOR,
-	CONSUMABLE
+	CONSUMABLE;
+
+	public static StorableObjectType parseStorableObjectType(String str) {
+		str.toUpperCase();
+		switch (str) {
+			case "WEAPON":
+				return WEAPON;
+			case "ARMOR":
+				return ARMOR;
+			case "CONSUMABLE":
+				return CONSUMABLE;
+			default:
+				return null;
+		}
+	}
 }

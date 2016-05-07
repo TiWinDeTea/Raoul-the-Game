@@ -143,4 +143,35 @@ public enum LivingEntityType {
 		//return null;
 		}
 	}
+
+	public static LivingEntityType parseLivingEntity(String str) {
+		str.toLowerCase();
+		if (PLAYER1.toString().equals(str)) {
+			return PLAYER1;
+		} else if (PLAYER2.toString().equals(str)) {
+			return PLAYER2;
+		} else if (LITTLE_PUNK_DUCK.toString().equals(str)) {
+			return LITTLE_PUNK_DUCK;
+		} else if (PUNK_DUCK.toString().equals(str)) {
+			return PUNK_DUCK;
+		} else if (LITTLE_ARISTOCRAT_DUCK.toString().equals(str)) {
+			return LITTLE_ARISTOCRAT_DUCK;
+		} else if (ARISTOCRAT_DUCK.toString().equals(str)) {
+			return ARISTOCRAT_DUCK;
+		} else if (LITTLE_MONSTER_TRUCK_DUCK.toString().equals(str)) {
+			return LITTLE_MONSTER_TRUCK_DUCK;
+		} else if (MONSTER_TRUCK_DUCK.toString().equals(str)) {
+			return MONSTER_TRUCK_DUCK;
+		} else if (LITTLE_SPACE_SHIP_DUCK.toString().equals(str)) {
+			return LITTLE_SPACE_SHIP_DUCK;
+		} else if (SPACE_SHIP_DUCK.toString().equals(str)) {
+			return SPACE_SHIP_DUCK;
+		} else if (LITTLE_SATANIC_DUCK.toString().equals(str)) {
+			return LITTLE_SATANIC_DUCK;
+		} else if (SATANIC_DUCK.toString().equals(str)) {
+			return SATANIC_DUCK;
+		} else {
+			return null;
+		}
+	}
 }

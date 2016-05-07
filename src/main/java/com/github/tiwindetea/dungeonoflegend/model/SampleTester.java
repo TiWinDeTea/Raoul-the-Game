@@ -54,7 +54,9 @@ public class SampleTester extends Application {
             stairUp = Tile.STAIR_UP.getSpritePosition().multiply(this.xsize),
             stairDown = Tile.STAIR_DOWN.getSpritePosition().multiply(this.xsize),
             pillar = Tile.PILLAR.getSpritePosition().multiply(this.xsize),
-            hole = Tile.HOLE.getSpritePosition().multiply(this.xsize);
+            hole = Tile.HOLE.getSpritePosition().multiply(this.xsize),
+            bulb = new Vector2i(32 * 3, 32 * 4);
+
     Stack<Vector2i> path = new Stack<>();
     double zoom = 1;
     Image objectTextures = new Image(MainPackage.path + "/" + MainPackage.spriteSheetBundle.getString("objects.file"));
@@ -431,6 +433,34 @@ public class SampleTester extends Application {
                 sprite.setTranslateX(i * this.ysize * this.zoom);
                 this.root.getChildren().add(sprite);
             }
+        }
+        if (this.allVisible) {
+            Vector2i bulbPos, upPos, downPos;
+            bulbPos = this.world.getBulbPosition();
+            upPos = this.world.getStairsUpPosition();
+            downPos = this.world.getStairsDownPosition();
+            ImageView sprite1 = new ImageView(this.objectTextures),
+                    sprite2 = new ImageView(this.objectTextures),
+                    sprite3 = new ImageView(this.objectTextures);
+
+            sprite1.setViewport(new Rectangle2D(this.bulb.x, this.bulb.y, this.xsize, this.ysize));
+            sprite1.setFitWidth(SampleTester.this.xsize * SampleTester.this.zoom);
+            sprite1.setFitHeight(SampleTester.this.ysize * SampleTester.this.zoom);
+            sprite1.setTranslateX(bulbPos.x * this.xsize * this.zoom);
+            sprite1.setTranslateY(bulbPos.y * this.ysize * this.zoom);
+            this.root.getChildren().add(sprite1);
+            sprite2.setViewport(new Rectangle2D(this.stairDown.x, this.stairDown.y, this.xsize, this.ysize));
+            sprite2.setFitWidth(SampleTester.this.xsize * SampleTester.this.zoom);
+            sprite2.setFitHeight(SampleTester.this.ysize * SampleTester.this.zoom);
+            sprite2.setTranslateX(downPos.x * this.xsize * this.zoom);
+            sprite2.setTranslateY(downPos.y * this.ysize * this.zoom);
+            this.root.getChildren().add(sprite2);
+            sprite3.setViewport(new Rectangle2D(this.stairUp.x, this.stairUp.y, this.xsize, this.ysize));
+            sprite3.setFitWidth(SampleTester.this.xsize * SampleTester.this.zoom);
+            sprite3.setFitHeight(SampleTester.this.ysize * SampleTester.this.zoom);
+            sprite3.setTranslateX(upPos.x * this.xsize * this.zoom);
+            sprite3.setTranslateY(upPos.y * this.ysize * this.zoom);
+            this.root.getChildren().add(sprite3);
         }
     }
 }

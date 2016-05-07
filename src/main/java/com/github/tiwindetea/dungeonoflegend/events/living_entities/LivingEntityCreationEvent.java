@@ -14,6 +14,7 @@ public class LivingEntityCreationEvent extends LivingEntityEvent {
 
 	public LivingEntityCreationEvent(int entityId, LivingEntityType type, Vector2i position, Direction direction) {
 		super(entityId);
+		System.out.println("\033[31mIs the ID needed ?\033[0m");
 		this.type = type;
 		this.position = position;
 		this.direction = direction;

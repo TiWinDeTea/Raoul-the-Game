@@ -12,6 +12,7 @@ public class StaticEntityCreationEvent extends StaticEntityEvent {
 
 	public StaticEntityCreationEvent(int entityId, StaticEntityType type, Vector2i position) {
 		super(entityId);
+		System.out.println("\033[31mIs the ID needed ?\033[0m");
 		this.type = type;
 		this.position = position;
 	}

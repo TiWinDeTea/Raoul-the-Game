@@ -13,6 +13,10 @@ public class Player extends LivingThing {
 	private Armor[] armor;
 	private Weapon weapon;
 	private String name;
+	private int hitPointsPerLevel;
+	private int manaPerLevel;
+	private int attackPowerPerLevel;
+	private int defensePowerPerLevel;
 
 	Player() {
 		//TODO
@@ -50,6 +54,32 @@ public class Player extends LivingThing {
 
 	public StorableObject[] getInventory() {
 		return this.inventory.toArray(new StorableObject[this.inventory.size()]);
+	}
+
+	public void addMana(int mana) {
+		this.mana = Math.min(this.maxMana, mana + this.mana);
+	}
+
+	public void heal(int hp) {
+		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
+	}
+
+	public void increaseAttack(int ad) {
+		this.attackPower += ad;
+	}
+
+	public void increaseHP(int hp) {
+		this.maxHitPoints += hp;
+		this.hitPoints += hp;
+	}
+
+	public void increaseDefense(int def) {
+		this.defensePower += def;
+	}
+
+	public void increaseMana(int manaModifier) {
+		this.maxMana += manaModifier;
+		this.mana += manaModifier;
 	}
 
 	@Override

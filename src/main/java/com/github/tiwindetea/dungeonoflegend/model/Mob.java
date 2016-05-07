@@ -10,6 +10,15 @@ public class Mob extends LivingThing {
 		this.position = pos;
 	}
 
+	public Mob(int level, int maxHitPoints, int attackPower, int defensePower, Vector2i position) {
+		this.level = level;
+		this.maxHitPoints = maxHitPoints;
+		this.attackPower = attackPower;
+		this.defensePower = defensePower;
+		this.position = position;
+		this.hitPoints = maxHitPoints;
+	}
+
 	public Mob() {
 		//TODO
 	}

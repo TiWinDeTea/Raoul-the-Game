@@ -239,7 +239,7 @@ public class Map {
      *
      * @param level The level to generate
      */
-    public void generateLevel(int level) {
+    public ArrayList<Room> generateLevel(int level) {
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Room> corridors = new ArrayList<>();
         int retries = 0;
@@ -320,6 +320,25 @@ public class Map {
                 }
             }
         }
+        Vector2i[] positions = new Vector2i[3];
+        for (int i = 0; i < positions.length; i++) {
+            positions[i] = new Vector2i(0, 0);
+        }
+        do {
+            for (int i = 0; i < positions.length; i++) {
+                do {
+                    room = rooms.get(this.random.nextInt(rooms.size()));
+                    positions[i].x = this.random.nextInt(room.bottom.x - room.top.x) + room.top.x;
+                    positions[i].y = this.random.nextInt(room.bottom.y - room.top.y) + room.top.y;
+                } while (isObstructed(this.map[positions[i].x][positions[i].y]));
+            }
+        } while (this.getPath(positions[0], positions[1], true, null) == null
+                || this.getPath(positions[1], positions[2], true, null) == null);
+        this.bulbPosition = positions[0];
+        this.stairsDownPosition = positions[1];
+        this.stairsUpPosition = positions[2];
+        rooms.addAll(corridors);
+        return rooms;
     }
 
     /**
@@ -574,9 +593,9 @@ public class Map {
      *
      * @author Lucas LAZARE
      */
-    private class Room {
-        private Vector2i top;
-        private Vector2i bottom;
+    public class Room {
+        public Vector2i top;
+        public Vector2i bottom;
 
         /**
          * Instantiates a new Room.

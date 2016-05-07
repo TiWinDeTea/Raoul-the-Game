@@ -24,7 +24,7 @@ public class Main extends Application {
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.setScene(GUI.getScene());
 		primaryStage.show();
-		Game game = new Game();
+		Game game = new Game(0);
 		game.addGameListener(GUI);
 		GUI.addRequestListener(game);
 		game.launch((byte) 1);

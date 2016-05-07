@@ -9,12 +9,23 @@ public class InteractiveObject {
 	private int manaModifier;
 	private int hpModifier;
 	private StorableObject loot;
-	private LivingThingType target;
     private Vector2i position;
 
-    public InteractiveObject(boolean isTrap, Vector2i position) {
-        this.isTrap = isTrap;
+    public InteractiveObject(Vector2i position) {
         this.position = position;
+    }
+
+    public InteractiveObject(Vector2i position, StorableObject loot) {
+        this.position = position;
+        this.loot = loot;
+        this.isTrap = false;
+    }
+
+    public InteractiveObject(Vector2i position, int hpModifier, int manaModifier) {
+        this.position = position;
+        this.hpModifier = hpModifier;
+        this.manaModifier = manaModifier;
+        this.isTrap = true;
     }
 
     public boolean trigger(LivingThing livingThing) {
@@ -31,11 +42,20 @@ public class InteractiveObject {
         }
     }
 
-    public boolean isActivableOn(LivingThingType type) {
-        return this.isTrap || type == LivingThingType.PLAYER;
+    public boolean isTrap() {
+        return this.isTrap;
     }
 
     public Vector2i getPosition() {
         return this.position;
+    }
+
+    public boolean equals(Object o) {
+        /* asserting o to be an interactive object */
+        return this.equals((InteractiveObject) o);
+    }
+
+    public boolean equals(InteractiveObject io) {
+        return this.position.equals(io.position);
     }
 }

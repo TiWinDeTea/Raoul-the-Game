@@ -155,6 +155,18 @@ public enum StaticEntityType {
 		public String toString() {
 			return resourceBundle.getString("chest.string");
 		}
+	},
+	LIT_BULB {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("lit-bulb.string");
+		}
+	},
+	UNLIT_BULB {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("unlit-bulb.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".StaticEntity";

@@ -100,7 +100,7 @@ public enum ArmorType {
 		return null;
 	}
 
-	static public ArmorType fromInt(int a) {
+	public static ArmorType fromInt(int a) {
 		//Java code style convention are ugly
 		switch(a) {
 		case 0:
@@ -115,6 +115,24 @@ public enum ArmorType {
 			return PANTS;
 		default:
 			return null;
+		}
+	}
+
+	public static ArmorType parseArmorType(String str) {
+		str.toUpperCase();
+		switch (str) {
+			case "BREAST-PLATE":
+				return BREAST_PLATE;
+			case "GLOVES":
+				return GLOVES;
+			case "HELMET":
+				return HELMET;
+			case "BOOTS":
+				return BOOTS;
+			case "PANTS":
+				return PANTS;
+			default:
+				return null;
 		}
 	}
 }
