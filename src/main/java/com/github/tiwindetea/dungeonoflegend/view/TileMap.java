@@ -202,6 +202,8 @@ public class TileMap extends Parent {
 			return;
 		}
 
+		getChildren().removeAll();
+
 		int mapWidth = map.length;
 		int mapHeight = map[0].length;
 

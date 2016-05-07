@@ -37,9 +37,12 @@ public class Main extends Application {
 			  public void handle(MouseEvent event) {
 				  if(event.getButton() == MouseButton.PRIMARY) {
 					  GUI.changePlayerStat(new PlayerStatEvent(1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 100));
+					  GUI.changePlayerStat(new PlayerStatEvent(1, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, 20));
 				  }
 				  else if(event.getButton() == MouseButton.SECONDARY) {
 					  GUI.changePlayerStat(new PlayerStatEvent(1, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 10));
+					  GUI.changePlayerStat(new PlayerStatEvent(1, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, 90));
+
 				  }
 			  }
 		  });

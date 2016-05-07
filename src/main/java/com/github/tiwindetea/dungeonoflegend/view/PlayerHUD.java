@@ -1,10 +1,14 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 /**
@@ -24,7 +28,15 @@ public class PlayerHUD extends Parent {
 	private static final Color actualManaRectangleColor = Color.BLUE;
 	private static final Color backGroundColor = Color.PURPLE;
 
-	private static final Duration duration = Duration.millis(1000);
+	private static final Duration AnimationDuration = Duration.millis(1000);
+
+	public static final Font healthLabelFont = Font.font("Serif", FontWeight.NORMAL, 15);
+	public static final Color healthLabelTextColor = Color.WHITE;
+	public static final int healthLabelTranslateY = 33;
+	public static final Font manaLabelFont = Font.font("Serif", FontWeight.NORMAL, 10);
+	public static final Color manaLabelTextColor = Color.WHITE;
+	public static final int manaLabelTranslateY = 53;
+	public static final int labelsOffset = 5;
 
 	private final ImageView playerPicture;
 	private final Rectangle maxHealthRectangle = new Rectangle();
@@ -32,6 +44,11 @@ public class PlayerHUD extends Parent {
 	private final Rectangle maxManaRectangle = new Rectangle();
 	private final Rectangle actualManaRectangle = new Rectangle();
 	private final Rectangle backGroundRectangle = new Rectangle(mainPaneSize.x, mainPaneSize.y, backGroundColor);
+
+	private final Label healthLabel = new Label();
+	private final Label manaLabel = new Label();
+	private final SimpleStringProperty healthString = new SimpleStringProperty();
+	private final SimpleStringProperty manaString = new SimpleStringProperty();
 
 	private int maxHealth;
 	private int actualHealth;
@@ -87,6 +104,22 @@ public class PlayerHUD extends Parent {
 		this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
 		this.actualManaRectangle.setHeight(manaRectanglesHeight);
 		this.actualManaRectangle.setFill(actualManaRectangleColor);
+
+		this.getChildren().add(this.healthLabel);
+		this.healthLabel.setFont(healthLabelFont);
+		this.healthLabel.setTextFill(healthLabelTextColor);
+		this.healthLabel.textProperty().bind(this.healthString);
+		this.healthString.set(this.maxHealth + " / " + this.actualHealth);
+		this.healthLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + labelsOffset);
+		this.healthLabel.setTranslateY(healthLabelTranslateY);
+
+		this.getChildren().add(this.manaLabel);
+		this.manaLabel.setFont(manaLabelFont);
+		this.manaLabel.setTextFill(manaLabelTextColor);
+		this.manaLabel.textProperty().bind(this.manaString);
+		this.manaString.set(this.maxHealth + " / " + this.actualHealth);
+		this.manaLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + labelsOffset);
+		this.manaLabel.setTranslateY(manaLabelTranslateY);
 	}
 
 	public static Vector2i getSize() {
@@ -95,13 +128,15 @@ public class PlayerHUD extends Parent {
 
 	private void updateHealth() {
 		//this.actualHealthRectangle.setWidth((double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth());
-		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, (double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth(), duration);
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, (double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth(), AnimationDuration);
+		this.healthString.set(this.actualHealth + " / " + this.maxHealth);
 		transition.play();
 	}
 
 	private void updateMana() {
 		//this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
-		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), duration);
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), AnimationDuration);
+		this.manaString.set(this.actualMana + " / " + this.maxMana);
 		transition.play();
 	}
 
