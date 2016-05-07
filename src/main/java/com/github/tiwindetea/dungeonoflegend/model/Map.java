@@ -337,6 +337,8 @@ public class Map {
         this.bulbPosition = positions[0];
         this.stairsDownPosition = positions[1];
         this.stairsUpPosition = positions[2];
+        this.map[this.stairsUpPosition.x][this.stairsUpPosition.y] = Tile.STAIR_UP;
+        this.map[this.stairsDownPosition.x][this.stairsDownPosition.y] = Tile.STAIR_DOWN;
         rooms.addAll(corridors);
         return rooms;
     }

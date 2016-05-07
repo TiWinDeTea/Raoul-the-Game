@@ -25,12 +25,6 @@ public class Node {
         this.heuristic = heuristic;
     }
 
-    public Node(Vector2i pos, int heuristic) {
-        this.distance = Integer.MAX_VALUE;
-        this.heuristic = heuristic;
-        this.pos = pos;
-    }
-
     public boolean equals(Object o) {
         /* asserting o to be a Node */
         return this.equals((Node) o);
