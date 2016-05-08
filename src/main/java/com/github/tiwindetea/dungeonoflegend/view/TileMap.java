@@ -71,36 +71,84 @@ public class TileMap extends Parent {
 			double newTranslateY = TileMap.this.translateAnchorY + event.getSceneY() - TileMap.this.mouseAnchorY;
 
 			TileMap tileMap = TileMap.this;
-			Pane prent = (Pane) (tileMap.getParent());
+			Pane parent = (Pane) (tileMap.getParent());
 
-			/*if(newTranslateX < tileMap.getTranslateX()) {
-				if(tileMap.getTranslateX() + (tileMap.getWidth() * tileMap.getScale()) > prent.getWidth()) {
-					TileMap.this.setTranslateX(newTranslateX);
+			double width = getWidth() * getScale();
+			double height = getHeight() * getScale();
+
+			double realOldTranslateX = getTranslateX() + (getWidth() - width) / 2;
+			double realOldTranslateY = getTranslateY() + (getHeight() - height) / 2;
+			double realNewTranslateX = newTranslateX + (getWidth() - width) / 2;
+			double realNewTranslateY = newTranslateY + (getHeight() - height) / 2;
+
+			if(width > parent.getWidth()) {
+				if(newTranslateX < tileMap.getTranslateX()) {
+					if(realOldTranslateX + width > parent.getWidth()) {
+						TileMap.this.setTranslateX(newTranslateX);
+					}
+					else {
+						System.out.println("left");
+					}
+				}
+				else {
+					if(realOldTranslateX < 0) {
+						TileMap.this.setTranslateX(newTranslateX);
+					}
+					else {
+						System.out.println("right");
+					}
+				}
+				if(newTranslateY < tileMap.getTranslateY()) {
+					if(realOldTranslateY + height > parent.getHeight()) {
+						TileMap.this.setTranslateY(newTranslateY);
+					}
+					else {
+						System.out.println("up");
+					}
+				}
+				else {
+					if(realOldTranslateY < 0) {
+						TileMap.this.setTranslateY(newTranslateY);
+					}
+					else {
+						System.out.println("down");
+					}
 				}
 			}
 			else {
-				if(tileMap.getTranslateX() < 0) {
-					TileMap.this.setTranslateX(newTranslateX);
+				if(newTranslateX > tileMap.getTranslateX()) {
+					if(realOldTranslateX + width < parent.getWidth()) {
+						TileMap.this.setTranslateX(newTranslateX);
+					}
+					else {
+						System.out.println("left");
+					}
+				}
+				else {
+					if(realOldTranslateX > 0) {
+						TileMap.this.setTranslateX(newTranslateX);
+					}
+					else {
+						System.out.println("right");
+					}
+				}
+				if(newTranslateY > tileMap.getTranslateY()) {
+					if(realOldTranslateY + height < parent.getHeight()) {
+						TileMap.this.setTranslateY(newTranslateY);
+					}
+					else {
+						System.out.println("up");
+					}
+				}
+				else {
+					if(realOldTranslateY > 0) {
+						TileMap.this.setTranslateY(newTranslateY);
+					}
+					else {
+						System.out.println("down");
+					}
 				}
 			}
-
-			if(newTranslateY < tileMap.getTranslateY()) {
-				if(tileMap.getTranslateY() + (tileMap.getHeight() * tileMap.getScale()) > prent.getHeight()) {
-					TileMap.this.setTranslateY(newTranslateY);
-				}
-			}
-			else {
-				if(tileMap.getTranslateY() < 0) {
-					TileMap.this.setTranslateY(newTranslateY);
-				}
-			}*/
-
-			TileMap.this.setTranslateX(newTranslateX);
-			TileMap.this.setTranslateY(newTranslateY);
-
-			//TileMap.this.setTranslateX(0);
-			//TileMap.this.setTranslateY(0);
-
 			event.consume();
 		}
 	};
@@ -127,41 +175,12 @@ public class TileMap extends Parent {
 			double dx = (event.getSceneX() - (TileMap.this.getBoundsInParent().getWidth() / 2 + TileMap.this.getBoundsInParent().getMinX()));
 			double dy = (event.getSceneY() - (TileMap.this.getBoundsInParent().getHeight() / 2 + TileMap.this.getBoundsInParent().getMinY()));
 
-			//double originalWidth = getWidth();
-			//double originalHeight = getHeight();
-
 			TileMap.this.scale.set(scale);
 
 			// note: pivot value must be untransformed, i. e. without scaling
 			TileMap.this.setPivot(f * dx, f * dy);
 
 			event.consume();
-
-			//double newWidth = getWidth() * getScale();
-			//double newHeight = getHeight() * getScale();
-
-			/*if(newWidth > originalWidth) {
-				setLayoutX(getLayoutX() - (originalWidth - newWidth) / 2);
-				setLayoutY(getLayoutY() - (originalHeight - newHeight) / 2);
-				System.out.println("++");
-			}
-			else {
-				setLayoutX(getLayoutX() + (originalWidth - newWidth) / 2);
-				setLayoutY(getLayoutY() + (originalHeight - newHeight) / 2);
-				System.out.println("--");
-			}*/
-			/*Rectangle rect = new Rectangle(50, 50, Color.CYAN);
-			rect.setTranslateX(getLayoutX());
-			rect.setTranslateY(getLayoutY());
-			Rectangle rect2 = new Rectangle(50, 50, Color.PURPLE);
-			rect2.setTranslateX(originalWidth);
-			rect2.setTranslateY(originalHeight);
-			Rectangle rect3 = new Rectangle(50, 50, Color.GREEN);
-			rect3.setTranslateX(newWidth);
-			rect3.setTranslateY(newHeight);
-			getChildren().add(rect);
-			getChildren().add(rect2);
-			getChildren().add(rect3);*/
 		}
 	};
 
@@ -191,10 +210,10 @@ public class TileMap extends Parent {
 		Map map = new Map(new Seed(rand.nextInt(), rand.nextInt()));
 		map.generateLevel(1);
 		this.setMap(map.getMapCopy());
-		setLayoutX(getWidth() / 2);
+		/*setLayoutX(getWidth() / 2);
 		setLayoutY(getHeight() / 2);
 		setTranslateX(-getWidth() / 2);
-		setTranslateY(-getHeight() / 2);
+		setTranslateY(-getHeight() / 2);*/
 	}
 
 	public void setMap(Tile[][] map) {
