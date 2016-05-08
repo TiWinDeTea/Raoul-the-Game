@@ -86,32 +86,10 @@ public class TileMap extends Parent {
 					if(realOldTranslateX + width > parent.getWidth()) {
 						TileMap.this.setTranslateX(newTranslateX);
 					}
-					else {
-						System.out.println("left");
-					}
 				}
 				else {
 					if(realOldTranslateX < 0) {
 						TileMap.this.setTranslateX(newTranslateX);
-					}
-					else {
-						System.out.println("right");
-					}
-				}
-				if(newTranslateY < tileMap.getTranslateY()) {
-					if(realOldTranslateY + height > parent.getHeight()) {
-						TileMap.this.setTranslateY(newTranslateY);
-					}
-					else {
-						System.out.println("up");
-					}
-				}
-				else {
-					if(realOldTranslateY < 0) {
-						TileMap.this.setTranslateY(newTranslateY);
-					}
-					else {
-						System.out.println("down");
 					}
 				}
 			}
@@ -120,35 +98,39 @@ public class TileMap extends Parent {
 					if(realOldTranslateX + width < parent.getWidth()) {
 						TileMap.this.setTranslateX(newTranslateX);
 					}
-					else {
-						System.out.println("left");
-					}
 				}
 				else {
 					if(realOldTranslateX > 0) {
 						TileMap.this.setTranslateX(newTranslateX);
 					}
-					else {
-						System.out.println("right");
+				}
+			}
+
+			if(height > parent.getHeight()) {
+				if(newTranslateY < tileMap.getTranslateY()) {
+					if(realOldTranslateY + height > parent.getHeight()) {
+						TileMap.this.setTranslateY(newTranslateY);
 					}
 				}
+				else {
+					if(realOldTranslateY < 0) {
+						TileMap.this.setTranslateY(newTranslateY);
+					}
+				}
+			}
+			else {
 				if(newTranslateY > tileMap.getTranslateY()) {
 					if(realOldTranslateY + height < parent.getHeight()) {
 						TileMap.this.setTranslateY(newTranslateY);
-					}
-					else {
-						System.out.println("up");
 					}
 				}
 				else {
 					if(realOldTranslateY > 0) {
 						TileMap.this.setTranslateY(newTranslateY);
 					}
-					else {
-						System.out.println("down");
-					}
 				}
 			}
+
 			event.consume();
 		}
 	};
