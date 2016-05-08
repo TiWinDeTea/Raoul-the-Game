@@ -7,97 +7,97 @@ import java.util.ResourceBundle;
  */
 public enum Tile {
 	WALL_LEFT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-left.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-left.sprite.position.y")));
 		}
 	},
 	WALL_RIGHT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-right.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-right.sprite.position.y")));
 		}
 	},
 	WALL_DOWN {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-down.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-down.sprite.position.y")));
 		}
 	},
 	WALL_TOP {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-top.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-top.sprite.position.y")));
 		}
 	},
 	WALL_TOPLEFT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-topleft.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-topleft.sprite.position.y")));
 		}
 	},
 	WALL_TOPRIGHT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-topright.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-topright.sprite.position.y")));
 		}
 	},
 	WALL_DOWNLEFT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-downleft.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-downleft.sprite.position.y")));
 		}
 	},
 	WALL_DOWNRIGHT {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("wall-downright.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("wall-downright.sprite.position.y")));
 		}
 	},
 	PILLAR {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("pillar.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("pillar.sprite.position.y")));
 		}
 	},
 	GROUND {
-		public Vector2i getSpritePosition() {
-			return new Vector2i(Integer.parseInt(resourceBundle.getString("ground.sprite.position.x")),
+		public Vector2i getSpritePosition(int subIndex) {
+			return new Vector2i(Integer.parseInt(resourceBundle.getString("ground.sprite.position.x")) + subIndex % 5,
 			  Integer.parseInt(resourceBundle.getString("ground.sprite.position.y")));
 		}
 	},
 	OPENED_DOOR {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("opened-door.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("opened-door.sprite.position.y")));
 		}
 	},
 	CLOSED_DOOR {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("closed-door.sprite.position.x")),
 			  Integer.parseInt(resourceBundle.getString("closed-door.sprite.position.y")));
 		}
 	},
 	STAIR_UP {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("stair-up.sprite.position.x")),
 			  Integer.parseInt(resourceBundle.getString("stair-up.sprite.position.y")));
 		}
 	},
 	STAIR_DOWN {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("stair-down.sprite.position.x")),
 			  Integer.parseInt(resourceBundle.getString("stair-down.sprite.position.y")));
 		}
 	},
 	HOLE {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("hole.sprite.position.x")),
 					Integer.parseInt(resourceBundle.getString("hole.sprite.position.y")));
 		}
 	},
 	UNKNOWN {
-		public Vector2i getSpritePosition() {
+		public Vector2i getSpritePosition(int subIndex) {
 			return new Vector2i(Integer.parseInt(resourceBundle.getString("unknown.sprite.position.x")),
 			  Integer.parseInt(resourceBundle.getString("unknown.sprite.position.y")));
 		}
@@ -131,7 +131,7 @@ public enum Tile {
 		}
 	}
 
-	public Vector2i getSpritePosition() {
+	public Vector2i getSpritePosition(int subIndex) {
 		return null;
 	}
 }

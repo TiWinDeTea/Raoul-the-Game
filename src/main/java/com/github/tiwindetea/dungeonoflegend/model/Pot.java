@@ -5,7 +5,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
  */
 public class Pot implements Consumable {
 
-	private byte turns;
+	private int turns;
 	private int heal;
 	private int defensePowerModifier;
 	private int attackPowerModifier;
@@ -14,7 +14,7 @@ public class Pot implements Consumable {
 	private int manaModifier;
 	private Player target;
 
-	public Pot(byte turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier, int healthModifier, int manaModifier) {
+	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier, int healthModifier, int manaModifier) {
 		this.turns = turns;
 		this.heal = heal;
 		this.mana_heal = mana_heal;
@@ -51,5 +51,10 @@ public class Pot implements Consumable {
 
 	public ConsumableType getConsumableType() {
 		return ConsumableType.POT;
+	}
+
+	@Override
+	public StorableObjectType getType() {
+		return StorableObjectType.CONSUMABLE;
 	}
 }

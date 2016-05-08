@@ -226,8 +226,8 @@ public class Map {
                 currentY += yShifting;
                 x = Math.round(currentX);
                 y = Math.round(currentY);
-                if (isObstructed(this.map[x][y])
-                        && !tilePosition.equals(new Vector2i(x, y)))
+                if (isObstructed(this.map[x][y]) && !tilePosition.equals(new Vector2i(x, y))
+                        && this.map[x][y] != Tile.HOLE)
                     return false;
             }
         }
@@ -728,7 +728,7 @@ public class Map {
      * @return the path
      */
     public Stack<Vector2i> getPath(Vector2i departure, Vector2i arrival, boolean ignoreDoor, Collection<LivingThing> entities) {
-        if (departure.equals(arrival) || Tile.isObstructed(this.map[arrival.x][arrival.y]))
+        if (departure.equals(arrival) || (Tile.isObstructed(this.map[arrival.x][arrival.y]) && this.map[arrival.x][arrival.y] != Tile.HOLE))
             return null;
         ArrayList<Node> closedList = new ArrayList<>();
         NodePriorityQueue openList = new NodePriorityQueue(new NodeComparator());
@@ -783,7 +783,7 @@ public class Map {
      * Computes the heuristic. (Path finding)
      */
     private int heuristic(Vector2i departure, Vector2i arrival) {
-        return Math.abs(departure.x - arrival.x) + Math.abs(departure.y - arrival.y);
+        return 2 * (Math.abs(departure.x - arrival.x) + Math.abs(departure.y - arrival.y)) / 3;
     }
 
     /**

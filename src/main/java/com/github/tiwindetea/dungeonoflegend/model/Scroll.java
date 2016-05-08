@@ -5,12 +5,12 @@ package com.github.tiwindetea.dungeonoflegend.model;
  */
 public class Scroll implements Consumable {
 
-	private byte turns;
+	private int turns;
 	private int healthModifierPerTick;
 	private int healthModifierModifierPerTick;
 	private LivingThing target;
 
-	public Scroll(byte turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
+	public Scroll(int turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
 		this.turns = turns;
 		this.healthModifierPerTick = healthModifierPerTick;
 		this.healthModifierModifierPerTick = healthModifierModifierPerTick;
@@ -30,5 +30,10 @@ public class Scroll implements Consumable {
 
 	public ConsumableType getConsumableType() {
 		return ConsumableType.SCROLL;
+	}
+
+	@Override
+	public StorableObjectType getType() {
+		return StorableObjectType.CONSUMABLE;
 	}
 }
