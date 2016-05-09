@@ -1,5 +1,9 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
+
+import java.util.Random;
+
 /**
  * Created by maxime on 4/23/16.
  */
@@ -9,11 +13,18 @@ public class Scroll implements Consumable {
 	private int healthModifierPerTick;
 	private int healthModifierModifierPerTick;
 	private LivingThing target;
+	private StaticEntityType gtype;
 
 	public Scroll(int turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
 		this.turns = turns;
 		this.healthModifierPerTick = healthModifierPerTick;
 		this.healthModifierModifierPerTick = healthModifierModifierPerTick;
+		Random random = new Random();
+		if (random.nextBoolean()) {
+			this.gtype = StaticEntityType.SCROLL1;
+		} else {
+			this.gtype = StaticEntityType.SCROLL2;
+		}
 	}
 
 	public void trigger(LivingThing livingThing) {
@@ -35,5 +46,9 @@ public class Scroll implements Consumable {
 	@Override
 	public StorableObjectType getType() {
 		return StorableObjectType.CONSUMABLE;
+	}
+
+	public StaticEntityType getGtype() {
+		return this.gtype;
 	}
 }

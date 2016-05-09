@@ -15,20 +15,18 @@ import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntity
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
-import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.EntityListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by maxime on 4/24/16.
  */
 public class Game implements RequestListener {
 	/* Tunning parameters for the entities generation */
-	public static final int MIN_MOB_QTT_PER_ROOM = 0;
-	public static final int MAX_MOB_QTT_PER_ROOM = 3;
 	public static final int MIN_MOB_QTT_PER_LEVEL = 15;
 	public static final int MAX_MOB_QTT_PER_LEVEL = 20;
 	public static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
@@ -39,11 +37,13 @@ public class Game implements RequestListener {
 
 	private int level;
 	private Map world;
-	private ArrayList<Mob> mobs;
-	private ArrayList<InteractiveObject> interactiveObjects;
-	private ArrayList<Player> players;
+	private ArrayList<Pair<StorableObject>> objectsOnGround = new ArrayList<>();
+	private ArrayList<Pair<Mob>> mobs = new ArrayList<>();
+	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
+	private ArrayList<Pair<Player>> players;
+	private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
 	private Seed seed;
-	private final List<EntityListener> listeners = new ArrayList<>();
+	private final List<GameListener> listeners = new ArrayList<>();
 	private LivingEntityType[] mobsTypes;
 	private int[] mobsBaseHP;
 	private int[] mobsBaseDef;
@@ -85,32 +85,26 @@ public class Game implements RequestListener {
 	private int[] lootsScrollDamageModPerTurnPerLevel;
 	private int[] lootsScrollTurns;
 
+	private int playerTurn;
 
-	public Game(int playerNumber, Seed seed, int level) {
 
-		this.mobs = new ArrayList<>();
-		this.interactiveObjects = new ArrayList<>();
+	public Game(ArrayList<Player> players, Seed seed, int level) {
+
+		this.playerTurn = 0;
 		this.level = level;
 		this.seed = seed;
 		this.world = new Map(this.seed);
-		this.players = new ArrayList<>(playerNumber);
+
 		this.world.generateLevel(level);
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
+		this.players = new ArrayList<>(players.size());
+		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
 	}
 
-	public Game(int playerNumber) {
-		this.mobs = new ArrayList<>();
-		this.interactiveObjects = new ArrayList<>();
-		this.level = 0;
-		this.seed = new Seed();
-		this.world = new Map(this.seed);
-		this.players = new ArrayList<>(playerNumber);
-		this.world.generateLevel(this.level);
-		this.loadMobs();
-		this.loadChests();
-		this.loadTraps();
+	public Game(ArrayList<Player> players) {
+		this(players, new Seed(), 0);
 	}
 
 	private void loadMobs() {
@@ -124,7 +118,7 @@ public class Game implements RequestListener {
 		this.mobsDefPerLevel = new int[mobQtt];
 		this.mobsAttackPerLevel = new int[mobQtt];
 		for (int i = 0; i < mobQtt; i++) {
-			String mobName = new String("mob" + i + ".");
+			String mobName = "mob" + i + ".";
 			this.mobsTypes[i] = LivingEntityType.parseLivingEntity(mobs.getString(mobName + "type"));
 			this.mobsBaseHP[i] = Integer.parseInt(mobs.getString(mobName + "base-hp"));
 			this.mobsBaseDef[i] = Integer.parseInt(mobs.getString(mobName + "base-def"));
@@ -144,7 +138,7 @@ public class Game implements RequestListener {
 		this.lootsArmorDefensePerLevel = new int[armorQtt];
 		this.lootsArmorAttackPerLevel = new int[armorQtt];
 		for (int i = 0; i < armorQtt; i++) {
-			String armorName = new String("armor" + i + ".");
+			String armorName = "armor" + i + ".";
 			this.lootsArmorType[i] = ArmorType.parseArmorType(loots.getString(armorName + "type"));
 			this.lootsArmorBaseDefense[i] = Integer.parseInt(loots.getString(armorName + "base-defense"));
 			this.lootsArmorBaseAttack[i] = Integer.parseInt(loots.getString(armorName + "base-attack"));
@@ -159,7 +153,7 @@ public class Game implements RequestListener {
 		this.lootsWeaponAttackPerLevel = new int[weaponQtt];
 		this.lootsWeaponManaCostPerLevel = new int[weaponQtt];
 		for (int i = 0; i < weaponQtt; i++) {
-			String weaponName = new String("weapon" + i + ".");
+			String weaponName = "weapon" + i + ".";
 			this.lootsWeaponRange[i] = Integer.parseInt(loots.getString(weaponName + "range"));
 			this.lootsWeaponBaseAttack[i] = Integer.parseInt(loots.getString(weaponName + "base-attack"));
 			this.lootsWeaponManaCost[i] = Integer.parseInt(loots.getString(weaponName + "mana-cost"));
@@ -178,7 +172,7 @@ public class Game implements RequestListener {
 		this.lootsPotHealPerLevel = new int[potQtt];
 		this.lootsPotManaPerLevel = new int[potQtt];
 		for (int i = 0; i < potQtt; i++) {
-			String potName = new String("pot" + i + ".");
+			String potName = "pot" + i + ".";
 			this.lootsPotTurns[i] = Integer.parseInt(loots.getString(potName + "turns"));
 			this.lootsPotHeal[i] = Integer.parseInt(loots.getString(potName + "base-hp"));
 			this.lootsPotMana[i] = Integer.parseInt(loots.getString(potName + "base-mana"));
@@ -197,7 +191,7 @@ public class Game implements RequestListener {
 		this.lootsScrollDamageModPerTurnPerLevel = new int[scrollQtt];
 		this.lootsScrollTurns = new int[scrollQtt];
 		for (int i = 0; i < scrollQtt; i++) {
-			String scrollName = new String("scroll" + i + ".");
+			String scrollName = "scroll" + i + ".";
 			this.lootsScrollBaseDamagePerTurn[i] = Integer.parseInt(loots.getString(scrollName + "base-damage-per-turn"));
 			this.lootsScrollBaseDamageModPerTurn[i] = Integer.parseInt(loots.getString(scrollName + "base-damage-mod-per-turn"));
 			this.lootsScrollDamagePerTurnPerLevel[i] = Integer.parseInt(loots.getString(scrollName + "damage-per-turn-per-level"));
@@ -214,7 +208,7 @@ public class Game implements RequestListener {
 		this.trapsHPPerLevel = new int[trapsQtt];
 		this.trapsManaPerLevel = new int[trapsQtt];
 		for (int i = 0; i < trapsQtt; i++) {
-			String trapName = new String("trap" + i + ".");
+			String trapName = "trap" + i + ".";
 			this.trapsBaseHP[i] = Integer.parseInt(traps.getString(trapName + "base-hp"));
 			this.trapsBaseMana[i] = Integer.parseInt(traps.getString(trapName + "base-mana"));
 			this.trapsHPPerLevel[i] = Integer.parseInt(traps.getString(trapName + "hp-per-level"));
@@ -226,7 +220,7 @@ public class Game implements RequestListener {
 		this.listeners.add(listener);
 	}
 
-	public GameListener[] getGameListeners() {
+	private GameListener[] getGameListeners() {
 		return this.listeners.toArray(new GameListener[this.listeners.size()]);
 	}
 
@@ -310,26 +304,26 @@ public class Game implements RequestListener {
 
 	@Override
 	public void requestComplexMove(ComplexMoveRequestEvent e) {
-		if(e == null) {
-			return;
+		Stack<Vector2i> path = this.world.getPath(this.players.get(this.playerTurn).object.getPosition(), e.moveArrival, false, null);
+		if (path != null) {
+			this.players.get(this.playerTurn).object.setPath(path);
+			this.nextTurn();
 		}
-		//TODO
 	}
 
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		if(e == null) {
-			return;
-		}
-		//TODO
+		StorableObject object = this.players.get(this.playerTurn).object.removeFromInventory(e.objectId);
+		/* TODO **********************************************************************************************************************************************************************
+		if (object != null) {
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent());
+		}*/
 	}
 
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-		if(e == null) {
-			return;
-		}
-		//TODO
+		this.players.get(this.playerTurn).object.setInteractionRequested();
+		this.nextTurn();
 	}
 
 	@Override
@@ -337,7 +331,10 @@ public class Game implements RequestListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		Stack<Vector2i> path = new Stack<>();
+		path.add(this.players.get(this.playerTurn).object.getPosition().copy().add(e.moveDirection));
+		this.players.get(this.playerTurn).object.setPath(path);
+		this.nextTurn();
 	}
 
 	@Override
@@ -348,69 +345,92 @@ public class Game implements RequestListener {
 		//TODO
 	}
 
-	public void nextLevel() {
-		/** TODO : MOVE THE PLAYERS *********************************************************************************************************************************************************************************/
-		for (int i = 0; i < this.mobs.size(); ++i) {
-			this.fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(0));
-		}
-		for (int i = -1; i < this.interactiveObjects.size(); ++i) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(0));
+	public void generateLevel() {
+		for (Pair<Mob> mob : this.mobs) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.id));
 		}
 
-		++this.level;
+		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.id));
+		}
+
+		for (Pair<Vector2i> bulb : this.bulbs) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.id));
+		}
+
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 		ArrayList<Map.Room> rooms = this.world.generateLevel(this.level);
 
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
-		fireStaticEntityCreationEvent(new StaticEntityCreationEvent(0, StaticEntityType.LIT_BULB, this.world.getBulbPosition()));
+
+		this.bulbs.clear();
+		for (Vector2i bulb : this.world.getBulbPosition()) {
+			Pair<Vector2i> p = new Pair<>(bulb);
+			this.bulbs.add(p);
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.id, StaticEntityType.LIT_BULB, p.object));
+		}
 
 		Random random = this.seed.getRandomizer(this.level);
+
+		for (Pair<Player> player : this.players) {
+			player.object.setPosition(this.world.getStairsUpPosition());
+			fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.id, player.object.getPosition()));
+		}
+
 		int mobsNbr = random.nextInt(MAX_MOB_QTT_PER_LEVEL - MIN_MOB_QTT_PER_LEVEL) + MIN_MOB_QTT_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
+
 		int selectedMob, mobLevel;
 		Vector2i mobPos;
-		for (int i = 0; i < mobsNbr; i++) {
+		for (int i = 0; i < mobsNbr; ++i) {
 			selectedMob = random.nextInt(this.mobsTypes.length);
 			mobLevel = random.nextInt(3) + this.level - 1;
 			mobPos = this.selectRandomGroundPosition(rooms, random);
-			this.mobs.add(new Mob(mobLevel,
+			Pair<Mob> pair = new Pair<>(new Mob(mobLevel,
 					mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
 					mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
 					mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
-					mobPos.copy()
-			));
-			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(i, this.mobsTypes[selectedMob], mobPos.copy(), null));
+					mobPos.copy()));
+			this.mobs.add(pair);
+			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.id, this.mobsTypes[selectedMob], mobPos.copy(), null));
 		}
 
 		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL) + MIN_CHEST_QTT_PER_LEVEL;
 		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL) + MIN_TRAPS_QTT_PER_LEVEL;
 		int selection, chestLevel;
-		Vector2i chestPos;
+		Vector2i pos;
 		this.interactiveObjects = new ArrayList<>(chestsNbr + trapsNbr);
 		for (int i = 0; i < chestsNbr; i++) {
-			/* TODO : FIRE CHESTS CREATION EVENTS ****************************************************************************************************************************************************************/
+			Pair<InteractiveObject> pair;
 			chestLevel = random.nextInt(3) + this.level - 1;
+			pos = selectRandomGroundPosition(rooms, random);
 			switch (random.nextInt(4)) {
 				case 0:
 					selection = random.nextInt(this.lootsArmorType.length);
 					Armor armor = new Armor(this.lootsArmorDefensePerLevel[selection] * chestLevel + this.lootsArmorBaseDefense[selection],
 							this.lootsArmorAttackPerLevel[selection] * chestLevel + this.lootsArmorBaseAttack[selection],
 							this.lootsArmorType[selection]);
-					this.interactiveObjects.add(new InteractiveObject(this.selectRandomGroundPosition(rooms, random), armor));
+					pair = new Pair<>(new InteractiveObject(pos, armor));
+					this.interactiveObjects.add(pair);
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, armor.getGtype(), pos));
 					break;
 				case 1:
 					selection = random.nextInt(this.lootsWeaponRange.length);
 					Weapon weapon = new Weapon(this.lootsWeaponBaseAttack[selection] + this.lootsWeaponAttackPerLevel[selection] * chestLevel,
 							this.lootsWeaponRange[selection],
 							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
-					this.interactiveObjects.add(new InteractiveObject(this.selectRandomGroundPosition(rooms, random), weapon));
+					pair = new Pair<>(new InteractiveObject(pos, weapon));
+					this.interactiveObjects.add(pair);
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, weapon.getGtype(), pos));
 					break;
 				case 2:
 					selection = random.nextInt(this.lootsScrollTurns.length);
 					Scroll scroll = new Scroll(this.lootsScrollTurns[selection],
 							this.lootsScrollBaseDamagePerTurn[selection] + chestLevel * this.lootsScrollDamagePerTurnPerLevel[selection],
 							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
-					this.interactiveObjects.add(new InteractiveObject(this.selectRandomGroundPosition(rooms, random), scroll));
+					pair = new Pair<>(new InteractiveObject(pos, scroll));
+					this.interactiveObjects.add(pair);
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, scroll.getGtype(), pos));
 					break;
 				case 3:
 					/* Falls through */
@@ -423,16 +443,20 @@ public class Game implements RequestListener {
 							this.lootsPotAttackMod[selection],
 							this.lootsPotHPMod[selection],
 							this.lootsPotManaMod[selection]);
-					this.interactiveObjects.add(new InteractiveObject(this.selectRandomGroundPosition(rooms, random), pot));
+					pair = new Pair<>(new InteractiveObject(pos, pot));
+					this.interactiveObjects.add(pair);
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, pot.getGType(), pos));
 					break;
 			}
 		}
 		for (int i = 0; i < trapsNbr; i++) {
-			/* TODO : FIRE CHESTS CREATION EVENTS ********************************************************************************************************************************************************************/
 			selection = random.nextInt(this.trapsBaseHP.length);
-			this.interactiveObjects.add(new InteractiveObject(this.selectRandomGroundPosition(rooms, random),
+			pos = selectRandomGroundPosition(rooms, random);
+			Pair<InteractiveObject> pair = new Pair<>(new InteractiveObject(pos,
 					this.trapsBaseHP[selection] + this.trapsHPPerLevel[selection] * random.nextInt(3) + this.level - 1,
 					this.trapsBaseMana[selection] + this.trapsManaPerLevel[selection] * random.nextInt(3) + this.level - 1));
+			this.interactiveObjects.add(pair);
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, StaticEntityType.TRAP, pos));
 		}
 	}
 
@@ -452,6 +476,35 @@ public class Game implements RequestListener {
 			pos.y = selectedRoom.top.y;
 		}
 		return pos;
+	}
+
+	private void nextTurn() {
+		int count = 0;
+		do {
+			this.playerTurn = (this.playerTurn + 1) % this.players.size();
+			++count;
+		} while (count != this.players.size() && this.players.get(this.playerTurn).object.getFloor() != this.level);
+
+		if (count == this.players.size()) {
+			++this.level;
+			this.generateLevel();
+		} else if (this.playerTurn == 0) {
+			this.nextTick();
+		}
+	}
+
+	private void nextTick() {
+		Player player;
+		for (Pair<Player> playerPair : this.players) {
+			player = playerPair.object;
+			/* TODO ****************************************************************************************************************************************************************/
+		}
+
+		Mob mob;
+		for (Pair<Mob> mobPair : this.mobs) {
+			mob = mobPair.object;
+			/* TODO **********************************************************************************************************************************************************************/
+		}
 	}
 
 	public void launch(byte numberOfPlayers) {

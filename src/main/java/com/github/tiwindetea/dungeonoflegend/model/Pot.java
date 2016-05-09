@@ -1,5 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
+
 /**
  * Created by maxime on 4/23/16.
  */
@@ -13,6 +15,7 @@ public class Pot implements Consumable {
 	private int heathModifier;
 	private int manaModifier;
 	private Player target;
+	private StaticEntityType gtype;
 
 	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier, int healthModifier, int manaModifier) {
 		this.turns = turns;
@@ -22,6 +25,14 @@ public class Pot implements Consumable {
 		this.attackPowerModifier = attackPowerModifier;
 		this.heathModifier = healthModifier;
 		this.manaModifier = manaModifier;
+
+		if (defensePowerModifier > 0 || attackPowerModifier > 0 || healthModifier > 0 || manaModifier > 0) {
+			this.gtype = StaticEntityType.SUPER_POT;
+		} else if (heal == 0) {
+			this.gtype = StaticEntityType.HEALING_POT;
+		} else {
+			this.gtype = StaticEntityType.MANA_POT;
+		}
 	}
 
 	public void trigger(LivingThing livingThing) {
@@ -56,5 +67,9 @@ public class Pot implements Consumable {
 	@Override
 	public StorableObjectType getType() {
 		return StorableObjectType.CONSUMABLE;
+	}
+
+	public StaticEntityType getGType() {
+		return this.gtype;
 	}
 }
