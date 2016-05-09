@@ -6,9 +6,9 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEvent;
  * Created by maxime on 5/6/16.
  */
 public abstract class InventoryEvent extends PlayerEvent {
-	int ObjectId;
+	long ObjectId;
 
-	public InventoryEvent(byte playerNumber, int objectId) {
+	public InventoryEvent(int playerNumber, long objectId) {
 		super(playerNumber);
 		this.ObjectId = objectId;
 	}

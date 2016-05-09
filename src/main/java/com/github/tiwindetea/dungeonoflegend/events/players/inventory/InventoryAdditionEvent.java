@@ -8,7 +8,7 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 public class InventoryAdditionEvent extends InventoryEvent {
 	StaticEntityType type;
 
-	public InventoryAdditionEvent(byte playerNumber, int objectId, StaticEntityType type) {
+	public InventoryAdditionEvent(int playerNumber, long objectId, StaticEntityType type) {
 		super(playerNumber, objectId);
 		this.type = type;
 	}
