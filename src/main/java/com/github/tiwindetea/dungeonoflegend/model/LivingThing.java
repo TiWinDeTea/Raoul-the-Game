@@ -46,6 +46,10 @@ public abstract class LivingThing {
 		return this.position;
 	}
 
+	public void setPosition(Vector2i position) {
+		this.position = position;
+	}
+
 	public Direction getRequestedAttack() {
 		return this.requestedAttack;
 	}
