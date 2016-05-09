@@ -46,9 +46,9 @@ import java.util.List;
 public class GUI implements GameListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
-	public static final Color bottomBackgroundColor = Color.GREEN;
-	public static final Color rightBackgroundColor = Color.CRIMSON;
-	public static final Color centerBackgroundColor = Color.BLACK;
+	public static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
+	public static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
+	public static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
@@ -67,6 +67,8 @@ public class GUI implements GameListener {
 	private final List<PlayerHUD> playersHUD = new ArrayList<>();
 	private final int maxPlayersNumber = 2;
 
+	private final TileMap cTileMap = new TileMap();
+
 	public GUI() {
 		this.init();
 	}
@@ -82,12 +84,11 @@ public class GUI implements GameListener {
 		this.borderPane.setMinHeight(500);
 
 		//Center pane
-		this.cPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-		TileMap tileMap = new TileMap();
-		this.cPane.getChildren().add(tileMap);
+		this.cPane.setBackground(new Background(new BackgroundFill(CENTER_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.cPane.getChildren().add(this.cTileMap);
 
 		//Right pane
-		this.rPane.setBackground(new Background(new BackgroundFill(Color.CRIMSON, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rPane.setMaxWidth(300);
 		this.rPane.setMinWidth(300);
 
@@ -98,7 +99,7 @@ public class GUI implements GameListener {
 		this.bHBox.getChildren().addAll(this.blTilePane, this.brMiniMapPain);
 		this.bHBox.setMinWidth(2 * PlayerHUD.getSize().x + this.brMiniMapPain.getMinWidth());
 
-		this.bPane.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
 		this.bPane.getChildren().add(this.bHBox);
 		this.bPane.widthProperty().addListener(e -> {
@@ -310,6 +311,6 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.cTileMap.setMap(e.map);
 	}
 }
