@@ -60,8 +60,7 @@ public class Map {
     private Random random;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
-    private Vector2i bulbPosition;
-    private ArrayList<InteractiveObject> interactiveObjects = new ArrayList<>();
+    private ArrayList<Vector2i> bulbPosition;
     private Tile[][] map;
 
     /**
@@ -209,7 +208,6 @@ public class Map {
     }
 
     private boolean isVisibleFrom(Vector2i tilePosition, Vector2i watcherPosition) {
-        ArrayList<String> test;
         float distance = (float) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
                 + Math.pow(tilePosition.y - watcherPosition.y, 2));
 
@@ -219,7 +217,6 @@ public class Map {
             float currentX = watcherPosition.x;
             float currentY = watcherPosition.y;
             int x, y;
-            float a = 0;
 
             for (int i = (int) (Math.floor(distance)); i > 0; --i) {
                 currentX += xShifting;
@@ -328,13 +325,14 @@ public class Map {
             for (int i = 0; i < positions.length; i++) {
                 do {
                     room = rooms.get(this.random.nextInt(rooms.size()));
-                    positions[i].x = this.random.nextInt(room.bottom.x - room.top.x) + room.top.x;
-                    positions[i].y = this.random.nextInt(room.bottom.y - room.top.y) + room.top.y;
+                    positions[i].x = this.random.nextInt(room.bottom.x - room.top.x - 2) + room.top.x + 1;
+                    positions[i].y = this.random.nextInt(room.bottom.y - room.top.y - 2) + room.top.y + 1;
                 } while (isObstructed(this.map[positions[i].x][positions[i].y]));
             }
         } while (this.getPath(positions[0], positions[1], true, null) == null
                 || this.getPath(positions[1], positions[2], true, null) == null);
-        this.bulbPosition = positions[0];
+        this.bulbPosition.clear();
+        this.bulbPosition.add(positions[0]);
         this.stairsDownPosition = positions[1];
         this.stairsUpPosition = positions[2];
         this.map[this.stairsUpPosition.x][this.stairsUpPosition.y] = Tile.STAIR_UP;
@@ -440,7 +438,7 @@ public class Map {
      * @param tile    Position where the door was
      */
     private void reconstrucWalls(Room source1, Room source2, Vector2i tile) {
-        if (source1.top.y == source2.top.y && source2.bottom.y == source2.bottom.y) {
+        if (source1.top.y == source2.top.y && source1.bottom.y == source2.bottom.y) {
             this.map[tile.x][tile.y - 1] = Tile.WALL_DOWN;
             this.map[tile.x][tile.y + 1] = Tile.WALL_TOP;
         } else if (source1.top.x == source2.top.x && source1.bottom.x == source2.bottom.x) {
@@ -585,7 +583,7 @@ public class Map {
      *
      * @return the bulb position
      */
-    public Vector2i getBulbPosition() {
+    public ArrayList<Vector2i> getBulbPosition() {
         return this.bulbPosition;
     }
 
@@ -743,7 +741,6 @@ public class Map {
         Node node;
         Node openListNode;
         Vector2i next;
-        int i;
         Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
 
         openList.add(dep);
