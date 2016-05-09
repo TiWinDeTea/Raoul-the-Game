@@ -15,35 +15,35 @@ import javafx.util.Duration;
  * Created by maxime on 5/5/16.
  */
 public class PlayerHUD extends Parent {
-	private static final Vector2i mainPaneSize = new Vector2i(400, 100);
-	private static final Vector2i playerPictureSize = new Vector2i(64, 64);
-	private static final int healthRectanglesHeight = 20;
-	private static final int manaRectanglesHeight = 15;
-	private static final double manaRectanglesWidth = 0.75; //relative to healthRectangleWidth (auto computed)
-	private static final int space = 20;
+	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(400, 100);
+	private static final Vector2i PLAYER_PICTURE_SIZE = new Vector2i(64, 64);
+	private static final int HEALTH_RECTANGLES_HEIGHT = 20;
+	private static final int MANA_RECTANGLES_HEIGHT = 15;
+	private static final double MANA_RECTANGLES_WIDTH = 0.75; //relative to healthRectangleWidth (auto computed)
+	private static final int SPACE = 20;
 
-	private static final Color maxHealthRectangleColor = Color.DARKRED;
-	private static final Color actualHealthRectangleColor = Color.RED;
-	private static final Color maxManaRectangleColor = Color.DARKBLUE;
-	private static final Color actualManaRectangleColor = Color.BLUE;
-	private static final Color backGroundColor = Color.PURPLE;
+	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.DARKRED;
+	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
+	private static final Color MAX_MANA_RECTANGLE_COLOR = Color.DARKBLUE;
+	private static final Color ACTUAL_MANA_RECTANGLE_COLOR = Color.BLUE;
+	private static final Color BACKGROUND_COLOR = Color.PURPLE;
 
-	private static final Duration AnimationDuration = Duration.millis(1000);
+	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
 
-	public static final Font healthLabelFont = Font.font("Serif", FontWeight.NORMAL, 15);
-	public static final Color healthLabelTextColor = Color.WHITE;
-	public static final int healthLabelTranslateY = 33;
-	public static final Font manaLabelFont = Font.font("Serif", FontWeight.NORMAL, 10);
-	public static final Color manaLabelTextColor = Color.WHITE;
-	public static final int manaLabelTranslateY = 53;
-	public static final int labelsOffset = 5;
+	public static final Font HEALTH_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
+	public static final Color HEALTH_LABEL_TEXT_COLOR = Color.WHITE;
+	public static final int HEALTH_LABEL_TRANSLATE_Y = 33;
+	public static final Font MANA_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 10);
+	public static final Color MANA_LABEL_TEXT_COLOR = Color.WHITE;
+	public static final int MANA_LABEL_TRANSLATE_Y = 53;
+	public static final int LABELS_OFFSET = 5;
 
 	private final ImageView playerPicture;
 	private final Rectangle maxHealthRectangle = new Rectangle();
 	private final Rectangle actualHealthRectangle = new Rectangle();
 	private final Rectangle maxManaRectangle = new Rectangle();
 	private final Rectangle actualManaRectangle = new Rectangle();
-	private final Rectangle backGroundRectangle = new Rectangle(mainPaneSize.x, mainPaneSize.y, backGroundColor);
+	private final Rectangle backGroundRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -70,72 +70,72 @@ public class PlayerHUD extends Parent {
 		this.getChildren().add(this.playerPicture);
 		double originalWidth = this.playerPicture.getViewport().getWidth();
 		double originalHeight = this.playerPicture.getViewport().getHeight();
-		this.playerPicture.setScaleX(playerPictureSize.x / this.playerPicture.getViewport().getWidth());
-		this.playerPicture.setScaleY(playerPictureSize.y / this.playerPicture.getViewport().getHeight());
-		this.playerPicture.setLayoutX(this.playerPicture.getLayoutX() - (originalWidth - playerPictureSize.x) / 2);
-		this.playerPicture.setLayoutY(this.playerPicture.getLayoutY() - (originalHeight - playerPictureSize.y) / 2);
-		this.playerPicture.setTranslateX(space);
-		this.playerPicture.setTranslateY((mainPaneSize.y - playerPictureSize.y) / 2.0);
+		this.playerPicture.setScaleX(PLAYER_PICTURE_SIZE.x / this.playerPicture.getViewport().getWidth());
+		this.playerPicture.setScaleY(PLAYER_PICTURE_SIZE.y / this.playerPicture.getViewport().getHeight());
+		this.playerPicture.setLayoutX(this.playerPicture.getLayoutX() - (originalWidth - PLAYER_PICTURE_SIZE.x) / 2);
+		this.playerPicture.setLayoutY(this.playerPicture.getLayoutY() - (originalHeight - PLAYER_PICTURE_SIZE.y) / 2);
+		this.playerPicture.setTranslateX(SPACE);
+		this.playerPicture.setTranslateY((MAIN_PANE_SIZE.y - PLAYER_PICTURE_SIZE.y) / 2.0);
 
 		this.getChildren().add(this.maxHealthRectangle);
-		this.maxHealthRectangle.setTranslateX(2 * space + playerPictureSize.x);
-		this.maxHealthRectangle.setTranslateY((mainPaneSize.y - healthRectanglesHeight - manaRectanglesHeight) / 2);
-		this.maxHealthRectangle.setWidth(mainPaneSize.x - 3 * space - playerPictureSize.x);
-		this.maxHealthRectangle.setHeight(healthRectanglesHeight);
-		this.maxHealthRectangle.setFill(maxHealthRectangleColor);
+		this.maxHealthRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
+		this.maxHealthRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT) / 2);
+		this.maxHealthRectangle.setWidth(MAIN_PANE_SIZE.x - 3 * SPACE - PLAYER_PICTURE_SIZE.x);
+		this.maxHealthRectangle.setHeight(HEALTH_RECTANGLES_HEIGHT);
+		this.maxHealthRectangle.setFill(MAX_HEALTH_RECTANGLE_COLOR);
 
 		this.getChildren().add(this.actualHealthRectangle);
 		this.actualHealthRectangle.setTranslateX(this.maxHealthRectangle.getTranslateX());
 		this.actualHealthRectangle.setTranslateY(this.maxHealthRectangle.getTranslateY());
 		this.actualHealthRectangle.setWidth((double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth());
-		this.actualHealthRectangle.setHeight(healthRectanglesHeight);
-		this.actualHealthRectangle.setFill(actualHealthRectangleColor);
+		this.actualHealthRectangle.setHeight(HEALTH_RECTANGLES_HEIGHT);
+		this.actualHealthRectangle.setFill(ACTUAL_HEALTH_RECTANGLE_COLOR);
 
 		this.getChildren().add(this.maxManaRectangle);
-		this.maxManaRectangle.setTranslateX(2 * space + playerPictureSize.x);
-		this.maxManaRectangle.setTranslateY((mainPaneSize.y - healthRectanglesHeight - manaRectanglesHeight) / 2 + healthRectanglesHeight);
-		this.maxManaRectangle.setWidth(manaRectanglesWidth * this.maxHealthRectangle.getWidth());
-		this.maxManaRectangle.setHeight(manaRectanglesHeight);
-		this.maxManaRectangle.setFill(maxManaRectangleColor);
+		this.maxManaRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
+		this.maxManaRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT) / 2 + HEALTH_RECTANGLES_HEIGHT);
+		this.maxManaRectangle.setWidth(MANA_RECTANGLES_WIDTH * this.maxHealthRectangle.getWidth());
+		this.maxManaRectangle.setHeight(MANA_RECTANGLES_HEIGHT);
+		this.maxManaRectangle.setFill(MAX_MANA_RECTANGLE_COLOR);
 
 		this.getChildren().add(this.actualManaRectangle);
 		this.actualManaRectangle.setTranslateX(this.maxManaRectangle.getTranslateX());
 		this.actualManaRectangle.setTranslateY(this.maxManaRectangle.getTranslateY());
 		this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
-		this.actualManaRectangle.setHeight(manaRectanglesHeight);
-		this.actualManaRectangle.setFill(actualManaRectangleColor);
+		this.actualManaRectangle.setHeight(MANA_RECTANGLES_HEIGHT);
+		this.actualManaRectangle.setFill(ACTUAL_MANA_RECTANGLE_COLOR);
 
 		this.getChildren().add(this.healthLabel);
-		this.healthLabel.setFont(healthLabelFont);
-		this.healthLabel.setTextFill(healthLabelTextColor);
+		this.healthLabel.setFont(HEALTH_LABEL_FONT);
+		this.healthLabel.setTextFill(HEALTH_LABEL_TEXT_COLOR);
 		this.healthLabel.textProperty().bind(this.healthString);
 		this.healthString.set(this.maxHealth + " / " + this.actualHealth);
-		this.healthLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + labelsOffset);
-		this.healthLabel.setTranslateY(healthLabelTranslateY);
+		this.healthLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + LABELS_OFFSET);
+		this.healthLabel.setTranslateY(HEALTH_LABEL_TRANSLATE_Y);
 
 		this.getChildren().add(this.manaLabel);
-		this.manaLabel.setFont(manaLabelFont);
-		this.manaLabel.setTextFill(manaLabelTextColor);
+		this.manaLabel.setFont(MANA_LABEL_FONT);
+		this.manaLabel.setTextFill(MANA_LABEL_TEXT_COLOR);
 		this.manaLabel.textProperty().bind(this.manaString);
 		this.manaString.set(this.maxHealth + " / " + this.actualHealth);
-		this.manaLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + labelsOffset);
-		this.manaLabel.setTranslateY(manaLabelTranslateY);
+		this.manaLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + LABELS_OFFSET);
+		this.manaLabel.setTranslateY(MANA_LABEL_TRANSLATE_Y);
 	}
 
 	public static Vector2i getSize() {
-		return mainPaneSize;
+		return MAIN_PANE_SIZE;
 	}
 
 	private void updateHealth() {
 		//this.actualHealthRectangle.setWidth((double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth());
-		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, (double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth(), AnimationDuration);
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, (double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth(), ANIMATION_DURATION);
 		this.healthString.set(this.actualHealth + " / " + this.maxHealth);
 		transition.play();
 	}
 
 	private void updateMana() {
 		//this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
-		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), AnimationDuration);
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), ANIMATION_DURATION);
 		this.manaString.set(this.actualMana + " / " + this.maxMana);
 		transition.play();
 	}
