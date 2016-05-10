@@ -20,6 +20,7 @@ import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntity
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
+import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
@@ -242,6 +243,25 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
+		Vector2i oldPosition = this.livingEntities.get(e.entityId).getPosition();
+		Vector2i newPosition = e.newPosition;
+		Direction direction;
+		if(newPosition.y > oldPosition.y) {
+			direction = Direction.DOWN;
+		}
+		else if(newPosition.y < oldPosition.y) {
+			direction = Direction.UP;
+		}
+		else if(newPosition.x > oldPosition.x) {
+			direction = Direction.RIGHT;
+		}
+		else if(newPosition.x < oldPosition.x) {
+			direction = Direction.LEFT;
+		}
+		else {
+			direction = this.livingEntities.get(e.entityId).getDirection();
+		}
+		this.livingEntities.get(e.entityId).setDirection(direction);
 		this.livingEntities.get(e.entityId).setPosition(e.newPosition);
 		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}

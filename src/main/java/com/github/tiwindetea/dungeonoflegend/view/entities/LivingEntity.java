@@ -39,4 +39,8 @@ public class LivingEntity extends Entity {
 			this.imageView.setViewport(new Rectangle2D(spritePosition.x * spriteSize.x, spritePosition.y * spriteSize.y, spriteSize.x, spriteSize.y));
 		}
 	}
+
+	public Direction getDirection() {
+		return this.direction;
+	}
 }

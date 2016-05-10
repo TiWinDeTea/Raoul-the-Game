@@ -107,12 +107,12 @@ public enum LivingEntityType {
 
 	public Vector2i getSpriteRightPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.right.position.x")),
-		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.right.position.y")));
+		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.right.position.y")));
 	}
 
 	public Vector2i getSpriteLeftPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.left.position.x")),
-		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.left.position.y")));
+		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.left.position.y")));
 	}
 
 	public Vector2i getSpritePosition(Direction direction) {
