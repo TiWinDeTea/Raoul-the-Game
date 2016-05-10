@@ -217,12 +217,6 @@ public class GUI implements GameListener, TileMapListener {
 		}
 	}
 
-	private void fireSimpleMoveRequestEvent(MoveRequestEvent event) {
-		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestMove(event);
-		}
-	}
-
 	private void fireInteractionRequestEvent(InteractionRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
 			listener.requestInteraction(event);
