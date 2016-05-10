@@ -7,10 +7,9 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
-import com.github.tiwindetea.dungeonoflegend.events.requests.moves.ComplexMoveRequestEvent;
-import com.github.tiwindetea.dungeonoflegend.events.requests.moves.SimpleMoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
@@ -307,15 +306,6 @@ public class Game implements RequestListener {
 	}
 
 	@Override
-	public void requestComplexMove(ComplexMoveRequestEvent e) {
-		Stack<Vector2i> path = this.world.getPath(this.players.get(this.playerTurn).object.getPosition(), e.moveArrival, false, null);
-		if (path != null) {
-			this.players.get(this.playerTurn).object.setPath(path);
-			this.nextTurn();
-		}
-	}
-
-	@Override
 	public void requestDrop(DropRequestEvent e) {
 		StorableObject object = this.players.get(this.playerTurn).object.removeFromInventory(e.objectId);
 		/* TODO **********************************************************************************************************************************************************************
@@ -326,27 +316,17 @@ public class Game implements RequestListener {
 
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-		this.players.get(this.playerTurn).object.setInteractionRequested();
-		this.nextTurn();
-	}
-
-	@Override
-	public void requestSimpleMove(SimpleMoveRequestEvent e) {
-		if(e == null) {
-			return;
-		}
-		Stack<Vector2i> path = new Stack<>();
-		path.add(this.players.get(this.playerTurn).object.getPosition().copy().add(e.moveDirection));
-		this.players.get(this.playerTurn).object.setPath(path);
-		this.nextTurn();
+		//TODO
 	}
 
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-		if(e == null) {
-			return;
-		}
 		//TODO
+	}
+
+	@Override
+	public void requestMove(MoveRequestEvent e) {
+
 	}
 
 	public void generateLevel() {
