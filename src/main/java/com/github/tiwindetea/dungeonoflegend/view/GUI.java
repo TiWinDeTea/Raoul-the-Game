@@ -38,6 +38,7 @@ import javafx.scene.layout.TilePane;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,7 +49,7 @@ public class GUI implements GameListener {
 
 	public static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
 	public static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
-	public static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
+	public static final Color CENTER_BACKGROUND_COLOR = Color.CYAN;
 
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
@@ -60,12 +61,12 @@ public class GUI implements GameListener {
 	private final TilePane blTilePane = new TilePane();
 	private final Pane brMiniMapPain = new Pane();
 
-	private final List<LivingEntity> enemies = new ArrayList<>();
-	private final List<LivingEntity> players = new ArrayList<>();
-	private final List<StaticEntity> staticEntities = new ArrayList<>();
+	private final HashMap<Long, LivingEntity> livingEntities = new HashMap<>();
+	private final HashMap<Long, StaticEntity> staticEntities = new HashMap<>();
 
 	private final List<PlayerHUD> playersHUD = new ArrayList<>();
 	private final int maxPlayersNumber = 2;
+	private int actualPlayersNumber = 0;
 
 	private final TileMap cTileMap = new TileMap();
 
@@ -117,6 +118,27 @@ public class GUI implements GameListener {
 
 	public Scene getScene() {
 		return this.scene;
+	}
+
+	public boolean[][] computeVisibleTiles() {
+		boolean[][] visibleTiles = new boolean[this.cTileMap.getGridSize().x][this.cTileMap.getGridSize().y];
+		for(Long currentKey : this.livingEntities.keySet()) {
+			LivingEntity livingEntity = this.livingEntities.get(currentKey);
+			if(livingEntity.getLOS() != null) {
+				boolean[][] LOS = livingEntity.getLOS();
+				int LOSPosX = livingEntity.getPosition().x - ((LOS.length - 1) / 2);
+				int LOSPosY = livingEntity.getPosition().y - ((LOS[0].length - 1) / 2);
+				for(int i = 0; i < LOS.length; i++) {
+					for(int j = 0; j < LOS[i].length; j++) {
+						if(((LOSPosX + i > 0) && (LOSPosX + i < visibleTiles.length))
+						  && ((LOSPosY + j > 0) && (LOSPosY + j < visibleTiles[0].length))) {
+							visibleTiles[LOSPosX + i][LOSPosY + j] |= LOS[i][j];
+						}
+					}
+				}
+			}
+		}
+		return visibleTiles;
 	}
 
 	public void addRequestListener(RequestListener listener) {
@@ -178,7 +200,9 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction);
+		this.livingEntities.put(e.entityId, livingEntity);
+		this.cTileMap.addEntity(livingEntity);
 	}
 
 	@Override
@@ -186,7 +210,8 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.cTileMap.removeEntity(this.livingEntities.get(e.entityId));
+		this.livingEntities.remove(e.entityId);
 	}
 
 	@Override
@@ -194,7 +219,8 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.livingEntities.get(e.entityId).setLOS(e.newLOS);
+		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
 	@Override
@@ -203,6 +229,12 @@ public class GUI implements GameListener {
 			return;
 		}
 		//TODO
+		boolean[][] LOS = this.livingEntities.get(e.entityId).getLOS();
+		for(Vector2i modifiedTilesPosition : e.modifiedTilesPositions) {
+			LOS[modifiedTilesPosition.x][modifiedTilesPosition.y] = !LOS[modifiedTilesPosition.x][modifiedTilesPosition.y];
+		}
+		this.livingEntities.get(e.entityId).setLOS(LOS);
+		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
 	@Override
@@ -210,7 +242,8 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.livingEntities.get(e.entityId).setPosition(e.newPosition);
+		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
 	@Override
@@ -218,7 +251,7 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		if(this.players.size() < this.maxPlayersNumber) {
+		if(this.actualPlayersNumber < this.maxPlayersNumber) {
 			LivingEntityType livingEntityType;
 			if(e.playerNumber == 2) {
 				livingEntityType = LivingEntityType.PLAYER2;
@@ -226,7 +259,10 @@ public class GUI implements GameListener {
 			else {
 				livingEntityType = LivingEntityType.PLAYER1;
 			}
-			this.players.add(new LivingEntity(livingEntityType, e.position, e.direction));
+			LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction);
+			this.livingEntities.put(e.entityId, livingEntity);
+			this.cTileMap.addEntity(livingEntity);
+			++this.actualPlayersNumber;
 
 			ImageView imageView = new ImageView(livingEntityType.getImage());
 			Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
@@ -252,7 +288,7 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		if(e.playerNumber > 0 && e.playerNumber <= this.players.size()) {
+		if(e.playerNumber > 0 && e.playerNumber <= this.actualPlayersNumber) {
 			int value = e.value;
 			if(value < 0) {
 				value = 0;
@@ -287,7 +323,9 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		StaticEntity staticEntity = new StaticEntity(e.type, e.position);
+		this.staticEntities.put(e.entityId, staticEntity);
+		this.cTileMap.addEntity(staticEntity);
 	}
 
 	@Override
@@ -295,7 +333,8 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.cTileMap.removeEntity(this.staticEntities.get(e.entityId));
+		this.staticEntities.remove(e.entityId);
 	}
 
 	@Override
@@ -303,7 +342,8 @@ public class GUI implements GameListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.staticEntities.get(e.entityId).setLOS(e.newLOS);
+		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
 	@Override
