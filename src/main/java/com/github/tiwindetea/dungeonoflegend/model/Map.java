@@ -26,26 +26,27 @@ public class Map {
     /*
      * Tuning parameters for the map generation
      */
-    private static final int MIN_ROOM_WIDTH = 3;
-    private static final int MAX_ROOM_WIDTH = 12;
-    private static final int MIN_ROOM_HEIGHT = 3;
-    private static final int MAX_ROOM_HEIGHT = 12;
-    private static final int MIN_LEVEL_WIDTH = 75;
-    private static final int MAX_LEVEL_WIDTH = 125;
-    private static final int MIN_LEVEL_HEIGHT = 75;
-    private static final int MAX_LEVEL_HEIGHT = 125;
-    private static final int MIN_ROOM_NUMBER = 60;
-    private static final int MAX_ROOM_NUMBER = 61;
-    private static final int MIN_CORRIDOR_NBR = 20;
-    private static final int MAX_CORRIDOR_NBR = 30;
-    private static final int MIN_CORRIDOR_LENGTH = 6;
-    private static final int MAX_CORRIDOR_LENGTH = 18;
+    private static final int MIN_ROOM_WIDTH = 3; // >= 3
+    private static final int MAX_ROOM_WIDTH = 12; // > MIN_ROOM_WIDTH
+    private static final int MIN_ROOM_HEIGHT = 3; // >= 3
+    private static final int MAX_ROOM_HEIGHT = 12; // > MIN_ROOM_HEIGHT
+    private static final int MIN_ROOM_NUMBER = 60; // >= 1
+    private static final int MAX_ROOM_NUMBER = 61; // > MIN_ROOM_NUMBER
+    private static final int MIN_CORRIDOR_NBR = 20; // >= 1
+    private static final int MAX_CORRIDOR_NBR = 30; // > MIN_CORRIDOR_NBR
+    private static final int MIN_CORRIDOR_LENGTH = 4; // >= 1
+    private static final int MAX_CORRIDOR_LENGTH = 18; // > MIN_CORRIDOR_LENGTH
+    private static final int MIN_LEVEL_WIDTH = 7; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_WIDTH = 9; // > MIN_LEVEL_WIDTH
+    private static final int MIN_LEVEL_HEIGHT = 75; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_HEIGHT = 125; // > MIN_LEVEL_HEIGHT
     private static final int RETRIES_NBR = 5000;
     private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
 
-    private static final int PROBABILITY_UNIT = 100;
-    private static final int MIN_HOLE_COVERAGE = 25;
-    private static final int MAX_HOLE_COVERAGE = 65;
+    private static final int PROBABILITY_UNIT = 100; // > 0
+    /* Following values should be between 0 and PROBABILITY_UNIT (both included) */
+    private static final int MIN_HOLE_COVERAGE = 0;
+    private static final int MAX_HOLE_COVERAGE = 0; // > MIN_HOLE_COVERAGE
     private static final int HOLE_CHANCE = 5;
     private static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
     private static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;
@@ -67,7 +68,18 @@ public class Map {
      * Instantiates a new Map.
      */
     public Map() {
+        this.bulbPosition = new ArrayList<>();
         this.seed = new Seed();
+    }
+
+    /**
+     * Instantiates a new Map.
+     *
+     * @param seed the seed
+     */
+    public Map(Seed seed) {
+        this.bulbPosition = new ArrayList<>();
+        this.seed = seed;
     }
 
     /**
@@ -77,15 +89,6 @@ public class Map {
      */
     public Seed getSeed() {
         return this.seed;
-    }
-
-    /**
-     * Instantiates a new Map.
-     *
-     * @param seed the seed
-     */
-    public Map(Seed seed) {
-        this.seed = seed;
     }
 
     /**
@@ -165,7 +168,7 @@ public class Map {
      * @param visionRange the vision range
      * @return the LOS
      */
-    public Tile[][] getLOS(Vector2i position, int visionRange) {
+    public boolean[][] getLOS(Vector2i position, int visionRange) {
         if (visionRange < 0) {
             throw new IllegalArgumentException("visionRange should not be negative (value : " + visionRange);
         }
@@ -173,28 +176,21 @@ public class Map {
             throw new IllegalArgumentException("Watcher outside of the map !");
         }
 
-        Tile[][] LOS = new Tile[2 * visionRange + 1][2 * visionRange + 1];
+        boolean[][] LOS = new boolean[2 * visionRange + 1][2 * visionRange + 1];
         int squaredVisionRange = visionRange * visionRange;
         int xlos_shift = position.x - visionRange;
         int ylos_shift = position.y - visionRange;
         int i_end = Math.min(position.x + visionRange + 1, this.map.length);
         int j_end = Math.min(position.y + visionRange + 1, this.map[0].length);
 
-        for (int i = 0; i < LOS.length; i++) {
-            for (int j = 0; j < LOS[i].length; j++) {
-                LOS[i][j] = Tile.UNKNOWN;
-            }
-        }
-
         for (int i = Math.max(position.x - visionRange, 0); i < i_end; ++i) {
             for (int j = Math.max(position.y - visionRange, 0); j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
-                    if (this.isVisibleFrom(new Vector2i(i, j), position)) {
-                        LOS[i - xlos_shift][j - ylos_shift] = this.map[i][j];
-                    }
+                    LOS[i - xlos_shift][j - ylos_shift] = this.isVisibleFrom(new Vector2i(i, j), position);
                 }
             }
         }
+
         return LOS;
     }
 
@@ -257,12 +253,11 @@ public class Map {
 
         do {
             width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+            x = this.random.nextInt(width + 1) + this.map.length / 2 - 4 * width / 5;
             height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
-            x = this.random.nextInt((this.map.length - width) / 2 - 5) + 10 + width;
-            y = this.random.nextInt((this.map[0].length - height) / 2 - 5) + 10 + height;
+            y = this.random.nextInt(height + 1) + this.map[0].length / 2 - 4 * height / 5;
             room = new Room(x, y, x + width, y + height);
         } while (!isPlaceable(room));
-
         rooms.add(room);
         room.print();
         do {

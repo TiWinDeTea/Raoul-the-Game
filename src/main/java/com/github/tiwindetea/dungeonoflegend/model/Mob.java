@@ -36,6 +36,12 @@ public class Mob extends LivingThing {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		/* Asserting o to be a mob */
+		return ((Mob) o).position.equals(this.position);
+	}
+
+	@Override
 	public void live() {
 		//TODO
 	}

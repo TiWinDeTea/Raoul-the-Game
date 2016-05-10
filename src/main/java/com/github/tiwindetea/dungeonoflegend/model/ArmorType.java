@@ -119,20 +119,18 @@ public enum ArmorType {
 	}
 
 	public static ArmorType parseArmorType(String str) {
-		str.toUpperCase();
-		switch (str) {
-			case "BREAST-PLATE":
-				return BREAST_PLATE;
-			case "GLOVES":
-				return GLOVES;
-			case "HELMET":
-				return HELMET;
-			case "BOOTS":
-				return BOOTS;
-			case "PANTS":
-				return PANTS;
-			default:
-				return null;
+		if (str.equals(BREAST_PLATE.toString())) {
+			return BREAST_PLATE;
+		} else if (str.equals(GLOVES.toString())) {
+			return GLOVES;
+		} else if (str.equals(HELMET.toString())) {
+			return HELMET;
+		} else if (str.equals(BOOTS.toString())) {
+			return BOOTS;
+		} else if (str.equals(PANTS.toString())) {
+			return PANTS;
+		} else {
+			return null;
 		}
 	}
 }

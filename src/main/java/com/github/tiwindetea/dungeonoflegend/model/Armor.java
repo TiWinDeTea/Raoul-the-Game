@@ -58,6 +58,24 @@ public class Armor implements StorableObject {
 		}
 	}
 
+	private Armor() {
+
+	}
+
+	public static Armor parseArmor(String str) {
+		int SEType = str.indexOf("SEType=") + 7;
+		int type = str.indexOf("type=", SEType) + 5;
+		int def = str.indexOf("defense=", type) + 8;
+		int attack = str.indexOf("attack=", def) + 7;
+
+		Armor armor = new Armor();
+		armor.defensePowerModifier = Integer.parseInt(str.substring(def, str.indexOf(',', def)));
+		armor.attackPowerModifier = Integer.parseInt(str.substring(attack, str.indexOf(',', attack)));
+		armor.type = ArmorType.parseArmorType(str.substring(type, str.indexOf(',', type)));
+		armor.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
+		return armor;
+	}
+
 	public StaticEntityType getGtype() {
 		return this.gtype;
 	}
@@ -76,5 +94,14 @@ public class Armor implements StorableObject {
 
 	public StorableObjectType getType() {
 		return StorableObjectType.ARMOR;
+	}
+
+	@Override
+	public String toString() {
+		return "armor={SEType=" + this.gtype
+				+ ",type=" + this.type
+				+ ",defense=" + this.defensePowerModifier
+				+ ",attack=" + this.attackPowerModifier
+				+ ",}";
 	}
 }

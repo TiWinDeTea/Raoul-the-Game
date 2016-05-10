@@ -40,4 +40,18 @@ public enum WeaponType {
 	public String toString() {
 		return null;
 	}
+
+	public static WeaponType parseWeaponType(String str) {
+		if (str.equals(BOW.toString())) {
+			return BOW;
+		} else if (str.equals(SWORD.toString())) {
+			return SWORD;
+		} else if (str.equals(WAND.toString())) {
+			return WAND;
+		} else if (str.equals(FIST.toString())) {
+			return FIST;
+		} else {
+			return null;
+		}
+	}
 }

@@ -27,6 +27,24 @@ public class Scroll implements Consumable {
 		}
 	}
 
+	private Scroll() {
+
+	}
+
+	public static Scroll parseScroll(String str) {
+		int SEType = str.indexOf("SEType=") + 7;
+		int turns = str.indexOf("turns=", SEType) + 6;
+		int hmpt = str.indexOf("healthMod=", turns) + 10;
+		int hmmpt = str.indexOf("healthModMod=", hmpt) + 13;
+
+		Scroll scroll = new Scroll();
+		scroll.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(",", SEType)));
+		scroll.turns = Integer.parseInt(str.substring(turns, str.indexOf(",", turns)));
+		scroll.healthModifierPerTick = Integer.parseInt(str.substring(hmpt, str.indexOf(",", hmpt)));
+		scroll.healthModifierModifierPerTick = Integer.parseInt(str.substring(hmmpt, str.indexOf(",", hmmpt)));
+		return scroll;
+	}
+
 	public void trigger(LivingThing livingThing) {
 		this.target = livingThing;
 		livingThing.damage(this.healthModifierPerTick);
@@ -50,5 +68,14 @@ public class Scroll implements Consumable {
 
 	public StaticEntityType getGtype() {
 		return this.gtype;
+	}
+
+	@Override
+	public String toString() {
+		return "scroll={SEType=" + this.gtype
+				+ ",turns=" + this.turns
+				+ ",healthMod=" + this.healthModifierPerTick
+				+ ",healthModMod=" + this.healthModifierModifierPerTick
+				+ ",}";
 	}
 }

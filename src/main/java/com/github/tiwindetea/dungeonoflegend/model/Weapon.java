@@ -42,6 +42,26 @@ public class Weapon implements StorableObject {
 		}
 	}
 
+	private Weapon() {
+
+	}
+
+	public static Weapon parseWeapon(String str) {
+		int SEType = str.indexOf("SEType=") + 7;
+		int type = str.indexOf("type=", SEType) + 5;
+		int attack = str.indexOf("attack=", type) + 7;
+		int range = str.indexOf("range=", attack) + 6;
+		int mana = str.indexOf("mana=", range) + 5;
+
+		Weapon weapon = new Weapon();
+		weapon.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
+		weapon.type = WeaponType.parseWeaponType(str.substring(type, str.indexOf(',', type)));
+		weapon.attackPowerModifier = Integer.parseInt(str.substring(attack, str.indexOf(',', attack)));
+		weapon.range = Integer.parseInt(str.substring(range, str.indexOf(',', range)));
+		weapon.manaCost = Integer.parseInt(str.substring(mana, str.indexOf(',', mana)));
+		return weapon;
+	}
+
 	public StaticEntityType getGtype() {
 		return this.gtype;
 	}
@@ -64,5 +84,15 @@ public class Weapon implements StorableObject {
 
 	public StorableObjectType getType() {
 		return StorableObjectType.WEAPON;
+	}
+
+	@Override
+	public String toString() {
+		return "weapon={SEType=" + this.gtype
+				+ ",type=" + this.type
+				+ ",attack=" + this.attackPowerModifier
+				+ ",range=" + this.range
+				+ ",mana=" + this.manaCost
+				+ ",}";
 	}
 }

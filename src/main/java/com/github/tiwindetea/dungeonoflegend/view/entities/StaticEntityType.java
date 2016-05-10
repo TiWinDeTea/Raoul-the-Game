@@ -206,4 +206,62 @@ public enum StaticEntityType {
 		//return null;
 		}
 	}
+
+	public static StaticEntityType parseStaticEntityType(String str) {
+		if (str.equals(HELMET1.toString())) {
+			return HELMET1;
+		} else if (str.equals(HELMET2.toString())) {
+			return HELMET2;
+		} else if (str.equals(BREAST_PLATE1.toString())) {
+			return BREAST_PLATE1;
+		} else if (str.equals(BREAST_PLATE2.toString())) {
+			return BREAST_PLATE2;
+		} else if (str.equals(PANTS1.toString())) {
+			return PANTS1;
+		} else if (str.equals(PANTS2.toString())) {
+			return PANTS2;
+		} else if (str.equals(BOOTS1.toString())) {
+			return BOOTS1;
+		} else if (str.equals(BOOTS2.toString())) {
+			return BOOTS2;
+		} else if (str.equals(GLOVES1.toString())) {
+			return GLOVES1;
+		} else if (str.equals(GLOVES2.toString())) {
+			return GLOVES2;
+		} else if (str.equals(BOW1.toString())) {
+			return BOW1;
+		} else if (str.equals(BOW2.toString())) {
+			return BOW2;
+		} else if (str.equals(SWORD1.toString())) {
+			return SWORD1;
+		} else if (str.equals(SWORD2.toString())) {
+			return SWORD2;
+		} else if (str.equals(WAND1.toString())) {
+			return WAND1;
+		} else if (str.equals(WAND2.toString())) {
+			return WAND2;
+		} else if (str.equals(HEALING_POT.toString())) {
+			return HEALING_POT;
+		} else if (str.equals(MANA_POT.toString())) {
+			return MANA_POT;
+		} else if (str.equals(SUPER_POT.toString())) {
+			return SUPER_POT;
+		} else if (str.equals(SCROLL1.toString())) {
+			return SCROLL1;
+		} else if (str.equals(SCROLL2.toString())) {
+			return SCROLL2;
+		} else if (str.equals(TRAP.toString())) {
+			return TRAP;
+		} else if (str.equals(ACTIVATED_TRAP.toString())) {
+			return ACTIVATED_TRAP;
+		} else if (str.equals(CHEST.toString())) {
+			return CHEST;
+		} else if (str.equals(LIT_BULB.toString())) {
+			return LIT_BULB;
+		} else if (str.equals(UNLIT_BULB.toString())) {
+			return UNLIT_BULB;
+		} else {
+			return null;
+		}
+	}
 }
