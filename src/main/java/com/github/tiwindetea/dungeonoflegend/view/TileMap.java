@@ -343,6 +343,9 @@ public class TileMap extends Parent {
 				this.visibleTiles[i][j] = visibility;
 			}
 		}
+		for(Entity entity : this.entities) {
+			entity.setVisible(true);
+		}
 		redrawTiles();
 	}
 
@@ -403,6 +406,14 @@ public class TileMap extends Parent {
 						}
 					}
 				}
+			}
+		}
+		for(Entity entity : this.entities) {
+			if(newVisibleTiles[entity.getPosition().x][entity.getPosition().y]) {
+				entity.setVisible(true);
+			}
+			else {
+				entity.setVisible(false);
 			}
 		}
 	}

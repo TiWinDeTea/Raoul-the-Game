@@ -139,6 +139,22 @@ public class GUI implements GameListener {
 				}
 			}
 		}
+		for(Long currentKey : this.staticEntities.keySet()) {
+			StaticEntity staticEntity = this.staticEntities.get(currentKey);
+			if(staticEntity.getLOS() != null) {
+				boolean[][] LOS = staticEntity.getLOS();
+				int LOSPosX = staticEntity.getPosition().x - ((LOS.length - 1) / 2);
+				int LOSPosY = staticEntity.getPosition().y - ((LOS[0].length - 1) / 2);
+				for(int i = 0; i < LOS.length; i++) {
+					for(int j = 0; j < LOS[i].length; j++) {
+						if(((LOSPosX + i > 0) && (LOSPosX + i < visibleTiles.length))
+						  && ((LOSPosY + j > 0) && (LOSPosY + j < visibleTiles[0].length))) {
+							visibleTiles[LOSPosX + i][LOSPosY + j] |= LOS[i][j];
+						}
+					}
+				}
+			}
+		}
 		return visibleTiles;
 	}
 
