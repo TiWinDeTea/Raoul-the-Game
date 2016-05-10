@@ -50,7 +50,7 @@ public class GUI implements GameListener {
 
 	public static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
 	public static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
-	public static final Color CENTER_BACKGROUND_COLOR = Color.CYAN;
+	public static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);

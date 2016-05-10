@@ -1,6 +1,10 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.Stack;
 
 import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
 
@@ -34,10 +38,10 @@ public class Map {
     private static final int MAX_ROOM_NUMBER = 61; // > MIN_ROOM_NUMBER
     private static final int MIN_CORRIDOR_NBR = 20; // >= 1
     private static final int MAX_CORRIDOR_NBR = 30; // > MIN_CORRIDOR_NBR
-    private static final int MIN_CORRIDOR_LENGTH = 4; // >= 1
+    private static final int MIN_CORRIDOR_LENGTH = 6; // >= 1
     private static final int MAX_CORRIDOR_LENGTH = 18; // > MIN_CORRIDOR_LENGTH
-    private static final int MIN_LEVEL_WIDTH = 7; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
-    private static final int MAX_LEVEL_WIDTH = 9; // > MIN_LEVEL_WIDTH
+    private static final int MIN_LEVEL_WIDTH = 75; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_WIDTH = 125; // > MIN_LEVEL_WIDTH
     private static final int MIN_LEVEL_HEIGHT = 75; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
     private static final int MAX_LEVEL_HEIGHT = 125; // > MIN_LEVEL_HEIGHT
     private static final int RETRIES_NBR = 5000;
@@ -45,8 +49,8 @@ public class Map {
 
     private static final int PROBABILITY_UNIT = 100; // > 0
     /* Following values should be between 0 and PROBABILITY_UNIT (both included) */
-    private static final int MIN_HOLE_COVERAGE = 0;
-    private static final int MAX_HOLE_COVERAGE = 0; // > MIN_HOLE_COVERAGE
+    private static final int MIN_HOLE_COVERAGE = 25;
+    private static final int MAX_HOLE_COVERAGE = 65; // > MIN_HOLE_COVERAGE
     private static final int HOLE_CHANCE = 5;
     private static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
     private static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;

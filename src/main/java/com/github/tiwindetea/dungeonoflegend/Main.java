@@ -9,7 +9,6 @@ import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Game;
 import com.github.tiwindetea.dungeonoflegend.model.Map;
 import com.github.tiwindetea.dungeonoflegend.model.Seed;
-import com.github.tiwindetea.dungeonoflegend.model.Tile;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
 import javafx.application.Application;
@@ -93,14 +92,7 @@ public class Main extends Application {
 					return;
 				}
 				GUI.moveLivingEntity(new LivingEntityMoveEvent(42L, pos.add(direction)));
-				Tile[][] falseLOS = map.getLOS(pos, 4);
-				boolean[][] trueLOS = new boolean[falseLOS.length][falseLOS[0].length];
-				for(int i = 0; i < falseLOS.length; i++) {
-					for(int j = 0; j < falseLOS[i].length; j++) {
-						trueLOS[i][j] = (falseLOS[i][j] != Tile.UNKNOWN);
-					}
-				}
-				GUI.defineLivingEntityLOS(new LivingEntityLOSDefinitionEvent(42L, trueLOS));
+				GUI.defineLivingEntityLOS(new LivingEntityLOSDefinitionEvent(42L, map.getLOS(pos, 4)));
 			}
 		});
 	}

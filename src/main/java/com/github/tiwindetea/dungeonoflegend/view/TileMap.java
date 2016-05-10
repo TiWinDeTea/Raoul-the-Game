@@ -221,25 +221,25 @@ public class TileMap extends Parent {
 		for(int i = 0; i < horizontalCanevasNumbers - 1; i++) {
 			for(int j = 0; j < verticalCanevasNumbers - 1; j++) {
 				this.canvases[i][j] = new Canvas(RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
-				this.canvases[i][j].setTranslateX(i * (RCANVAS_MAX_WIDTH - 1));
-				this.canvases[i][j].setTranslateY(j * (RCANVAS_MAX_HEIGHT - 1));
+				this.canvases[i][j].setTranslateX(i * RCANVAS_MAX_WIDTH);
+				this.canvases[i][j].setTranslateY(j * RCANVAS_MAX_HEIGHT);
 			}
 			int canevasesY = verticalCanevasNumbers - 1;
 			this.canvases[i][canevasesY] = new Canvas(RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.spritesSize.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
-			this.canvases[i][canevasesY].setTranslateX(i * (RCANVAS_MAX_WIDTH - 1));
-			this.canvases[i][canevasesY].setTranslateY(canevasesY * (RCANVAS_MAX_HEIGHT - 1));
+			this.canvases[i][canevasesY].setTranslateX(i * RCANVAS_MAX_WIDTH);
+			this.canvases[i][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 		}
 		for(int i = 0; i < verticalCanevasNumbers - 1; i++) {
 			int canevasesX = horizontalCanevasNumbers - 1;
 			this.canvases[canevasesX][i] = new Canvas(mapWidth * ViewPackage.spritesSize.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
-			this.canvases[canevasesX][i].setTranslateX(canevasesX * (RCANVAS_MAX_WIDTH - 1));
-			this.canvases[canevasesX][i].setTranslateY(i * (RCANVAS_MAX_HEIGHT - 1));
+			this.canvases[canevasesX][i].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
+			this.canvases[canevasesX][i].setTranslateY(i * RCANVAS_MAX_HEIGHT);
 		}
 		int canevasesX = this.canvases.length - 1;
 		int canevasesY = this.canvases[0].length - 1;
 		this.canvases[canevasesX][canevasesY] = new Canvas(mapWidth * ViewPackage.spritesSize.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.spritesSize.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
-		this.canvases[canevasesX][canevasesY].setTranslateX(canevasesX * (RCANVAS_MAX_WIDTH - 1));
-		this.canvases[canevasesX][canevasesY].setTranslateY(canevasesY * (RCANVAS_MAX_HEIGHT - 1));
+		this.canvases[canevasesX][canevasesY].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
+		this.canvases[canevasesX][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 
 		Image image = ViewPackage.objectsImage;
 		for(int i = 0; i < map.length; i++) {
