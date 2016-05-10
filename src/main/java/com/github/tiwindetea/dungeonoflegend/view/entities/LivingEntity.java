@@ -16,6 +16,8 @@ public class LivingEntity extends Entity {
 		this.setPosition(position);
 		this.imageView.setImage(livingEntityType.getImage());
 		this.setDirection(direction);
+
+		getChildren().add(this.imageView);
 	}
 
 	public void setPosition(Vector2i position, Direction direction) {
@@ -26,8 +28,8 @@ public class LivingEntity extends Entity {
 	@Override
 	public void setPosition(Vector2i position) {
 		this.position = new Vector2i(position);
-		this.imageView.setTranslateX(position.x);
-		this.imageView.setTranslateY(position.y);
+		this.imageView.setTranslateX(position.x * spriteSize.x);
+		this.imageView.setTranslateY(position.y * spriteSize.y);
 	}
 
 	public void setDirection(Direction direction) {

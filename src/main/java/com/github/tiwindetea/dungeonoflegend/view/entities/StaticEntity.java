@@ -23,6 +23,8 @@ public class StaticEntity extends Entity {
 		if(staticEntityType.getSpritesNumber() > 1) {
 			this.animate();
 		}
+
+		getChildren().add(this.imageView);
 	}
 
 	private void animate() {
@@ -35,8 +37,8 @@ public class StaticEntity extends Entity {
 	@Override
 	public void setPosition(Vector2i position) {
 		this.position = new Vector2i(position);
-		this.imageView.setTranslateX(position.x);
-		this.imageView.setTranslateY(position.y);
+		this.imageView.setTranslateX(position.x * spriteSize.x);
+		this.imageView.setTranslateY(position.y * spriteSize.y);
 	}
 
 	public boolean isAnimated() {
