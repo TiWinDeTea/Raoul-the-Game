@@ -11,15 +11,16 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
-import com.github.tiwindetea.dungeonoflegend.events.requests.moves.ComplexMoveRequestEvent;
-import com.github.tiwindetea.dungeonoflegend.events.requests.moves.SimpleMoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
@@ -45,7 +46,7 @@ import java.util.List;
 /**
  * Created by maxime on 5/2/16.
  */
-public class GUI implements GameListener {
+public class GUI implements GameListener, TileMapListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
 	public static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
@@ -88,6 +89,7 @@ public class GUI implements GameListener {
 		//Center pane
 		this.cPane.setBackground(new Background(new BackgroundFill(CENTER_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.cPane.getChildren().add(this.cTileMap);
+		this.cTileMap.addTileMapListener(this);
 
 		//Right pane
 		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -178,15 +180,15 @@ public class GUI implements GameListener {
 		}
 	}
 
-	private void fireComplexMoveRequestEvent(ComplexMoveRequestEvent event) {
+	private void fireMoveRequestEvent(MoveRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestComplexMove(event);
+			listener.requestMove(event);
 		}
 	}
 
-	private void fireSimpleMoveRequestEvent(SimpleMoveRequestEvent event) {
+	private void fireSimpleMoveRequestEvent(MoveRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestSimpleMove(event);
+			listener.requestMove(event);
 		}
 	}
 
@@ -388,5 +390,10 @@ public class GUI implements GameListener {
 			return;
 		}
 		this.cTileMap.setMap(e.map);
+	}
+
+	@Override
+	public void tileClicked(TileClickEvent e) {
+		fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
 	}
 }

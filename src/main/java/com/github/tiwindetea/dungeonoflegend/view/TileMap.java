@@ -1,5 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
+import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Tile;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.Entity;
@@ -32,10 +34,15 @@ public class TileMap extends Parent {
 	private static final double MIN_SCALE = .1d;
 	private static final double DELTA = 1.1d;
 	private final DoubleProperty scale = new SimpleDoubleProperty(1.0);
-	private double mouseAnchorX;
-	private double mouseAnchorY;
+
+	private final List<TileMapListener> listeners = new ArrayList<>();
+
+	private double leftMouseAnchorX;
+	private double leftMouseAnchorY;
 	private double translateAnchorX;
 	private double translateAnchorY;
+	private double rightMouseAnchorX;
+	private double rightMouseAnchorY;
 
 	private Canvas[][] canvases;
 
@@ -53,18 +60,39 @@ public class TileMap extends Parent {
 
 		public void handle(MouseEvent event) {
 
-			// right mouse button
-			if(!event.isPrimaryButtonDown())
-				return;
+			// left mouse button
+			if(event.isPrimaryButtonDown()) {
+				TileMap.this.leftMouseAnchorX = event.getSceneX();
+				TileMap.this.leftMouseAnchorY = event.getSceneY();
 
-			TileMap.this.mouseAnchorX = event.getSceneX();
-			TileMap.this.mouseAnchorY = event.getSceneY();
+				TileMap.this.translateAnchorX = getTranslateX();
+				TileMap.this.translateAnchorY = getTranslateY();
+			}
 
-			TileMap.this.translateAnchorX = getTranslateX();
-			TileMap.this.translateAnchorY = getTranslateY();
+			// left mouse button
+			if(event.isSecondaryButtonDown()) {
+				System.out.println("Mouse pressed at: [" + event.getX() + "," + event.getY() + "]");
+				TileMap.this.rightMouseAnchorX = event.getX();
+				TileMap.this.rightMouseAnchorY = event.getY();
+			}
 
 		}
 
+	};
+
+	private EventHandler<MouseEvent> onMouseReleasedEventHandler = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle(MouseEvent event) {
+
+			// left mouse button
+			if(event.isSecondaryButtonDown()) {
+				System.out.println("Mouse released at: [" + event.getX() + "," + event.getY() + "]");
+				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));
+				if(((int) Math.floor(TileMap.this.rightMouseAnchorX / ViewPackage.spritesSize.x) == tilePosition.x) && ((int) Math.floor(event.getY() / ViewPackage.spritesSize.y) == tilePosition.y)) {
+					fireTileClickEvent(new TileClickEvent(tilePosition));
+				}
+			}
+		}
 	};
 
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
@@ -74,8 +102,8 @@ public class TileMap extends Parent {
 			if(!event.isPrimaryButtonDown())
 				return;
 
-			double newTranslateX = TileMap.this.translateAnchorX + event.getSceneX() - TileMap.this.mouseAnchorX;
-			double newTranslateY = TileMap.this.translateAnchorY + event.getSceneY() - TileMap.this.mouseAnchorY;
+			double newTranslateX = TileMap.this.translateAnchorX + event.getSceneX() - TileMap.this.leftMouseAnchorX;
+			double newTranslateY = TileMap.this.translateAnchorY + event.getSceneY() - TileMap.this.leftMouseAnchorY;
 
 			TileMap tileMap = TileMap.this;
 			Pane parent = (Pane) (tileMap.getParent());
@@ -406,6 +434,10 @@ public class TileMap extends Parent {
 						}
 					}
 				}
+				//******************************************************************************************************************************************************************
+				//to display the complete map
+				//******************************************************************************************************************************************************************
+				drawRealTile(new Vector2i(i, j));
 			}
 		}
 		for(Entity entity : this.entities) {
@@ -433,5 +465,19 @@ public class TileMap extends Parent {
 			return max;
 
 		return value;
+	}
+
+	public void addTileMapListener(TileMapListener listener) {
+		this.listeners.add(listener);
+	}
+
+	private TileMapListener[] getTileMapListeners() {
+		return this.listeners.toArray(new TileMapListener[this.listeners.size()]);
+	}
+
+	private void fireTileClickEvent(TileClickEvent event) {
+		for(TileMapListener listener : this.getTileMapListeners()) {
+			listener.tileClicked(event);
+		}
 	}
 }
