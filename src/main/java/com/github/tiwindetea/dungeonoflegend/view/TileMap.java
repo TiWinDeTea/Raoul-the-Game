@@ -11,6 +11,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
@@ -69,9 +70,8 @@ public class TileMap extends Parent {
 				TileMap.this.translateAnchorY = getTranslateY();
 			}
 
-			// left mouse button
+			// right mouse button
 			if(event.isSecondaryButtonDown()) {
-				System.out.println("Mouse pressed at: [" + event.getX() + "," + event.getY() + "]");
 				TileMap.this.rightMouseAnchorX = event.getX();
 				TileMap.this.rightMouseAnchorY = event.getY();
 			}
@@ -84,9 +84,8 @@ public class TileMap extends Parent {
 		@Override
 		public void handle(MouseEvent event) {
 
-			// left mouse button
-			if(event.isSecondaryButtonDown()) {
-				System.out.println("Mouse released at: [" + event.getX() + "," + event.getY() + "]");
+			// right mouse button
+			if(event.getButton() == MouseButton.SECONDARY) {
 				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));
 				if(((int) Math.floor(TileMap.this.rightMouseAnchorX / ViewPackage.spritesSize.x) == tilePosition.x) && ((int) Math.floor(event.getY() / ViewPackage.spritesSize.y) == tilePosition.y)) {
 					fireTileClickEvent(new TileClickEvent(tilePosition));
@@ -220,6 +219,7 @@ public class TileMap extends Parent {
 		scaleXProperty().bind(this.scale);
 		scaleYProperty().bind(this.scale);
 		setOnMousePressed(this.onMousePressedEventHandler);
+		setOnMouseReleased(this.onMouseReleasedEventHandler);
 		setOnMouseDragged(this.onMouseDraggedEventHandler);
 		setOnScroll(this.onScrollEventHandler);
 
