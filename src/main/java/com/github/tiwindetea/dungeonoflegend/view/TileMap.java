@@ -1,9 +1,8 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
-import com.github.tiwindetea.dungeonoflegend.model.Map;
-import com.github.tiwindetea.dungeonoflegend.model.Seed;
 import com.github.tiwindetea.dungeonoflegend.model.Tile;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.entities.Entity;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -14,21 +13,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by maxime on 5/6/16.
  */
 public class TileMap extends Parent {
 
+	private static final int CANVAS_MAX_WIDTH = 1024;
+	private static final int CANVAS_MAX_HEIGHT = 1024;
+	private static final int RCANVAS_MAX_WIDTH = (int) (Math.floor(CANVAS_MAX_WIDTH / ViewPackage.spritesSize.x) * ViewPackage.spritesSize.x);
+	private static final int RCANVAS_MAX_HEIGHT = (int) (Math.floor(CANVAS_MAX_HEIGHT / ViewPackage.spritesSize.y) * ViewPackage.spritesSize.y);
 
-	public static final int CANVAS_MAX_WIDTH = 1024;
-	public static final int CANVAS_MAX_HEIGHT = 1024;
-	public static final int RCANVAS_MAX_WIDTH = (int) (Math.floor(CANVAS_MAX_WIDTH / ViewPackage.spritesSize.x) * ViewPackage.spritesSize.x);
-	public static final int RCANVAS_MAX_HEIGHT = (int) (Math.floor(CANVAS_MAX_HEIGHT / ViewPackage.spritesSize.y) * ViewPackage.spritesSize.y);
-
-	public static final Tile emptyTile = Tile.UNKNOWN;
+	private static final Tile EMPTY_TILE = Tile.UNKNOWN;
 
 	private static final double MAX_SCALE = 10.0d;
 	private static final double MIN_SCALE = .1d;
@@ -40,6 +38,8 @@ public class TileMap extends Parent {
 	private double translateAnchorY;
 
 	private Canvas[][] canvases;
+
+	private final List<Entity> entities = new ArrayList<>();
 
 	private Tile[][] realTileMap;
 	private boolean[][] visibleTiles;
@@ -196,10 +196,10 @@ public class TileMap extends Parent {
 		setOnScroll(this.onScrollEventHandler);
 
 		// test
-		Random rand = new Random();
+		/*Random rand = new Random();
 		Map map = new Map(new Seed(rand.nextInt(), rand.nextInt()));
 		map.generateLevel(1);
-		this.setMap(map.getMapCopy());
+		this.setMap(map.getMapCopy());*/
 	}
 
 	public void setMap(Tile[][] map) {
@@ -251,12 +251,13 @@ public class TileMap extends Parent {
 		for(Canvas[] canvas : this.canvases) {
 			getChildren().addAll(canvas);
 		}
+		getChildren().addAll(this.entities);
 
 		//TODO:
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		this.fogedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		setAllTilesFog(false);
-		setAllTilesVisibility(true);
+		setAllTilesVisibility(false);
 	}
 
 	private void drawRealTile(Vector2i tilePosition) {
@@ -265,7 +266,7 @@ public class TileMap extends Parent {
 	}
 
 	private void drawEmptyTile(Vector2i tilePosition) {
-		drawImage(ViewPackage.objectsImage, emptyTile.getSpritePosition(tilePosition.x + tilePosition.y).x, emptyTile.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+		drawImage(ViewPackage.objectsImage, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).x, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
 	}
 
 	private void drawFoggedTile(Vector2i tilePosition) {
@@ -355,6 +356,16 @@ public class TileMap extends Parent {
 		redrawTiles();
 	}
 
+	public void addEntity(Entity entity) {
+		this.entities.add(entity);
+		getChildren().add(entity);
+	}
+
+	public void removeEntity(Entity entity) {
+		this.entities.remove(entity);
+		getChildren().remove(entity);
+	}
+
 	private void redrawTiles() {
 		for(int i = 0; i < this.realTileMap.length; i++) {
 			for(int j = 0; j < this.realTileMap[i].length; j++) {
@@ -379,13 +390,16 @@ public class TileMap extends Parent {
 				if(this.visibleTiles[i][j] != newVisibleTiles[i][j]) {
 					if(newVisibleTiles[i][j]) {
 						drawRealTile(new Vector2i(i, j));
+						//System.out.println("TileMap: tile " + i + " " + j + " visible");
 					}
 					else {
 						if(this.fogedTiles[i][j]) {
 							drawFoggedTile(new Vector2i(i, j));
+							//System.out.println("TileMap: tile " + i + " " + j + " fogged");
 						}
 						else {
 							drawEmptyTile(new Vector2i(i, j));
+							//System.out.println("TileMap: tile " + i + " " + j + " empty");
 						}
 					}
 				}
