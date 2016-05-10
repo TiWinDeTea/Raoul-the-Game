@@ -26,10 +26,12 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
@@ -71,6 +73,33 @@ public class GUI implements GameListener, TileMapListener {
 	private int actualPlayersNumber = 0;
 
 	private final TileMap cTileMap = new TileMap();
+
+	private EventHandler<KeyEvent> onKeyReleasedEventHandler = new EventHandler<KeyEvent>() {
+
+		@Override
+		public void handle(KeyEvent event) {
+			switch(event.getCode()) {
+			case LEFT:
+			case Q:
+			case A:
+				fireMoveRequestEvent(new MoveRequestEvent(Direction.LEFT));
+				break;
+			case RIGHT:
+			case D:
+				fireMoveRequestEvent(new MoveRequestEvent(Direction.RIGHT));
+				break;
+			case UP:
+			case Z:
+			case W:
+				fireMoveRequestEvent(new MoveRequestEvent(Direction.UP));
+				break;
+			case DOWN:
+			case S:
+				fireMoveRequestEvent(new MoveRequestEvent(Direction.DOWN));
+				break;
+			}
+		}
+	};
 
 	public GUI() {
 		this.init();
@@ -117,6 +146,8 @@ public class GUI implements GameListener, TileMapListener {
 			}
 			this.blTilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
 		});
+
+		this.scene.setOnKeyReleased(this.onKeyReleasedEventHandler);
 	}
 
 	public Scene getScene() {
