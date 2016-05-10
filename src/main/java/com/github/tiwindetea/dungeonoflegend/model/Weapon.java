@@ -47,6 +47,9 @@ public class Weapon implements StorableObject {
 	}
 
 	public static Weapon parseWeapon(String str) {
+		if (str.equals("weapon={null}")) {
+			return null;
+		}
 		int SEType = str.indexOf("SEType=") + 7;
 		int type = str.indexOf("type=", SEType) + 5;
 		int attack = str.indexOf("attack=", type) + 7;

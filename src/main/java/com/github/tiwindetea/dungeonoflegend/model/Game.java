@@ -87,9 +87,17 @@ public class Game implements RequestListener {
 
 	private int playerTurn;
 
+	String gameName;
 
-	public Game(ArrayList<Player> players, Seed seed, int level) {
+	public Game(String gameName) {
+		this.gameName = gameName;
+	}
 
+	public void init(Collection<Player> players) {
+		this.init(players, new Seed(), 0);
+	}
+
+	public void init(Collection<Player> players, Seed seed, int level) {
 		this.playerTurn = 0;
 		this.level = level;
 		this.seed = seed;
@@ -101,10 +109,6 @@ public class Game implements RequestListener {
 		this.loadTraps();
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
-	}
-
-	public Game(ArrayList<Player> players) {
-		this(players, new Seed(), 0);
 	}
 
 	private void loadMobs() {
@@ -347,15 +351,15 @@ public class Game implements RequestListener {
 
 	public void generateLevel() {
 		for (Pair<Mob> mob : this.mobs) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.id));
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.getId()));
 		}
 
 		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.id));
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
 		}
 
 		for (Pair<Vector2i> bulb : this.bulbs) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.id));
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
 
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
@@ -367,14 +371,14 @@ public class Game implements RequestListener {
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
 			this.bulbs.add(p);
-			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.id, StaticEntityType.LIT_BULB, p.object));
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, p.object));
 		}
 
 		Random random = this.seed.getRandomizer(this.level);
 
 		for (Pair<Player> player : this.players) {
 			player.object.setPosition(this.world.getStairsUpPosition());
-			fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.id, player.object.getPosition()));
+			fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.getId(), player.object.getPosition()));
 		}
 
 		int mobsNbr = random.nextInt(MAX_MOB_QTT_PER_LEVEL - MIN_MOB_QTT_PER_LEVEL) + MIN_MOB_QTT_PER_LEVEL;
@@ -392,7 +396,7 @@ public class Game implements RequestListener {
 					mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
 					mobPos.copy()));
 			this.mobs.add(pair);
-			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.id, this.mobsTypes[selectedMob], mobPos.copy(), null));
+			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), null));
 		}
 
 		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL) + MIN_CHEST_QTT_PER_LEVEL;
@@ -412,7 +416,7 @@ public class Game implements RequestListener {
 							this.lootsArmorType[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, armor));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, armor.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), armor.getGtype(), pos));
 					break;
 				case 1:
 					selection = random.nextInt(this.lootsWeaponRange.length);
@@ -421,7 +425,7 @@ public class Game implements RequestListener {
 							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
 					pair = new Pair<>(new InteractiveObject(pos, weapon));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, weapon.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), weapon.getGtype(), pos));
 					break;
 				case 2:
 					selection = random.nextInt(this.lootsScrollTurns.length);
@@ -430,7 +434,7 @@ public class Game implements RequestListener {
 							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, scroll));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, scroll.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), scroll.getGtype(), pos));
 					break;
 				case 3:
 					/* Falls through */
@@ -445,7 +449,7 @@ public class Game implements RequestListener {
 							this.lootsPotManaMod[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, pot));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, pot.getGType(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), pot.getGType(), pos));
 					break;
 			}
 		}
@@ -456,7 +460,7 @@ public class Game implements RequestListener {
 					this.trapsBaseHP[selection] + this.trapsHPPerLevel[selection] * random.nextInt(3) + this.level - 1,
 					this.trapsBaseMana[selection] + this.trapsManaPerLevel[selection] * random.nextInt(3) + this.level - 1));
 			this.interactiveObjects.add(pair);
-			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.id, StaticEntityType.TRAP, pos));
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.TRAP, pos));
 		}
 	}
 
@@ -488,6 +492,7 @@ public class Game implements RequestListener {
 		if (count == this.players.size()) {
 			++this.level;
 			this.generateLevel();
+			this.save();
 		} else if (this.playerTurn == 0) {
 			this.nextTick();
 		}
@@ -511,7 +516,8 @@ public class Game implements RequestListener {
 		//TODO
 	}
 
-	private void loadSave() {
+	public void loadSave() {
+		// TODO
 	}
 
 	private void save() {

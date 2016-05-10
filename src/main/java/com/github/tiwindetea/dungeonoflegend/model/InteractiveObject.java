@@ -35,7 +35,7 @@ public class InteractiveObject {
                 ((Player) livingThing).useMana(this.manaModifier);
             return true;
         } else if (livingThing.getType() == LivingThingType.PLAYER) {
-            ((Player) livingThing).addToInventory(this.loot);
+            //((Player) livingThing).addToInventory(this.loot);
             return true;
         } else {
             return false;

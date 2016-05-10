@@ -63,6 +63,9 @@ public class Armor implements StorableObject {
 	}
 
 	public static Armor parseArmor(String str) {
+		if (str.equals("armor={null}")) {
+			return null;
+		}
 		int SEType = str.indexOf("SEType=") + 7;
 		int type = str.indexOf("type=", SEType) + 5;
 		int def = str.indexOf("defense=", type) + 8;

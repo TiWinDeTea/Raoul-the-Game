@@ -1,10 +1,6 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.*;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
@@ -164,8 +160,8 @@ public class GUI implements GameListener, TileMapListener {
 				int LOSPosY = livingEntity.getPosition().y - ((LOS[0].length - 1) / 2);
 				for(int i = 0; i < LOS.length; i++) {
 					for(int j = 0; j < LOS[i].length; j++) {
-						if(((LOSPosX + i > 0) && (LOSPosX + i < visibleTiles.length))
-						  && ((LOSPosY + j > 0) && (LOSPosY + j < visibleTiles[0].length))) {
+						if (((LOSPosX + i >= 0) && (LOSPosX + i < visibleTiles.length))
+								&& ((LOSPosY + j >= 0) && (LOSPosY + j < visibleTiles[0].length))) {
 							visibleTiles[LOSPosX + i][LOSPosY + j] |= LOS[i][j];
 						}
 					}
@@ -180,8 +176,8 @@ public class GUI implements GameListener, TileMapListener {
 				int LOSPosY = staticEntity.getPosition().y - ((LOS[0].length - 1) / 2);
 				for(int i = 0; i < LOS.length; i++) {
 					for(int j = 0; j < LOS[i].length; j++) {
-						if(((LOSPosX + i > 0) && (LOSPosX + i < visibleTiles.length))
-						  && ((LOSPosY + j > 0) && (LOSPosY + j < visibleTiles[0].length))) {
+						if (((LOSPosX + i >= 0) && (LOSPosX + i < visibleTiles.length))
+								&& ((LOSPosY + j >= 0) && (LOSPosY + j < visibleTiles[0].length))) {
 							visibleTiles[LOSPosX + i][LOSPosY + j] |= LOS[i][j];
 						}
 					}

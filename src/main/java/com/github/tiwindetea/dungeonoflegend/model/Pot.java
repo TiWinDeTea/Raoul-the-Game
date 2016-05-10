@@ -40,6 +40,9 @@ public class Pot implements Consumable {
 	}
 
 	public static Pot parsePot(String str) {
+		if (str.equals("pot={null}")) {
+			return null;
+		}
 		int SEType = str.indexOf("SEType=") + 7;
 		int turns = str.indexOf("turns=", SEType) + 6;
 		int heal = str.indexOf("heal=", turns) + 5;

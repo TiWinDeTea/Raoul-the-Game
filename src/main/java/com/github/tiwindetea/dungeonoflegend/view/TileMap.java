@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class TileMap extends Parent {
 
-	private static final int CANVAS_MAX_WIDTH = 1024;
-	private static final int CANVAS_MAX_HEIGHT = 1024;
+	private static final int CANVAS_MAX_WIDTH = 2048;
+	private static final int CANVAS_MAX_HEIGHT = 2048;
 	private static final int RCANVAS_MAX_WIDTH = (int) (Math.floor(CANVAS_MAX_WIDTH / ViewPackage.spritesSize.x) * ViewPackage.spritesSize.x);
 	private static final int RCANVAS_MAX_HEIGHT = (int) (Math.floor(CANVAS_MAX_HEIGHT / ViewPackage.spritesSize.y) * ViewPackage.spritesSize.y);
 

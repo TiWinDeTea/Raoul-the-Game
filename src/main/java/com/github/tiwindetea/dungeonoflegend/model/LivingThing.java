@@ -14,6 +14,9 @@ public abstract class LivingThing {
 	protected int defensePower;
 	protected Vector2i position;
 
+	public LivingThing() {
+
+	}
 	public void updateSight(Tile[][] sight) {
 		this.sight = sight;
 	}

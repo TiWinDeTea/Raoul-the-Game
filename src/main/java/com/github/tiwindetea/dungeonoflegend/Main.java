@@ -5,11 +5,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.model.Direction;
-import com.github.tiwindetea.dungeonoflegend.model.Game;
-import com.github.tiwindetea.dungeonoflegend.model.Map;
-import com.github.tiwindetea.dungeonoflegend.model.Seed;
-import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.model.*;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -18,8 +14,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 
 /**
  * Created by maxime on 5/3/16.
@@ -32,7 +26,7 @@ public class Main extends Application {
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.setScene(GUI.getScene());
 		primaryStage.show();
-		Game game = new Game(new ArrayList<>());
+		Game game = new Game("LOL");
 		game.addGameListener(GUI);
 		GUI.addRequestListener(game);
 		game.launch((byte) 1);
@@ -57,10 +51,11 @@ public class Main extends Application {
 
 
 		Map map = new Map(new Seed());
+		System.out.println("Seed: {" + map.getSeed().getAlphaSeed() + ";" + map.getSeed().getBetaSeed() + "}");
 		map.generateLevel(1);
 		GUI.createMap(new MapCreationEvent(map.getMapCopy()));
 
-		Vector2i pos = new Vector2i(40, 40);
+		Vector2i pos = map.getStairsUpPosition();
 		GUI.createPlayer(new PlayerCreationEvent(1, 42L, pos, Direction.DOWN, 100, 100));
 		boolean[][] LOS = new boolean[9][9];
 		for(int i = 0; i < LOS.length; i++) {

@@ -32,6 +32,9 @@ public class Scroll implements Consumable {
 	}
 
 	public static Scroll parseScroll(String str) {
+		if (str.equals("scroll={null}")) {
+			return null;
+		}
 		int SEType = str.indexOf("SEType=") + 7;
 		int turns = str.indexOf("turns=", SEType) + 6;
 		int hmpt = str.indexOf("healthMod=", turns) + 10;
