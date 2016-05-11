@@ -5,6 +5,8 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 
+import java.util.List;
+
 /**
  * Created by maxime on 5/6/16.
  */
@@ -36,6 +38,16 @@ public abstract class Entity extends Parent {
 
 	public boolean[][] getLOS() {
 		return this.LOS;
+	}
+
+	public void modifieLOS(List<Vector2i> modifiedTilesPositions) {
+		if(this.LOS != null && this.LOS.length > 0) {
+			for(Vector2i modifiedTilesPosition : modifiedTilesPositions) {
+				if(((modifiedTilesPosition.x >= 0) && (modifiedTilesPosition.x < this.LOS.length)) && ((modifiedTilesPosition.y >= 0) && (modifiedTilesPosition.y >= this.LOS[0].length))) {
+					this.LOS[modifiedTilesPosition.x][modifiedTilesPosition.y] = !this.LOS[modifiedTilesPosition.x][modifiedTilesPosition.y];
+				}
+			}
+		}
 	}
 
 	public abstract void setPosition(Vector2i position);

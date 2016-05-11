@@ -1,6 +1,10 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.*;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
@@ -268,12 +272,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
-		boolean[][] LOS = this.livingEntities.get(e.entityId).getLOS();
-		for(Vector2i modifiedTilesPosition : e.modifiedTilesPositions) {
-			LOS[modifiedTilesPosition.x][modifiedTilesPosition.y] = !LOS[modifiedTilesPosition.x][modifiedTilesPosition.y];
-		}
-		this.livingEntities.get(e.entityId).setLOS(LOS);
+		this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
 		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
