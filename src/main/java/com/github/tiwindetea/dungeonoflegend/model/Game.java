@@ -18,6 +18,7 @@ import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,50 +40,50 @@ public class Game implements RequestListener {
 	private ArrayList<Pair<StorableObject>> objectsOnGround = new ArrayList<>();
 	private ArrayList<Pair<Mob>> mobs = new ArrayList<>();
 	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
-	private ArrayList<Pair<Player>> players;
+	private ArrayList<Pair<Player>> players = new ArrayList<>();
 	private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
 	private Seed seed;
 	private final List<GameListener> listeners = new ArrayList<>();
-	private LivingEntityType[] mobsTypes;
-	private int[] mobsBaseHP;
-	private int[] mobsBaseDef;
-	private int[] mobsBaseAttack;
-	private int[] mobsHPPerLevel;
-	private int[] mobsDefPerLevel;
-	private int[] mobsAttackPerLevel;
+	private LivingEntityType[] mobsTypes = new LivingEntityType[0];
+	private int[] mobsBaseHP = new int[0];
+	private int[] mobsBaseDef = new int[0];
+	private int[] mobsBaseAttack = new int[0];
+	private int[] mobsHPPerLevel = new int[0];
+	private int[] mobsDefPerLevel = new int[0];
+	private int[] mobsAttackPerLevel = new int[0];
 
-	private int[] trapsBaseHP;
-	private int[] trapsBaseMana;
-	private int[] trapsHPPerLevel;
-	private int[] trapsManaPerLevel;
+	private int[] trapsBaseHP = new int[0];
+	private int[] trapsBaseMana = new int[0];
+	private int[] trapsHPPerLevel = new int[0];
+	private int[] trapsManaPerLevel = new int[0];
 
-	private ArmorType[] lootsArmorType;
-	private int[] lootsArmorBaseDefense;
-	private int[] lootsArmorBaseAttack;
-	private int[] lootsArmorDefensePerLevel;
-	private int[] lootsArmorAttackPerLevel;
+	private ArmorType[] lootsArmorType = new ArmorType[0];
+	private int[] lootsArmorBaseDefense = new int[0];
+	private int[] lootsArmorBaseAttack = new int[0];
+	private int[] lootsArmorDefensePerLevel = new int[0];
+	private int[] lootsArmorAttackPerLevel = new int[0];
 
-	private int[] lootsWeaponRange;
-	private int[] lootsWeaponBaseAttack;
-	private int[] lootsWeaponManaCost;
-	private int[] lootsWeaponAttackPerLevel;
-	private int[] lootsWeaponManaCostPerLevel;
+	private int[] lootsWeaponRange = new int[0];
+	private int[] lootsWeaponBaseAttack = new int[0];
+	private int[] lootsWeaponManaCost = new int[0];
+	private int[] lootsWeaponAttackPerLevel = new int[0];
+	private int[] lootsWeaponManaCostPerLevel = new int[0];
 
-	private int[] lootsPotTurns;
-	private int[] lootsPotHeal;
-	private int[] lootsPotMana;
-	private int[] lootsPotAttackMod;
-	private int[] lootsPotDefMod;
-	private int[] lootsPotHPMod;
-	private int[] lootsPotManaMod;
-	private int[] lootsPotHealPerLevel;
-	private int[] lootsPotManaPerLevel;
+	private int[] lootsPotTurns = new int[0];
+	private int[] lootsPotHeal = new int[0];
+	private int[] lootsPotMana = new int[0];
+	private int[] lootsPotAttackMod = new int[0];
+	private int[] lootsPotDefMod = new int[0];
+	private int[] lootsPotHPMod = new int[0];
+	private int[] lootsPotManaMod = new int[0];
+	private int[] lootsPotHealPerLevel = new int[0];
+	private int[] lootsPotManaPerLevel = new int[0];
 
-	private int[] lootsScrollBaseDamagePerTurn;
-	private int[] lootsScrollBaseDamageModPerTurn;
-	private int[] lootsScrollDamagePerTurnPerLevel;
-	private int[] lootsScrollDamageModPerTurnPerLevel;
-	private int[] lootsScrollTurns;
+	private int[] lootsScrollBaseDamagePerTurn = new int[0];
+	private int[] lootsScrollBaseDamageModPerTurn = new int[0];
+	private int[] lootsScrollDamagePerTurnPerLevel = new int[0];
+	private int[] lootsScrollDamageModPerTurnPerLevel = new int[0];
+	private int[] lootsScrollTurns = new int[0];
 
 	private int playerTurn;
 
@@ -93,7 +94,32 @@ public class Game implements RequestListener {
 	}
 
 	public void init(Collection<Player> players) {
-		this.init(players, new Seed(), 0);
+		this.init(players, new Seed(), 1);
+	}
+
+	public void init(int numberOfPlayers) {
+		ArrayList<Player> players = new ArrayList<>();
+		ResourceBundle playersBundle = ResourceBundle.getBundle(MainPackage.name + ".Players");
+
+		for (int i = 0; i < numberOfPlayers; i++) {
+			String pString = "player" + i + ".";
+			players.add(new Player(
+					playersBundle.getString(pString + "name"),
+					Integer.parseInt(playersBundle.getString(pString + "los")),
+					Integer.parseInt(playersBundle.getString(pString + "explorelos")),
+					1,
+					Integer.parseInt(playersBundle.getString(pString + "maxStorageCapacity")),
+					Integer.parseInt(playersBundle.getString(pString + "baseHealth")),
+					Integer.parseInt(playersBundle.getString(pString + "baseMana")),
+					Integer.parseInt(playersBundle.getString(pString + "baseAttack")),
+					Integer.parseInt(playersBundle.getString(pString + "baseDef")),
+					Integer.parseInt(playersBundle.getString(pString + "healthPerLevel")),
+					Integer.parseInt(playersBundle.getString(pString + "anaPerLevel")),
+					Integer.parseInt(playersBundle.getString(pString + "attackPerLevel")),
+					Integer.parseInt(playersBundle.getString(pString + "defensePerLevel"))
+			));
+		}
+		this.init(players, new Seed(), 1);
 	}
 
 	public void init(Collection<Player> players, Seed seed, int level) {
@@ -102,16 +128,16 @@ public class Game implements RequestListener {
 		this.seed = seed;
 		this.world = new Map(this.seed);
 
+		this.players = new ArrayList<>(players.size());
+		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
 		this.world.generateLevel(level);
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
-		this.players = new ArrayList<>(players.size());
-		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
 	}
 
 	private void loadMobs() {
-		ResourceBundle mobs = ResourceBundle.getBundle(MainPackage.name + ".Mobs", Locale.getDefault());
+		ResourceBundle mobs = ResourceBundle.getBundle(MainPackage.name + ".Mobs");
 		int mobQtt = Integer.parseInt(mobs.getString("mobs.qtt"));
 		this.mobsTypes = new LivingEntityType[mobQtt];
 		this.mobsBaseHP = new int[mobQtt];
@@ -307,16 +333,34 @@ public class Game implements RequestListener {
 
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		StorableObject object = this.players.get(this.playerTurn).object.removeFromInventory(e.objectId);
-		/* TODO **********************************************************************************************************************************************************************
-		if (object != null) {
-			fireStaticEntityCreationEvent(new StaticEntityCreationEvent());
-		}*/
+		ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
+		Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
+		for (Direction direction : dirs) {
+			paths.add(this.world.getPath(this.player().getPosition().add(direction), e.dropPosition, false, null));
+		}
+		Stack<Vector2i> theChoosenOne = paths.get(0);
+		for (Stack<Vector2i> stack : paths) {
+			if (stack != null && stack.size() < theChoosenOne.size()) {
+				theChoosenOne = stack;
+			}
+		}
+		if (paths != null) {
+			this.player().setRequestedPath(theChoosenOne);
+		}
+		this.player().setObjectToDropId(e.objectId);
+		this.nextTurn();
 	}
 
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-		//TODO
+		Tile tile = this.world.getTile(e.tilePosition);
+		int distance = e.tilePosition.distance(this.player().getPosition());
+		if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+			this.world.triggerTile(e.tilePosition);
+			//TODO : fire event
+		} else if (distance <= player().getLos()) {
+			// TODO : GUI Fires event only if it is a visited tile ?
+		}
 	}
 
 	@Override
@@ -329,7 +373,7 @@ public class Game implements RequestListener {
 
 	}
 
-	public void generateLevel() {
+	private void generateLevel() {
 		for (Pair<Mob> mob : this.mobs) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.getId()));
 		}
@@ -462,12 +506,16 @@ public class Game implements RequestListener {
 		return pos;
 	}
 
+	private Player player() {
+		return this.players.get(this.playerTurn).object;
+	}
+
 	private void nextTurn() {
 		int count = 0;
 		do {
 			this.playerTurn = (this.playerTurn + 1) % this.players.size();
 			++count;
-		} while (count != this.players.size() && this.players.get(this.playerTurn).object.getFloor() != this.level);
+		} while (count != this.players.size() && this.player().getFloor() != this.level);
 
 		if (count == this.players.size()) {
 			++this.level;
@@ -476,31 +524,63 @@ public class Game implements RequestListener {
 		} else if (this.playerTurn == 0) {
 			this.nextTick();
 		}
+
+		if (this.player().isARequestPending()) {
+			this.nextTurn();
+		}
+		//TODO ********************************************************************************************************************************************************************
+		//fireNextTurnEvent(new event)
 	}
 
 	private void nextTick() {
 		Player player;
 		for (Pair<Player> playerPair : this.players) {
 			player = playerPair.object;
+			//player.live();
 			/* TODO ****************************************************************************************************************************************************************/
+			// + requests
 		}
 
 		Mob mob;
 		for (Pair<Mob> mobPair : this.mobs) {
 			mob = mobPair.object;
+			//mob.live();
 			/* TODO **********************************************************************************************************************************************************************/
 		}
 	}
 
-	public void launch(byte numberOfPlayers) {
-		//TODO
-	}
-
 	public void loadSave() {
-		// TODO
+		try {
+			Scanner file = new Scanner(new FileInputStream(this.gameName));
+			this.seed = Seed.parseSeed(file.nextLine());
+			String lvl = file.nextLine();
+			this.level = Integer.parseInt(lvl.substring(lvl.indexOf('=') + 1));
+			this.players.clear();
+			while (file.hasNext()) {
+				String line = file.nextLine();
+				this.players.add(new Pair<>(Player.parsePlayer(line)));
+			}
+			file.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("Failed to open the save file");
+			e.printStackTrace();
+		}
 	}
 
 	private void save() {
-		//TODO
+		try {
+			FileWriter file = new FileWriter(new File(this.gameName));
+			file.write(this.seed.toString() + "\n");
+			file.write("level=" + this.level + "\n");
+			for (Pair<Player> player : this.players) {
+				if (player.object != null) {
+					file.write(player.object.toString() + "\n");
+				}
+			}
+			file.close();
+		} catch (IOException e) {
+			System.out.println("Failed to open the save file");
+			e.printStackTrace();
+		}
 	}
 }

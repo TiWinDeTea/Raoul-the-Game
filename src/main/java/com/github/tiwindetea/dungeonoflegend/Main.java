@@ -29,7 +29,6 @@ public class Main extends Application {
 		Game game = new Game("LOL");
 		game.addGameListener(GUI);
 		GUI.addRequestListener(game);
-		game.launch((byte) 1);
 		//GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
 		//GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
 
