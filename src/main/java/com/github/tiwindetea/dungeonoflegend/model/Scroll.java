@@ -32,6 +32,9 @@ public class Scroll implements Consumable {
 	}
 
 	public static Scroll parseScroll(String str) {
+		if (!str.substring(0, 7).equals("scroll=")) {
+			throw new IllegalArgumentException("Invoking Scroll.parseScroll with input string: \"" + str + "\"");
+		}
 		if (str.equals("scroll={null}")) {
 			return null;
 		}

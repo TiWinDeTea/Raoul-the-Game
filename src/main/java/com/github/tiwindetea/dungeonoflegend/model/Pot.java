@@ -40,6 +40,9 @@ public class Pot implements Consumable {
 	}
 
 	public static Pot parsePot(String str) {
+		if (!str.substring(0, 4).equals("pot=")) {
+			throw new IllegalArgumentException("Invoking Pot.parsePot with input string: \"" + str + "\"");
+		}
 		if (str.equals("pot={null}")) {
 			return null;
 		}

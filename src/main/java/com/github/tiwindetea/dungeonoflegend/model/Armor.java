@@ -63,6 +63,9 @@ public class Armor implements StorableObject {
 	}
 
 	public static Armor parseArmor(String str) {
+		if (!str.substring(0, 6).equals("armor=")) {
+			throw new IllegalArgumentException("Invoking Armor.parseArmor with input string: \"" + str + "\"");
+		}
 		if (str.equals("armor={null}")) {
 			return null;
 		}
