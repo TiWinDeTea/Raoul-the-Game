@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
@@ -10,31 +11,32 @@ import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.*;
  * Created by maxime on 4/23/16.
  */
 public class Player extends LivingThing {
-	private List<Pair<? extends StorableObject>> inventory;
+	private List<Pair<StorableObject>> inventory;
 	private static ArmorType[] equipedArmor = {HELMET, BREAST_PLATE, GLOVES, PANTS, BOOTS};
 	private int maxStorageCapacity;
 	private int maxMana;
 	private int mana;
-	private Pair<Armor>[] armors;
+	private List<Pair<Armor>> armors;
 	private Pair<Weapon> weapon;
 	private String name;
 	private int hitPointsPerLevel;
 	private int manaPerLevel;
 	private int attackPowerPerLevel;
 	private int defensePowerPerLevel;
-	private Stack<Vector2i> path;
-	private Vector2i requestMove;
-	private boolean requestInteraction;
+	private Stack<Vector2i> requestedPath;
+	private long objectToDropId;
 	private int floor;
 	private int xp;
+	private int los;
+	private int exploreLOS;
 
-	public Player(String name, int level, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef, int healthPerLevel,
-				  int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel, int floor) {
+	public Player(String name, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef, int healthPerLevel,
+				  int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
 		super();
 		this.inventory = new ArrayList<>();
-		this.armors = new Pair[5];
-		for (int i = 0; i < this.armors.length; i++) {
-			this.armors[i] = new Pair<>(null);
+		this.armors = new ArrayList<>(5);
+		for (int i = 0; i < 5; i++) {
+			this.armors.add(new Pair<>(null));
 		}
 		this.weapon = null;
 		this.name = name;
@@ -50,20 +52,37 @@ public class Player extends LivingThing {
 		this.manaPerLevel = manaPerLevel;
 		this.attackPowerPerLevel = attackPowerPerLevel;
 		this.defensePowerPerLevel = defensePowerPerLevel;
-		this.path = new Stack<>();
-		this.requestMove = null;
-		this.requestInteraction = false;
-		this.floor = floor;
+		this.requestedPath = new Stack<>();
+		this.floor = 0;
+		this.xp = 0;
+		this.los = los;
+		this.exploreLOS = exploreLOS;
 	}
 
 	private Player() {
 		super();
 		this.inventory = new ArrayList<>();
-		this.armors = new Pair[5];
-		for (int i = 0; i < this.armors.length; i++) {
-			this.armors[i] = new Pair<>(null);
+		this.armors = new ArrayList<>(5);
+		for (int i = 0; i < 5; i++) {
+			this.armors.add(new Pair<>(null));
 		}
-		this.path = new Stack<>();
+		this.requestedPath = new Stack<>();
+	}
+
+	public long getObjectToDropId() {
+		return this.objectToDropId;
+	}
+
+	public void setObjectToDropId(long objectToDropId) {
+		this.objectToDropId = objectToDropId;
+	}
+
+	public void setRequestedPath(Stack<Vector2i> requestedPath) {
+		this.requestedPath = requestedPath;
+	}
+
+	public Vector2i getRequestMove() {
+		return this.requestedPath.size() == 0 ? null : this.requestedPath.get(0);
 	}
 
 	public int getFloor() {
@@ -78,20 +97,53 @@ public class Player extends LivingThing {
 		return this.mana;
 	}
 
-	public void addToInventory(Pair<? extends StorableObject> storable) {
+	public String getName() {
+		return this.name;
+	}
+
+	public Pair<Armor>[] getEquipedArmor() {
+		return (Pair<Armor>[]) this.armors.toArray();
+	}
+
+	public Pair<Weapon> getEquipedWeapon() {
+		return this.weapon;
+	}
+
+	public int getExploreLOS() {
+		return this.exploreLOS;
+	}
+
+	public int getLos() {
+		return this.los;
+	}
+
+	public Pair<StorableObject>[] getInventory() {
+		return (Pair<StorableObject>[]) this.inventory.toArray();
+	}
+
+	public void addToInventory(Pair<StorableObject> storable) {
 		if (this.inventory.size() < this.maxStorageCapacity) {
 			this.inventory.add(storable);
 		}
 	}
 
-	public Pair<? extends StorableObject> removeFromInventory(int index) {
-		Pair<? extends StorableObject> obj = this.inventory.get(index);
+	public StorableObject dropRequestAccepted() {
+		StorableObject object = this.removeFromInventory(this.objectToDropId);
+		this.objectToDropId = Pair.ERROR_VAL;
+		return object;
+	}
+
+	public Pair<StorableObject> removeFromInventory(int index) {
+		Pair<StorableObject> obj = this.inventory.get(index);
 		this.inventory.remove(index);
 		return obj;
 	}
 
 	public StorableObject removeFromInventory(long id) {
 		int i = this.inventory.indexOf(new Pair<StorableObject>(id));
+		if (i < 0) {
+			return null;
+		}
 		StorableObject obj = this.inventory.get(i).object;
 		this.inventory.remove(i);
 		return obj;
@@ -109,11 +161,11 @@ public class Player extends LivingThing {
 		Pair<Armor> removedArmor = null;
 		for (int i = 0; i < equipedArmor.length; i++) {
 			if (equipedArmor[i] == armor.object.getArmorType()) {
-				if (this.armors[i] != null) {
-					addToInventory(this.armors[i]);
-					removedArmor = this.armors[i];
+				if (this.armors.get(i).object != null) {
+					removedArmor = this.armors.get(i);
+					addToInventory(new Pair<>(removedArmor.getId(), removedArmor.object));
 				}
-				this.armors[i] = armor;
+				this.armors.set(i, armor);
 				return removedArmor;
 			}
 		}
@@ -124,29 +176,9 @@ public class Player extends LivingThing {
 		Pair<Weapon> removedWeapon = this.weapon;
 		this.weapon = weapon;
 		if (removedWeapon != null) {
-			this.addToInventory(removedWeapon);
+			this.addToInventory(new Pair<>(removedWeapon.getId(), removedWeapon.object));
 		}
 		return removedWeapon;
-	}
-
-	public void setPath(Stack<Vector2i> path) {
-		this.path = path;
-	}
-
-	public void setInteractionRequested() {
-		this.requestInteraction = true;
-	}
-
-	public Pair<Armor>[] getEquipedArmor() {
-		return this.armors;
-	}
-
-	public Pair<Weapon> getEquipedWeapon() {
-		return this.weapon;
-	}
-
-	public Pair<StorableObject>[] getInventory() {
-		return (Pair<StorableObject>[]) this.inventory.toArray();
 	}
 
 	public void addMana(int mana) {
@@ -176,9 +208,14 @@ public class Player extends LivingThing {
 	}
 
 	public static Player parsePlayer(String str) {
+		if (!str.substring(0, 7).equals("player=")) {
+			throw new IllegalArgumentException("Invoking Player.parsePlayer with input string: \"" + str + "\"");
+		}
 
 		int name = str.indexOf("name=") + 5;
-		int capa = str.indexOf("capacity=", name) + 9;
+		int los = str.indexOf("los=", name) + 4;
+		int elos = str.indexOf("elos=", los) + 5;
+		int capa = str.indexOf("capacity=", elos) + 9;
 		int mhp = str.indexOf("maxHitPoints=", capa) + 13;
 		int mm = str.indexOf("maxMana=", mhp) + 8;
 		int hp = str.indexOf("hitPoints=", mm) + 10;
@@ -186,7 +223,8 @@ public class Player extends LivingThing {
 		int hppl = str.indexOf("hitPointsPerLevel=", mana) + 18;
 		int mpl = str.indexOf("manaPerLevel=", hppl) + 13;
 		int level = str.indexOf("level=", mpl) + 6;
-		int ap = str.indexOf("attackPower=", level) + 12;
+		int xp = str.indexOf("xp=", level) + 3;
+		int ap = str.indexOf("attackPower=", xp) + 12;
 		int dp = str.indexOf("defensePower=", ap) + 13;
 		int appl = str.indexOf("attackPowerPerLevel=", dp) + 20;
 		int adpl = str.indexOf("defensePowerPerLevel=", appl) + 21;
@@ -194,6 +232,8 @@ public class Player extends LivingThing {
 		Player p = new Player();
 
 		p.name = str.substring(name, str.indexOf(',', name));
+		p.los = Integer.parseInt(str.substring(los, str.indexOf(',', los)));
+		p.exploreLOS = Integer.parseInt(str.substring(elos, str.indexOf(',', elos)));
 		p.maxStorageCapacity = Integer.parseInt(str.substring(capa, str.indexOf(',', capa)));
 		p.maxHitPoints = Integer.parseInt(str.substring(mhp, str.indexOf(',', mhp)));
 		p.maxMana = Integer.parseInt(str.substring(mm, str.indexOf(',', mm)));
@@ -202,6 +242,7 @@ public class Player extends LivingThing {
 		p.hitPointsPerLevel = Integer.parseInt(str.substring(hppl, str.indexOf(',', hppl)));
 		p.manaPerLevel = Integer.parseInt(str.substring(mpl, str.indexOf(',', mpl)));
 		p.level = Integer.parseInt(str.substring(level, str.indexOf(',', level)));
+		p.xp = Integer.parseInt(str.substring(xp, str.indexOf(',', xp)));
 		p.attackPower = Integer.parseInt(str.substring(ap, str.indexOf(',', ap)));
 		p.defensePower = Integer.parseInt(str.substring(dp, str.indexOf(',', dp)));
 		p.attackPowerPerLevel = Integer.parseInt(str.substring(appl, str.indexOf(',', appl)));
@@ -209,7 +250,7 @@ public class Player extends LivingThing {
 
 		String weapon = str.substring(str.indexOf("weapon={"));
 		weapon = weapon.substring(0, weapon.indexOf('}') + 1);
-		p.weapon = new Pair(Weapon.parseWeapon(weapon));
+		p.weapon = new Pair<>(Weapon.parseWeapon(weapon));
 
 		ArmorType[] armorTypes = {
 				BREAST_PLATE,
@@ -223,7 +264,7 @@ public class Player extends LivingThing {
 		for (int i = 0; i < armorTypes.length; i++) {
 			armorIndex = str.indexOf("armor={", armorIndex + 1);
 			String armor = str.substring(armorIndex, str.indexOf('}', armorIndex) + 1);
-			p.armors[i] = new Pair<>(Armor.parseArmor(armor));
+			p.armors.set(i, new Pair<>(Armor.parseArmor(armor)));
 		}
 
 		str = "," + str.substring(str.indexOf("inventory={") + 11);
@@ -257,6 +298,8 @@ public class Player extends LivingThing {
 	@Override
 	public String toString() {
 		String ans = "player={name=" + this.name
+				+ ",los=" + this.los
+				+ ",elos=" + this.exploreLOS
 				+ ",capacity=" + this.maxStorageCapacity
 				+ ",maxHitPoints=" + this.maxHitPoints
 				+ ",maxMana=" + this.maxMana
@@ -265,6 +308,7 @@ public class Player extends LivingThing {
 				+ ",hitPointsPerLevel=" + this.hitPointsPerLevel
 				+ ",manaPerLevel=" + this.manaPerLevel
 				+ ",level=" + this.level
+				+ ",xp=" + this.xp
 				+ ",attackPower=" + this.attackPower
 				+ ",defensePower=" + this.defensePower
 				+ ",attackPowerPerLevel=" + this.attackPowerPerLevel
@@ -284,19 +328,27 @@ public class Player extends LivingThing {
 			}
 		}
 		ans += ",inventory={";
-		for (Pair<? extends StorableObject> storableObjectPair : this.inventory) {
+		for (Pair<StorableObject> storableObjectPair : this.inventory) {
 			ans += storableObjectPair.object + ",";
 		}
 		return ans.substring(0, ans.length() - 1) + ",},}";
 	}
 
 	@Override
-	public void live() {
-		//TODO
+	public void live(Collection<Pair<LivingThing>> livingEntities) {
+		for (Pair<LivingThing> entity : livingEntities) {
+			if (entity.object.getType() == LivingThingType.MOB) {
+				this.requestedPath = null;
+			}
+		}
 	}
 
 	@Override
 	public LivingThingType getType() {
 		return LivingThingType.PLAYER;
+	}
+
+	public boolean isARequestPending() {
+		return this.requestedPath.size() > 0 || this.objectToDropId != Pair.ERROR_VAL;
 	}
 }

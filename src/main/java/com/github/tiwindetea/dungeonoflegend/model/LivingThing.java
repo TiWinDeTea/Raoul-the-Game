@@ -1,11 +1,11 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import java.util.Collection;
+
 /**
  * Created by maxime on 4/23/16.
  */
 public abstract class LivingThing {
-	protected Direction requestedAttack;
-	protected Direction requestedMove;
 	protected Tile[][] sight;
 	protected int level;
 	protected int maxHitPoints;
@@ -46,19 +46,11 @@ public abstract class LivingThing {
 	}
 
 	public Vector2i getPosition() {
-		return this.position;
+		return this.position.copy();
 	}
 
 	public void setPosition(Vector2i position) {
 		this.position = position;
-	}
-
-	public Direction getRequestedAttack() {
-		return this.requestedAttack;
-	}
-
-	public Direction getRequestedMove() {
-		return this.requestedMove;
 	}
 
 	public void damage(int damages) {
@@ -70,11 +62,7 @@ public abstract class LivingThing {
 		return (this.hitPoints > 0);
 	}
 
-	public void print() {
-		//TODO
-	}
-
-	public abstract void live();
+	public abstract void live(Collection<Pair<LivingThing>> livingEntities);
 
 	public abstract LivingThingType getType();
 

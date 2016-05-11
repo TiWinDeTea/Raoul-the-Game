@@ -1,5 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import java.util.Collection;
+
 /**
  * Created by maxime on 4/23/16.
  */
@@ -42,7 +44,7 @@ public class Mob extends LivingThing {
 	}
 
 	@Override
-	public void live() {
+	public void live(Collection<Pair<LivingThing>> livingEntities) {
 		//TODO
 	}
 
