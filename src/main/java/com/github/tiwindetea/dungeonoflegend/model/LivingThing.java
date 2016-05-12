@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import java.util.Collection;
@@ -69,6 +77,10 @@ public abstract class LivingThing {
 	public boolean equals(Object o) {
 		/* Asserting o to be a LivingThing */
 		return this.equals((LivingThing) o);
+	}
+
+	public boolean equals(Vector2i vect) {
+		return this.position.equals(vect);
 	}
 
 	public boolean equals(LivingThing livingThing) {

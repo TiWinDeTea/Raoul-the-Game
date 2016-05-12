@@ -1,6 +1,18 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.*;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
@@ -18,8 +30,19 @@ import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.ResourceBundle;
+import java.util.Scanner;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
