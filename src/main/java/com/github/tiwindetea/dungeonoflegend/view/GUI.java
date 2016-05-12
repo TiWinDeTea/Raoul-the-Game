@@ -6,6 +6,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
@@ -415,5 +416,10 @@ public class GUI implements GameListener, TileMapListener {
 	@Override
 	public void tileClicked(TileClickEvent e) {
 		fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
+	}
+
+	@Override
+	public void modifieTile(TileModificationEvent e) {
+		//TODO
 	}
 }
