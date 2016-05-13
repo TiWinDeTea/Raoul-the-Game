@@ -14,6 +14,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
@@ -109,6 +110,9 @@ public class Game implements RequestListener {
 	private int[] lootsScrollTurns = new int[0];
 
 	private int playerTurn;
+	private Player currentPlayer;
+	private Pair<Consumable> objectToUse = null;
+	private ArrayList<Consumable> triggeredObjects = new ArrayList<>();
 
 	String gameName;
 
@@ -128,6 +132,7 @@ public class Game implements RequestListener {
 			String pString = "player" + i + ".";
 			players.add(new Player(
 					playersBundle.getString(pString + "name"),
+					i,
 					Integer.parseInt(playersBundle.getString(pString + "los")),
 					Integer.parseInt(playersBundle.getString(pString + "explorelos")),
 					1,
@@ -153,6 +158,7 @@ public class Game implements RequestListener {
 
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
+		this.currentPlayer = this.players.get(0).object;
 		this.world.generateLevel(level);
 		this.loadMobs();
 		this.loadChests();
@@ -354,12 +360,18 @@ public class Game implements RequestListener {
 		}
 	}
 
+	private void fireTileModificationEvent(TileModificationEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.modifieTile(event);
+		}
+	}
+
 	@Override
 	public void requestDrop(DropRequestEvent e) {
 		ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
 		Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
 		for (Direction direction : dirs) {
-			paths.add(this.world.getPath(this.player().getPosition().add(direction), e.dropPosition, false, null));
+			paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.add(direction), false, null));
 		}
 		Stack<Vector2i> theChoosenOne = paths.get(0);
 		for (Stack<Vector2i> stack : paths) {
@@ -368,32 +380,65 @@ public class Game implements RequestListener {
 			}
 		}
 		if (paths != null) {
-			this.player().setRequestedPath(theChoosenOne);
+			this.currentPlayer.setRequestedPath(theChoosenOne);
 		}
-		this.player().setObjectToDropId(e.objectId);
+		this.currentPlayer.setObjectToDropId(e.objectId);
 		this.nextTurn();
 	}
 
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
 		Tile tile = this.world.getTile(e.tilePosition);
-		int distance = e.tilePosition.distance(this.player().getPosition());
+		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
+				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 		if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-			this.world.triggerTile(e.tilePosition);
-			//TODO : fire event
-		} else if (distance <= player().getLos()) {
-			// TODO : GUI Fires event only if it is a visited tile ?
+			this.currentPlayer.setRequestedInteraction(e.tilePosition);
+			nextTurn();
+		} else if (distance <= this.currentPlayer.getLos()) {
+			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
+			Vector2i p = this.currentPlayer.getPosition();
+			if (los[p.x + los.length - e.tilePosition.x][p.y + los[0].length - e.tilePosition.y]) {
+				for (Pair<Mob> mobPair : this.mobs) {
+					if (mobPair.object.equals(e.tilePosition)) {
+						if (this.objectToUse != null) {
+							this.objectToUse.object.trigger(mobPair.object);
+							this.triggeredObjects.add(this.objectToUse.object);
+							fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
+						} else {
+							this.currentPlayer.setRequestedAttack(e.tilePosition);
+						}
+						return;
+					}
+				}
+			}
+			this.currentPlayer.setRequestedPath(this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null));
+		} else {
+			this.currentPlayer.setRequestedPath(this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null));
 		}
 	}
 
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-		//TODO
+		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
+		this.objectToUse = null;
+		for (Pair<StorableObject> pair : inventory) {
+			if (pair.object.getType() == StorableObjectType.CONSUMABLE && pair.getId() == e.objectId) {
+				this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
+			}
+		}
+		if (this.objectToUse != null && this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
+			this.triggeredObjects.add(this.objectToUse.object);
+			this.objectToUse.object.trigger(this.currentPlayer);
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
+			this.objectToUse = null;
+		}
 	}
 
 	@Override
 	public void requestMove(MoveRequestEvent e) {
-
+		Stack<Vector2i> stack = new Stack<>();
+		stack.add(this.currentPlayer.getPosition().add(e.moveDirection));
+		this.currentPlayer.setRequestedPath(stack);
 	}
 
 	private void generateLevel() {
@@ -534,11 +579,12 @@ public class Game implements RequestListener {
 	}
 
 	private void nextTurn() {
+		this.objectToUse = null;
 		int count = 0;
 		do {
 			this.playerTurn = (this.playerTurn + 1) % this.players.size();
 			++count;
-		} while (count != this.players.size() && this.player().getFloor() != this.level);
+		} while (count != this.players.size() && this.currentPlayer.getFloor() != this.level);
 
 		if (count == this.players.size()) {
 			++this.level;
@@ -548,10 +594,12 @@ public class Game implements RequestListener {
 			this.nextTick();
 		}
 
-		if (this.player().isARequestPending()) {
+		this.currentPlayer = this.players.get(this.playerTurn).object;
+
+		if (this.currentPlayer.isARequestPending()) {
 			this.nextTurn();
 		}
-		//TODO ********************************************************************************************************************************************************************
+		//TODO
 		//fireNextTurnEvent(new event)
 	}
 
@@ -560,7 +608,7 @@ public class Game implements RequestListener {
 		for (Pair<Player> playerPair : this.players) {
 			player = playerPair.object;
 			//player.live();
-			/* TODO ****************************************************************************************************************************************************************/
+			// TODO
 			// + requests
 		}
 
@@ -568,8 +616,14 @@ public class Game implements RequestListener {
 		for (Pair<Mob> mobPair : this.mobs) {
 			mob = mobPair.object;
 			//mob.live();
-			/* TODO **********************************************************************************************************************************************************************/
+			// TODO
 		}
+
+		//TODO : consumable objects next turn
+
+		// TODO: check for dead mobs, has-been consumables
+
+		// TODO: check for objects on ground
 	}
 
 	public void loadSave() {

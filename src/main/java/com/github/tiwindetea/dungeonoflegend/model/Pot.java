@@ -8,7 +8,11 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
+
+import java.util.ArrayList;
 
 /**
  * Created by maxime on 4/23/16.
@@ -24,8 +28,10 @@ public class Pot implements Consumable {
 	private int manaModifier;
 	private Player target;
 	private StaticEntityType gtype;
+	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 
-	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier, int healthModifier, int manaModifier) {
+	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier,
+			   int healthModifier, int manaModifier) {
 		this.turns = turns;
 		this.heal = heal;
 		this.mana_heal = mana_heal;
@@ -44,7 +50,20 @@ public class Pot implements Consumable {
 	}
 
 	private Pot() {
+	}
 
+	public static void addPlayerListener(PlayerStatListener listener) {
+		listeners.add(listener);
+	}
+
+	private PlayerStatListener[] getPlayersListeners() {
+		return this.listeners.toArray(new PlayerStatListener[this.listeners.size()]);
+	}
+
+	private void firePlayerStatEvent(PlayerStatEvent event) {
+		for (PlayerStatListener listener : getPlayersListeners()) {
+			listener.changePlayerStat(event);
+		}
 	}
 
 	public static Pot parsePot(String str) {
@@ -85,19 +104,36 @@ public class Pot implements Consumable {
 	}
 
 	public void trigger(Player player) {
-		player.addMana(this.mana_heal);
-		player.heal(this.heal);
-		player.increaseAttack(this.attackPowerModifier);
-		player.increaseDefense(this.defensePowerModifier);
-		player.increaseHP(this.healthModifier);
-		player.increaseMana(this.manaModifier);
+		this.target = player;
+		this.healTarget();
+		this.manaHealTarget();
+		if (this.attackPowerModifier != 0) {
+			player.increaseAttack(this.attackPowerModifier);
+		}
+		if (this.defensePowerModifier != 0) {
+			player.increaseDefense(this.defensePowerModifier);
+		}
+		if (this.healthModifier != 0) {
+			player.increaseHP(this.healthModifier);
+			this.firePlayerStatEvent(new PlayerStatEvent(player.getNumber(), PlayerStatEvent.StatType.HEALTH,
+					PlayerStatEvent.ValueType.MAX, player.getMaxHitPoints()));
+		}
+		if (this.manaModifier != 0) {
+			player.increaseMana(this.manaModifier);
+			this.firePlayerStatEvent(new PlayerStatEvent(player.getNumber(), PlayerStatEvent.StatType.MANA,
+					PlayerStatEvent.ValueType.MAX, player.getMaxMana()));
+		}
 	}
 
 	public boolean nextTick() {
-		--this.turns;
-		this.target.increaseHP(this.heal);
-		this.target.addMana(this.mana_heal);
-		return this.turns < 0;
+		if (this.turns != 0) {
+			--this.turns;
+			this.healTarget();
+			this.manaHealTarget();
+			this.target.addMana(this.mana_heal);
+			return this.turns <= 0;
+		}
+		return true;
 	}
 
 	public ConsumableType getConsumableType() {
@@ -124,5 +160,21 @@ public class Pot implements Consumable {
 				+ ",healthMod=" + this.healthModifier
 				+ ",manaMod=" + this.manaModifier
 				+ ",}";
+	}
+
+	private void manaHealTarget() {
+		if (this.mana_heal != 0) {
+			this.target.addMana(this.mana_heal);
+			this.firePlayerStatEvent(new PlayerStatEvent(this.target.getNumber(), PlayerStatEvent.StatType.MANA,
+					PlayerStatEvent.ValueType.ACTUAL, this.target.getMana()));
+		}
+	}
+
+	private void healTarget() {
+		if (this.heal != 0) {
+			this.target.heal(this.heal);
+			this.firePlayerStatEvent(new PlayerStatEvent(this.target.getNumber(), PlayerStatEvent.StatType.HEALTH,
+					PlayerStatEvent.ValueType.ACTUAL, this.target.getHitPoints()));
+		}
 	}
 }

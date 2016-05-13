@@ -13,7 +13,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.*;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.BOOTS;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.BREAST_PLATE;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.GLOVES;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.HELMET;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.PANTS;
 
 /**
  * Created by maxime on 4/23/16.
@@ -36,11 +40,15 @@ public class Player extends LivingThing {
 	private int floor;
 	private int xp;
 	private int los;
+	private int number;
 	private int exploreLOS;
+	private Vector2i requestedAttack;
+	private Vector2i requestedInteraction;
 
-	public Player(String name, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef, int healthPerLevel,
+	public Player(String name, int number, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef, int healthPerLevel,
 				  int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
 		super();
+		this.number = number;
 		this.inventory = new ArrayList<>();
 		this.armors = new ArrayList<>(5);
 		for (int i = 0; i < 5; i++) {
@@ -123,6 +131,22 @@ public class Player extends LivingThing {
 
 	public int getLos() {
 		return this.los;
+	}
+
+	public void setRequestedAttack(Vector2i requestedAttack) {
+		this.requestedAttack = requestedAttack.copy();
+	}
+
+	public int getNumber() {
+		return this.number;
+	}
+
+	public Vector2i getRequestedAttack() {
+		return this.requestedAttack.copy();
+	}
+
+	public void setRequestedInteraction(Vector2i position) {
+		this.requestedInteraction = position;
 	}
 
 	public Pair<StorableObject>[] getInventory() {
@@ -221,7 +245,8 @@ public class Player extends LivingThing {
 		}
 
 		int name = str.indexOf("name=") + 5;
-		int los = str.indexOf("los=", name) + 4;
+		int nbr = str.indexOf("nbr=", name) + 4;
+		int los = str.indexOf("los=", nbr) + 4;
 		int elos = str.indexOf("elos=", los) + 5;
 		int capa = str.indexOf("capacity=", elos) + 9;
 		int mhp = str.indexOf("maxHitPoints=", capa) + 13;
@@ -240,6 +265,7 @@ public class Player extends LivingThing {
 		Player p = new Player();
 
 		p.name = str.substring(name, str.indexOf(',', name));
+		p.number = Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
 		p.los = Integer.parseInt(str.substring(los, str.indexOf(',', los)));
 		p.exploreLOS = Integer.parseInt(str.substring(elos, str.indexOf(',', elos)));
 		p.maxStorageCapacity = Integer.parseInt(str.substring(capa, str.indexOf(',', capa)));
@@ -306,6 +332,7 @@ public class Player extends LivingThing {
 	@Override
 	public String toString() {
 		String ans = "player={name=" + this.name
+				+ ",nbr=" + this.number
 				+ ",los=" + this.los
 				+ ",elos=" + this.exploreLOS
 				+ ",capacity=" + this.maxStorageCapacity
@@ -357,6 +384,10 @@ public class Player extends LivingThing {
 	}
 
 	public boolean isARequestPending() {
-		return this.requestedPath.size() > 0 || this.objectToDropId != Pair.ERROR_VAL;
+		return this.requestedPath.size() > 0 || this.objectToDropId != Pair.ERROR_VAL || this.requestedInteraction != null;
+	}
+
+	public int getMaxMana() {
+		return this.maxMana;
 	}
 }
