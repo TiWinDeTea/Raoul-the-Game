@@ -133,8 +133,4 @@ public class Vector2i {
 				", y=" + this.y +
 				'}';
 	}
-
-	public int distance(Vector2i that) {
-		return Math.abs(this.x - that.x) + Math.abs(this.y - that.y);
-	}
 }

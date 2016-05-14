@@ -41,10 +41,6 @@ public abstract class LivingThing {
 		this.sight = sight;
 	}
 
-	public Tile[][] getSight() {
-		return this.sight;
-	}
-
 	/**
 	 * Gets level.
 	 *
