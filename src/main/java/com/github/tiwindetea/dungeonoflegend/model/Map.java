@@ -47,8 +47,11 @@ public class Map {
     private static final int MAX_LEVEL_WIDTH = 125; // > MIN_LEVEL_WIDTH
     private static final int MIN_LEVEL_HEIGHT = 75; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
     private static final int MAX_LEVEL_HEIGHT = 125; // > MIN_LEVEL_HEIGHT
-    private static final int RETRIES_NBR = 5000;
+    private static final int RETRIES_NBR = 5000; // < Integer.MAX_VALUE / 2
     private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
+    private static final int BULB_FIX_NBR = 1; // negative to ignore this value
+    private static final int BULB_MINIMUM_NBR = 2; // > 0 ; ignored if BULB_FIX_NBR is > 0
+    private static final int BULB_MAXIMUM_NBR = 5; // > BULB_MINIMUM_NBR ; ignored if BULB_FIX_NBR is > 0
 
     private static final int PROBABILITY_UNIT = 100; // > 0
     /* Following values should be between 0 and PROBABILITY_UNIT (both included) */
@@ -334,7 +337,13 @@ public class Map {
                 }
             }
         }
-        Vector2i[] positions = new Vector2i[3];
+
+        /* How may bulbs ? */
+        int bulbs_nbr = BULB_FIX_NBR < 0 ? this.random.nextInt(BULB_MAXIMUM_NBR - BULB_MINIMUM_NBR) + BULB_MINIMUM_NBR : BULB_FIX_NBR;
+        boolean done;
+
+        /* Computes possible positions for stairs and bulbs*/
+        Vector2i[] positions = new Vector2i[2 + bulbs_nbr];
         for (int i = 0; i < positions.length; i++) {
             positions[i] = new Vector2i(0, 0);
         }
@@ -346,14 +355,22 @@ public class Map {
                     positions[i].y = this.random.nextInt(room.bottom.y - room.top.y - 2) + room.top.y + 1;
                 } while (isObstructed(this.map[positions[i].x][positions[i].y]));
             }
-        } while (this.getPath(positions[0], positions[1], true, null) == null
-                || this.getPath(positions[1], positions[2], true, null) == null);
+            done = true;
+            for (int i = 1; i < positions.length; i++) {
+                if (this.getPath(positions[i - 1], positions[i], true, null) == null) {
+                    done = false;
+                }
+            }
+        } while (!done);
+
+        this.stairsDownPosition = positions[0];
+        this.stairsUpPosition = positions[1];
         this.bulbPosition.clear();
-        this.bulbPosition.add(positions[0]);
-        this.stairsDownPosition = positions[1];
-        this.stairsUpPosition = positions[2];
+        this.bulbPosition.addAll(Arrays.asList(positions).subList(2, positions.length));
+
         this.map[this.stairsUpPosition.x][this.stairsUpPosition.y] = Tile.STAIR_UP;
         this.map[this.stairsDownPosition.x][this.stairsDownPosition.y] = Tile.STAIR_DOWN;
+
         rooms.addAll(corridors);
         return rooms;
     }
