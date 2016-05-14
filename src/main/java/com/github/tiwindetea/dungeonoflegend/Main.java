@@ -5,8 +5,13 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.model.*;
+import com.github.tiwindetea.dungeonoflegend.model.Direction;
+import com.github.tiwindetea.dungeonoflegend.model.Game;
+import com.github.tiwindetea.dungeonoflegend.model.Map;
+import com.github.tiwindetea.dungeonoflegend.model.Seed;
+import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
+import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -31,6 +36,7 @@ public class Main extends Application {
 		GUI.addRequestListener(game);
 		//GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
 		//GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
+        primaryStage.getIcons().add(ViewPackage.icon);
 
 		GUI.getScene().setOnMouseClicked(
 		  new EventHandler<MouseEvent>() {
