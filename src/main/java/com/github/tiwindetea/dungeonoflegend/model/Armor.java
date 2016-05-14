@@ -13,7 +13,9 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import java.util.Random;
 
 /**
- * Created by maxime on 4/23/16.
+ * Armor
+ *
+ * @author Lucas LAZARE
  */
 public class Armor implements StorableObject {
 
@@ -22,6 +24,13 @@ public class Armor implements StorableObject {
 	private ArmorType type;
 	private StaticEntityType gtype;
 
+	/**
+	 * Instantiates a new Armor.
+	 *
+	 * @param defensePowerModifier the defense power modifier
+	 * @param attackPowerModifier  the attack power modifier
+	 * @param type                 the type
+	 */
 	public Armor(int defensePowerModifier, int attackPowerModifier, ArmorType type) {
 		this.defensePowerModifier = defensePowerModifier;
 		this.attackPowerModifier = attackPowerModifier;
@@ -70,6 +79,12 @@ public class Armor implements StorableObject {
 
 	}
 
+	/**
+	 * Parses an Armor.
+	 *
+	 * @param str an Armor's String
+	 * @return the Armor
+	 */
 	public static Armor parseArmor(String str) {
 		if (!str.substring(0, 6).equals("armor=")) {
 			throw new IllegalArgumentException("Invoking Armor.parseArmor with input string: \"" + str + "\"");
@@ -90,26 +105,54 @@ public class Armor implements StorableObject {
 		return armor;
 	}
 
+	/**
+	 * Gets the graphical type.
+	 *
+	 * @return the graphical type
+	 * @see StaticEntityType
+	 */
 	public StaticEntityType getGtype() {
 		return this.gtype;
 	}
 
+	/**
+	 * Gets defense power modifier.
+	 *
+	 * @return the defense power modifier
+	 */
 	public int getDefensePowerModifier() {
 		return this.defensePowerModifier;
 	}
 
+	/**
+	 * Gets attack power modifier.
+	 *
+	 * @return the attack power modifier
+	 */
 	public int getAttackPowerModifier() {
 		return this.attackPowerModifier;
 	}
 
+	/**
+	 * Gets armor type.
+	 *
+	 * @return the armor type
+	 * @see ArmorType
+	 */
 	public ArmorType getArmorType() {
 		return this.type;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public StorableObjectType getType() {
 		return StorableObjectType.ARMOR;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "armor={SEType=" + this.gtype

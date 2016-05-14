@@ -15,7 +15,9 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import java.util.ArrayList;
 
 /**
- * Created by maxime on 4/23/16.
+ * Pot.
+ *
+ * @author Lucas LAZARE
  */
 public class Pot implements Consumable {
 
@@ -30,6 +32,17 @@ public class Pot implements Consumable {
 	private StaticEntityType gtype;
 	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 
+	/**
+	 * Instantiates a new Pot.
+	 *
+	 * @param turns                the turns
+	 * @param heal                 the heal
+	 * @param mana_heal            the mana heal
+	 * @param defensePowerModifier the defense power modifier
+	 * @param attackPowerModifier  the attack power modifier
+	 * @param healthModifier       the health modifier
+	 * @param manaModifier         the mana modifier
+	 */
 	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier,
 			   int healthModifier, int manaModifier) {
 		this.turns = turns;
@@ -52,8 +65,14 @@ public class Pot implements Consumable {
 	private Pot() {
 	}
 
+	/**
+	 * Adds a player listener.
+	 *
+	 * @param listener the listener
+	 */
 	public static void addPlayerListener(PlayerStatListener listener) {
-		listeners.add(listener);
+		if (!listeners.contains(listener))
+			listeners.add(listener);
 	}
 
 	private PlayerStatListener[] getPlayersListeners() {
@@ -66,6 +85,12 @@ public class Pot implements Consumable {
 		}
 	}
 
+	/**
+	 * Parses a pot.
+	 *
+	 * @param str a pot's String
+	 * @return the pot
+	 */
 	public static Pot parsePot(String str) {
 		if (!str.substring(0, 4).equals("pot=")) {
 			throw new IllegalArgumentException("Invoking Pot.parsePot with input string: \"" + str + "\"");
@@ -94,6 +119,9 @@ public class Pot implements Consumable {
 		return pot;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void trigger(LivingThing livingThing) {
 		if (livingThing.getType() == LivingThingType.PLAYER) {
 			this.target = (Player) livingThing;
@@ -103,6 +131,11 @@ public class Pot implements Consumable {
 		}
 	}
 
+	/**
+	 * Triggers the pot.
+	 *
+	 * @param player the target of the pot
+	 */
 	public void trigger(Player player) {
 		this.target = player;
 		this.healTarget();
@@ -125,6 +158,9 @@ public class Pot implements Consumable {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean nextTick() {
 		if (this.turns != 0) {
 			--this.turns;
@@ -136,6 +172,9 @@ public class Pot implements Consumable {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ConsumableType getConsumableType() {
 		return ConsumableType.POT;
 	}
@@ -145,10 +184,18 @@ public class Pot implements Consumable {
 		return StorableObjectType.CONSUMABLE;
 	}
 
+	/**
+	 * Gets graphical type.
+	 *
+	 * @return the graphical type
+	 */
 	public StaticEntityType getGType() {
 		return this.gtype;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "pot={SEType=" + this.gtype

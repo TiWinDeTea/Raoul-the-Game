@@ -20,7 +20,9 @@ import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.HELMET;
 import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.PANTS;
 
 /**
- * Created by maxime on 4/23/16.
+ * Player
+ *
+ * @author Lucas LAZARE
  */
 public class Player extends LivingThing {
 	private List<Pair<StorableObject>> inventory;
@@ -45,8 +47,27 @@ public class Player extends LivingThing {
 	private Vector2i requestedAttack;
 	private Vector2i requestedInteraction;
 
-	public Player(String name, int number, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef, int healthPerLevel,
-				  int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
+	/**
+	 * Instantiates a new Player.
+	 *
+	 * @param name                 his name
+	 * @param number               his number
+	 * @param los                  his los
+	 * @param exploreLOS           his explore los
+	 * @param level                his level
+	 * @param maxStorageCapacity   his max storage capacity
+	 * @param baseHealth           his base health
+	 * @param baseMana             his base mana
+	 * @param baseAttack           his base attack
+	 * @param baseDef              his base def
+	 * @param healthPerLevel       his health per level
+	 * @param manaPerLevel         his mana per level
+	 * @param attackPowerPerLevel  his attack power per level
+	 * @param defensePowerPerLevel his defense power per level
+	 */
+	public Player(String name, int number, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth,
+				  int baseMana, int baseAttack, int baseDef, int healthPerLevel, int manaPerLevel,
+				  int attackPowerPerLevel, int defensePowerPerLevel) {
 		super();
 		this.number = number;
 		this.inventory = new ArrayList<>();
@@ -85,92 +106,211 @@ public class Player extends LivingThing {
 		this.requestedPath = new Stack<>();
 	}
 
+	/**
+	 * Gets the id of the object to drop (request).
+	 *
+	 * @return the id of the object to drop
+	 */
 	public long getObjectToDropId() {
 		return this.objectToDropId;
 	}
 
+	/**
+	 * Sets the id of the object to drop (request for next turn).
+	 *
+	 * @param objectToDropId the id of the object to drop
+	 */
 	public void setObjectToDropId(long objectToDropId) {
 		this.objectToDropId = objectToDropId;
 	}
 
+	/**
+	 * Sets the requested path (request for next turn).
+	 *
+	 * @param requestedPath the requested path
+	 */
 	public void setRequestedPath(Stack<Vector2i> requestedPath) {
 		this.requestedPath = requestedPath;
 	}
 
+	/**
+	 * Gets the requested move.
+	 *
+	 * @return the requested move
+	 */
 	public Vector2i getRequestMove() {
 		return this.requestedPath.size() == 0 ? null : this.requestedPath.get(0);
 	}
 
+	/**
+	 * Gets the current floor.
+	 *
+	 * @return the current floor
+	 */
 	public int getFloor() {
 		return this.floor;
 	}
 
+	/**
+	 * Sets the floor.
+	 *
+	 * @param floor the floor
+	 */
 	public void setFloor(int floor) {
 		this.floor = floor;
 	}
 
+	/**
+	 * Gets the mana.
+	 *
+	 * @return the mana
+	 */
 	public int getMana() {
 		return this.mana;
 	}
 
+	/**
+	 * Gets max mana.
+	 *
+	 * @return the max mana
+	 */
+	public int getMaxMana() {
+		return this.maxMana;
+	}
+
+	/**
+	 * Gets the name.
+	 *
+	 * @return the name
+	 */
 	public String getName() {
 		return this.name;
 	}
 
+	/**
+	 * Get the equiped armors.
+	 *
+	 * @return the equiped armors
+	 */
 	public Pair<Armor>[] getEquipedArmor() {
 		return (Pair<Armor>[]) this.armors.toArray();
 	}
 
+	/**
+	 * Gets the equiped weapon.
+	 *
+	 * @return the equiped weapon
+	 */
 	public Pair<Weapon> getEquipedWeapon() {
 		return this.weapon;
 	}
 
+	/**
+	 * Gets the explore los (fogged, on the map).
+	 *
+	 * @return the explore los
+	 */
 	public int getExploreLOS() {
 		return this.exploreLOS;
 	}
 
+	/**
+	 * Gets the los.
+	 *
+	 * @return the los
+	 */
 	public int getLos() {
 		return this.los;
 	}
 
+	/**
+	 * Sets the requested attack.
+	 *
+	 * @param requestedAttack the requested attack
+	 */
 	public void setRequestedAttack(Vector2i requestedAttack) {
 		this.requestedAttack = requestedAttack.copy();
 	}
 
+	/**
+	 * Gets the number of the player (player 0, player 1, …).
+	 *
+	 * @return the number of the player
+	 */
 	public int getNumber() {
 		return this.number;
 	}
 
+	/**
+	 * Gets the requested attack.
+	 *
+	 * @return the requested attack
+	 */
 	public Vector2i getRequestedAttack() {
 		return this.requestedAttack.copy();
 	}
 
+	/**
+	 * Sets the requested interaction.
+	 *
+	 * @param position the position of the interaction
+	 */
 	public void setRequestedInteraction(Vector2i position) {
 		this.requestedInteraction = position;
 	}
 
+	/**
+	 * Gets the inventory.
+	 *
+	 * @return the inventory.
+	 */
 	public Pair<StorableObject>[] getInventory() {
 		return (Pair<StorableObject>[]) this.inventory.toArray();
 	}
 
+	/**
+	 * Add to inventory.
+	 *
+	 * @param storable a storable item
+	 */
 	public void addToInventory(Pair<StorableObject> storable) {
 		if (this.inventory.size() < this.maxStorageCapacity) {
 			this.inventory.add(storable);
 		}
 	}
 
-	public StorableObject dropRequestAccepted() {
-		StorableObject object = this.removeFromInventory(this.objectToDropId);
-		this.objectToDropId = Pair.ERROR_VAL;
-		return object;
+	/**
+	 * Method to call when the drop request was solved successfully
+	 *
+	 * @return the dropped intem
+	 */
+	public Pair<StorableObject> dropRequestAccepted() {
+		if (this.objectToDropId != Pair.ERROR_VAL) {
+			Pair<StorableObject> object = new Pair<>(this.objectToDropId, this.removeFromInventory(this.objectToDropId));
+			this.objectToDropId = Pair.ERROR_VAL;
+			return object;
+		}
+		return null;
 	}
 
+	/**
+	 * Remove an item from the inventory.
+	 *
+	 * @param index the index of the object in the inventory
+	 * @return the removed object
+	 */
 	public Pair<StorableObject> removeFromInventory(int index) {
 		Pair<StorableObject> obj = this.inventory.get(index);
 		this.inventory.remove(index);
 		return obj;
 	}
 
+	/**
+	 * Remove an item from the inventory.
+	 *
+	 * @param id the id of the object in the inventory
+	 * @return the removed object
+	 */
 	public StorableObject removeFromInventory(long id) {
 		int i = this.inventory.indexOf(new Pair<StorableObject>(id));
 		if (i < 0) {
@@ -181,6 +321,12 @@ public class Player extends LivingThing {
 		return obj;
 	}
 
+	/**
+	 * Diminishes the quantity of mana disponible.
+	 *
+	 * @param consumption the mana consumption
+	 * @return true if the mana was consumed, false otherwise (ie : not enough mana)
+	 */
 	public boolean useMana(int consumption) {
 		if(this.mana > consumption) {
 			this.mana -= consumption;
@@ -189,6 +335,12 @@ public class Player extends LivingThing {
 		return false;
 	}
 
+	/**
+	 * Equips with a new armor and adds the previously equiped armor to the inventory
+	 *
+	 * @param armor the armor to equip
+	 * @return The previously equipped armor if there was one, null otherwise.
+	 */
 	public Pair<Armor> equipWithArmor(Pair<Armor> armor) {
 		Pair<Armor> removedArmor = null;
 		for (int i = 0; i < equipedArmor.length; i++) {
@@ -204,6 +356,13 @@ public class Player extends LivingThing {
 		return null;
 	}
 
+
+	/**
+	 * Equips with a new weapon and adds the previously equiped weapon to the inventory
+	 *
+	 * @param weapon the armor to equip
+	 * @return The previously equipped weapon if there was one, null otherwise.
+	 */
 	public Pair<Weapon> equipWithWeapon(Pair<Weapon> weapon) {
 		Pair<Weapon> removedWeapon = this.weapon;
 		this.weapon = weapon;
@@ -213,32 +372,72 @@ public class Player extends LivingThing {
 		return removedWeapon;
 	}
 
+	/**
+	 * Add mana.
+	 *
+	 * @param mana the mana
+	 */
 	public void addMana(int mana) {
+		if (mana < 0)
+			throw new IllegalArgumentException("mana must be positive");
 		this.mana = Math.min(this.maxMana, mana + this.mana);
 	}
 
+	/**
+	 * Heal.
+	 *
+	 * @param hp the hp
+	 */
 	public void heal(int hp) {
+		if (hp < 0)
+			throw new IllegalArgumentException("hp must be positive");
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
 	}
 
+	/**
+	 * Increases the attack.
+	 *
+	 * @param ad the attack upgrade (or downgrade)
+	 */
 	public void increaseAttack(int ad) {
 		this.attackPower += ad;
 	}
 
+	/**
+	 * Increases the maxhp.
+	 *
+	 * @param hp the hp upgrade (or downgrade)
+	 */
 	public void increaseHP(int hp) {
-		this.maxHitPoints += hp;
-		this.hitPoints += hp;
+		this.maxHitPoints = Math.max(hp + this.maxHitPoints, 1);
+		this.hitPoints = Math.max(hp + this.hitPoints, 1);
 	}
 
+	/**
+	 * Increase the defense.
+	 *
+	 * @param def the defense upgrade (or downgrade)
+	 */
 	public void increaseDefense(int def) {
 		this.defensePower += def;
 	}
 
+	/**
+	 * Increase the maxmana.
+	 *
+	 * @param manaModifier the mana upgrade (or downgrade)
+	 */
 	public void increaseMana(int manaModifier) {
-		this.maxMana += manaModifier;
-		this.mana += manaModifier;
+		this.maxMana = Math.max(this.maxMana + manaModifier, 1);
+		this.mana = Math.max(this.mana + manaModifier, 1);
 	}
 
+	/**
+	 * Parses a player.
+	 *
+	 * @param str a player's String
+	 * @return the player
+	 */
 	public static Player parsePlayer(String str) {
 		if (!str.substring(0, 7).equals("player=")) {
 			throw new IllegalArgumentException("Invoking Player.parsePlayer with input string: \"" + str + "\"");
@@ -329,6 +528,9 @@ public class Player extends LivingThing {
 		return p;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		String ans = "player={name=" + this.name
@@ -369,6 +571,9 @@ public class Player extends LivingThing {
 		return ans.substring(0, ans.length() - 1) + ",},}";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void live(Collection<Pair<LivingThing>> livingEntities) {
 		for (Pair<LivingThing> entity : livingEntities) {
@@ -378,16 +583,18 @@ public class Player extends LivingThing {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public LivingThingType getType() {
 		return LivingThingType.PLAYER;
 	}
 
+	/**
+	 * @return true if a riquest is pending, false otherwise.
+	 */
 	public boolean isARequestPending() {
 		return this.requestedPath.size() > 0 || this.objectToDropId != Pair.ERROR_VAL || this.requestedInteraction != null;
-	}
-
-	public int getMaxMana() {
-		return this.maxMana;
 	}
 }

@@ -9,40 +9,81 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by organic-code on 4/17/16.
+ * Vector2i
+ *
+ * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
 public class Vector2i {
     public int x, y;
 
-    public Vector2i() {
-    }
+	/**
+	 * Instantiates a new Vector 2 i.
+	 */
+	public Vector2i() {
+	}
 
-    public Vector2i(Vector2i v) {
-        this.x = v.x;
-        this.y = v.y;
-    }
+	/**
+	 * Copy Constructor
+	 *
+	 * @param v A instance of Vector2i
+	 */
+	public Vector2i(Vector2i v) {
+		this.x = v.x;
+		this.y = v.y;
+	}
 
-    public Vector2i(int x, int y) {
+	/**
+	 * Instantiates a new Vector 2 i.
+	 *
+	 * @param x x
+	 * @param y y
+	 */
+	public Vector2i(int x, int y) {
 
-        this.x = x;
-        this.y = y;
-    }
+		this.x = x;
+		this.y = y;
+	}
 
-    public void set(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+	/**
+	 * Sets a Vector2i.
+	 *
+	 * @param x the x
+	 * @param y the y
+	 */
+	public void set(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
 
-    public boolean equals(Vector2i vect) {
-        return this.x == vect.x && this.y == vect.y;
-    }
+	/**
+	 * Equals.
+	 *
+	 * @param vect an instance of Vector2i
+	 * @return true if both vectors are equals, false otherwise
+	 */
+	public boolean equals(Vector2i vect) {
+		return this.x == vect.x && this.y == vect.y;
+	}
 
+	/**
+	 * Adds two vector2i.
+	 *
+	 * @param vect an instance of Vector2i
+	 * @return this
+	 */
 	public Vector2i add(Vector2i vect) {
 		this.x += vect.x;
 		this.y += vect.y;
 		return this;
 	}
 
+	/**
+	 * Adds a vector2i and a direction.
+	 *
+	 * @param dir a direction (not nullable)
+	 * @return this
+	 */
 	public Vector2i add(Direction dir) {
 		switch(dir) {
 		case UP:
@@ -61,16 +102,30 @@ public class Vector2i {
 		return this;
 	}
 
+	/**
+	 * Multiplies a Vector2i by a scalar.
+	 *
+	 * @param a the scalar
+	 * @return this
+	 */
 	public Vector2i multiply(int a) {
 		this.x *= a;
 		this.y *= a;
 		return this;
 	}
 
+	/**
+	 * Copies this.
+	 *
+	 * @return A copy of this.
+	 */
 	public Vector2i copy() {
 		return new Vector2i(this);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "Vector2i{" +

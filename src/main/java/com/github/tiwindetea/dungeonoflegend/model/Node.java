@@ -9,23 +9,45 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by organic-code on 5/5/16.
+ * Node. (path finding)
+ *
+ * @author Lucas LAZARE
  */
 public class Node {
+
     public int heuristic;
     public int distance;
     public Node parent;
     public Vector2i pos;
 
+    /**
+     * Instantiates a new Node. (for comparison purposes)
+     *
+     * @param pos the pos
+     */
     public Node(Vector2i pos) {
         this.pos = pos;
     }
 
+    /**
+     * Instantiates a new Node.
+     *
+     * @param pos    the pos
+     * @param parent the parent
+     */
     public Node(Vector2i pos, Node parent) {
         this.pos = pos;
         this.parent = parent;
     }
 
+    /**
+     * Instantiates a new Node.
+     *
+     * @param pos       the pos
+     * @param heuristic the heuristic
+     * @param distance  the distance
+     * @param parent    the parent
+     */
     public Node(Vector2i pos, int heuristic, int distance, Node parent) {
         this.pos = pos;
         this.parent = parent;
@@ -38,10 +60,21 @@ public class Node {
         return this.equals((Node) o);
     }
 
+    /**
+     * Equals boolean.
+     *
+     * @param n a Node
+     * @return true if both nodes are at the same position
+     */
     public boolean equals(Node n) {
         return n.pos.x == this.pos.x && n.pos.y == this.pos.y;
     }
 
+    /**
+     * Sum.
+     *
+     * @return this.distance + this.heuristic (global value)
+     */
     public int sum() {
         return this.distance + this.heuristic;
     }

@@ -11,7 +11,9 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 4/24/16.
+ * Tile
+ *
+ * @author Lucas LAZARE
  */
 public enum Tile {
 	WALL_LEFT {
@@ -112,9 +114,12 @@ public enum Tile {
 	};
 
 	private final static String bundleName = MainPackage.name + ".Tile";
-
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName);
 
+	/**
+	 * @param tile tile
+	 * @return True if the tile is obstructed (ie : wall), false otherwise
+	 */
 	public static boolean isObstructed(Tile tile) {
 		switch (tile) {
 			case WALL_LEFT:
@@ -139,6 +144,11 @@ public enum Tile {
 		}
 	}
 
+	/**
+	 * Returns the position of the tile in the spriteSheet
+	 * @param subIndex subindex (ie : Tile.GROUND has more than 1 sprite)
+	 * @return the position of the tile in the spriteSheet
+	 */
 	public Vector2i getSpritePosition(int subIndex) {
 		return null;
 	}

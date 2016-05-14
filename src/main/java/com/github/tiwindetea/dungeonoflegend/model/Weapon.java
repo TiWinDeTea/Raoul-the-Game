@@ -13,7 +13,9 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import java.util.Random;
 
 /**
- * Created by maxime on 4/23/16.
+ * Weapon.
+ *
+ * @author Lucas LAZARE
  */
 public class Weapon implements StorableObject {
 
@@ -24,6 +26,13 @@ public class Weapon implements StorableObject {
 
 	private StaticEntityType gtype;
 
+	/**
+	 * Instantiates a new Weapon.
+	 *
+	 * @param attackPowerModifier the attack power modifier
+	 * @param range               the range
+	 * @param manaCost            the mana cost
+	 */
 	public Weapon(int attackPowerModifier, int range, int manaCost) {
 		this.attackPowerModifier = attackPowerModifier;
 		this.range = range;
@@ -54,6 +63,12 @@ public class Weapon implements StorableObject {
 
 	}
 
+	/**
+	 * Parses a weapon.
+	 *
+	 * @param str a weapon's String
+	 * @return the weapon
+	 */
 	public static Weapon parseWeapon(String str) {
 		if (str.equals("weapon={null}")) {
 			return null;
@@ -73,30 +88,62 @@ public class Weapon implements StorableObject {
 		return weapon;
 	}
 
+	/**
+	 * Gets graphical type.
+	 *
+	 * @return the graphical type
+	 */
 	public StaticEntityType getGtype() {
 		return this.gtype;
 	}
 
+	/**
+	 * Gets the weapon type.
+	 *
+	 * @return the weapon type
+	 * @see WeaponType
+	 */
 	public WeaponType getWeaponType() {
 		return this.type;
 	}
 
+	/**
+	 * Gets the attack power modifier.
+	 *
+	 * @return the attack power modifier
+	 */
 	public int getAttackPowerModifier() {
 		return this.attackPowerModifier;
 	}
 
+	/**
+	 * Gets the range.
+	 *
+	 * @return the range
+	 */
 	public int getRange() {
 		return this.range;
 	}
 
+	/**
+	 * Gets the mana cost.
+	 *
+	 * @return the mana cost
+	 */
 	public int getManaCost() {
 		return this.manaCost;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public StorableObjectType getType() {
 		return StorableObjectType.WEAPON;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "weapon={SEType=" + this.gtype

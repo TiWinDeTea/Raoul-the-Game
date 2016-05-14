@@ -11,35 +11,68 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.Random;
 
 /**
- * Created by organic-code on 4/30/16.
+ * Seed (levels generation)
+ *
+ * @author Lucas LAZARE
  */
 public class Seed {
     private long alphaSeed;
     private long betaSeed;
 
+    /**
+     * Instantiates a new Seed with random subseeds.
+     */
     public Seed() {
         Random random = new Random();
         this.alphaSeed = random.nextLong();
         this.betaSeed = random.nextLong();
     }
 
+    /**
+     * Instantiates a new Seed with given subseeds.
+     *
+     * @param alphaSeed alpha seed
+     * @param betaSeed  beta seed
+     */
     public Seed(long alphaSeed, long betaSeed) {
         this.alphaSeed = alphaSeed;
         this.betaSeed = betaSeed;
     }
 
+    /**
+     * Gets alpha seed.
+     *
+     * @return the alpha seed
+     */
     public long getAlphaSeed() {
         return this.alphaSeed;
     }
 
+    /**
+     * Gets beta seed.
+     *
+     * @return the beta seed
+     */
     public long getBetaSeed() {
         return this.betaSeed;
     }
 
+    /**
+     * Gets randomizer.
+     *
+     * @param level level
+     * @return a Random instance corresponding to the level
+     */
     public Random getRandomizer(int level) {
         return new Random(this.alphaSeed + this.betaSeed * level);
     }
 
+    /**
+     * Parses a Seed.
+     *
+     * @param str a Seed's String
+     * @return the Seed
+     */
     public static Seed parseSeed(String str) {
         if (!str.substring(0, 5).equals("seed=")) {
             throw new IllegalArgumentException("Invoking Seed.parseSeed with input string: \"" + str + "\"");
@@ -52,6 +85,9 @@ public class Seed {
         );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "seed={alphaSeed=" + this.alphaSeed + ",betaSeed=" + this.betaSeed + ",}";

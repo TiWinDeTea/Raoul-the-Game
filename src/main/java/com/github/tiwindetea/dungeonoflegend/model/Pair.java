@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by organic-code on 5/9/16.
+ * Pair<T extends Object>
+ *
+ * @param <T> the type parameter
+ * @author Lucas LAZARE
  */
 public class Pair<T extends Object> {
     private static long currID = Long.MIN_VALUE;
@@ -17,10 +20,11 @@ public class Pair<T extends Object> {
     private long id;
     public T object;
 
-    public Pair() {
-
-    }
-
+    /**
+     * Instantiates a new Pair with a unique id.
+     *
+     * @param object the object
+     */
     public Pair(T object) {
         if (currID == Long.MAX_VALUE) {
             throw new RuntimeException("Reached max ID");
@@ -29,13 +33,22 @@ public class Pair<T extends Object> {
         this.id = currID++;
     }
 
-    /* Generate a pair using the given ID /!\(no checks done on the id) */
+    /**
+     * Generate a pair using the given ID (/!\no checks done on the id)
+     *
+     * @param id     the id
+     * @param object the object
+     */
     public Pair(long id, T object) {
         this.id = id;
         this.object = object;
     }
 
-    /* For research purposes */
+    /**
+     * Instantiates a new Pair. (for research purposes)
+     *
+     * @param id the id
+     */
     public Pair(long id) {
         this.id = id;
     }
@@ -46,6 +59,11 @@ public class Pair<T extends Object> {
         return ((Pair<T>) o).getId() == this.getId();
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public long getId() {
         return this.id;
     }

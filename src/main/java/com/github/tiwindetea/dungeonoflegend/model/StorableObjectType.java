@@ -9,13 +9,30 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by maxime on 4/23/16.
+ * StorableObjectType
+ *
+ * @author Lucas LAZARE
  */
 public enum StorableObjectType {
+	/**
+	 * Weapon storable object type.
+	 */
 	WEAPON,
+	/**
+	 * Armor storable object type.
+	 */
 	ARMOR,
+	/**
+	 * Consumable storable object type.
+	 */
 	CONSUMABLE;
 
+	/**
+	 * Parses a storable object type.
+	 *
+	 * @param str a storable object type's string
+	 * @return the storable object type, or null.
+	 */
 	public static StorableObjectType parseStorableObjectType(String str) {
 		str.toUpperCase();
 		switch (str) {

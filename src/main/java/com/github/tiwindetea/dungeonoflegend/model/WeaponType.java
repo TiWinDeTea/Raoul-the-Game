@@ -12,7 +12,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 4/23/16.
+ * WeaponType
+ *
+ * @author Lucas LAZARE
  */
 public enum WeaponType {
 	BOW {
@@ -45,10 +47,19 @@ public enum WeaponType {
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String toString() {
 		return null;
 	}
 
+	/**
+	 * Parses a WeaponType.
+	 *
+	 * @param str a WeaponType's String
+	 * @return the WeaponType
+	 */
 	public static WeaponType parseWeaponType(String str) {
 		if (str.equals(BOW.toString())) {
 			return BOW;

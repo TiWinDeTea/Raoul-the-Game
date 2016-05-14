@@ -11,7 +11,8 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.ResourceBundle;
 
 /**
- * Created by organic-code on 4/30/16.
+ * MainPackage (constants)
+ * @author Lucas LAZARE
  */
 public class MainPackage {
     public static final String name = "com.github.tiwindetea.dungeonoflegend";

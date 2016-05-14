@@ -9,13 +9,31 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by maxime on 4/23/16.
+ * Consumable
+ *
+ * @author Lucas LAZARE
  */
 public interface Consumable extends StorableObject {
 
+	/**
+	 * Triggers a consumable.
+	 *
+	 * @param livingThing the target of the consumable
+	 */
 	void trigger(LivingThing livingThing);
 
+	/**
+	 * method to call after each game tick
+	 *
+	 * @return true if the object finished its effects, false otherwise
+	 */
 	boolean nextTick();
 
+	/**
+	 * Gets the consumable type.
+	 *
+	 * @return the consumable type
+	 * @see ConsumableType
+	 */
 	ConsumableType getConsumableType();
 }

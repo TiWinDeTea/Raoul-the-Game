@@ -13,7 +13,9 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import java.util.Random;
 
 /**
- * Created by maxime on 4/23/16.
+ * Scroll
+ *
+ * @author Lucas LAZARE
  */
 public class Scroll implements Consumable {
 
@@ -23,6 +25,13 @@ public class Scroll implements Consumable {
 	private LivingThing target;
 	private StaticEntityType gtype;
 
+	/**
+	 * Instantiates a new Scroll.
+	 *
+	 * @param turns                         the turns
+	 * @param healthModifierPerTick         the health modifier per tick
+	 * @param healthModifierModifierPerTick the health modifier modifier per tick
+	 */
 	public Scroll(int turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
 		this.turns = turns;
 		this.healthModifierPerTick = healthModifierPerTick;
@@ -39,6 +48,12 @@ public class Scroll implements Consumable {
 
 	}
 
+	/**
+	 * Parses a Scroll.
+	 *
+	 * @param str a Scroll's String
+	 * @return the Scroll
+	 */
 	public static Scroll parseScroll(String str) {
 		if (!str.substring(0, 7).equals("scroll=")) {
 			throw new IllegalArgumentException("Invoking Scroll.parseScroll with input string: \"" + str + "\"");
@@ -59,11 +74,17 @@ public class Scroll implements Consumable {
 		return scroll;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void trigger(LivingThing livingThing) {
 		this.target = livingThing;
 		livingThing.damage(this.healthModifierPerTick);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public boolean nextTick() {
 		--this.turns;
 		this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
@@ -71,19 +92,33 @@ public class Scroll implements Consumable {
 		return this.turns < 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public ConsumableType getConsumableType() {
 		return ConsumableType.SCROLL;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public StorableObjectType getType() {
 		return StorableObjectType.CONSUMABLE;
 	}
 
+	/**
+	 * Gets Graphical type.
+	 *
+	 * @return the graphical type
+	 */
 	public StaticEntityType getGtype() {
 		return this.gtype;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "scroll={SEType=" + this.gtype

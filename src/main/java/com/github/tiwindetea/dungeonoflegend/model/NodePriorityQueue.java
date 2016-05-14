@@ -13,13 +13,27 @@ import java.util.Iterator;
 import java.util.PriorityQueue;
 
 /**
- * Created by organic-code on 5/5/16.
+ * NodePriorityQueue (path finding)
+ *
+ * @author Lucas LAZARE
  */
 public class NodePriorityQueue extends PriorityQueue<Node> {
+
+    /**
+     * Instantiates a new Node priority queue.
+     *
+     * @param comparator the comparator
+     */
     public NodePriorityQueue(Comparator<? super Node> comparator) {
         super(comparator);
     }
 
+    /**
+     * Finds a node.
+     *
+     * @param node_position the node position
+     * @return null if no node was found at the given position, the node at the given position otherwise
+     */
     public Node find(Vector2i node_position) {
         Node iter = new Node(new Vector2i(-1, -1));
         Node lookingFor = new Node(node_position);

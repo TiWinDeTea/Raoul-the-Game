@@ -46,10 +46,13 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
+
 /**
- * Created by maxime on 4/24/16.
+ * Game.
+ * @author Lucas LAZARE
  */
 public class Game implements RequestListener {
+
 	/* Tunning parameters for the entities generation */
 	public static final int MIN_MOB_QTT_PER_LEVEL = 15;
 	public static final int MAX_MOB_QTT_PER_LEVEL = 20;
@@ -68,6 +71,19 @@ public class Game implements RequestListener {
 	private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
 	private Seed seed;
 	private final List<GameListener> listeners = new ArrayList<>();
+
+	private int playerTurn;
+	private Player currentPlayer;
+	private Pair<Consumable> objectToUse = null;
+	private ArrayList<Consumable> triggeredObjects = new ArrayList<>();
+
+	/**
+	 * The Game name.
+	 */
+	String gameName;
+
+
+	/* Level generation variables. Charged at the creation of a game */
 	private LivingEntityType[] mobsTypes = new LivingEntityType[0];
 	private int[] mobsBaseHP = new int[0];
 	private int[] mobsBaseDef = new int[0];
@@ -109,21 +125,29 @@ public class Game implements RequestListener {
 	private int[] lootsScrollDamageModPerTurnPerLevel = new int[0];
 	private int[] lootsScrollTurns = new int[0];
 
-	private int playerTurn;
-	private Player currentPlayer;
-	private Pair<Consumable> objectToUse = null;
-	private ArrayList<Consumable> triggeredObjects = new ArrayList<>();
-
-	String gameName;
-
+	/**
+	 * Instantiates a new Game.
+	 *
+	 * @param gameName the game name (used as the save/load file)
+	 */
 	public Game(String gameName) {
 		this.gameName = gameName;
 	}
 
+	/**
+	 * Initialises a game.
+	 *
+	 * @param players the players
+	 */
 	public void init(Collection<Player> players) {
 		this.init(players, new Seed(), 1);
 	}
 
+	/**
+	 * Initiliases a game.
+	 *
+	 * @param numberOfPlayers the number of players
+	 */
 	public void init(int numberOfPlayers) {
 		ArrayList<Player> players = new ArrayList<>();
 		ResourceBundle playersBundle = ResourceBundle.getBundle(MainPackage.name + ".Players");
@@ -150,6 +174,13 @@ public class Game implements RequestListener {
 		this.init(players, new Seed(), 1);
 	}
 
+	/**
+	 * Initialises a game.
+	 *
+	 * @param players the players
+	 * @param seed    the seed
+	 * @param level   the level
+	 */
 	public void init(Collection<Player> players, Seed seed, int level) {
 		this.playerTurn = 0;
 		this.level = level;
@@ -159,7 +190,7 @@ public class Game implements RequestListener {
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
 		this.currentPlayer = this.players.get(0).object;
-		this.world.generateLevel(level);
+		this.generateLevel();
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
@@ -274,6 +305,11 @@ public class Game implements RequestListener {
 		}
 	}
 
+	/**
+	 * Adds a Gamelistener.
+	 *
+	 * @param listener the listener
+	 */
 	public void addGameListener(GameListener listener) {
 		this.listeners.add(listener);
 	}
@@ -366,6 +402,9 @@ public class Game implements RequestListener {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestDrop(DropRequestEvent e) {
 		ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
@@ -386,6 +425,9 @@ public class Game implements RequestListener {
 		this.nextTurn();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
 		Tile tile = this.world.getTile(e.tilePosition);
@@ -417,6 +459,9 @@ public class Game implements RequestListener {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
 		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
@@ -434,6 +479,9 @@ public class Game implements RequestListener {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
 		Stack<Vector2i> stack = new Stack<>();
@@ -441,24 +489,25 @@ public class Game implements RequestListener {
 		this.currentPlayer.setRequestedPath(stack);
 	}
 
+	/**
+	 * generates a level
+	 */
 	private void generateLevel() {
+		/* Next block deletes all entities on the GUI */
 		for (Pair<Mob> mob : this.mobs) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.getId()));
 		}
-
 		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
 		}
-
 		for (Pair<Vector2i> bulb : this.bulbs) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
-
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
-		ArrayList<Map.Room> rooms = this.world.generateLevel(this.level);
 
+		/* Generate the level and bulbs to turn off */
+		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
-
 		this.bulbs.clear();
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
@@ -466,16 +515,16 @@ public class Game implements RequestListener {
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, p.object));
 		}
 
-		Random random = this.seed.getRandomizer(this.level);
-
+		/* Move the players to the right position */
 		for (Pair<Player> player : this.players) {
 			player.object.setPosition(this.world.getStairsUpPosition());
 			fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.getId(), player.object.getPosition()));
 		}
 
+		/* Generate the mobs */
+		Random random = this.seed.getRandomizer(this.level);
 		int mobsNbr = random.nextInt(MAX_MOB_QTT_PER_LEVEL - MIN_MOB_QTT_PER_LEVEL) + MIN_MOB_QTT_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
-
 		int selectedMob, mobLevel;
 		Vector2i mobPos;
 		for (int i = 0; i < mobsNbr; ++i) {
@@ -491,6 +540,7 @@ public class Game implements RequestListener {
 			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), null));
 		}
 
+		/* Generate chests */
 		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL) + MIN_CHEST_QTT_PER_LEVEL;
 		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL) + MIN_TRAPS_QTT_PER_LEVEL;
 		int selection, chestLevel;
@@ -545,6 +595,8 @@ public class Game implements RequestListener {
 					break;
 			}
 		}
+
+		/* Generate traps */
 		for (int i = 0; i < trapsNbr; i++) {
 			selection = random.nextInt(this.trapsBaseHP.length);
 			pos = selectRandomGroundPosition(rooms, random);
@@ -556,7 +608,7 @@ public class Game implements RequestListener {
 		}
 	}
 
-	private Vector2i selectRandomGroundPosition(ArrayList<Map.Room> rooms, Random random) {
+	private Vector2i selectRandomGroundPosition(List<Map.Room> rooms, Random random) {
 		Map.Room selectedRoom;
 		Vector2i pos = new Vector2i();
 		selectedRoom = rooms.get(random.nextInt(rooms.size()));
@@ -574,10 +626,9 @@ public class Game implements RequestListener {
 		return pos;
 	}
 
-	private Player player() {
-		return this.players.get(this.playerTurn).object;
-	}
-
+	/**
+	 * Step into the next turn (next player)
+	 */
 	private void nextTurn() {
 		this.objectToUse = null;
 		int count = 0;
@@ -603,6 +654,9 @@ public class Game implements RequestListener {
 		//fireNextTurnEvent(new event)
 	}
 
+	/**
+	 * Step into the next tick (all entities live
+	 */
 	private void nextTick() {
 		Player player;
 		for (Pair<Player> playerPair : this.players) {
@@ -626,6 +680,9 @@ public class Game implements RequestListener {
 		// TODO: check for objects on ground
 	}
 
+	/**
+	 * Loads a save.
+	 */
 	public void loadSave() {
 		try {
 			Scanner file = new Scanner(new FileInputStream(this.gameName));

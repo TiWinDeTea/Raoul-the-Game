@@ -12,7 +12,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 4/23/16.
+ * ArmorType
+ *
+ * @author Lucas LAZARE
  */
 public enum ArmorType {
 	BREAST_PLATE {
@@ -126,6 +128,12 @@ public enum ArmorType {
 		}
 	}
 
+	/**
+	 * Parses an ArmorType.
+	 *
+	 * @param str an ArmorType's String
+	 * @return the ArmorType
+	 */
 	public static ArmorType parseArmorType(String str) {
 		if (str.equals(BREAST_PLATE.toString())) {
 			return BREAST_PLATE;

@@ -11,15 +11,31 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.Collection;
 
 /**
- * Created by maxime on 4/23/16.
+ * Mob.
+ *
+ * @author Lucas LAZARE
  */
 public class Mob extends LivingThing {
 	private State state;
 
+	/**
+	 * Instantiates a new Mob. (for comparison purposes)
+	 *
+	 * @param pos the pos
+	 */
 	public Mob(Vector2i pos) {
 		this.position = pos;
 	}
 
+	/**
+	 * Instantiates a new Mob.
+	 *
+	 * @param level        level
+	 * @param maxHitPoints max hit points
+	 * @param attackPower  attack power
+	 * @param defensePower defense power
+	 * @param position     position
+	 */
 	public Mob(int level, int maxHitPoints, int attackPower, int defensePower, Vector2i position) {
 		this.level = level;
 		this.maxHitPoints = maxHitPoints;
@@ -27,10 +43,6 @@ public class Mob extends LivingThing {
 		this.defensePower = defensePower;
 		this.position = position;
 		this.hitPoints = maxHitPoints;
-	}
-
-	public Mob() {
-		//TODO
 	}
 
 	private void keepPatroling() {
@@ -45,6 +57,9 @@ public class Mob extends LivingThing {
 		//TODO
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object o) {
 		/* Asserting o to be a mob */

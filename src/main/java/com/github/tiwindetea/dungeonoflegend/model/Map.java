@@ -9,8 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
@@ -24,14 +26,7 @@ import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
  * Map
  * This class manages a map, by generating it through a procedural algorithm and calculating paths from point A to B.
  *
- *
- *
- *
  * @author Lucas LAZARE
- *
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 public class Map {
 
@@ -195,6 +190,7 @@ public class Map {
         int i_end = Math.min(position.x + visionRange + 1, this.map.length);
         int j_end = Math.min(position.y + visionRange + 1, this.map[0].length);
 
+        /* Cast rays from the watcher position to all tiles within its vision radius that also exist in the map*/
         for (int i = Math.max(position.x - visionRange, 0); i < i_end; ++i) {
             for (int j = Math.max(position.y - visionRange, 0); j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
@@ -226,6 +222,7 @@ public class Map {
             float currentY = watcherPosition.y;
             int x, y;
 
+            /* Cast a ray from the watcher to the tile, stopping if a block is found to be obstructed (ie : wall) */
             for (int i = (int) (Math.floor(distance)); i > 0; --i) {
                 currentX += xShifting;
                 currentY += yShifting;
@@ -243,12 +240,14 @@ public class Map {
      * Generates a level using a procedural algorithm and tuning parameters defined hereinabove
      *
      * @param level The level to generate
+     * @return A lists of the rooms in this level
      */
-    public ArrayList<Room> generateLevel(int level) {
+    public List<Room> generateLevel(int level) {
         ArrayList<Room> rooms = new ArrayList<>();
         ArrayList<Room> corridors = new ArrayList<>();
         int retries = 0;
 
+        /* Generate the base of the level (its size) and set all the blocks to Tile.UNKNOWN*/
         this.random = this.seed.getRandomizer(level);
         this.map = new Tile[this.random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) + MIN_LEVEL_WIDTH]
                 [this.random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) + MIN_LEVEL_HEIGHT];
@@ -258,11 +257,13 @@ public class Map {
             }
         }
 
+        /* Generate the numbers of corridors and the number of rooms*/
         int roomNbr = this.random.nextInt(MAX_ROOM_NUMBER - MIN_ROOM_NUMBER) + MIN_ROOM_NUMBER;
         int corridorNbr = this.random.nextInt(MAX_CORRIDOR_NBR - MIN_CORRIDOR_NBR) + MIN_CORRIDOR_NBR;
         int x, y, width, height;
         Room room, corridor;
 
+        /* Dig the first room */
         do {
             width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
             x = this.random.nextInt(width + 1) + this.map.length / 2 - 4 * width / 5;
@@ -272,13 +273,18 @@ public class Map {
         } while (!isPlaceable(room));
         rooms.add(room);
         room.print();
+
+        /* Dig the first corridor */
         do {
             corridor = generateRoom(room, true, true);
         } while (corridor == null);
         corridors.add(corridor);
 
+        /* Dig the rest of the map */
         do {
             ++retries;
+
+            // If we are going to generate a corridor
             if (this.random.nextInt(roomNbr - rooms.size() + corridorNbr - corridors.size()) < (corridorNbr - corridors.size())) {
                 if (CORRIDOR_BINDED_TO_CORRIDOR_CHANCE >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
                     corridor = generateRoom(corridors.get(this.random.nextInt(corridors.size())), true, false);
@@ -289,7 +295,7 @@ public class Map {
                     retries = 0;
                     corridors.add(corridor);
                 }
-            } else {
+            } else { // We are going to generate a room
                 if (ROOM_BINDED_TO_CORRIDOR_CHANCE >= this.random.nextInt(PROBABILITY_UNIT)) {
                     room = generateRoom(corridors.get(this.random.nextInt(corridors.size())), false, true);
                 } else {
@@ -301,10 +307,14 @@ public class Map {
                 }
             }
         }
+        // Until (you have enough rooms and corridors),
+        // or (you failed RETRIES_NBR times consecutively and have at least MIN_ROOM_NUMBER rooms and MIN_CORRIDOR_NBR corridors)
+        // or (you failed 2 * RETRIES_NBR times consecutively)
         while ((rooms.size() < roomNbr || corridors.size() < corridorNbr)
                 && (retries < RETRIES_NBR || rooms.size() < MIN_ROOM_NUMBER || corridors.size() < MIN_CORRIDOR_NBR)
-                && retries < 5 * Byte.MAX_VALUE);
+                && retries < 2 * RETRIES_NBR);
 
+        /* Randomly remove some walls and make passages (when possible) */
         for (int i = 0; i < rooms.size(); ++i) {
             for (int j = i + 1; j < rooms.size(); ++j) {
                 if (REBIND_ROOM_TO_ROOM_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
@@ -358,6 +368,8 @@ public class Map {
     private void rebind(Room source, Room target, boolean door) {
         int min, max, tmp, nbr;
         Tile tile = door ? DEFAULT_DOOR : Tile.GROUND;
+
+        // If both rooms are connected at their top / bottom
         if (source.top.y - 2 == target.bottom.y) {
             if (source.top.x < target.bottom.x && source.bottom.x >= target.top.x) {
                 min = Math.max(source.top.x, target.top.x);
@@ -365,18 +377,24 @@ public class Map {
                 max = Math.max(min, tmp);
                 min = min + tmp - max;
                 tmp = source.top.y - 1;
+                // Don't do anything if the rooms already have a passage
                 for (int i = min; i <= max; ++i) {
                     if (!isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
                         return;
                 }
+
+                // Select the part of the wall to destroy
                 if (max != min) {
                     nbr = this.random.nextInt(max - min) + min;
                 } else {
                     nbr = min;
                 }
                 this.map[nbr][tmp] = tile;
+
+                // Remake the walls gracefully
                 reconstrucWalls(source, target, new Vector2i(nbr, tmp));
             }
+            // else If both rooms are connected at their top / bottom (the other combination)
         } else if (source.bottom.y + 2 == target.top.y) {
             if (source.top.x < target.bottom.x && source.bottom.x >= target.top.x) {
                 min = Math.max(source.top.x, target.top.x);
@@ -396,6 +414,7 @@ public class Map {
                 this.map[min][tmp] = tile;
                 reconstrucWalls(source, target, new Vector2i(nbr, tmp));
             }
+            // else If both rooms are connected at their left / right
         } else if (source.top.x - 2 == target.bottom.x) {
             if (source.top.y < target.bottom.y && source.bottom.y >= target.top.y) {
                 min = Math.max(source.top.y, target.top.y);
@@ -415,6 +434,7 @@ public class Map {
                 this.map[tmp][nbr] = tile;
                 reconstrucWalls(source, target, new Vector2i(tmp, nbr));
             }
+            // else If both rooms are connected at their left / right (the other combination)
         } else if (source.bottom.x + 2 == target.top.x) {
             if (source.top.y < target.bottom.y && source.bottom.y >= target.top.y) {
                 min = Math.max(source.top.y, target.top.y);
@@ -493,7 +513,10 @@ public class Map {
             height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
             width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
         }
+
+        /* Choose wether the new room will be binded to given previous room at the North, South, East, or West */
         switch (this.random.nextInt(4)) {
+            // EAST
             case 0:
                 x = link.bottom.x + 2;
                 if (link.bottom.y == link.top.y) {
@@ -511,6 +534,7 @@ public class Map {
                     }
                 }
                 break;
+            // WEST
             case 1:
                 x = link.top.x - 2;
                 if (link.bottom.y == link.top.y) {
@@ -529,6 +553,7 @@ public class Map {
                 }
                 x -= width;
                 break;
+            // SOUTH
             case 2:
                 if (link.bottom.x == link.top.x) {
                     x = link.top.x;
@@ -548,6 +573,7 @@ public class Map {
                 break;
             case 3:
                 /* Falls through */
+                // NORTH
             default:
                 if (link.bottom.x == link.top.x) {
                     x = link.top.x;
@@ -596,7 +622,7 @@ public class Map {
 
 
     /**
-     * Room
+     * Room (level generation)
      *
      * @author Lucas LAZARE
      */
@@ -724,7 +750,7 @@ public class Map {
     }
 
     /**
-     * Gets path.
+     * Gets path, using A* algorithm [Will perhaps be upgraded using the Jump Point Search method].
      *
      * @param departure  the departure
      * @param arrival    the arrival

@@ -12,7 +12,8 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 4/23/16.
+ * ConsumableType
+ * @author Lucas LAZARE
  */
 public enum ConsumableType {
 	POT {
@@ -42,6 +43,9 @@ public enum ConsumableType {
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String toString() {
 		return null;
 	}
