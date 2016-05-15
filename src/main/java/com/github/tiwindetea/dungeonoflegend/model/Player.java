@@ -41,15 +41,15 @@ public class Player extends LivingThing {
 	private int attackPowerPerLevel;
 	private int defensePowerPerLevel;
 	private Stack<Vector2i> requestedPath;
-	private long objectToDropId;
+	private Pair<StorableObject> objectToDrop;
 	private int floor;
 	private int xp;
 	private int los;
 	private int number;
 	private int exploreLOS;
-	private Vector2i requestedAttack;
 	private Vector2i requestedInteraction;
 	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
+	private Vector2i dropPos;
 
 	/**
 	 * Instantiates a new Player.
@@ -135,8 +135,8 @@ public class Player extends LivingThing {
 	 *
 	 * @return the id of the object to drop
 	 */
-	public long getObjectToDropId() {
-		return this.objectToDropId;
+	public Pair<StorableObject> getObjectToDrop() {
+		return this.objectToDrop;
 	}
 
 	/**
@@ -144,8 +144,14 @@ public class Player extends LivingThing {
 	 *
 	 * @param objectToDropId the id of the object to drop
 	 */
-	public void setObjectToDropId(long objectToDropId) {
-		this.objectToDropId = objectToDropId;
+	public void setObjectToDrop(long objectToDropId, Vector2i dropPos) {
+		int i = this.inventory.indexOf(new Pair<>(objectToDropId));
+		if (i >= 0) {
+			this.objectToDrop = this.inventory.get(i);
+			this.dropPos = dropPos;
+		} else {
+			this.objectToDrop = null;
+		}
 	}
 
 	/**
@@ -158,12 +164,29 @@ public class Player extends LivingThing {
 	}
 
 	/**
-	 * Gets the requested move.
-	 *
-	 * @return the requested move
+	 * {@inheritDoc}
 	 */
-	public Vector2i getRequestMove() {
-		return this.requestedPath.size() == 0 ? null : this.requestedPath.get(0);
+	@Override
+	public Vector2i getRequestedMove() {
+		return this.requestedPath.size() == 0 ? null : this.requestedPath.peek();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setPosition(Vector2i position) {
+		super.setPosition(position);
+		if (this.position.equals(this.requestedPath.get(0))) {
+			this.requestedPath.pop();
+		}
+	}
+
+	/**
+	 * Method to call when a move request was denied
+	 */
+	public void moveRequestDenied() {
+		this.requestedPath = null;
 	}
 
 	/**
@@ -257,6 +280,24 @@ public class Player extends LivingThing {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void attack(LivingThing target) {
+		if (target.getType() == LivingThingType.MOB) {
+			int damages = this.attackPower;
+			for (Pair<Armor> armorPair : this.armors) {
+				if (armorPair != null && armorPair.object != null)
+					damages += armorPair.object.getAttackPowerModifier();
+			}
+			if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
+				damages += this.weapon.object.getAttackPowerModifier();
+			}
+			target.damage(damages);
+		}
+	}
+
+	/**
 	 * Gets the number of the player (player 0, player 1, …).
 	 *
 	 * @return the number of the player
@@ -266,21 +307,21 @@ public class Player extends LivingThing {
 	}
 
 	/**
-	 * Gets the requested attack.
-	 *
-	 * @return the requested attack
-	 */
-	public Vector2i getRequestedAttack() {
-		return this.requestedAttack.copy();
-	}
-
-	/**
 	 * Sets the requested interaction.
 	 *
 	 * @param position the position of the interaction
 	 */
 	public void setRequestedInteraction(Vector2i position) {
 		this.requestedInteraction = position;
+	}
+
+	/**
+	 * Gets the requested interaction.
+	 *
+	 * @return the requested interaction
+	 */
+	public Vector2i getRequestedInteraction() {
+		return this.requestedInteraction.copy();
 	}
 
 	/**
@@ -296,10 +337,26 @@ public class Player extends LivingThing {
 	 * Add to inventory.
 	 *
 	 * @param storable a storable item
+	 * @return True if the object was added, false otherwise
 	 */
-	public void addToInventory(Pair<StorableObject> storable) {
+	public boolean addToInventory(Pair<StorableObject> storable) {
 		if (this.inventory.size() < this.maxStorageCapacity) {
 			this.inventory.add(storable);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Gets the attack range.
+	 *
+	 * @return the attack range
+	 */
+	public int getAttackRange() {
+		if (this.weapon != null && this.weapon.object != null) {
+			return this.weapon.object.getRange();
+		} else {
+			return 1;
 		}
 	}
 
@@ -309,12 +366,16 @@ public class Player extends LivingThing {
 	 * @return the dropped intem
 	 */
 	public Pair<StorableObject> dropRequestAccepted() {
-		if (this.objectToDropId != Pair.ERROR_VAL) {
-			Pair<StorableObject> object = new Pair<>(this.objectToDropId, this.removeFromInventory(this.objectToDropId));
-			this.objectToDropId = Pair.ERROR_VAL;
-			return object;
+		if (this.objectToDrop != null && this.inventory.remove(this.objectToDrop)) {
+			Pair<StorableObject> tmp = this.objectToDrop;
+			this.objectToDrop = null;
+			return tmp;
 		}
 		return null;
+	}
+
+	public Vector2i getDropPos(){
+		return this.dropPos.copy();
 	}
 
 	/**
@@ -607,12 +668,7 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Pair<LivingThing>> livingEntities) {
-		for (Pair<LivingThing> entity : livingEntities) {
-			if (entity.object.getType() == LivingThingType.MOB) {
-				this.requestedPath = null;
-			}
-		}
+	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players) {
 	}
 
 	/**
@@ -627,6 +683,16 @@ public class Player extends LivingThing {
 	 * @return true if a riquest is pending, false otherwise.
 	 */
 	public boolean isARequestPending() {
-		return this.requestedPath.size() > 0 || this.objectToDropId != Pair.ERROR_VAL || this.requestedInteraction != null;
+		return this.requestedPath.size() > 0 || this.objectToDrop != null || this.requestedInteraction != null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void damage(int damages) {
+		if (damages > 0)
+			this.hitPoints -= damages;
+		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 }

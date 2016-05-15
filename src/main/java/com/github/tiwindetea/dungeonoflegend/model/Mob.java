@@ -16,7 +16,14 @@ import java.util.Collection;
  * @author Lucas LAZARE
  */
 public class Mob extends LivingThing {
+	// Mobs know the map perfectly.
+	private static Map map;
 	private State state;
+	private Vector2i requstedPath;
+
+	public static void setMap(Map map) {
+		Mob.map = map;
+	}
 
 	/**
 	 * Instantiates a new Mob. (for comparison purposes)
@@ -43,6 +50,7 @@ public class Mob extends LivingThing {
 		this.defensePower = defensePower;
 		this.position = position;
 		this.hitPoints = maxHitPoints;
+		this.requstedPath = new Vector2i();
 	}
 
 	private void keepPatroling() {
@@ -66,9 +74,28 @@ public class Mob extends LivingThing {
 		return ((Mob) o).position.equals(this.position);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void live(Collection<Pair<LivingThing>> livingEntities) {
+	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players) {
 		//TODO
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Vector2i getRequestedMove() {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void attack(LivingThing target) {
+		target.damage(this.attackPower);
 	}
 
 	@Override

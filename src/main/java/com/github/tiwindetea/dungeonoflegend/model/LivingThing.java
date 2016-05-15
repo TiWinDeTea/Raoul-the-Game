@@ -23,6 +23,7 @@ public abstract class LivingThing {
 	protected int attackPower;
 	protected int defensePower;
 	protected Vector2i position;
+	protected Vector2i requestedAttack;
 
 
 	/**
@@ -124,9 +125,27 @@ public abstract class LivingThing {
 	/**
 	 * Make this to live.
 	 *
-	 * @param livingEntities the living entities around this Living Entity
+	 * @param mobs Mobs around this
+	 * @param players Players around this
+	 *
 	 */
-	public abstract void live(Collection<Pair<LivingThing>> livingEntities);
+	public abstract void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players);
+
+	/**
+	 * Gets the requested move.
+	 *
+	 * @return the requested move
+	 */
+	public abstract Vector2i getRequestedMove();
+
+	/**
+	 * Gets the requested attack.
+	 *
+	 * @return the requested attack
+	 */
+	public Vector2i getRequestedAttack() {
+		return this.requestedAttack.copy();
+	}
 
 	/**
 	 * Gets type.
@@ -135,6 +154,13 @@ public abstract class LivingThing {
 	 * @see LivingThingType
 	 */
 	public abstract LivingThingType getType();
+
+	/**
+	 * Make the players to attack the target
+	 *
+	 * @param target target of the attack
+	 */
+	public abstract void attack(LivingThing target);
 
 	/**
 	 * {@inheritDoc}
