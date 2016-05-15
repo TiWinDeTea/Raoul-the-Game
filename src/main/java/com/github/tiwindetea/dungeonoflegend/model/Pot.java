@@ -8,11 +8,7 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-
-import java.util.ArrayList;
 
 /**
  * Pot.
@@ -30,7 +26,6 @@ public class Pot implements Consumable {
 	private int manaModifier;
 	private Player target;
 	private StaticEntityType gtype;
-	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Pot.
@@ -63,26 +58,6 @@ public class Pot implements Consumable {
 	}
 
 	private Pot() {
-	}
-
-	/**
-	 * Adds a player listener.
-	 *
-	 * @param listener the listener
-	 */
-	public static void addPlayerListener(PlayerStatListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
-	}
-
-	private PlayerStatListener[] getPlayersListeners() {
-		return this.listeners.toArray(new PlayerStatListener[this.listeners.size()]);
-	}
-
-	private void firePlayerStatEvent(PlayerStatEvent event) {
-		for (PlayerStatListener listener : getPlayersListeners()) {
-			listener.changePlayerStat(event);
-		}
 	}
 
 	/**
@@ -148,13 +123,9 @@ public class Pot implements Consumable {
 		}
 		if (this.healthModifier != 0) {
 			player.increaseHP(this.healthModifier);
-			this.firePlayerStatEvent(new PlayerStatEvent(player.getNumber(), PlayerStatEvent.StatType.HEALTH,
-					PlayerStatEvent.ValueType.MAX, player.getMaxHitPoints()));
 		}
 		if (this.manaModifier != 0) {
 			player.increaseMana(this.manaModifier);
-			this.firePlayerStatEvent(new PlayerStatEvent(player.getNumber(), PlayerStatEvent.StatType.MANA,
-					PlayerStatEvent.ValueType.MAX, player.getMaxMana()));
 		}
 	}
 
@@ -211,16 +182,12 @@ public class Pot implements Consumable {
 	private void manaHealTarget() {
 		if (this.mana_heal != 0) {
 			this.target.addMana(this.mana_heal);
-			this.firePlayerStatEvent(new PlayerStatEvent(this.target.getNumber(), PlayerStatEvent.StatType.MANA,
-					PlayerStatEvent.ValueType.ACTUAL, this.target.getMana()));
 		}
 	}
 
 	private void healTarget() {
 		if (this.heal != 0) {
 			this.target.heal(this.heal);
-			this.firePlayerStatEvent(new PlayerStatEvent(this.target.getNumber(), PlayerStatEvent.StatType.HEALTH,
-					PlayerStatEvent.ValueType.ACTUAL, this.target.getHitPoints()));
 		}
 	}
 }

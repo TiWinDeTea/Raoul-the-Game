@@ -8,6 +8,9 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -46,6 +49,7 @@ public class Player extends LivingThing {
 	private int exploreLOS;
 	private Vector2i requestedAttack;
 	private Vector2i requestedInteraction;
+	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 
 	/**
 	 * Instantiates a new Player.
@@ -94,6 +98,26 @@ public class Player extends LivingThing {
 		this.xp = 0;
 		this.los = los;
 		this.exploreLOS = exploreLOS;
+	}
+
+	/**
+	 * Adds a player listener.
+	 *
+	 * @param listener the listener
+	 */
+	public static void addPlayerListener(PlayerStatListener listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+	}
+
+	private static PlayerStatListener[] getPlayersListeners() {
+		return Player.listeners.toArray(new PlayerStatListener[Player.listeners.size()]);
+	}
+
+	private void firePlayerStatEvent(PlayerStatEvent event) {
+		for (PlayerStatListener listener : getPlayersListeners()) {
+			listener.changePlayerStat(event);
+		}
 	}
 
 	private Player() {
@@ -381,6 +405,8 @@ public class Player extends LivingThing {
 		if (mana < 0)
 			throw new IllegalArgumentException("mana must be positive");
 		this.mana = Math.min(this.maxMana, mana + this.mana);
+		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
+				PlayerStatEvent.ValueType.ACTUAL, this.mana));
 	}
 
 	/**
@@ -392,6 +418,8 @@ public class Player extends LivingThing {
 		if (hp < 0)
 			throw new IllegalArgumentException("hp must be positive");
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
+		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
+				PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 
 	/**
@@ -411,6 +439,8 @@ public class Player extends LivingThing {
 	public void increaseHP(int hp) {
 		this.maxHitPoints = Math.max(hp + this.maxHitPoints, 1);
 		this.hitPoints = Math.max(hp + this.hitPoints, 1);
+		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
+				PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
 	}
 
 	/**
@@ -430,6 +460,8 @@ public class Player extends LivingThing {
 	public void increaseMana(int manaModifier) {
 		this.maxMana = Math.max(this.maxMana + manaModifier, 1);
 		this.mana = Math.max(this.mana + manaModifier, 1);
+		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
+				PlayerStatEvent.ValueType.MAX, this.maxMana));
 	}
 
 	/**
