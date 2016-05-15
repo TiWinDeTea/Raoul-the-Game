@@ -10,8 +10,10 @@ package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
+import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
@@ -40,7 +42,7 @@ public class Player extends LivingThing {
 	private int manaPerLevel;
 	private int attackPowerPerLevel;
 	private int defensePowerPerLevel;
-	private Stack<Vector2i> requestedPath;
+	private Stack<Vector2i> requestedPath = new Stack<>();
 	private Pair<StorableObject> objectToDrop;
 	private int floor;
 	private int xp;
@@ -50,6 +52,11 @@ public class Player extends LivingThing {
 	private Vector2i requestedInteraction;
 	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 	private Vector2i dropPos;
+	public boolean hasFallen = false;
+	private static final LivingEntityType[] ENUM_VAL = Arrays.copyOfRange(LivingEntityType.values(),
+			LivingEntityType.PLAYER1.ordinal(),
+			LivingEntityType.values().length - LivingEntityType.PLAYER1.ordinal()
+	);
 
 	/**
 	 * Instantiates a new Player.
@@ -93,7 +100,6 @@ public class Player extends LivingThing {
 		this.manaPerLevel = manaPerLevel;
 		this.attackPowerPerLevel = attackPowerPerLevel;
 		this.defensePowerPerLevel = defensePowerPerLevel;
-		this.requestedPath = new Stack<>();
 		this.floor = 0;
 		this.xp = 0;
 		this.los = los;
@@ -127,7 +133,6 @@ public class Player extends LivingThing {
 		for (int i = 0; i < 5; i++) {
 			this.armors.add(new Pair<>());
 		}
-		this.requestedPath = new Stack<>();
 	}
 
 	/**
@@ -168,7 +173,7 @@ public class Player extends LivingThing {
 	 */
 	@Override
 	public Vector2i getRequestedMove() {
-		return this.requestedPath.size() == 0 ? null : this.requestedPath.peek();
+		return this.requestedPath.size() > 0 ? this.requestedPath.peek() : null;
 	}
 
 	/**
@@ -177,7 +182,7 @@ public class Player extends LivingThing {
 	@Override
 	public void setPosition(Vector2i position) {
 		super.setPosition(position);
-		if (this.position.equals(this.requestedPath.get(0))) {
+		if (this.requestedPath.size() > 0 && this.position.equals(this.requestedPath.peek())) {
 			this.requestedPath.pop();
 		}
 	}
@@ -186,7 +191,7 @@ public class Player extends LivingThing {
 	 * Method to call when a move request was denied
 	 */
 	public void moveRequestDenied() {
-		this.requestedPath = null;
+		this.requestedPath.clear();
 	}
 
 	/**
@@ -540,7 +545,8 @@ public class Player extends LivingThing {
 		int nbr = str.indexOf("nbr=", name) + 4;
 		int los = str.indexOf("los=", nbr) + 4;
 		int elos = str.indexOf("elos=", los) + 5;
-		int capa = str.indexOf("capacity=", elos) + 9;
+		int hasFallen = str.indexOf("hasFallen=", elos) + 10;
+		int capa = str.indexOf("capacity=", hasFallen) + 9;
 		int mhp = str.indexOf("maxHitPoints=", capa) + 13;
 		int mm = str.indexOf("maxMana=", mhp) + 8;
 		int hp = str.indexOf("hitPoints=", mm) + 10;
@@ -560,6 +566,7 @@ public class Player extends LivingThing {
 		p.number = Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
 		p.los = Integer.parseInt(str.substring(los, str.indexOf(',', los)));
 		p.exploreLOS = Integer.parseInt(str.substring(elos, str.indexOf(',', elos)));
+		p.hasFallen = Boolean.parseBoolean(str.substring(hasFallen, str.indexOf(',', hasFallen)));
 		p.maxStorageCapacity = Integer.parseInt(str.substring(capa, str.indexOf(',', capa)));
 		p.maxHitPoints = Integer.parseInt(str.substring(mhp, str.indexOf(',', mhp)));
 		p.maxMana = Integer.parseInt(str.substring(mm, str.indexOf(',', mm)));
@@ -630,6 +637,7 @@ public class Player extends LivingThing {
 				+ ",nbr=" + this.number
 				+ ",los=" + this.los
 				+ ",elos=" + this.exploreLOS
+				+ ",hasFallen=" + this.hasFallen
 				+ ",capacity=" + this.maxStorageCapacity
 				+ ",maxHitPoints=" + this.maxHitPoints
 				+ ",maxMana=" + this.maxMana
@@ -694,5 +702,9 @@ public class Player extends LivingThing {
 		if (damages > 0)
 			this.hitPoints -= damages;
 		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
+	}
+
+	public LivingEntityType getGType() {
+		return ENUM_VAL[this.number];
 	}
 }

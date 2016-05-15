@@ -122,7 +122,12 @@ public enum Tile {
 	 */
 	public static boolean isObstructed(Tile tile) {
 		switch (tile) {
-			case WALL_LEFT:
+			case GROUND:
+			case OPENED_DOOR:
+			case STAIR_UP:
+			case STAIR_DOWN:
+				return false;
+			/*case WALL_LEFT:
 			case WALL_RIGHT:
 			case WALL_DOWN:
 			case WALL_TOP:
@@ -133,14 +138,33 @@ public enum Tile {
 			case CLOSED_DOOR:
 			case PILLAR:
 			case UNKNOWN:
-			case HOLE:
+			case HOLE:*/
+			default:
 				return true;
+		}
+	}
+
+	public static boolean isRoomBorder(Tile tile) {
+		switch (tile) {
+			case PILLAR:
 			case GROUND:
-			case OPENED_DOOR:
 			case STAIR_UP:
 			case STAIR_DOWN:
-			default:
+			case HOLE:
+			case UNKNOWN:
 				return false;
+			/*case WALL_LEFT:
+			case WALL_RIGHT:
+			case WALL_DOWN:
+			case WALL_TOP:
+			case WALL_TOPLEFT:
+			case WALL_TOPRIGHT:
+			case WALL_DOWNLEFT:
+			case WALL_DOWNRIGHT:
+			case OPENED_DOOR:
+			case CLOSED_DOOR:*/
+			default:
+				return true;
 		}
 	}
 

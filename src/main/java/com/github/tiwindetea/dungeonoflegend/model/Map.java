@@ -788,6 +788,12 @@ public class Map {
         }
     }
 
+    public Stack<Vector2i> getPathPair(Vector2i departure, Vector2i arrival, boolean ignoreDoor, Collection<Pair<LivingThing>> entities) {
+        Collection<LivingThing> shadow = new ArrayList<>(entities.size());
+        shadow.addAll(entities.stream().map(entity -> entity.object).collect(Collectors.toList()));
+        return getPath(departure, arrival, ignoreDoor, shadow);
+    }
+
     /**
      * Gets path, using A* algorithm [Will perhaps be upgraded using the Jump Point Search method].
      *

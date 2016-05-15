@@ -102,6 +102,10 @@ public class Vector2i {
 		return this;
 	}
 
+	public double distance(Vector2i that) {
+		return Math.sqrt(Math.pow(this.x - that.x, 2) + Math.pow(this.y - that.y, 2));
+	}
+
 	/**
 	 * Multiplies a Vector2i by a scalar.
 	 *
