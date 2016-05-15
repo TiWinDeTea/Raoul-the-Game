@@ -92,4 +92,8 @@ public class Seed {
     public String toString() {
         return "seed={alphaSeed=" + this.alphaSeed + ",betaSeed=" + this.betaSeed + ",}";
     }
+
+    public Seed copy() {
+        return new Seed(this.alphaSeed, this.betaSeed);
+    }
 }

@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
 
@@ -120,7 +121,13 @@ public class Map {
      * @return A copy of the tile map
      */
     public Tile[][] getMapCopy() {
-        return this.map.clone();
+        Tile[][] copy = new Tile[this.map.length][this.map[0].length];
+        for (int i = 0; i < this.map.length; i++) {
+            for (int j = 0; j < this.map[i].length; j++) {
+                copy[i][j] = this.map[i][j];
+            }
+        }
+        return copy;
     }
 
     /**
@@ -635,6 +642,21 @@ public class Map {
      */
     public ArrayList<Vector2i> getBulbPosition() {
         return this.bulbPosition;
+    }
+
+    /**
+     * Copies the map.
+     *
+     * @return a copy of this, with the exception of this.random that's set to null.
+     */
+    public Map copy() {
+        Map map = new Map(this.seed.copy());
+        map.random = null;
+        map.stairsDownPosition = this.stairsDownPosition.copy();
+        map.stairsUpPosition = this.stairsUpPosition.copy();
+        map.bulbPosition.addAll(this.bulbPosition.stream().map(Vector2i::copy).collect(Collectors.toList()));
+        map.map = this.getMapCopy();
+        return map;
     }
 
 
