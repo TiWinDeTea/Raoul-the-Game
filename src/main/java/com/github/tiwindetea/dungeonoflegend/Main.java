@@ -31,11 +31,12 @@ public class Main extends Application {
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.setScene(GUI.getScene());
 		primaryStage.show();
-		Game game = new Game("LOL");
-		game.addGameListener(GUI);
-		GUI.addRequestListener(game);
-		//GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
-		//GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
+        Game game = new Game("/tmp/LOL");
+        game.initNew(2);
+        game.addGameListener(GUI);
+        GUI.addRequestListener(game);
+        //GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
+        //GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
         primaryStage.getIcons().add(ViewPackage.icon);
 
 		GUI.getScene().setOnMouseClicked(

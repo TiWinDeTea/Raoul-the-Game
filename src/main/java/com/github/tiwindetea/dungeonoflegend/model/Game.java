@@ -38,12 +38,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
@@ -62,9 +65,10 @@ public class Game implements RequestListener {
 	public static final int MAX_CHEST_QTT_PER_LEVEL = 5;
 
 
+	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
 	private int level;
 	private Map world;
-	private ArrayList<Pair<StorableObject>> objectsOnGround = new ArrayList<>();
+	private HashMap<Vector2i, Pair<StorableObject>> objectsOnGround = new HashMap<>();
 	private ArrayList<Pair<Mob>> mobs = new ArrayList<>();
 	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
 	private ArrayList<Pair<Player>> players = new ArrayList<>();
@@ -84,46 +88,47 @@ public class Game implements RequestListener {
 
 
 	/* Level generation variables. Charged at the creation of a game */
-	private LivingEntityType[] mobsTypes = new LivingEntityType[0];
-	private int[] mobsBaseHP = new int[0];
-	private int[] mobsBaseDef = new int[0];
-	private int[] mobsBaseAttack = new int[0];
-	private int[] mobsHPPerLevel = new int[0];
-	private int[] mobsDefPerLevel = new int[0];
-	private int[] mobsAttackPerLevel = new int[0];
+	private LivingEntityType[] mobsTypes;
+	private int[] mobsBaseHP;
+	private int[] mobsBaseDef;
+	private int[] mobsBaseAttack;
+	private int[] mobsHPPerLevel;
+	private int[] mobsDefPerLevel;
+	private int[] mobsAttackPerLevel;
+	private int[] mobsChaseRange;
 
-	private int[] trapsBaseHP = new int[0];
-	private int[] trapsBaseMana = new int[0];
-	private int[] trapsHPPerLevel = new int[0];
-	private int[] trapsManaPerLevel = new int[0];
+	private int[] trapsBaseHP;
+	private int[] trapsBaseMana;
+	private int[] trapsHPPerLevel;
+	private int[] trapsManaPerLevel;
 
-	private ArmorType[] lootsArmorType = new ArmorType[0];
-	private int[] lootsArmorBaseDefense = new int[0];
-	private int[] lootsArmorBaseAttack = new int[0];
-	private int[] lootsArmorDefensePerLevel = new int[0];
-	private int[] lootsArmorAttackPerLevel = new int[0];
+	private ArmorType[] lootsArmorType;
+	private int[] lootsArmorBaseDefense;
+	private int[] lootsArmorBaseAttack;
+	private int[] lootsArmorDefensePerLevel;
+	private int[] lootsArmorAttackPerLevel;
 
-	private int[] lootsWeaponRange = new int[0];
-	private int[] lootsWeaponBaseAttack = new int[0];
-	private int[] lootsWeaponManaCost = new int[0];
-	private int[] lootsWeaponAttackPerLevel = new int[0];
-	private int[] lootsWeaponManaCostPerLevel = new int[0];
+	private int[] lootsWeaponRange;
+	private int[] lootsWeaponBaseAttack;
+	private int[] lootsWeaponManaCost;
+	private int[] lootsWeaponAttackPerLevel;
+	private int[] lootsWeaponManaCostPerLevel;
 
-	private int[] lootsPotTurns = new int[0];
-	private int[] lootsPotHeal = new int[0];
-	private int[] lootsPotMana = new int[0];
-	private int[] lootsPotAttackMod = new int[0];
-	private int[] lootsPotDefMod = new int[0];
-	private int[] lootsPotHPMod = new int[0];
-	private int[] lootsPotManaMod = new int[0];
-	private int[] lootsPotHealPerLevel = new int[0];
-	private int[] lootsPotManaPerLevel = new int[0];
+	private int[] lootsPotTurns;
+	private int[] lootsPotHeal;
+	private int[] lootsPotMana;
+	private int[] lootsPotAttackMod;
+	private int[] lootsPotDefMod;
+	private int[] lootsPotHPMod;
+	private int[] lootsPotManaMod;
+	private int[] lootsPotHealPerLevel;
+	private int[] lootsPotManaPerLevel;
 
-	private int[] lootsScrollBaseDamagePerTurn = new int[0];
-	private int[] lootsScrollBaseDamageModPerTurn = new int[0];
-	private int[] lootsScrollDamagePerTurnPerLevel = new int[0];
-	private int[] lootsScrollDamageModPerTurnPerLevel = new int[0];
-	private int[] lootsScrollTurns = new int[0];
+	private int[] lootsScrollBaseDamagePerTurn;
+	private int[] lootsScrollBaseDamageModPerTurn;
+	private int[] lootsScrollDamagePerTurnPerLevel;
+	private int[] lootsScrollDamageModPerTurnPerLevel;
+	private int[] lootsScrollTurns;
 
 	/**
 	 * Instantiates a new Game.
@@ -139,8 +144,8 @@ public class Game implements RequestListener {
 	 *
 	 * @param players the players
 	 */
-	public void init(Collection<Player> players) {
-		this.init(players, new Seed(), 1);
+	public void initNew(Collection<Player> players) {
+		this.initNew(players, new Seed(), 1);
 	}
 
 	/**
@@ -148,7 +153,7 @@ public class Game implements RequestListener {
 	 *
 	 * @param numberOfPlayers the number of players
 	 */
-	public void init(int numberOfPlayers) {
+	public void initNew(int numberOfPlayers) {
 		ArrayList<Player> players = new ArrayList<>();
 		ResourceBundle playersBundle = ResourceBundle.getBundle(MainPackage.name + ".Players");
 
@@ -166,12 +171,12 @@ public class Game implements RequestListener {
 					Integer.parseInt(playersBundle.getString(pString + "baseAttack")),
 					Integer.parseInt(playersBundle.getString(pString + "baseDef")),
 					Integer.parseInt(playersBundle.getString(pString + "healthPerLevel")),
-					Integer.parseInt(playersBundle.getString(pString + "anaPerLevel")),
+					Integer.parseInt(playersBundle.getString(pString + "manaPerLevel")),
 					Integer.parseInt(playersBundle.getString(pString + "attackPerLevel")),
 					Integer.parseInt(playersBundle.getString(pString + "defensePerLevel"))
 			));
 		}
-		this.init(players, new Seed(), 1);
+		this.initNew(players, new Seed(), 1);
 	}
 
 	/**
@@ -181,7 +186,7 @@ public class Game implements RequestListener {
 	 * @param seed    the seed
 	 * @param level   the level
 	 */
-	public void init(Collection<Player> players, Seed seed, int level) {
+	public void initNew(Collection<Player> players, Seed seed, int level) {
 		this.playerTurn = 0;
 		this.level = level;
 		this.seed = seed;
@@ -189,11 +194,21 @@ public class Game implements RequestListener {
 
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
+		for (Pair<Player> player : this.players) {
+			firePlayerCreationEvent(new PlayerCreationEvent(
+					player.object.getNumber(),
+					player.getId(),
+					new Vector2i(0, 0),
+					Direction.DOWN,
+					player.object.getMaxHitPoints(),
+					player.object.getMaxMana()
+			));
+		}
 		this.currentPlayer = this.players.get(0).object;
-		this.generateLevel();
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
+		this.generateLevel();
 	}
 
 	private void loadMobs() {
@@ -206,6 +221,7 @@ public class Game implements RequestListener {
 		this.mobsHPPerLevel = new int[mobQtt];
 		this.mobsDefPerLevel = new int[mobQtt];
 		this.mobsAttackPerLevel = new int[mobQtt];
+		this.mobsChaseRange = new int[mobQtt];
 		for (int i = 0; i < mobQtt; i++) {
 			String mobName = "mob" + i + ".";
 			this.mobsTypes[i] = LivingEntityType.parseLivingEntity(mobs.getString(mobName + "type"));
@@ -215,6 +231,7 @@ public class Game implements RequestListener {
 			this.mobsHPPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "defense-per-level"));
 			this.mobsDefPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "attack-per-level"));
 			this.mobsAttackPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "hp-per-level"));
+			this.mobsChaseRange[i] = Integer.parseInt(mobs.getString(mobName + "chase-range"));
 		}
 	}
 
@@ -312,6 +329,7 @@ public class Game implements RequestListener {
 	 */
 	public void addGameListener(GameListener listener) {
 		this.listeners.add(listener);
+		Player.addPlayerListener(listener);
 	}
 
 	private GameListener[] getGameListeners() {
@@ -390,6 +408,7 @@ public class Game implements RequestListener {
 		}
 	}
 
+	// TODO : Fire those events
 	private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
 			listener.defineStaticEntityLOS(event);
@@ -407,22 +426,25 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
-		Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
-		for (Direction direction : dirs) {
-			paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.add(direction), false, null));
-		}
-		Stack<Vector2i> theChoosenOne = paths.get(0);
-		for (Stack<Vector2i> stack : paths) {
-			if (stack != null && stack.size() < theChoosenOne.size()) {
-				theChoosenOne = stack;
+		logger.entering(MainPackage.name + ".model.Game", "requestDrop", e);
+		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
+			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
+			Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
+			for (Direction direction : dirs) {
+				paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.copy().add(direction), false, null));
+			}
+			if (paths.size() != 0) {
+				Stack<Vector2i> theChoosenOne = paths.get(0);
+				for (Stack<Vector2i> stack : paths) {
+					if (stack != null && stack.size() < theChoosenOne.size()) {
+						theChoosenOne = stack;
+					}
+				}
+				this.currentPlayer.setRequestedPath(theChoosenOne);
+				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
+				this.nextTurn();
 			}
 		}
-		if (paths != null) {
-			this.currentPlayer.setRequestedPath(theChoosenOne);
-		}
-		this.currentPlayer.setObjectToDropId(e.objectId);
-		this.nextTurn();
 	}
 
 	/**
@@ -430,32 +452,42 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
+		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
+		boolean success = true;
+		logger.entering(MainPackage.name + ".model.Game", "requestInteraction", e);
 		Tile tile = this.world.getTile(e.tilePosition);
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 		if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
 			this.currentPlayer.setRequestedInteraction(e.tilePosition);
-			nextTurn();
 		} else if (distance <= this.currentPlayer.getLos()) {
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
 			if (los[p.x + los.length - e.tilePosition.x][p.y + los[0].length - e.tilePosition.y]) {
-				for (Pair<Mob> mobPair : this.mobs) {
-					if (mobPair.object.equals(e.tilePosition)) {
-						if (this.objectToUse != null) {
-							this.objectToUse.object.trigger(mobPair.object);
-							this.triggeredObjects.add(this.objectToUse.object);
-							fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
-						} else {
-							this.currentPlayer.setRequestedAttack(e.tilePosition);
-						}
-						return;
+				int i = this.mobs.indexOf(new Mob(e.tilePosition));
+				if (i >= 0) {
+					if (this.objectToUse != null) {
+						this.objectToUse.object.trigger(this.mobs.get(i).object);
+						this.triggeredObjects.add(this.objectToUse.object);
+						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
+						this.objectToUse = null;
 					}
+					this.currentPlayer.setRequestedAttack(e.tilePosition);
+				} else {
+					success = false;
 				}
+			} else {
+				success = false;
 			}
-			this.currentPlayer.setRequestedPath(this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null));
 		} else {
-			this.currentPlayer.setRequestedPath(this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null));
+			success = false;
+		}
+		if (!success && path != null) {
+			this.currentPlayer.setRequestedPath(path);
+			success = true;
+		}
+		if (success) {
+			nextTurn();
 		}
 	}
 
@@ -464,6 +496,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
+		logger.entering(MainPackage.name + ".model.Game", "requestUsage", e);
 		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
 		this.objectToUse = null;
 		for (Pair<StorableObject> pair : inventory) {
@@ -484,6 +517,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
+		logger.entering(MainPackage.name + ".model.Game", "requestMove", e);
 		Stack<Vector2i> stack = new Stack<>();
 		stack.add(this.currentPlayer.getPosition().add(e.moveDirection));
 		this.currentPlayer.setRequestedPath(stack);
@@ -515,13 +549,8 @@ public class Game implements RequestListener {
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, p.object));
 		}
 
-		/* Move the players to the right position */
-		for (Pair<Player> player : this.players) {
-			player.object.setPosition(this.world.getStairsUpPosition());
-			fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.getId(), player.object.getPosition()));
-		}
-
 		/* Generate the mobs */
+		Mob.setMap(this.world.copy());
 		Random random = this.seed.getRandomizer(this.level);
 		int mobsNbr = random.nextInt(MAX_MOB_QTT_PER_LEVEL - MIN_MOB_QTT_PER_LEVEL) + MIN_MOB_QTT_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
@@ -535,6 +564,7 @@ public class Game implements RequestListener {
 					mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
 					mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
 					mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
+					this.mobsChaseRange[selectedMob],
 					mobPos.copy()));
 			this.mobs.add(pair);
 			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), null));
@@ -558,7 +588,7 @@ public class Game implements RequestListener {
 							this.lootsArmorType[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, armor));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), armor.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), armor.getGType(), pos));
 					break;
 				case 1:
 					selection = random.nextInt(this.lootsWeaponRange.length);
@@ -567,7 +597,7 @@ public class Game implements RequestListener {
 							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
 					pair = new Pair<>(new InteractiveObject(pos, weapon));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), weapon.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), weapon.getGType(), pos));
 					break;
 				case 2:
 					selection = random.nextInt(this.lootsScrollTurns.length);
@@ -576,7 +606,7 @@ public class Game implements RequestListener {
 							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, scroll));
 					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), scroll.getGtype(), pos));
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), scroll.getGType(), pos));
 					break;
 				case 3:
 					/* Falls through */
@@ -606,8 +636,28 @@ public class Game implements RequestListener {
 			this.interactiveObjects.add(pair);
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.TRAP, pos));
 		}
+
+
+		/* Move the players to the right position */
+		for (Pair<Player> player : this.players) {
+			if (player.object.hasFallen) {
+				do {
+					player.object.setPosition(this.selectRandomGroundPosition(rooms, random));
+				} while (Tile.isObstructed(this.world.getTile(player.object.getPosition())));
+				player.object.hasFallen = false;
+			} else {
+				player.object.setPosition(this.world.getStairsUpPosition());
+			}
+			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(
+					player.getId(),
+					player.object.getGType(),
+					player.object.getPosition(),
+					Direction.DOWN
+			));
+		}
 	}
 
+	//-------------------------------------//
 	private Vector2i selectRandomGroundPosition(List<Map.Room> rooms, Random random) {
 		Map.Room selectedRoom;
 		Vector2i pos = new Vector2i();
@@ -631,21 +681,18 @@ public class Game implements RequestListener {
 	 */
 	private void nextTurn() {
 		this.objectToUse = null;
-		int count = 0;
-		do {
-			this.playerTurn = (this.playerTurn + 1) % this.players.size();
-			++count;
-		} while (count != this.players.size() && this.currentPlayer.getFloor() != this.level);
 
-		if (count == this.players.size()) {
-			++this.level;
-			this.generateLevel();
-			this.save();
-		} else if (this.playerTurn == 0) {
+		while (++this.playerTurn < this.players.size()
+				&& this.players.get(this.playerTurn).object.getFloor() != this.level) ;
+
+		if (this.playerTurn >= this.players.size()) {
+			this.playerTurn = 0;
+			this.currentPlayer = this.players.get(0).object;
 			this.nextTick();
-		}
+			if (this.currentPlayer.getFloor() != this.level) {
 
-		this.currentPlayer = this.players.get(this.playerTurn).object;
+			}
+		}
 
 		if (this.currentPlayer.isARequestPending()) {
 			this.nextTurn();
@@ -655,29 +702,155 @@ public class Game implements RequestListener {
 	}
 
 	/**
-	 * Step into the next tick (all entities live
+	 * Step into the next tick (all entities live)
 	 */
 	private void nextTick() {
+		logger.log(Level.INFO, "Starting players lives");
 		Player player;
-		for (Pair<Player> playerPair : this.players) {
-			player = playerPair.object;
-			//player.live();
-			// TODO
-			// + requests
+		Vector2i pos;
+
+		for (int i = 0; i < this.players.size(); i++) {
+			player = this.players.get(i).object;
+			player.live(this.mobs, this.players);
+			Pair<StorableObject> drop;
+			if ((pos = player.getRequestedMove()) != null) {
+				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+				if (distance <= 1 && isAccessible(pos)) {
+					player.setPosition(pos);
+					fireLivingEntityMoveEvent(new LivingEntityMoveEvent(this.players.get(i).getId(), pos));
+				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
+					player.setFloor(this.level + 1);
+					player.hasFallen = true;
+					player.damage(player.getMaxHitPoints() / 5);
+				} else {
+					logger.log(Level.INFO, "Player " + player.getName() + " requested an invalid move ! (from "
+							+ player.getPosition() + " to " + pos + ")");
+					player.moveRequestDenied();
+				}
+			} else if ((pos = player.getRequestedAttack()) != null) {
+				if (Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y) <= player.getAttackRange()) {
+					int j = this.mobs.indexOf(new Mob(pos));
+					if (j >= 0) {
+						player.attack(this.mobs.get(j).object);
+					} else {
+						// Healing by 20%, because why not
+						player.heal(player.getMaxHitPoints() / 5);
+					}
+				}
+				player.setRequestedAttack(null);
+			} else if ((pos = player.getRequestedInteraction()) != null) {
+				this.world.triggerTile(pos);
+			} else if ((drop = player.getObjectToDrop()) != null) {
+				pos = player.getDropPos();
+				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+				if (drop.object != null && distance == 1) {
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(drop.getId(), drop.object.getGType(), pos));
+					fireInventoryDeletionEvent(new InventoryDeletionEvent(player.getNumber(), drop.getId()));
+					player.dropRequestAccepted();
+					this.objectsOnGround.put(pos, drop);
+				}
+			} else {
+				String msg = "Nothing to do with player " + player.getName()
+						+ " (player #" + (player.getNumber() + 1) + ")";
+				logger.log(Level.SEVERE, msg);
+				throw new RuntimeException(msg);
+			}
 		}
 
 		Mob mob;
-		for (Pair<Mob> mobPair : this.mobs) {
-			mob = mobPair.object;
-			//mob.live();
-			// TODO
+		ArrayList<Integer> toDelete = new ArrayList<>(3);
+		for (int i = 0; i < this.mobs.size(); i++) {
+			mob = this.mobs.get(i).object;
+			if (mob.isAlive()) {
+				mob.live(this.mobs, this.players);
+				if ((pos = mob.getRequestedMove()) != null) {
+					int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
+					if (distance <= 1 && isAccessible(pos)) {
+						mob.setPosition(pos);
+					}
+				} else if ((pos = mob.getRequestedAttack()) != null) {
+					int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
+					if (distance <= 1) {
+						int j = this.players.indexOf(new Mob(pos));
+						if (j < 0) {
+							j = this.mobs.indexOf(new Mob(pos));
+							if (j >= 0) {
+								mob.attack(this.players.get(j).object);
+							}
+						} else {
+							if (j >= 0) {
+								mob.attack(this.players.get(j).object);
+							}
+						}
+					}
+				}
+			} else {
+				toDelete.add(new Integer(i));
+				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.mobs.get(i).getId()));
+			}
 		}
 
-		//TODO : consumable objects next turn
+		toDelete.clear();
+		for (int i = 0; i < this.players.size(); i++) {
+			if (!this.players.get(i).object.isAlive()) {
+				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.players.get(i).getId()));
+				toDelete.add(new Integer(i));
+			}
+		}
 
-		// TODO: check for dead mobs, has-been consumables
+		for (Integer integer : toDelete) {
+			this.players.remove(integer.intValue());
+		}
 
-		// TODO: check for objects on ground
+		for (Integer integer : toDelete) {
+			this.mobs.remove(integer.intValue());
+		}
+
+		toDelete.clear();
+		for (int i = 0; i < this.triggeredObjects.size(); i++) {
+			if (this.triggeredObjects.get(i).nextTick()) {
+				toDelete.add(new Integer(i));
+			}
+		}
+		for (Integer integer : toDelete) {
+			this.triggeredObjects.remove(integer.intValue());
+		}
+
+		boolean nextLevel = true;
+		for (Pair<Player> playerPair : this.players) {
+			player = playerPair.object;
+			pos = player.getPosition();
+			Pair<StorableObject> drop = this.objectsOnGround.get(pos);
+
+			while (drop != null && player.addToInventory(drop)) {
+				fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(drop.getId()));
+				fireInventoryAdditionEvent(new InventoryAdditionEvent(player.getNumber(), drop.getId(), drop.object.getGType()));
+				this.objectsOnGround.remove(pos, drop);
+				drop = this.objectsOnGround.get(pos);
+			}
+
+			if (player.getPosition().equals(this.world.getStairsDownPosition())) {
+				player.setFloor(this.level + 1);
+				player.setPosition(new Vector2i(0, 0));
+				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(playerPair.getId()));
+			}
+
+			if (player.getFloor() == this.level) {
+				nextLevel = false;
+			}
+		}
+
+		if (nextLevel) {
+			++this.level;
+			this.generateLevel();
+		}
+	}
+
+	//-------------------------------------//
+	private boolean isAccessible(Vector2i pos) {
+		return !(Tile.isObstructed(this.world.getTile(pos))
+				|| this.mobs.contains(new Mob(pos))
+				|| this.players.contains(new Mob(pos)));
 	}
 
 	/**
@@ -701,6 +874,7 @@ public class Game implements RequestListener {
 		}
 	}
 
+	//-------------------------------------//
 	private void save() {
 		try {
 			FileWriter file = new FileWriter(new File(this.gameName));
