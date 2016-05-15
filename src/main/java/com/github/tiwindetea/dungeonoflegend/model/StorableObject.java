@@ -8,6 +8,8 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
+
 /**
  * StorableObject
  *
@@ -23,4 +25,11 @@ public interface StorableObject {
      * @see StorableObjectType
      */
     StorableObjectType getType();
+
+    /**
+     * Gets graphical type.
+     *
+     * @return the graphical type
+     */
+    StaticEntityType getGType();
 }

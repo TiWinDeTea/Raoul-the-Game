@@ -185,10 +185,9 @@ public class Pot implements Consumable {
 	}
 
 	/**
-	 * Gets graphical type.
-	 *
-	 * @return the graphical type
+	 * {@inheritDoc}
 	 */
+	@Override
 	public StaticEntityType getGType() {
 		return this.gtype;
 	}

@@ -89,11 +89,10 @@ public class Weapon implements StorableObject {
 	}
 
 	/**
-	 * Gets graphical type.
-	 *
-	 * @return the graphical type
+	 * {@inheritDoc}
 	 */
-	public StaticEntityType getGtype() {
+	@Override
+	public StaticEntityType getGType() {
 		return this.gtype;
 	}
 

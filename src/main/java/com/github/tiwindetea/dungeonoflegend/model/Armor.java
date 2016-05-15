@@ -106,12 +106,10 @@ public class Armor implements StorableObject {
 	}
 
 	/**
-	 * Gets the graphical type.
-	 *
-	 * @return the graphical type
-	 * @see StaticEntityType
+	 * {@inheritDoc}
 	 */
-	public StaticEntityType getGtype() {
+	@Override
+	public StaticEntityType getGType() {
 		return this.gtype;
 	}
 

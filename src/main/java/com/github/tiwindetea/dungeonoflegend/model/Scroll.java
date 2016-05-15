@@ -108,11 +108,10 @@ public class Scroll implements Consumable {
 	}
 
 	/**
-	 * Gets Graphical type.
-	 *
-	 * @return the graphical type
+	 * {@inheritDoc}
 	 */
-	public StaticEntityType getGtype() {
+	@Override
+	public StaticEntityType getGType() {
 		return this.gtype;
 	}
 
