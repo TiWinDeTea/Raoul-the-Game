@@ -20,6 +20,11 @@ public class Pair<T extends Object> {
     private long id;
     public T object;
 
+    public Pair() {
+        this.id = Pair.ERROR_VAL;
+        this.object = null;
+    }
+
     /**
      * Instantiates a new Pair with a unique id.
      *
@@ -42,6 +47,16 @@ public class Pair<T extends Object> {
     public Pair(long id, T object) {
         this.id = id;
         this.object = object;
+    }
+
+    /**
+     * Copy constructor
+     *
+     * @param pair pair to copy
+     */
+    public Pair(Pair<? extends T> pair) {
+        this.id = pair.id;
+        this.object = pair.object;
     }
 
     /**

@@ -73,7 +73,7 @@ public class Player extends LivingThing {
 		this.inventory = new ArrayList<>();
 		this.armors = new ArrayList<>(5);
 		for (int i = 0; i < 5; i++) {
-			this.armors.add(new Pair<>(null));
+			this.armors.add(new Pair<>());
 		}
 		this.weapon = null;
 		this.name = name;
@@ -101,7 +101,7 @@ public class Player extends LivingThing {
 		this.inventory = new ArrayList<>();
 		this.armors = new ArrayList<>(5);
 		for (int i = 0; i < 5; i++) {
-			this.armors.add(new Pair<>(null));
+			this.armors.add(new Pair<>());
 		}
 		this.requestedPath = new Stack<>();
 	}
@@ -347,7 +347,7 @@ public class Player extends LivingThing {
 			if (equipedArmor[i] == armor.object.getArmorType()) {
 				if (this.armors.get(i).object != null) {
 					removedArmor = this.armors.get(i);
-					addToInventory(new Pair<>(removedArmor.getId(), removedArmor.object));
+					addToInventory(new Pair<>(removedArmor));
 				}
 				this.armors.set(i, armor);
 				return removedArmor;
@@ -367,7 +367,7 @@ public class Player extends LivingThing {
 		Pair<Weapon> removedWeapon = this.weapon;
 		this.weapon = weapon;
 		if (removedWeapon != null) {
-			this.addToInventory(new Pair<>(removedWeapon.getId(), removedWeapon.object));
+			this.addToInventory(new Pair<>(removedWeapon));
 		}
 		return removedWeapon;
 	}
