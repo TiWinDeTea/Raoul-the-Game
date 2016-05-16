@@ -11,6 +11,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +24,7 @@ public class Mob extends LivingThing {
 	private static Map map;
 	private State state;
 	private Vector2i requestedPath;
+	private Stack<Vector2i> requestedPathStack = new Stack<>();
 	private int chaseRange;
 
 	/**
@@ -67,16 +69,25 @@ public class Mob extends LivingThing {
 	}
 
 	private void keepPatroling() {
-		Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.DOWN};
+		Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
 		int index;
+		/* Looking for a wall to follow */
 		for (index = 0; !Tile.isRoomBorder(map(this.position.copy().add(directions[index])))
 				&& index < directions.length; ++index)
 			;
 
-		Vector2i next = this.position.copy().add(directions[index]);
-		if (Tile.isRoomBorder(map(next))) {
+		/* If you are in a corner (twice for corridors)*/
+		int count = 0;
+		while (Tile.isRoomBorder(map(this.position.copy().add(directions[(index + 1) % directions.length]))) && count++ < 2) {
+			index = (index + 1) % directions.length;
+		}
+
+		/* Follow the wall, or try to find one */
+		Vector2i next = this.position.copy().add(directions[(index + 1) % 5]);
+		if (!Tile.isObstructed(map(next))) {
 			this.requestedPath = next;
 		} else {
+			/* Look for the a non-obstructed tile, ignoring living entities */
 			for (index = 0; Tile.isObstructed(map(this.position.copy().add(directions[index]))) && index < directions.length; ++index)
 				;
 			next = this.position.copy().add(directions[index]);
@@ -89,7 +100,7 @@ public class Mob extends LivingThing {
 	}
 
 	private void chase(Collection<LivingThing> collisionsEntities, Player player) {
-		this.requestedPath = map.getPath(this.position, player.getPosition(), false, collisionsEntities).peek();
+		this.requestedPathStack = map.getPath(this.position, player.getPosition(), false, collisionsEntities);
 	}
 
 	private void wander() {
@@ -120,7 +131,7 @@ public class Mob extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players) {
+	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los) {
 		int distance = this.chaseRange + 1;
 		Collection<LivingThing> shadow = new ArrayList<>();
 		Player chasedPlayer = null;
@@ -128,17 +139,22 @@ public class Mob extends LivingThing {
 
 
 		for (Pair<Player> player : players) {
-			int dist = map.getPath(this.position, player.object.getPosition(), false, shadow).size();
-			if (distance > dist) {
-				chasedPlayer = player.object;
-				distance = dist;
+			Vector2i pos = player.object.getPosition();
+			int dist = map.getPath(this.position, pos, false, shadow).size();
+			// if the player is in our LOS
+			if (los[this.position.x + los.length - pos.x][this.position.y + los[0].length - pos.y]) {
+				if (distance > dist) {
+					chasedPlayer = player.object;
+					distance = dist;
+				}
 			}
 		}
 		if (distance <= this.chaseRange) {
 			this.chase(shadow, chasedPlayer);
 			this.state = State.CHASING;
-		} else {
+		} else if (this.requestedPathStack.isEmpty()) {
 
+			/* Let's do something at random, if I can't chase anyone */
 			switch (this.state) {
 				case PATROLING:
 					this.keepPatroling();
@@ -197,6 +213,9 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public Vector2i getRequestedMove() {
+		if (this.requestedPathStack.size() > 0) {
+			return this.requestedPathStack.pop();
+		}
 		return this.requestedPath;
 	}
 
@@ -211,5 +230,9 @@ public class Mob extends LivingThing {
 	@Override
 	public LivingThingType getType() {
 		return LivingThingType.MOB;
+	}
+
+	public int getChaseRange() {
+		return this.chaseRange;
 	}
 }
