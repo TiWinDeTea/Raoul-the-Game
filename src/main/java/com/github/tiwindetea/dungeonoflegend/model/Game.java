@@ -212,6 +212,7 @@ public class Game implements RequestListener {
 	}
 
 	private void loadMobs() {
+		/* Loads the mobs stats from the .properties */
 		ResourceBundle mobs = ResourceBundle.getBundle(MainPackage.name + ".Mobs");
 		int mobQtt = Integer.parseInt(mobs.getString("mobs.qtt"));
 		this.mobsTypes = new LivingEntityType[mobQtt];
@@ -236,6 +237,7 @@ public class Game implements RequestListener {
 	}
 
 	private void loadChests() {
+		/* Loads the possible chests from the .properties */
 		ResourceBundle loots = ResourceBundle.getBundle(MainPackage.name + ".Chests");
 		int armorQtt = Integer.parseInt(loots.getString("armors.qtt"));
 		this.lootsArmorType = new ArmorType[armorQtt];
@@ -307,6 +309,7 @@ public class Game implements RequestListener {
 	}
 
 	private void loadTraps() {
+		/* Loads the possible traps from the .properties */
 		ResourceBundle traps = ResourceBundle.getBundle(MainPackage.name + ".Traps", Locale.getDefault());
 		int trapsQtt = Integer.parseInt(traps.getString("traps.qtt"));
 		this.trapsBaseHP = new int[trapsQtt];
@@ -432,6 +435,7 @@ public class Game implements RequestListener {
 	@Override
 	public void requestDrop(DropRequestEvent e) {
 		logger.entering(MainPackage.name + ".model.Game", "requestDrop", e);
+		/* Take the shortest path possible to drop the item */
 		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
 			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
 			Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
@@ -463,9 +467,13 @@ public class Game implements RequestListener {
 		Tile tile = this.world.getTile(e.tilePosition);
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
+
 		if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+		/* interaction with doors */
 			this.currentPlayer.setRequestedInteraction(e.tilePosition);
 		} else if (distance <= this.currentPlayer.getLos()) {
+
+		/* Looking for a mob to attack*/
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
 			if (los[p.x + los.length - e.tilePosition.x][p.y + los[0].length - e.tilePosition.y]) {
@@ -486,18 +494,22 @@ public class Game implements RequestListener {
 					}
 					this.currentPlayer.setRequestedAttack(e.tilePosition);
 				} else {
-					success = false;
+					success = false; // no mob found
 				}
 			} else {
-				success = false;
+				success = false; // tile not in the los
 			}
 		} else {
-			success = false;
+			success = false; // tile too far away
 		}
+
+		/* If you weren't able to do anything, just go to the tile */
 		if (!success && path != null) {
 			this.currentPlayer.setRequestedPath(path);
 			success = true;
 		}
+
+		/* If you did something, keep going */
 		if (success) {
 			nextTick();
 		}
@@ -591,7 +603,7 @@ public class Game implements RequestListener {
 			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), null));
 		}
 
-		/* Generate chests */
+		/* Generate some chests */
 		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL) + MIN_CHEST_QTT_PER_LEVEL;
 		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL) + MIN_TRAPS_QTT_PER_LEVEL;
 		int selection, chestLevel;
@@ -730,11 +742,13 @@ public class Game implements RequestListener {
 		Player player;
 		Vector2i pos;
 
+		/* Letting the players to play */
 		for (int i = 0; i < this.players.size(); i++) {
 			player = this.players.get(i).object;
-			player.live(this.mobs, this.players);
+			player.live(this.mobs, this.players, this.world.getLOS(player.getPosition(), player.getLos()));
 			Pair<StorableObject> drop;
 			if ((pos = player.getRequestedMove()) != null) {
+				/*See if the player can move as he wanted to */
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
 				if (distance <= 1 && isAccessible(pos)) {
 					// TODO : los
@@ -751,6 +765,7 @@ public class Game implements RequestListener {
 					player.moveRequestDenied();
 				}
 			} else if ((pos = player.getRequestedAttack()) != null) {
+				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
 				if (Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y) <= player.getAttackRange()) {
 					int j = this.mobs.indexOf(new Mob(pos));
 					if (j >= 0) {
@@ -762,6 +777,7 @@ public class Game implements RequestListener {
 				}
 				player.setRequestedAttack(null);
 			} else if ((pos = player.getRequestedInteraction()) != null) {
+				/* Make the player to interact with the map */
 				this.world.triggerTile(pos);
 				fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
 			} else if ((drop = player.getObjectToDrop()) != null) {
@@ -783,10 +799,11 @@ public class Game implements RequestListener {
 
 		Mob mob;
 		ArrayList<Integer> toDelete = new ArrayList<>(3);
+		/* Letting the mobs to play */
 		for (int i = 0; i < this.mobs.size(); i++) {
 			mob = this.mobs.get(i).object;
 			if (mob.isAlive()) {
-				mob.live(this.mobs, this.players);
+				mob.live(this.mobs, this.players, this.world.getLOS(mob.getPosition(), mob.getChaseRange()));
 				if ((pos = mob.getRequestedMove()) != null) {
 					int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
 					if (distance <= 1 && isAccessible(pos)) {
@@ -809,7 +826,7 @@ public class Game implements RequestListener {
 					}
 				}
 			} else {
-				toDelete.add(new Integer(i));
+				toDelete.add(new Integer(i)); // Woops, you're dead
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.mobs.get(i).getId()));
 			}
 		}
@@ -818,6 +835,7 @@ public class Game implements RequestListener {
 		}
 
 		toDelete.clear();
+		/* Scanning for dead players */
 		for (int i = 0; i < this.players.size(); i++) {
 			if (!this.players.get(i).object.isAlive()) {
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.players.get(i).getId()));
@@ -831,9 +849,10 @@ public class Game implements RequestListener {
 		}
 
 		toDelete.clear();
+		/* Letting consumable do their effects */
 		for (int i = 0; i < this.triggeredObjects.size(); i++) {
 			if (this.triggeredObjects.get(i).nextTick()) {
-				toDelete.add(new Integer(i));
+				toDelete.add(new Integer(i)); // Your effect is finished
 			}
 		}
 		for (Integer integer : toDelete) {
@@ -841,6 +860,7 @@ public class Game implements RequestListener {
 		}
 
 		boolean nextLevel = true;
+		/* Scanning for loots to give to players, and next levels */
 		for (Pair<Player> playerPair : this.players) {
 			player = playerPair.object;
 			pos = player.getPosition();
@@ -866,7 +886,7 @@ public class Game implements RequestListener {
 
 		if (nextLevel) {
 			++this.level;
-			this.generateLevel();
+			this.generateLevel(); // Hot dog !
 		}
 	}
 

@@ -73,6 +73,8 @@ public class Pot implements Consumable {
 		if (str.equals("pot={null}")) {
 			return null;
 		}
+
+		/* Computing values' indexes */
 		int SEType = str.indexOf("SEType=") + 7;
 		int turns = str.indexOf("turns=", SEType) + 6;
 		int heal = str.indexOf("heal=", turns) + 5;
@@ -82,6 +84,7 @@ public class Pot implements Consumable {
 		int healthMod = str.indexOf("healthMod=", mana) + 10;
 		int manaMod = str.indexOf("manaMod=", healthMod) + 8;
 
+		/* Parsing values */
 		Pot pot = new Pot();
 		pot.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
 		pot.turns = Integer.parseInt(str.substring(turns, str.indexOf(',', turns)));
@@ -133,6 +136,8 @@ public class Pot implements Consumable {
 	 * {@inheritDoc}
 	 */
 	public boolean nextTick() {
+		if (!this.target.isAlive())
+			return true;
 		if (this.turns != 0) {
 			--this.turns;
 			this.healTarget();

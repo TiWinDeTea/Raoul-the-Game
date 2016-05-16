@@ -30,7 +30,7 @@ import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
  * @author Lucas LAZARE
  */
 public class Map {
-
+    
     /*
      * Tuning parameters for the map generation
      */
@@ -200,7 +200,8 @@ public class Map {
         int i_end = Math.min(position.x + visionRange + 1, this.map.length);
         int j_end = Math.min(position.y + visionRange + 1, this.map[0].length);
 
-        /* Cast rays from the watcher position to all tiles within its vision radius that also exist in the map*/
+        /* Cast rays from the watcher position to all tiles within its vision radius that also exist in the map */
+        /* nb : as LOS is an array, it is in a heap so it is initialised to false */
         for (int i = Math.max(position.x - visionRange, 0); i < i_end; ++i) {
             for (int j = Math.max(position.y - visionRange, 0); j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
@@ -208,7 +209,6 @@ public class Map {
                 }
             }
         }
-
         return LOS;
     }
 
@@ -712,6 +712,7 @@ public class Map {
             Map.this.map[this.bottom.x + 1][this.top.y - 1] = Tile.WALL_DOWNLEFT;
             Map.this.map[this.bottom.x + 1][this.bottom.y + 1] = Tile.WALL_TOPLEFT;
 
+            // If it's not a corridor, try to add some holes or some pillars
             int minimum = Math.min(this.bottom.x - this.top.x, this.bottom.y - this.top.y);
             if (minimum > 2) {
                 if (HOLE_CHANCE > Map.this.random.nextInt(PROBABILITY_UNIT)) {
@@ -786,12 +787,6 @@ public class Map {
                     ", bottom=" + this.bottom +
                     '}';
         }
-    }
-
-    public Stack<Vector2i> getPathPair(Vector2i departure, Vector2i arrival, boolean ignoreDoor, Collection<Pair<LivingThing>> entities) {
-        Collection<LivingThing> shadow = new ArrayList<>(entities.size());
-        shadow.addAll(entities.stream().map(entity -> entity.object).collect(Collectors.toList()));
-        return getPath(departure, arrival, ignoreDoor, shadow);
     }
 
     /**

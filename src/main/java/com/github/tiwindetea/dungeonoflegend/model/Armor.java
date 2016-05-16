@@ -36,6 +36,8 @@ public class Armor implements StorableObject {
 		this.attackPowerModifier = attackPowerModifier;
 		this.type = type;
 		Random random = new Random();
+
+		/* Setting Graphical Type */
 		if (random.nextBoolean()) {
 			switch (type) {
 				case BREAST_PLATE:
@@ -92,11 +94,14 @@ public class Armor implements StorableObject {
 		if (str.equals("armor={null}")) {
 			return null;
 		}
+
+		/* Computing values' indexes */
 		int SEType = str.indexOf("SEType=") + 7;
 		int type = str.indexOf("type=", SEType) + 5;
 		int def = str.indexOf("defense=", type) + 8;
 		int attack = str.indexOf("attack=", def) + 7;
 
+		/* Parsing values */
 		Armor armor = new Armor();
 		armor.defensePowerModifier = Integer.parseInt(str.substring(def, str.indexOf(',', def)));
 		armor.attackPowerModifier = Integer.parseInt(str.substring(attack, str.indexOf(',', attack)));

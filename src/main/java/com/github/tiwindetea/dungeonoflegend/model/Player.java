@@ -31,12 +31,12 @@ import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.PANTS;
  */
 public class Player extends LivingThing {
 	private List<Pair<StorableObject>> inventory;
-	private static ArmorType[] equipedArmor = {HELMET, BREAST_PLATE, GLOVES, PANTS, BOOTS};
+	private static ArmorType[] equipedArmor = {HELMET, BREAST_PLATE, GLOVES, PANTS, BOOTS}; // Order of the armors in the player's amors' array
 	private int maxStorageCapacity;
 	private int maxMana;
 	private int mana;
-	private List<Pair<Armor>> armors;
-	private Pair<Weapon> weapon;
+	private List<Pair<Armor>> armors; // armor of the player (equiped)
+	private Pair<Weapon> weapon; // equiped armor
 	private String name;
 	private int hitPointsPerLevel;
 	private int manaPerLevel;
@@ -541,6 +541,7 @@ public class Player extends LivingThing {
 			throw new IllegalArgumentException("Invoking Player.parsePlayer with input string: \"" + str + "\"");
 		}
 
+		/* Computing stats values' indexes */
 		int name = str.indexOf("name=") + 5;
 		int nbr = str.indexOf("nbr=", name) + 4;
 		int los = str.indexOf("los=", nbr) + 4;
@@ -560,8 +561,8 @@ public class Player extends LivingThing {
 		int appl = str.indexOf("attackPowerPerLevel=", dp) + 20;
 		int adpl = str.indexOf("defensePowerPerLevel=", appl) + 21;
 
+		/* Parsing the stats values */
 		Player p = new Player();
-
 		p.name = str.substring(name, str.indexOf(',', name));
 		p.number = Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
 		p.los = Integer.parseInt(str.substring(los, str.indexOf(',', los)));
@@ -581,6 +582,7 @@ public class Player extends LivingThing {
 		p.attackPowerPerLevel = Integer.parseInt(str.substring(appl, str.indexOf(',', appl)));
 		p.defensePowerPerLevel = Integer.parseInt(str.substring(adpl, str.indexOf(',', adpl)));
 
+		/* parsing the equipement */
 		String weapon = str.substring(str.indexOf("weapon={"));
 		weapon = weapon.substring(0, weapon.indexOf('}') + 1);
 		p.weapon = new Pair<>(Weapon.parseWeapon(weapon));
@@ -600,6 +602,7 @@ public class Player extends LivingThing {
 			p.armors.set(i, new Pair<>(Armor.parseArmor(armor)));
 		}
 
+		/* Parsing for the inventory */
 		str = "," + str.substring(str.indexOf("inventory={") + 11);
 		String item;
 		while (!str.equals(",},}")) {
@@ -676,7 +679,15 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players) {
+	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los) {
+		for (Pair<Mob> mob : mobs) {
+			Vector2i pos = mob.object.getPosition();
+			if (los[this.position.x + los.length - pos.x][this.position.y + los[0].length - pos.y]) {
+				Vector2i tmp = this.requestedPath.peek();
+				this.requestedPath.clear();
+				this.requestedPath.add(tmp);
+			}
+		}
 	}
 
 	/**

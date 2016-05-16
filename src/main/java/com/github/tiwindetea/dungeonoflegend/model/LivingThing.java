@@ -127,9 +127,9 @@ public abstract class LivingThing {
 	 *
 	 * @param mobs Mobs around this
 	 * @param players Players around this
-	 *
+	 * @param los LOS of this
 	 */
-	public abstract void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players);
+	public abstract void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los);
 
 	/**
 	 * Gets the requested move.

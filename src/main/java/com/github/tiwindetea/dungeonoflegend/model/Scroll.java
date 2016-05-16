@@ -61,11 +61,14 @@ public class Scroll implements Consumable {
 		if (str.equals("scroll={null}")) {
 			return null;
 		}
+
+		/* Computing values' indexes */
 		int SEType = str.indexOf("SEType=") + 7;
 		int turns = str.indexOf("turns=", SEType) + 6;
 		int hmpt = str.indexOf("healthMod=", turns) + 10;
 		int hmmpt = str.indexOf("healthModMod=", hmpt) + 13;
 
+		/* Parsing values */
 		Scroll scroll = new Scroll();
 		scroll.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(",", SEType)));
 		scroll.turns = Integer.parseInt(str.substring(turns, str.indexOf(",", turns)));
@@ -86,10 +89,15 @@ public class Scroll implements Consumable {
 	 * {@inheritDoc}
 	 */
 	public boolean nextTick() {
-		--this.turns;
-		this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
-		this.target.damage(this.healthModifierPerTick);
-		return this.turns < 0;
+		if (!this.target.isAlive())
+			return true;
+		if (this.turns != 0) {
+			--this.turns;
+			this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
+			this.target.damage(this.healthModifierPerTick);
+			return this.turns < 0;
+		}
+		return true;
 	}
 
 	/**

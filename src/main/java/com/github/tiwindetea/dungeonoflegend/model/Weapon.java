@@ -38,6 +38,8 @@ public class Weapon implements StorableObject {
 		this.range = range;
 		this.manaCost = manaCost;
 		Random random = new Random();
+
+		/* Setting the type and the graphical type */
 		if (manaCost != 0) {
 			this.type = WeaponType.WAND;
 			if (random.nextBoolean())
@@ -70,15 +72,20 @@ public class Weapon implements StorableObject {
 	 * @return the weapon
 	 */
 	public static Weapon parseWeapon(String str) {
+		if (!str.substring(0, 7).equals("weapon=")) {
+			throw new IllegalArgumentException("Invoking Weapon.parseWeapon with input string: \"" + str + "\"");
+		}
 		if (str.equals("weapon={null}")) {
 			return null;
 		}
+		/* Computing values' indexes */
 		int SEType = str.indexOf("SEType=") + 7;
 		int type = str.indexOf("type=", SEType) + 5;
 		int attack = str.indexOf("attack=", type) + 7;
 		int range = str.indexOf("range=", attack) + 6;
 		int mana = str.indexOf("mana=", range) + 5;
 
+		/* Parsing values */
 		Weapon weapon = new Weapon();
 		weapon.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
 		weapon.type = WeaponType.parseWeaponType(str.substring(type, str.indexOf(',', type)));
