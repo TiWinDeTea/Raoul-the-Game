@@ -5,5 +5,5 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.inv
 /**
  * Created by maxime on 5/6/16.
  */
-public interface PlayerListener extends PlayerCreationListener, PlayerStatListener, InventoryListener {
+public interface PlayerListener extends PlayerCreationListener, PlayerStatListener, InventoryListener, PlayerNewTurnListener {
 }

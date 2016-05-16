@@ -8,6 +8,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
@@ -23,6 +24,7 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
+import com.github.tiwindetea.dungeonoflegend.model.InteractiveObject;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
@@ -273,6 +275,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
+		List<InteractiveObject> caca = new ArrayList<>();
 		this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
 		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
@@ -421,5 +424,10 @@ public class GUI implements GameListener, TileMapListener {
 	@Override
 	public void modifieTile(TileModificationEvent e) {
 		//TODO
+	}
+
+	@Override
+	public void playerNextTick(PlayerNextTickEvent event) {
+		// TODO
 	}
 }
