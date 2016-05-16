@@ -10,7 +10,7 @@ A machiavellian wizard and his devious ducks let the lights of the dungeon switc
 
 You may play alone or with a friend, which will play "Marie-Loue la roue", with different characteristics !
 
-The goal is to get the highest score you can. Both killing ducks and switching off bulbs give you points. The games autosaves each time you go downstairs.
+The goal is to get the highest score you can. Both killing ducks and switching off bulbs give you points. The game autosaves each time you go downstairs.
 
 
 <br/>
@@ -24,15 +24,15 @@ The goal is to get the highest score you can. Both killing ducks and switching o
 
 Credits to the [UTBM](https://utbm.fr) :
 
-    Raoul l'ampoule est une création de l'UTBM dans 
-    le cadre de la démarche ISO 14001 d'université éco-responsable
+    Raoul l'ampoule ou Marie-Loue la roue sont une création de l'UTBM
+    dans le cadre de la démarche ISO 14001 d'université éco-responsable
     
 <br/>
 (en)
 
     "Raoul l'ampoule" or "Marie-Loue la roue" are the creation of
-    the UTBM in the framework of the approach
-    ISO 14001 of the environmentally responsible university
+    the UTBM in the framework of the approach ISO 14001 of the
+    environmentally responsible university
 
 <br/>
 <br/>
