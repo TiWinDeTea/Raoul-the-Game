@@ -11,7 +11,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
-import java.util.Stack;
+import java.util.stream.Collectors;
 
 /**
  * Mob.
@@ -88,30 +88,8 @@ public class Mob extends LivingThing {
 		}
 	}
 
-	private boolean chase(Collection<Pair<LivingThing>> collisionsEntities, Collection<Pair<Player>> players) {
-		double minDistance = Double.POSITIVE_INFINITY;
-		double distance;
-		Vector2i target = null;
-		Player player;
-		for (Pair<Player> playerPair : players) {
-			player = playerPair.object;
-			distance = this.position.distance(player.getPosition());
-			if (distance <= this.chaseRange && distance <= minDistance) {
-				minDistance = distance;
-				target = player.getPosition();
-			}
-		}
-
-		if (target != null) {
-			Stack<Vector2i> tmp = map.getPathPair(this.position, target, false, collisionsEntities);
-			if (tmp == null) {
-				this.requestedPath = null;
-				return false;
-			}
-			this.requestedPath = tmp.peek();
-			return true;
-		}
-		return false;
+	private void chase(Collection<LivingThing> collisionsEntities, Player player) {
+		this.requestedPath = map.getPath(this.position, player.getPosition(), false, collisionsEntities).peek();
 	}
 
 	private void wander() {
@@ -143,18 +121,21 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players) {
+		int distance = this.chaseRange + 1;
+		Collection<LivingThing> shadow = new ArrayList<>();
+		Player chasedPlayer = null;
+		shadow.addAll(mobs.stream().map(mob -> mob.object).collect(Collectors.toList()));
 
-		//TODO : check all that
-		double distance = Double.POSITIVE_INFINITY;
+
 		for (Pair<Player> player : players) {
-			distance = Math.min(distance, this.position.distance(player.object.getPosition()));
-		}
-		if (distance < this.chaseRange) {
-			Collection<Pair<LivingThing>> shadow = new ArrayList<>();
-			for (Pair<Mob> mob : mobs) {
-				shadow.add(new Pair<>(mob));
+			int dist = map.getPath(this.position, player.object.getPosition(), false, shadow).size();
+			if (distance > dist) {
+				chasedPlayer = player.object;
+				distance = dist;
 			}
-			this.chase(shadow, players);
+		}
+		if (distance <= this.chaseRange) {
+			this.chase(shadow, chasedPlayer);
 			this.state = State.CHASING;
 		} else {
 
