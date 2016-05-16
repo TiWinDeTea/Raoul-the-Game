@@ -16,7 +16,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
@@ -57,13 +57,13 @@ import java.util.stream.Collectors;
 public class Game implements RequestListener {
 
 	/* Tunning parameters for the entities generation */
-	public static final int MIN_MOB_QTT_PER_LEVEL = 15;
-	public static final int MAX_MOB_QTT_PER_LEVEL = 20;
-	public static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
-	public static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
-	public static final int MIN_CHEST_QTT_PER_LEVEL = 1;
-	public static final int MAX_CHEST_QTT_PER_LEVEL = 5;
-
+	private static final int MIN_MOB_QTT_PER_LEVEL = 15;
+	private static final int MAX_MOB_QTT_PER_LEVEL = 20;
+	private static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
+	private static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
+	private static final int MIN_CHEST_QTT_PER_LEVEL = 1;
+	private static final int MAX_CHEST_QTT_PER_LEVEL = 5;
+	private static final int BULB_LOS = 1;
 
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
 	private int level;
@@ -84,7 +84,7 @@ public class Game implements RequestListener {
 	/**
 	 * The Game name.
 	 */
-	String gameName;
+	private String gameName;
 
 
 	/* Level generation variables. Charged at the creation of a game */
@@ -390,11 +390,11 @@ public class Game implements RequestListener {
 		}
 	}
 
-	private void firePlayerStatEvent(PlayerStatEvent event) {
+	/*private void firePlayerStatEvent(PlayerStatEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
 			listener.changePlayerStat(event);
 		}
-	}
+	}*/
 
 	private void fireStaticEntityCreationEvent(StaticEntityCreationEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
@@ -408,7 +408,6 @@ public class Game implements RequestListener {
 		}
 	}
 
-	// TODO : Fire those events
 	private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
 			listener.defineStaticEntityLOS(event);
@@ -418,6 +417,12 @@ public class Game implements RequestListener {
 	private void fireTileModificationEvent(TileModificationEvent event) {
 		for (GameListener listener : getGameListeners()) {
 			listener.modifieTile(event);
+		}
+	}
+
+	private void fireNextTickEvent(PlayerNextTickEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.playerNextTick(event);
 		}
 	}
 
@@ -442,7 +447,7 @@ public class Game implements RequestListener {
 				}
 				this.currentPlayer.setRequestedPath(theChoosenOne);
 				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
-				this.nextTurn();
+				this.nextTick();
 			}
 		}
 	}
@@ -464,7 +469,14 @@ public class Game implements RequestListener {
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
 			if (los[p.x + los.length - e.tilePosition.x][p.y + los[0].length - e.tilePosition.y]) {
-				int i = this.mobs.indexOf(new Mob(e.tilePosition));
+				int i = -1;
+				int j = 0;
+				do {
+					if (this.mobs.get(i).object.getPosition().equals(e.tilePosition)) {
+						i = j;
+					}
+					++j;
+				} while (i == -1 && j < this.mobs.size());
 				if (i >= 0) {
 					if (this.objectToUse != null) {
 						this.objectToUse.object.trigger(this.mobs.get(i).object);
@@ -487,7 +499,7 @@ public class Game implements RequestListener {
 			success = true;
 		}
 		if (success) {
-			nextTurn();
+			nextTick();
 		}
 	}
 
@@ -529,7 +541,7 @@ public class Game implements RequestListener {
 	private void generateLevel() {
 		/* Next block deletes all entities on the GUI */
 		for (Pair<Mob> mob : this.mobs) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(mob.getId()));
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
 		}
 		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
@@ -537,16 +549,25 @@ public class Game implements RequestListener {
 		for (Pair<Vector2i> bulb : this.bulbs) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
+		for (Pair<Player> player : this.players) {
+			//TODO : what should I put here ?
+			//fireLivingEntityLOSModificationEvent(new LivingEntityLOSModificationEvent());
+		}
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
+
 		this.bulbs.clear();
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
 			this.bulbs.add(p);
-			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, p.object));
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb));
+			fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(
+					p.getId(),
+					this.world.getLOS(bulb, BULB_LOS)
+			));
 		}
 
 		/* Generate the mobs */
@@ -654,6 +675,7 @@ public class Game implements RequestListener {
 					player.object.getPosition(),
 					Direction.DOWN
 			));
+			// TODO : LOS ??
 		}
 	}
 
@@ -677,9 +699,9 @@ public class Game implements RequestListener {
 	}
 
 	/**
-	 * Step into the next turn (next player)
+	 * Step into the next tick (next player)
 	 */
-	private void nextTurn() {
+	private void nextTick() {
 		this.objectToUse = null;
 
 		while (++this.playerTurn < this.players.size()
@@ -688,23 +710,22 @@ public class Game implements RequestListener {
 		if (this.playerTurn >= this.players.size()) {
 			this.playerTurn = 0;
 			this.currentPlayer = this.players.get(0).object;
-			this.nextTick();
+			this.nextTurn();
 			if (this.currentPlayer.getFloor() != this.level) {
 
 			}
 		}
 
 		if (this.currentPlayer.isARequestPending()) {
-			this.nextTurn();
+			this.nextTick();
 		}
-		//TODO
-		//fireNextTurnEvent(new event)
+		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
 	}
 
 	/**
-	 * Step into the next tick (all entities live)
+	 * Step into the next turn (all entities live)
 	 */
-	private void nextTick() {
+	private void nextTurn() {
 		logger.log(Level.INFO, "Starting players lives");
 		Player player;
 		Vector2i pos;
@@ -716,9 +737,11 @@ public class Game implements RequestListener {
 			if ((pos = player.getRequestedMove()) != null) {
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
 				if (distance <= 1 && isAccessible(pos)) {
+					// TODO : los
 					player.setPosition(pos);
 					fireLivingEntityMoveEvent(new LivingEntityMoveEvent(this.players.get(i).getId(), pos));
 				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
+					// TODO : los
 					player.setFloor(this.level + 1);
 					player.hasFallen = true;
 					player.damage(player.getMaxHitPoints() / 5);
@@ -740,6 +763,7 @@ public class Game implements RequestListener {
 				player.setRequestedAttack(null);
 			} else if ((pos = player.getRequestedInteraction()) != null) {
 				this.world.triggerTile(pos);
+				fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
 			} else if ((drop = player.getObjectToDrop()) != null) {
 				pos = player.getDropPos();
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
@@ -789,6 +813,9 @@ public class Game implements RequestListener {
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.mobs.get(i).getId()));
 			}
 		}
+		for (Integer integer : toDelete) {
+			this.mobs.remove(integer.intValue());
+		}
 
 		toDelete.clear();
 		for (int i = 0; i < this.players.size(); i++) {
@@ -799,11 +826,8 @@ public class Game implements RequestListener {
 		}
 
 		for (Integer integer : toDelete) {
+			// TODO : los
 			this.players.remove(integer.intValue());
-		}
-
-		for (Integer integer : toDelete) {
-			this.mobs.remove(integer.intValue());
 		}
 
 		toDelete.clear();
