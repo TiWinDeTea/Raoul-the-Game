@@ -82,6 +82,7 @@ public class Game implements RequestListener {
 	 * The Game name.
 	 */
 	private String gameName;
+	private static final Level debugLevel = Level.INFO; //debug
 
 
 	/* Level generation variables. Charged at the creation of a game */
@@ -93,6 +94,7 @@ public class Game implements RequestListener {
 	private int[] mobsDefPerLevel;
 	private int[] mobsAttackPerLevel;
 	private int[] mobsChaseRange;
+	private String[] mobsName;
 
 	private int[] trapsBaseHP;
 	private int[] trapsBaseMana;
@@ -162,6 +164,7 @@ public class Game implements RequestListener {
 					Integer.parseInt(playersBundle.getString(pString + "los")),
 					Integer.parseInt(playersBundle.getString(pString + "explorelos")),
 					1,
+					1,
 					Integer.parseInt(playersBundle.getString(pString + "maxStorageCapacity")),
 					Integer.parseInt(playersBundle.getString(pString + "baseHealth")),
 					Integer.parseInt(playersBundle.getString(pString + "baseMana")),
@@ -199,19 +202,26 @@ public class Game implements RequestListener {
 					Direction.DOWN,
 					player.getMaxHitPoints(),
 					player.getMaxMana(),
+					player.getDescription()
 			));
+		}
+
+		for (Player player : players) {
+			player.addToInventory(new Pair<>(new Pot(2, 15, 15, 0, 0, 0, 0)));
 		}
 		this.currentPlayer = this.players.get(0);
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
 		this.generateLevel();
+		fireNextTickEvent(new PlayerNextTickEvent(0));
 	}
 
 	private void loadMobs() {
 		/* Loads the mobs stats from the .properties */
 		ResourceBundle mobs = ResourceBundle.getBundle(MainPackage.name + ".Mobs");
 		int mobQtt = Integer.parseInt(mobs.getString("mobs.qtt"));
+		this.mobsName = new String[mobQtt];
 		this.mobsTypes = new LivingEntityType[mobQtt];
 		this.mobsBaseHP = new int[mobQtt];
 		this.mobsBaseDef = new int[mobQtt];
@@ -223,6 +233,7 @@ public class Game implements RequestListener {
 		for (int i = 0; i < mobQtt; i++) {
 			String mobName = "mob" + i + ".";
 			this.mobsTypes[i] = LivingEntityType.parseLivingEntity(mobs.getString(mobName + "type"));
+			this.mobsName[i] = mobs.getString(mobName + "name");
 			this.mobsBaseHP[i] = Integer.parseInt(mobs.getString(mobName + "base-hp"));
 			this.mobsBaseDef[i] = Integer.parseInt(mobs.getString(mobName + "base-def"));
 			this.mobsBaseAttack[i] = Integer.parseInt(mobs.getString(mobName + "base-attack"));
@@ -407,7 +418,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		logger.log(Level.INFO, "drop requested on player " + this.currentPlayer.getNumber());
+		logger.log(this.debugLevel, "drop requested on player " + this.currentPlayer.getNumber());
 		/* Take the shortest path possible to drop the item */
 		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
 			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
@@ -434,7 +445,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-		logger.log(Level.INFO, "interaction requested for player " + this.currentPlayer.getNumber());
+		logger.log(this.debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
 		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
 		boolean success = true;
 		Tile tile = this.world.getTile(e.tilePosition);
@@ -492,7 +503,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-		logger.log(Level.INFO, "Usage requested for player " + this.currentPlayer.getNumber());
+		logger.log(this.debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
 		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
 		this.objectToUse = null;
 		for (Pair<StorableObject> pair : inventory) {
@@ -512,10 +523,10 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
-		logger.log(Level.INFO, "Move requested for player " + this.currentPlayer.getNumber());
 		Stack<Vector2i> stack = new Stack<>();
 		stack.add(this.currentPlayer.getPosition().add(e.moveDirection));
 		this.currentPlayer.setRequestedPath(stack);
+		logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
 	}
 
 	/**
@@ -546,7 +557,7 @@ public class Game implements RequestListener {
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
 			this.bulbs.add(p);
-			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb));
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb, "A Lit bulb"));
 			fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(
 					p.getId(),
 					this.world.getLOS(bulb, BULB_LOS)
