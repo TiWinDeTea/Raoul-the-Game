@@ -332,15 +332,23 @@ public class TileMap extends Parent {
 		tilesPosition.forEach(this::drawRealTile);
 	}
 
+	public void setTile(Tile tileType, Vector2i tilePosition) {
+		if(tilePosition.x < this.realTileMap.length && tilePosition.y < this.realTileMap[0].length) {
+			this.realTileMap[tilePosition.x][tilePosition.y] = tileType;
+			drawImage(ViewPackage.objectsImage, tileType.getSpritePosition(tilePosition.x + tilePosition.y).x, tileType.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+		}
+	}
+
 	public void setTiles(Tile tileType, List<Vector2i> tilesPosition) {
 		for(Vector2i tilePosition : tilesPosition) {
-			drawImage(ViewPackage.objectsImage, tileType.getSpritePosition(tilePosition.x + tilePosition.y).x, tileType.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+			setTile(tileType, tilePosition);
 		}
 	}
 
 	public void setAllTiles(Tile tileType) {
 		for(int i = 0; i < this.realTileMap.length; i++) {
 			for(int j = 0; j < this.realTileMap[i].length; j++) {
+				this.realTileMap[i][j] = tileType;
 				addOnTile(ViewPackage.objectsImage, this.realTileMap[i][j].getSpritePosition(i + j), new Vector2i(i, j));
 			}
 		}

@@ -420,7 +420,7 @@ public class GUI implements GameListener, TileMapListener {
 
 	@Override
 	public void modifieTile(TileModificationEvent e) {
-		//TODO
+		this.cTileMap.setTile(e.tileType, e.tilePosition);
 	}
 
 	@Override
