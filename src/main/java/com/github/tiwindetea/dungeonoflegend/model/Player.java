@@ -55,7 +55,7 @@ public class Player extends LivingThing {
 	public boolean hasFallen = false;
 	private static final LivingEntityType[] ENUM_VAL = Arrays.copyOfRange(LivingEntityType.values(),
 			LivingEntityType.PLAYER1.ordinal(),
-			LivingEntityType.values().length - LivingEntityType.PLAYER1.ordinal()
+			LivingEntityType.values().length
 	);
 
 	/**
@@ -76,9 +76,9 @@ public class Player extends LivingThing {
 	 * @param attackPowerPerLevel  his attack power per level
 	 * @param defensePowerPerLevel his defense power per level
 	 */
-	public Player(String name, int number, int los, int exploreLOS, int level, int maxStorageCapacity, int baseHealth,
-				  int baseMana, int baseAttack, int baseDef, int healthPerLevel, int manaPerLevel,
-				  int attackPowerPerLevel, int defensePowerPerLevel) {
+	public Player(String name, int number, int los, int exploreLOS, int level, int floor,
+				  int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef,
+				  int healthPerLevel, int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
 		super();
 		this.number = number;
 		this.inventory = new ArrayList<>();
@@ -100,7 +100,7 @@ public class Player extends LivingThing {
 		this.manaPerLevel = manaPerLevel;
 		this.attackPowerPerLevel = attackPowerPerLevel;
 		this.defensePowerPerLevel = defensePowerPerLevel;
-		this.floor = 0;
+		this.floor = floor;
 		this.xp = 0;
 		this.los = los;
 		this.exploreLOS = exploreLOS;
@@ -157,7 +157,11 @@ public class Player extends LivingThing {
 	 * @param requestedPath the requested path
 	 */
 	public void setRequestedPath(Stack<Vector2i> requestedPath) {
-		this.requestedPath = requestedPath;
+		if (requestedPath == null) {
+			requestedPath.clear();
+		} else {
+			this.requestedPath = requestedPath;
+		}
 	}
 
 	/**
@@ -273,7 +277,11 @@ public class Player extends LivingThing {
 	 * @param requestedAttack the requested attack
 	 */
 	public void setRequestedAttack(Vector2i requestedAttack) {
-		this.requestedAttack = requestedAttack.copy();
+		if (requestedAttack == null) {
+			this.requestedAttack = null;
+		} else {
+			this.requestedAttack = requestedAttack.copy();
+		}
 	}
 
 	/**
@@ -318,6 +326,9 @@ public class Player extends LivingThing {
 	 * @return the requested interaction
 	 */
 	public Vector2i getRequestedInteraction() {
+		if (this.requestedInteraction == null) {
+			return null;
+		}
 		return this.requestedInteraction.copy();
 	}
 
@@ -381,34 +392,6 @@ public class Player extends LivingThing {
 
 	public Vector2i getDropPos(){
 		return this.dropPos.copy();
-	}
-
-	/**
-	 * Remove an item from the inventory.
-	 *
-	 * @param index the index of the object in the inventory
-	 * @return the removed object
-	 */
-	public Pair<StorableObject> removeFromInventory(int index) {
-		Pair<StorableObject> obj = this.inventory.get(index);
-		this.inventory.remove(index);
-		return obj;
-	}
-
-	/**
-	 * Remove an item from the inventory.
-	 *
-	 * @param id the id of the object in the inventory
-	 * @return the removed object
-	 */
-	public StorableObject removeFromInventory(long id) {
-		int i = this.inventory.indexOf(new Pair<StorableObject>(id));
-		if (i < 0) {
-			return null;
-		}
-		StorableObject obj = this.inventory.get(i).object;
-		this.inventory.remove(i);
-		return obj;
 	}
 
 	/**
@@ -679,13 +662,18 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los) {
-		for (Pair<Mob> mob : mobs) {
-			Vector2i pos = mob.object.getPosition();
-			if (los[this.position.x + los.length - pos.x][this.position.y + los[0].length - pos.y]) {
-				Vector2i tmp = this.requestedPath.peek();
-				this.requestedPath.clear();
-				this.requestedPath.add(tmp);
+	public void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los) {
+		for (Mob mob : mobs) {
+			Vector2i pos = mob.getPosition();
+			int distance = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
+			if (distance <= this.los) {
+				if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
+					if (this.requestedPath.size() > 0) {
+						Vector2i tmp = this.requestedPath.peek();
+						this.requestedPath.clear();
+						this.requestedPath.add(tmp);
+					}
+				}
 			}
 		}
 	}

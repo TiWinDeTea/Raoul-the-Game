@@ -67,8 +67,7 @@ public class InteractiveObject implements Descriptable {
                 ((Player) livingThing).useMana(this.manaModifier);
             return true;
         } else if (livingThing.getType() == LivingThingType.PLAYER) {
-            //((Player) livingThing).addToInventory(this.loot);
-            return true;
+            return ((Player) livingThing).addToInventory(new Pair<>(this.loot));
         } else {
             return false;
         }

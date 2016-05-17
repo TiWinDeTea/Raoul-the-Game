@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * Mob.
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class Mob extends LivingThing {
 	// Mobs know the map perfectly.
 	private static Map map;
-	private State state;
+	private State state = State.SLEEPING;
 	private Vector2i requestedPath;
 	private Stack<Vector2i> requestedPathStack = new Stack<>();
 	private int chaseRange;
@@ -72,8 +71,8 @@ public class Mob extends LivingThing {
 		Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
 		int index;
 		/* Looking for a wall to follow */
-		for (index = 0; !Tile.isRoomBorder(map(this.position.copy().add(directions[index])))
-				&& index < directions.length; ++index)
+		for (index = 0; index < directions.length &&
+				!Tile.isRoomBorder(map(this.position.copy().add(directions[index]))); ++index)
 			;
 
 		/* If you are in a corner (twice for corridors)*/
@@ -83,7 +82,7 @@ public class Mob extends LivingThing {
 		}
 
 		/* Follow the wall, or try to find one */
-		Vector2i next = this.position.copy().add(directions[(index + 1) % 5]);
+		Vector2i next = this.position.copy().add(directions[(index + 1) % 4]);
 		if (!Tile.isObstructed(map(next))) {
 			this.requestedPath = next;
 		} else {
@@ -131,21 +130,24 @@ public class Mob extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los) {
+	public void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los) {
 		int distance = this.chaseRange + 1;
 		Collection<LivingThing> shadow = new ArrayList<>();
 		Player chasedPlayer = null;
-		shadow.addAll(mobs.stream().map(mob -> mob.object).collect(Collectors.toList()));
+		shadow.addAll(mobs);
 
 
-		for (Pair<Player> player : players) {
-			Vector2i pos = player.object.getPosition();
-			int dist = map.getPath(this.position, pos, false, shadow).size();
+		for (Player player : players) {
+			Vector2i pos = player.getPosition();
 			// if the player is in our LOS
-			if (los[this.position.x + los.length - pos.x][this.position.y + los[0].length - pos.y]) {
-				if (distance > dist) {
-					chasedPlayer = player.object;
-					distance = dist;
+			int distanceToPlayer = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
+			if (distanceToPlayer < los.length / 2) {
+				if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
+					int dist = this.distanceTo(pos, shadow);
+					if (distance > dist) {
+						chasedPlayer = player;
+						distance = dist;
+					}
 				}
 			}
 		}
@@ -235,6 +237,12 @@ public class Mob extends LivingThing {
 	public int getChaseRange() {
 		return this.chaseRange;
 	}
+
+	private int distanceTo(Vector2i pos, Collection<LivingThing> entities) {
+		Stack<Vector2i> path = map.getPath(this.position, pos, false, entities);
+		return (path == null) ? Integer.MAX_VALUE : path.size();
+	}
+
 	@Override
 	public String getDescription() {
 		return this.name + " (Lv" + this.level + ".)";

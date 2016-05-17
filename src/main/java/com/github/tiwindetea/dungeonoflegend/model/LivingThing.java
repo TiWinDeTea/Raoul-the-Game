@@ -180,6 +180,9 @@ public abstract class LivingThing implements Descriptable {
 	 * @return the requested attack
 	 */
 	public Vector2i getRequestedAttack() {
+		if (this.requestedAttack == null) {
+			return null;
+		}
 		return this.requestedAttack.copy();
 	}
 

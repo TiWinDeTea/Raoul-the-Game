@@ -39,6 +39,15 @@ public class Pair<T extends Object> {
     }
 
     /**
+     * Gets an unique ID
+     *
+     * @return an unique ID
+     */
+    public static long getNewId() {
+        return currID++;
+    }
+
+    /**
      * Generate a pair using the given ID (/!\no checks done on the id)
      *
      * @param id     the id
