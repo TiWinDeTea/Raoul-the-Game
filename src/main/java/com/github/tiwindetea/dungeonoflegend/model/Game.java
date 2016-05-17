@@ -695,25 +695,32 @@ public class Game implements RequestListener {
 	 * Step into the next tick (next player)
 	 */
 	private void nextTick() {
-		this.logger.entering(MainPackage.name + ".model.Game", "nextTick");
 		this.objectToUse = null;
-
-		while (++this.playerTurn < this.players.size()
-				&& this.players.get(this.playerTurn).object.getFloor() != this.level) ;
-
-		if (this.playerTurn >= this.players.size()) {
-			this.playerTurn = 0;
-			this.currentPlayer = this.players.get(0).object;
-			this.nextTurn();
-			if (this.currentPlayer.getFloor() != this.level) {
-
+		do {
+			do {
+				++this.playerTurn;
 			}
-		}
+			while (this.playerTurn < this.players.size()
+					&& this.players.get(this.playerTurn).getFloor() != this.level);
 
-		if (this.currentPlayer.isARequestPending()) {
-			this.nextTick();
-		}
-		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+			if (this.playerTurn >= this.players.size()) {
+				this.playerTurn = 0;
+				this.currentPlayer = this.players.get(0);
+				long time = System.currentTimeMillis();
+				this.nextTurn();
+				time = System.currentTimeMillis() - time;
+				if (time < MINIMUN_TURN_TIME_MS) {
+					try {
+						Thread.sleep(MINIMUN_TURN_TIME_MS - time);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			} else {
+				this.currentPlayer = this.players.get(this.playerTurn);
+			}
+			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+		} while (this.currentPlayer.isARequestPending());
 	}
 
 	/**
