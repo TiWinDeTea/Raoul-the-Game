@@ -44,7 +44,6 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 /**
@@ -54,13 +53,14 @@ import java.util.stream.Collectors;
 public class Game implements RequestListener {
 
 	/* Tunning parameters for the entities generation */
-	private static final int MIN_MOB_QTT_PER_LEVEL = 15;
-	private static final int MAX_MOB_QTT_PER_LEVEL = 20;
+	private static final int MIN_MOB_QTT_PER_LEVEL = 25;
+	private static final int MAX_MOB_QTT_PER_LEVEL = 40;
 	private static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
-	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
-	private static final int MAX_CHEST_QTT_PER_LEVEL = 5;
+	private static final int MIN_CHEST_QTT_PER_LEVEL = 20;
+	private static final int MAX_CHEST_QTT_PER_LEVEL = 30;
 	private static final int BULB_LOS = 1;
+	private static final int MINIMUN_TURN_TIME_MS = 0;
 
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
 	private int level;

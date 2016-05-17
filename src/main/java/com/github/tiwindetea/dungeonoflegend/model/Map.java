@@ -51,7 +51,7 @@ public class Map {
     private static final int RETRIES_NBR = 5000; // < Integer.MAX_VALUE / 2
     private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
     private static final int BULB_FIX_NBR = 1; // negative to ignore this value
-    private static final int BULB_MINIMUM_NBR = 2; // > 0 ; ignored if BULB_FIX_NBR is > 0
+    private static final int BULB_MINIMUM_NBR = 2; // >= 0 ; ignored if BULB_FIX_NBR is > 0
     private static final int BULB_MAXIMUM_NBR = 5; // > BULB_MINIMUM_NBR ; ignored if BULB_FIX_NBR is > 0
 
     private static final int PROBABILITY_UNIT = 100; // > 0

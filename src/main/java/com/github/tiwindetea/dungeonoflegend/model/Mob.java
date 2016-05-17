@@ -122,8 +122,12 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public boolean equals(Object o) {
-		/* Asserting o to be a mob */
-		return ((Mob) o).position.equals(this.position);
+		if (o instanceof LivingThing) {
+			return ((LivingThing) o).getPosition().equals(this.position);
+		} else {
+			/* Asserting o to be a pair of LivingThing */
+			return ((Pair<LivingThing>) o).object.getPosition().equals(this.position);
+		}
 	}
 
 	/**
@@ -151,7 +155,10 @@ public class Mob extends LivingThing {
 				}
 			}
 		}
-		if (distance <= this.chaseRange) {
+		if (distance <= 1) {
+			this.requestedAttack = chasedPlayer.getPosition();
+			this.requestedPath = null;
+		} else if (distance <= this.chaseRange) {
 			this.chase(shadow, chasedPlayer);
 			this.state = State.CHASING;
 		} else if (this.requestedPathStack.isEmpty()) {

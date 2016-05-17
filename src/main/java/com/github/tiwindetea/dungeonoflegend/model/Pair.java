@@ -79,8 +79,10 @@ public class Pair<T extends Object> {
 
     @Override
     public boolean equals(Object o) {
-        /* Asserting o to be a Pair<T> */
-        return ((Pair<T>) o).getId() == this.getId();
+        if (o instanceof Pair)
+            return ((Pair) o).getId() == this.getId();
+        else /* Asserting o to be a T */
+            return ((T) o).equals(this.object);
     }
 
     /**
