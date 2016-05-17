@@ -104,4 +104,13 @@ public class PlayerInventory extends Parent {
 		this.equipedItemsHBox.getChildren().remove(this.equipedItems.get(entityId));
 		this.equipedItems.remove(entityId);
 	}
+
+	public void removeItem(Long entityId) {
+		if(this.equipedItems.containsKey(entityId)) {
+			removeEquipedItem(entityId);
+		}
+		else {
+			removeInventoryItem(entityId);
+		}
+	}
 }
