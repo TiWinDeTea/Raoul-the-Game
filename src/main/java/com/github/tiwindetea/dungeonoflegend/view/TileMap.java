@@ -237,7 +237,7 @@ public class TileMap extends Parent {
 
 		this.realTileMap = map.clone();
 
-		getChildren().removeAll();
+		getChildren().clear();
 
 		int mapWidth = map.length;
 		int mapHeight = map[0].length;

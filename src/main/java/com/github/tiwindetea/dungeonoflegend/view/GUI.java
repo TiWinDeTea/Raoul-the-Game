@@ -127,8 +127,6 @@ public class GUI implements GameListener, TileMapListener {
 
 		//Right pane
 		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-		//this.rPane.setMaxWidth(300);
-		this.rPane.setMinWidth(650);
 
 		//TODO: Real inventory creation
 		//////////////////////////////////////
