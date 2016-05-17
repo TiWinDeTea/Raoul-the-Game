@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -17,8 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 /**
  * Created by maxime on 5/11/16.
@@ -35,64 +35,73 @@ public class PlayerInventory extends Parent {
 
 	private final ImageView playerPicture;
 
-	private final List<InventoryItem> inventoryItems = new ArrayList<>();
-	private final List<InventoryItem> equipedItems = new ArrayList<>();
+	private final HashMap<Long, StaticEntity> inventoryItems = new HashMap<>();
+	private final HashMap<Long, StaticEntity> equipedItems = new HashMap<>();
 
+	private final VBox mainVBox = new VBox();
+	private final HBox topHBox = new HBox();
 	private final HBox equipedItemsHBox = new HBox();
-	private final TilePane itemsTilePane = new TilePane();
-
-	private final String playerName = "GILBERT";
+	private final TilePane inventoryItemsTilePane = new TilePane();
 
 	public PlayerInventory(ImageView playerPicture) {
 
 		this.playerPicture = playerPicture;
 
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.HELMET1, "HELMET1"));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BREAST_PLATE1, "BREAST_PLATE1"));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.PANTS1, "PANTS1"));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOOTS1, "BOOTS1"));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.GLOVES1, "GLOVES1"));
+		getChildren().add(this.mainVBox);
+		this.mainVBox.setBackground(new Background(new BackgroundFill(Color.SALMON, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.mainVBox.prefWidthProperty().bind(this.mainRectangle.widthProperty());
 
-		this.itemsTilePane.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.itemsTilePane.setMinWidth(this.mainRectangle.getWidth() - (2 * SPACE));
-		this.itemsTilePane.setMaxWidth(this.mainRectangle.getWidth() - (2 * SPACE));
-		for(int i = 0; i < 17; ++i) {
-			this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
-		}
+		this.mainVBox.getChildren().add(this.topHBox);
+		this.topHBox.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.topHBox.setPadding(new Insets(SPACE));
+		this.topHBox.getChildren().add(playerPicture);
 
-		HBox hBox = new HBox();
-		hBox.setBackground(new Background(new BackgroundFill(Color.GREEN, CornerRadii.EMPTY, Insets.EMPTY)));
-		hBox.setPadding(new Insets(SPACE));
-		hBox.getChildren().add(playerPicture);
-		this.equipedItemsHBox.setPadding(new Insets(0, 0, 0, SPACE));
+		this.topHBox.getChildren().add(this.equipedItemsHBox);
 		this.equipedItemsHBox.setBackground(new Background(new BackgroundFill(Color.FUCHSIA, CornerRadii.EMPTY, Insets.EMPTY)));
-		hBox.getChildren().add(this.equipedItemsHBox);
-		VBox mainVbox = new VBox();
-		mainVbox.getChildren().addAll(hBox);
-		this.itemsTilePane.setPadding(new Insets(SPACE));
-		this.itemsTilePane.setPrefWidth(Double.MAX_VALUE);
-		this.itemsTilePane.maxWidthProperty().bind(mainVbox.widthProperty());
-		mainVbox.getChildren().add(this.itemsTilePane);
-		mainVbox.setBackground(new Background(new BackgroundFill(Color.SALMON, CornerRadii.EMPTY, Insets.EMPTY)));
-		mainVbox.prefWidthProperty().bind(this.mainRectangle.widthProperty());
+		this.equipedItemsHBox.setPadding(new Insets(0, 0, 0, SPACE));
 
-		getChildren().add(mainVbox);
+		this.mainVBox.getChildren().add(this.inventoryItemsTilePane);
+		this.inventoryItemsTilePane.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.inventoryItemsTilePane.setMaxWidth(this.mainRectangle.getWidth() - (2 * SPACE));
+		this.inventoryItemsTilePane.setPrefWidth(Double.MAX_VALUE);
+		this.inventoryItemsTilePane.setPadding(new Insets(SPACE));
+		this.inventoryItemsTilePane.maxWidthProperty().bind(this.mainVBox.widthProperty());
 
 
+		//For test
 		setOnMouseClicked(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
 				if(event.getButton() == MouseButton.SECONDARY) {
 
-					PlayerInventory.this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
+					PlayerInventory.this.inventoryItemsTilePane.getChildren().add(new StaticEntity(StaticEntityType.SUPER_POT, new Vector2i(), "SUPER_POT"));
 				}
 				else {
 
-					PlayerInventory.this.itemsTilePane.getChildren().clear();
+					PlayerInventory.this.inventoryItemsTilePane.getChildren().clear();
 				}
 			}
 		});
 
+	}
+
+	public void addInventoryItem(Long entityId, StaticEntity staticEntity) {
+		this.inventoryItems.put(entityId, staticEntity);
+		this.inventoryItemsTilePane.getChildren().add(staticEntity);
+	}
+
+	public void removeInventoryItem(Long entityId) {
+		this.inventoryItemsTilePane.getChildren().remove(this.inventoryItems.get(entityId));
+		this.inventoryItems.remove(entityId);
+	}
+
+	public void addEquipedItem(Long entityId, StaticEntity staticEntity) {
+		this.equipedItems.put(entityId, staticEntity);
+		this.equipedItemsHBox.getChildren().add(staticEntity);
+	}
+
+	public void removeEquipedItem(Long entityId) {
+		this.equipedItemsHBox.getChildren().remove(this.equipedItems.get(entityId));
+		this.equipedItems.remove(entityId);
 	}
 }
