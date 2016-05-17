@@ -235,4 +235,8 @@ public class Mob extends LivingThing {
 	public int getChaseRange() {
 		return this.chaseRange;
 	}
+	@Override
+	public String getDescription() {
+		return this.name + " (Lv" + this.level + ".)";
+	}
 }

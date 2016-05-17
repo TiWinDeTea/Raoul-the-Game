@@ -14,7 +14,7 @@ import java.util.Collection;
  * LivingThing.
  * @author Lucas LAZARE
  */
-public abstract class LivingThing {
+public abstract class LivingThing implements Descriptable {
 
 	protected Tile[][] sight;
 	protected int level;
@@ -24,6 +24,7 @@ public abstract class LivingThing {
 	protected int defensePower;
 	protected Vector2i position;
 	protected Vector2i requestedAttack;
+	protected String name;
 
 
 	/**
@@ -188,5 +189,10 @@ public abstract class LivingThing {
 	 */
 	public boolean equals(LivingThing livingThing) {
 		return this.position.equals(livingThing.position);
+	}
+
+	public String getDescription() {
+		System.out.println("name = " + this.name);
+		return this.name;
 	}
 }

@@ -24,6 +24,7 @@ public class Pot implements Consumable {
 	private int mana_heal;
 	private int healthModifier;
 	private int manaModifier;
+	private String name;
 	private Player target;
 	private StaticEntityType gtype;
 
@@ -194,5 +195,17 @@ public class Pot implements Consumable {
 		if (this.heal != 0) {
 			this.target.heal(this.heal);
 		}
+	}
+
+	@Override
+	public String getDescription() {
+		if (this.name == null) {
+			int i = 0;
+			this.name = this.gtype.toString().replaceAll("[0~9]+", "");
+			while ((i = this.name.indexOf("-")) != -1) {
+				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
+			}
+		}
+		return this.name;
 	}
 }

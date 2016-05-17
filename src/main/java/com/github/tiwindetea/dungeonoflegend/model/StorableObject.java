@@ -15,7 +15,7 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
  *
  * @author Lucas LAZARE
  */
-public interface StorableObject {
+public interface StorableObject extends Descriptable {
 
     /**
      * Gets the Storable Object type.

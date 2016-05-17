@@ -11,7 +11,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
 /**
  * Created by maxime on 4/24/16.
  */
-public class InteractiveObject {
+public class InteractiveObject implements Descriptable {
 
 	private boolean isTrap;
 	private int manaModifier;
@@ -108,5 +108,14 @@ public class InteractiveObject {
      */
     public boolean equals(InteractiveObject io) {
         return this.position.equals(io.position);
+    }
+
+    @Override
+    public String getDescription() {
+        if (this.isTrap) {
+            return "A dangerous oil puddle";
+        } else {
+            return "A mysterious gift";
+        }
     }
 }

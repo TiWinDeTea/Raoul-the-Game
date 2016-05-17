@@ -23,6 +23,7 @@ public class Weapon implements StorableObject {
 	private int range;
 	private int manaCost;
 	private WeaponType type;
+	String name;
 
 	private StaticEntityType gtype;
 
@@ -158,5 +159,20 @@ public class Weapon implements StorableObject {
 				+ ",range=" + this.range
 				+ ",mana=" + this.manaCost
 				+ ",}";
+	}
+
+	@Override
+	public String getDescription() {
+		if (this.name == null) {
+			int i = 0;
+			this.name = this.gtype.toString().replaceAll("[0~9]+", "");
+			while ((i = this.name.indexOf("-")) != -1) {
+				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
+			}
+			this.name += "\nAttack power: " + this.attackPowerModifier;
+			this.name += "\nRange: " + this.range;
+			this.name += "\nMana cost: " + this.manaCost;
+		}
+		return this.name;
 	}
 }
