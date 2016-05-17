@@ -137,6 +137,10 @@ public abstract class LivingThing implements Descriptable {
 		this.position = position;
 	}
 
+	public long getId() {
+		return this.id;
+	}
+
 	/**
 	 * Damages this.
 	 *
@@ -161,7 +165,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @param players Players around this
 	 * @param los LOS of this
 	 */
-	public abstract void live(Collection<Pair<Mob>> mobs, Collection<Pair<Player>> players, boolean[][] los);
+	public abstract void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los);
 
 	/**
 	 * Gets the requested move.
