@@ -8,6 +8,12 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -25,6 +31,30 @@ public abstract class LivingThing implements Descriptable {
 	protected Vector2i position;
 	protected Vector2i requestedAttack;
 	protected String name;
+	protected long id = Pair.getNewId();
+	protected static final ArrayList<GameListener> listeners = new ArrayList<>();
+
+
+	public static void addGameListener(GameListener listener) {
+		if (!listeners.contains(listener))
+			listeners.add(listener);
+	}
+
+	protected static GameListener[] getPlayersListeners() {
+		return LivingThing.listeners.toArray(new GameListener[LivingThing.listeners.size()]);
+	}
+
+	protected void fireStatEvent(PlayerStatEvent event) {
+		for (PlayerStatListener listener : getPlayersListeners()) {
+			listener.changePlayerStat(event);
+		}
+	}
+
+	protected void fireMoveEvent(LivingEntityMoveEvent event) {
+		for (GameListener listener : getPlayersListeners()) {
+			listener.moveLivingEntity(event);
+		}
+	}
 
 
 	/**
@@ -103,6 +133,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @param position the new position
 	 */
 	public void setPosition(Vector2i position) {
+		fireMoveEvent(new LivingEntityMoveEvent(this.id, position));
 		this.position = position;
 	}
 

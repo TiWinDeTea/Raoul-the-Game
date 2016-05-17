@@ -9,7 +9,9 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ public class Player extends LivingThing {
 	private int mana;
 	private List<Pair<Armor>> armors; // armor of the player (equiped)
 	private Pair<Weapon> weapon; // equiped armor
-	private String name;
 	private int hitPointsPerLevel;
 	private int manaPerLevel;
 	private int attackPowerPerLevel;
@@ -50,7 +51,6 @@ public class Player extends LivingThing {
 	private int number;
 	private int exploreLOS;
 	private Vector2i requestedInteraction;
-	private static ArrayList<PlayerStatListener> listeners = new ArrayList<>();
 	private Vector2i dropPos;
 	public boolean hasFallen = false;
 	private static final LivingEntityType[] ENUM_VAL = Arrays.copyOfRange(LivingEntityType.values(),
@@ -106,32 +106,24 @@ public class Player extends LivingThing {
 		this.exploreLOS = exploreLOS;
 	}
 
-	/**
-	 * Adds a player listener.
-	 *
-	 * @param listener the listener
-	 */
-	public static void addPlayerListener(PlayerStatListener listener) {
-		if (!listeners.contains(listener))
-			listeners.add(listener);
-	}
-
-	private static PlayerStatListener[] getPlayersListeners() {
-		return Player.listeners.toArray(new PlayerStatListener[Player.listeners.size()]);
-	}
-
-	private void firePlayerStatEvent(PlayerStatEvent event) {
-		for (PlayerStatListener listener : getPlayersListeners()) {
-			listener.changePlayerStat(event);
-		}
-	}
-
 	private Player() {
 		super();
 		this.inventory = new ArrayList<>();
 		this.armors = new ArrayList<>(5);
 		for (int i = 0; i < 5; i++) {
 			this.armors.add(new Pair<>());
+		}
+	}
+
+	private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {
+		for (GameListener listener : this.getPlayersListeners()) {
+			listener.addInventory(event);
+		}
+	}
+
+	private void fireInventoryDeletionEvent(InventoryDeletionEvent event) {
+		for (GameListener listener : this.getPlayersListeners()) {
+			listener.deleteInventory(event);
 		}
 	}
 
@@ -347,6 +339,13 @@ public class Player extends LivingThing {
 	public boolean addToInventory(Pair<StorableObject> storable) {
 		if (this.inventory.size() < this.maxStorageCapacity) {
 			this.inventory.add(storable);
+			fireInventoryAdditionEvent(new InventoryAdditionEvent(
+					this.number,
+					storable.getId(),
+					false,
+					storable.object.getGType(),
+					storable.object.getDescription()
+			));
 			return true;
 		}
 		return false;
@@ -372,6 +371,7 @@ public class Player extends LivingThing {
 	 */
 	public Pair<StorableObject> dropRequestAccepted() {
 		if (this.objectToDrop != null && this.inventory.remove(this.objectToDrop)) {
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
 			Pair<StorableObject> tmp = this.objectToDrop;
 			this.objectToDrop = null;
 			return tmp;
@@ -471,7 +471,7 @@ public class Player extends LivingThing {
 		if (mana < 0)
 			throw new IllegalArgumentException("mana must be positive");
 		this.mana = Math.min(this.maxMana, mana + this.mana);
-		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
+		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
 				PlayerStatEvent.ValueType.ACTUAL, this.mana));
 	}
 
@@ -484,7 +484,7 @@ public class Player extends LivingThing {
 		if (hp < 0)
 			throw new IllegalArgumentException("hp must be positive");
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
-		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
+		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
 				PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 
@@ -505,7 +505,7 @@ public class Player extends LivingThing {
 	public void increaseHP(int hp) {
 		this.maxHitPoints = Math.max(hp + this.maxHitPoints, 1);
 		this.hitPoints = Math.max(hp + this.hitPoints, 1);
-		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
+		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
 				PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
 	}
 
@@ -526,7 +526,7 @@ public class Player extends LivingThing {
 	public void increaseMana(int manaModifier) {
 		this.maxMana = Math.max(this.maxMana + manaModifier, 1);
 		this.mana = Math.max(this.mana + manaModifier, 1);
-		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
+		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
 				PlayerStatEvent.ValueType.MAX, this.maxMana));
 	}
 
@@ -712,7 +712,7 @@ public class Player extends LivingThing {
 	public void damage(int damages) {
 		if (damages > 0)
 			this.hitPoints -= damages;
-		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
+		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 
 	public LivingEntityType getGType() {

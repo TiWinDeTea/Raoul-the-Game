@@ -363,27 +363,9 @@ public class Game implements RequestListener {
 		}
 	}
 
-	private void fireLivingEntityMoveEvent(LivingEntityMoveEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
-			listener.moveLivingEntity(event);
-		}
-	}
-
 	private void fireMapCreationEvent(MapCreationEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
 			listener.createMap(event);
-		}
-	}
-
-	private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
-			listener.addInventory(event);
-		}
-	}
-
-	private void fireInventoryDeletionEvent(InventoryDeletionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
-			listener.deleteInventory(event);
 		}
 	}
 
@@ -392,12 +374,6 @@ public class Game implements RequestListener {
 			listener.createPlayer(event);
 		}
 	}
-
-	/*private void firePlayerStatEvent(PlayerStatEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
-			listener.changePlayerStat(event);
-		}
-	}*/
 
 	private void fireStaticEntityCreationEvent(StaticEntityCreationEvent event) {
 		for(GameListener listener : this.getGameListeners()) {
@@ -489,7 +465,6 @@ public class Game implements RequestListener {
 					if (this.objectToUse != null) {
 						this.objectToUse.object.trigger(this.mobs.get(i).object);
 						this.triggeredObjects.add(this.objectToUse.object);
-						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
 						this.objectToUse = null;
 					}
 					this.currentPlayer.setRequestedAttack(e.tilePosition);
@@ -531,7 +506,6 @@ public class Game implements RequestListener {
 		if (this.objectToUse != null && this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
 			this.triggeredObjects.add(this.objectToUse.object);
 			this.objectToUse.object.trigger(this.currentPlayer);
-			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.currentPlayer.getNumber(), this.objectToUse.getId()));
 			this.objectToUse = null;
 		}
 	}
@@ -750,7 +724,6 @@ public class Game implements RequestListener {
 				if (distance <= 1 && isAccessible(pos)) {
 					// TODO : los
 					player.setPosition(pos);
-					fireLivingEntityMoveEvent(new LivingEntityMoveEvent(this.players.get(i).getId(), pos));
 				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
 					// TODO : los
 					player.setFloor(this.level + 1);
@@ -781,8 +754,6 @@ public class Game implements RequestListener {
 				pos = player.getDropPos();
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
 				if (drop.object != null && distance == 1) {
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(drop.getId(), drop.object.getGType(), pos));
-					fireInventoryDeletionEvent(new InventoryDeletionEvent(player.getNumber(), drop.getId()));
 					player.dropRequestAccepted();
 					this.objectsOnGround.put(pos, drop);
 				}
