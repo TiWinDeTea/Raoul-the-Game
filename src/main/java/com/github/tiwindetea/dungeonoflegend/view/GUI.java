@@ -31,6 +31,7 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -42,6 +43,7 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -125,32 +127,38 @@ public class GUI implements GameListener, TileMapListener {
 
 		//Right pane
 		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.rPane.setMaxWidth(300);
-		this.rPane.setMinWidth(300);
+		//this.rPane.setMaxWidth(300);
+		this.rPane.setMinWidth(650);
 
+		//TODO: Real inventory creation
+		//////////////////////////////////////
+		ImageView imageView = new ImageView(LivingEntityType.PLAYER1.getImage());
+		Vector2i spritePosition = LivingEntityType.PLAYER1.getSpritePosition(Direction.DOWN);
+		imageView.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+		VBox vBox = new VBox();
+		this.rPane.getChildren().add(vBox);
+		vBox.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+		vBox.getChildren().add(new ScoreDisplayer());
+		PlayerInventory playerInventory = new PlayerInventory(imageView);
+		vBox.getChildren().add(playerInventory);
+		vBox.setAlignment(Pos.TOP_LEFT);
+		vBox.getChildren().add(InformationsDisplayer.getInstance());
+		/////////////////////////////////////
+
+		//Bootom pane
 		this.brMiniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.brMiniMapPain.setMinWidth(300);
 		this.brMiniMapPain.setMaxWidth(300);
+		this.brMiniMapPain.setMaxHeight(200);
+		this.brMiniMapPain.setMaxHeight(200);
 
 		this.bHBox.getChildren().addAll(this.blTilePane, this.brMiniMapPain);
-		this.bHBox.setMinWidth(2 * PlayerHUD.getSize().x + this.brMiniMapPain.getMinWidth());
+		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
+		this.bHBox.setBackground(new Background(new BackgroundFill(Color.BLUEVIOLET, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
 		this.bPane.getChildren().add(this.bHBox);
-		this.bPane.widthProperty().addListener(e -> {
-			if(this.playersHUD.size() > 1) {
-				if((this.bPane.getWidth() - this.rPane.getWidth()) < (this.playersHUD.size() * PlayerHUD.getSize().x)) {
-					this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
-				}
-				else {
-					this.bPane.setMinHeight(PlayerHUD.getSize().y);
-				}
-			}
-			this.blTilePane.setMaxWidth(this.bPane.getWidth() - this.rPane.getWidth());
-		});
-
-		this.scene.setOnKeyReleased(this.onKeyReleasedEventHandler);
+		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
 	}
 
 	public Scene getScene() {
@@ -332,14 +340,6 @@ public class GUI implements GameListener, TileMapListener {
 			PlayerHUD playerHUD = new PlayerHUD(imageView, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
 			this.playersHUD.add(playerHUD);
 			this.blTilePane.getChildren().add(playerHUD);
-			if(this.playersHUD.size() > 1) {
-				if((this.bPane.getWidth() - this.rPane.getWidth()) < (this.playersHUD.size() * PlayerHUD.getSize().x)) {
-					this.bPane.setMinHeight(this.playersHUD.size() * PlayerHUD.getSize().y);
-				}
-				else {
-					this.bPane.setMinHeight(PlayerHUD.getSize().y);
-				}
-			}
 
 			//TODO: inventory
 		}

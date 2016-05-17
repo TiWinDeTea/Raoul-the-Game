@@ -2,9 +2,11 @@ package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -76,6 +78,21 @@ public class PlayerHUD extends Parent {
 		this.playerPicture.setLayoutY(this.playerPicture.getLayoutY() - (originalHeight - PLAYER_PICTURE_SIZE.y) / 2);
 		this.playerPicture.setTranslateX(SPACE);
 		this.playerPicture.setTranslateY((MAIN_PANE_SIZE.y - PLAYER_PICTURE_SIZE.y) / 2.0);
+
+		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				//TODO: display informations on the InformationDisplayer
+			}
+		});
+		this.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				//TODO: display informations on the InformationDisplayer
+			}
+		});
 
 		this.getChildren().add(this.maxHealthRectangle);
 		this.maxHealthRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
