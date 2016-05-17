@@ -73,6 +73,7 @@ public class GUI implements GameListener, TileMapListener {
 	private final HashMap<Long, StaticEntity> staticEntities = new HashMap<>();
 
 	private final List<PlayerHUD> playersHUD = new ArrayList<>();
+	private final List<PlayerInventory> playersInventories = new ArrayList<>();
 	private final int maxPlayersNumber = 2;
 	private int actualPlayersNumber = 0;
 
@@ -252,7 +253,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction);
+		LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction, e.description);
 		this.livingEntities.put(e.entityId, livingEntity);
 		this.cTileMap.addEntity(livingEntity);
 	}
@@ -325,7 +326,7 @@ public class GUI implements GameListener, TileMapListener {
 			else {
 				livingEntityType = LivingEntityType.PLAYER1;
 			}
-			LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction);
+			LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction, e.description);
 			this.livingEntities.put(e.entityId, livingEntity);
 			this.cTileMap.addEntity(livingEntity);
 			++this.actualPlayersNumber;
@@ -381,7 +382,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		StaticEntity staticEntity = new StaticEntity(e.type, e.position);
+		StaticEntity staticEntity = new StaticEntity(e.type, e.position, e.description);
 		this.staticEntities.put(e.entityId, staticEntity);
 		this.cTileMap.addEntity(staticEntity);
 	}
@@ -424,6 +425,10 @@ public class GUI implements GameListener, TileMapListener {
 
 	@Override
 	public void playerNextTick(PlayerNextTickEvent event) {
+		for(PlayerHUD playerHUD : this.playersHUD) {
+			playerHUD.setMasked(true);
+		}
+		this.playersHUD.get(event.playerNumber).setMasked(false);
 		//TODO
 	}
 }

@@ -2,8 +2,11 @@ package com.github.tiwindetea.dungeonoflegend.view.entities;
 
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.InformationsDisplayer;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 
 import java.util.List;
 
@@ -15,6 +18,27 @@ public abstract class Entity extends Parent {
 	protected ImageView imageView = new ImageView();
 	protected Vector2i position;
 	protected boolean[][] LOS;
+
+	private String description;
+
+	public Entity(String description) {
+		this.description = description;
+
+		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText(description);
+			}
+		});
+		this.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
+	}
 
 	public ImageView getImageView() {
 		return this.imageView;

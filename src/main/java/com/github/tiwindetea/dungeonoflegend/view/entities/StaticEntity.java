@@ -14,7 +14,8 @@ public class StaticEntity extends Entity {
 	private boolean animated;
 	private Animation animation;
 
-	public StaticEntity(StaticEntityType staticEntityType, Vector2i position) {
+	public StaticEntity(StaticEntityType staticEntityType, Vector2i position, String description) {
+		super(description);
 		this.setPosition(position);
 		this.staticEntityType = staticEntityType;
 		this.imageView.setImage(staticEntityType.getImage());

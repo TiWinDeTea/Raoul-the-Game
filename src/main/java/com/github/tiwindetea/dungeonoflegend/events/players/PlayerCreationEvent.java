@@ -3,8 +3,6 @@ package com.github.tiwindetea.dungeonoflegend.events.players;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
-import java.util.UUID;
-
 /**
  * Created by maxime on 5/5/16.
  */
@@ -14,13 +12,15 @@ public class PlayerCreationEvent extends PlayerEvent {
 	public Direction direction;
 	public int maxHealth;
 	public int maxMana;
+	public String description;
 
-	public PlayerCreationEvent(int playerNumber, long entityId, Vector2i position, Direction direction, int maxHealth, int maxMana) {
+	public PlayerCreationEvent(int playerNumber, long entityId, Vector2i position, Direction direction, int maxHealth, int maxMana, String description) {
 		super(playerNumber);
 		this.entityId = entityId;
 		this.position = position;
 		this.direction = direction;
 		this.maxHealth = maxHealth;
 		this.maxMana = maxMana;
+		this.description = description;
 	}
 }

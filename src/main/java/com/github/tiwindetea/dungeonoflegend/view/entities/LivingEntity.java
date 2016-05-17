@@ -11,7 +11,8 @@ public class LivingEntity extends Entity {
 	private LivingEntityType livingEntityType;
 	private Direction direction;
 
-	public LivingEntity(LivingEntityType livingEntityType, Vector2i position, Direction direction) {
+	public LivingEntity(LivingEntityType livingEntityType, Vector2i position, Direction direction, String description) {
+		super(description);
 		this.livingEntityType = livingEntityType;
 		this.setPosition(position);
 		this.imageView.setImage(livingEntityType.getImage());

@@ -9,11 +9,12 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 public class StaticEntityCreationEvent extends StaticEntityEvent {
 	public StaticEntityType type;
 	public Vector2i position;
+	public String description;
 
-
-	public StaticEntityCreationEvent(long entityId, StaticEntityType type, Vector2i position) {
+	public StaticEntityCreationEvent(long entityId, StaticEntityType type, Vector2i position, String description) {
 		super(entityId);
 		this.type = type;
 		this.position = position;
+		this.description = description;
 	}
 }

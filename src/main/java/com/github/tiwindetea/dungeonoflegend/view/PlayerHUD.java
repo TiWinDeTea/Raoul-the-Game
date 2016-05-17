@@ -24,6 +24,7 @@ public class PlayerHUD extends Parent {
 	private static final double MANA_RECTANGLES_WIDTH = 0.75; //relative to healthRectangleWidth (auto computed)
 	private static final int SPACE = 20;
 
+	private static final Color MASK_COLOR = Color.rgb(0, 0, 0, 0.5);
 	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.DARKRED;
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Color MAX_MANA_RECTANGLE_COLOR = Color.DARKBLUE;
@@ -46,6 +47,7 @@ public class PlayerHUD extends Parent {
 	private final Rectangle maxManaRectangle = new Rectangle();
 	private final Rectangle actualManaRectangle = new Rectangle();
 	private final Rectangle backGroundRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
+	private final Rectangle maskRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -138,6 +140,10 @@ public class PlayerHUD extends Parent {
 		this.manaString.set(this.maxHealth + " / " + this.actualHealth);
 		this.manaLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + LABELS_OFFSET);
 		this.manaLabel.setTranslateY(MANA_LABEL_TRANSLATE_Y);
+
+		getChildren().add(this.maskRectangle);
+		this.maskRectangle.setFill(MASK_COLOR);
+		this.maskRectangle.setVisible(false);
 	}
 
 	public static Vector2i getSize() {
@@ -156,6 +162,10 @@ public class PlayerHUD extends Parent {
 		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), ANIMATION_DURATION);
 		this.manaString.set(this.actualMana + " / " + this.maxMana);
 		transition.play();
+	}
+
+	public void setMasked(boolean masked) {
+		this.maskRectangle.setVisible(masked);
 	}
 
 	public void setMaxHealth(int maxHealth) {
