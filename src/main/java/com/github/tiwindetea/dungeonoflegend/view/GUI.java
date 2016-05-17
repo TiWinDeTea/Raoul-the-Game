@@ -24,7 +24,6 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
-import com.github.tiwindetea.dungeonoflegend.model.InteractiveObject;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
@@ -281,7 +280,6 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		List<InteractiveObject> caca = new ArrayList<>();
 		this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
 		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
@@ -321,7 +319,7 @@ public class GUI implements GameListener, TileMapListener {
 		}
 		if(this.actualPlayersNumber < this.maxPlayersNumber) {
 			LivingEntityType livingEntityType;
-			if(e.playerNumber == 2) {
+			if(e.playerNumber == 1) {
 				livingEntityType = LivingEntityType.PLAYER2;
 			}
 			else {
@@ -348,7 +346,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		if(e.playerNumber > 0 && e.playerNumber <= this.actualPlayersNumber) {
+		if(e.playerNumber >= 0 && e.playerNumber < this.actualPlayersNumber) {
 			int value = e.value;
 			if(value < 0) {
 				value = 0;
@@ -357,20 +355,20 @@ public class GUI implements GameListener, TileMapListener {
 			case HEALTH:
 				switch(e.valueType) {
 				case ACTUAL:
-					this.playersHUD.get(e.playerNumber - 1).setActualHealth(value);
+					this.playersHUD.get(e.playerNumber).setActualHealth(value);
 					break;
 				case MAX:
-					this.playersHUD.get(e.playerNumber - 1).setMaxHealth(value);
+					this.playersHUD.get(e.playerNumber).setMaxHealth(value);
 					break;
 				}
 				break;
 			case MANA:
 				switch(e.valueType) {
 				case ACTUAL:
-					this.playersHUD.get(e.playerNumber - 1).setActualMana(value);
+					this.playersHUD.get(e.playerNumber).setActualMana(value);
 					break;
 				case MAX:
-					this.playersHUD.get(e.playerNumber - 1).setMaxMana(value);
+					this.playersHUD.get(e.playerNumber).setMaxMana(value);
 					break;
 				}
 				break;
@@ -426,6 +424,6 @@ public class GUI implements GameListener, TileMapListener {
 
 	@Override
 	public void playerNextTick(PlayerNextTickEvent event) {
-		// TODO
+		//TODO
 	}
 }
