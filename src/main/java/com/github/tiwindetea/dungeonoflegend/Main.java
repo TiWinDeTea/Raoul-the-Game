@@ -1,23 +1,10 @@
 package com.github.tiwindetea.dungeonoflegend;
 
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
-import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
-import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Game;
-import com.github.tiwindetea.dungeonoflegend.model.Map;
-import com.github.tiwindetea.dungeonoflegend.model.Seed;
-import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 /**
@@ -32,14 +19,14 @@ public class Main extends Application {
 		primaryStage.setScene(GUI.getScene());
 		primaryStage.show();
         Game game = new Game("/tmp/LOL");
-        game.initNew(2);
         game.addGameListener(GUI);
-        GUI.addRequestListener(game);
-        //GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
-        //GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
-        primaryStage.getIcons().add(ViewPackage.icon);
+		GUI.addRequestListener(game);
+		game.initNew(2);
+		//GUI.createPlayer(new PlayerCreationEvent(1, 666, new Vector2i(), Direction.DOWN, 100, 100));
+		//GUI.createPlayer(new PlayerCreationEvent(2, 42, new Vector2i(), Direction.DOWN, 100, 100));
+		primaryStage.getIcons().add(ViewPackage.icon);
 
-		GUI.getScene().setOnMouseClicked(
+		/*GUI.getScene().setOnMouseClicked(
 		  new EventHandler<MouseEvent>() {
 			  @Override
 			  public void handle(MouseEvent event) {
@@ -56,7 +43,7 @@ public class Main extends Application {
 		  });
 
 
-		Map map = new Map(new Seed());
+	Map map = new Map(new Seed());
 		System.out.println("Seed: {" + map.getSeed().getAlphaSeed() + ";" + map.getSeed().getBetaSeed() + "}");
 		map.generateLevel(1);
 		GUI.createMap(new MapCreationEvent(map.getMapCopy()));
@@ -95,7 +82,7 @@ public class Main extends Application {
 				GUI.moveLivingEntity(new LivingEntityMoveEvent(42L, pos.add(direction)));
 				GUI.defineLivingEntityLOS(new LivingEntityLOSDefinitionEvent(42L, map.getLOS(pos, 4)));
 			}
-		});
+		});*/
 	}
 
 	public static void main(String[] args) {

@@ -61,7 +61,7 @@ public class Game implements RequestListener {
 	private static final int MAX_MOB_QTT_PER_LEVEL = 20;
 	private static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
-	private static final int MIN_CHEST_QTT_PER_LEVEL = 1;
+	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 5;
 	private static final int BULB_LOS = 1;
 
@@ -196,7 +196,7 @@ public class Game implements RequestListener {
 		this.players.addAll(players.stream().map(Pair::new).collect(Collectors.toList()));
 		for (Pair<Player> player : this.players) {
 			firePlayerCreationEvent(new PlayerCreationEvent(
-					player.object.getNumber(),
+					player.object.getNumber() + 1,
 					player.getId(),
 					new Vector2i(0, 0),
 					Direction.DOWN,
@@ -434,7 +434,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		logger.entering(MainPackage.name + ".model.Game", "requestDrop", e);
+		logger.log(Level.INFO, "drop requested on player " + this.currentPlayer.getNumber());
 		/* Take the shortest path possible to drop the item */
 		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
 			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
@@ -461,9 +461,9 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
+		logger.log(Level.INFO, "interaction requested for player " + this.currentPlayer.getNumber());
 		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
 		boolean success = true;
-		logger.entering(MainPackage.name + ".model.Game", "requestInteraction", e);
 		Tile tile = this.world.getTile(e.tilePosition);
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
@@ -520,7 +520,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-		logger.entering(MainPackage.name + ".model.Game", "requestUsage", e);
+		logger.log(Level.INFO, "Usage requested for player " + this.currentPlayer.getNumber());
 		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
 		this.objectToUse = null;
 		for (Pair<StorableObject> pair : inventory) {
@@ -541,7 +541,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
-		logger.entering(MainPackage.name + ".model.Game", "requestMove", e);
+		logger.log(Level.INFO, "Move requested for player " + this.currentPlayer.getNumber());
 		Stack<Vector2i> stack = new Stack<>();
 		stack.add(this.currentPlayer.getPosition().add(e.moveDirection));
 		this.currentPlayer.setRequestedPath(stack);
@@ -600,7 +600,7 @@ public class Game implements RequestListener {
 					this.mobsChaseRange[selectedMob],
 					mobPos.copy()));
 			this.mobs.add(pair);
-			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), null));
+			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(pair.getId(), this.mobsTypes[selectedMob], mobPos.copy(), Direction.DOWN));
 		}
 
 		/* Generate some chests */
@@ -620,8 +620,6 @@ public class Game implements RequestListener {
 							this.lootsArmorAttackPerLevel[selection] * chestLevel + this.lootsArmorBaseAttack[selection],
 							this.lootsArmorType[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, armor));
-					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), armor.getGType(), pos));
 					break;
 				case 1:
 					selection = random.nextInt(this.lootsWeaponRange.length);
@@ -629,8 +627,6 @@ public class Game implements RequestListener {
 							this.lootsWeaponRange[selection],
 							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
 					pair = new Pair<>(new InteractiveObject(pos, weapon));
-					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), weapon.getGType(), pos));
 					break;
 				case 2:
 					selection = random.nextInt(this.lootsScrollTurns.length);
@@ -638,8 +634,6 @@ public class Game implements RequestListener {
 							this.lootsScrollBaseDamagePerTurn[selection] + chestLevel * this.lootsScrollDamagePerTurnPerLevel[selection],
 							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, scroll));
-					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), scroll.getGType(), pos));
 					break;
 				case 3:
 					/* Falls through */
@@ -653,10 +647,10 @@ public class Game implements RequestListener {
 							this.lootsPotHPMod[selection],
 							this.lootsPotManaMod[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, pot));
-					this.interactiveObjects.add(pair);
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), pot.getGType(), pos));
 					break;
 			}
+			this.interactiveObjects.add(pair);
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.CHEST, pos));
 		}
 
 		/* Generate traps */
@@ -695,18 +689,20 @@ public class Game implements RequestListener {
 	private Vector2i selectRandomGroundPosition(List<Map.Room> rooms, Random random) {
 		Map.Room selectedRoom;
 		Vector2i pos = new Vector2i();
-		selectedRoom = rooms.get(random.nextInt(rooms.size()));
-		if (selectedRoom.top.x != selectedRoom.bottom.x) {
-			pos.x = random.nextInt(selectedRoom.bottom.x - selectedRoom.top.x) + selectedRoom.top.x;
-		} else {
-			pos.x = selectedRoom.top.x;
-		}
+		do {
+			selectedRoom = rooms.get(random.nextInt(rooms.size()));
+			if (selectedRoom.top.x != selectedRoom.bottom.x) {
+				pos.x = random.nextInt(selectedRoom.bottom.x - selectedRoom.top.x) + selectedRoom.top.x;
+			} else {
+				pos.x = selectedRoom.top.x;
+			}
 
-		if (selectedRoom.top.y != selectedRoom.bottom.y) {
-			pos.y = random.nextInt(selectedRoom.bottom.y - selectedRoom.top.y) + selectedRoom.top.y;
-		} else {
-			pos.y = selectedRoom.top.y;
-		}
+			if (selectedRoom.top.y != selectedRoom.bottom.y) {
+				pos.y = random.nextInt(selectedRoom.bottom.y - selectedRoom.top.y) + selectedRoom.top.y;
+			} else {
+				pos.y = selectedRoom.top.y;
+			}
+		} while (Tile.isObstructed(this.world.getTile(pos)));
 		return pos;
 	}
 
@@ -714,6 +710,7 @@ public class Game implements RequestListener {
 	 * Step into the next tick (next player)
 	 */
 	private void nextTick() {
+		this.logger.entering(MainPackage.name + ".model.Game", "nextTick");
 		this.objectToUse = null;
 
 		while (++this.playerTurn < this.players.size()
@@ -887,6 +884,7 @@ public class Game implements RequestListener {
 		if (nextLevel) {
 			++this.level;
 			this.generateLevel(); // Hot dog !
+			this.save();
 		}
 	}
 
