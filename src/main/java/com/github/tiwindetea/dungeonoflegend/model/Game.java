@@ -6,6 +6,10 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
+
+// TODO: Fog LOS
+// TODO: Traps actions
+
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
@@ -452,15 +456,12 @@ public class Game implements RequestListener {
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 
-		if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-		/* interaction with doors */
-			this.currentPlayer.setRequestedInteraction(e.tilePosition);
-		} else if (distance <= this.currentPlayer.getLos()) {
 
+		if (distance <= this.currentPlayer.getLos()) {
 		/* Looking for a mob to attack*/
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
-			if (los[p.x + los.length - e.tilePosition.x][p.y + los[0].length - e.tilePosition.y]) {
+			if (los[los.length / 2 - p.x + e.tilePosition.x][los[0].length / 2 - p.y + e.tilePosition.y]) {
 				int i = -1;
 				int j = 0;
 				do {
@@ -476,8 +477,11 @@ public class Game implements RequestListener {
 						this.objectToUse = null;
 					}
 					this.currentPlayer.setRequestedAttack(e.tilePosition);
+				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+					/* interaction with doors */
+					this.currentPlayer.setRequestedInteraction(e.tilePosition);
 				} else {
-					success = false; // no mob found
+					success = false; // no mob found, neither doors
 				}
 			} else {
 				success = false; // tile not in the los
@@ -523,10 +527,16 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
-		Stack<Vector2i> stack = new Stack<>();
-		stack.add(this.currentPlayer.getPosition().add(e.moveDirection));
-		this.currentPlayer.setRequestedPath(stack);
 		logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
+		Vector2i pos = this.currentPlayer.getPosition().copy().add(e.moveDirection);
+		if (isAccessible(pos)) {
+			Stack<Vector2i> stack = new Stack<>();
+			stack.add(pos);
+			this.currentPlayer.setRequestedPath(stack);
+			this.nextTick();
+		} else {
+			this.requestInteraction(new InteractionRequestEvent(pos));
+		}
 	}
 
 	/**
@@ -543,9 +553,13 @@ public class Game implements RequestListener {
 		for (Pair<Vector2i> bulb : this.bulbs) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
-			//TODO : what should I put here ?
-			//fireLivingEntityLOSModificationEvent(new LivingEntityLOSModificationEvent());
 		for (Player player : this.players) {
+			player.heal(player.getMaxHitPoints() / 3);
+			player.addMana(player.getMaxMana());
+			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+					player.getId(),
+					null
+			));
 		}
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
