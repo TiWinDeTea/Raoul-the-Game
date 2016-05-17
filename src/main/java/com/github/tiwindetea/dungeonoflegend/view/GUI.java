@@ -343,7 +343,7 @@ public class GUI implements GameListener, TileMapListener {
 			this.playersHUD.add(playerHUD);
 			this.blTilePane.getChildren().add(playerHUD);
 
-			//TODO: inventory
+			this.playersInventories.add(new PlayerInventory(imageView));
 		}
 	}
 
