@@ -10,6 +10,7 @@ public class StaticEntityCreationEvent extends StaticEntityEvent {
 	public StaticEntityType type;
 	public Vector2i position;
 
+
 	public StaticEntityCreationEvent(long entityId, StaticEntityType type, Vector2i position) {
 		super(entityId);
 		this.type = type;
