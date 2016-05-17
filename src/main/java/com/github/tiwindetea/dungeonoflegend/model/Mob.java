@@ -53,7 +53,8 @@ public class Mob extends LivingThing {
 	 * @param defensePower defense power
 	 * @param position     position
 	 */
-	public Mob(int level, int maxHitPoints, int attackPower, int defensePower, int chaseRange, Vector2i position) {
+	public Mob(String name, int level, int maxHitPoints, int attackPower, int defensePower, int chaseRange, Vector2i position) {
+		this.name = name;
 		this.level = level;
 		this.maxHitPoints = maxHitPoints;
 		this.attackPower = attackPower;
