@@ -237,7 +237,12 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		if(e.isEquiped) {
+			this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, new Vector2i(), e.description));
+		}
+		else {
+			this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, new Vector2i(), e.description));
+		}
 	}
 
 	@Override
@@ -245,7 +250,7 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		//TODO
+		this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
 	}
 
 	@Override
