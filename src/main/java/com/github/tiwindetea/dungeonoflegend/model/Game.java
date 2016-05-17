@@ -720,28 +720,25 @@ public class Game implements RequestListener {
 	 * Step into the next turn (all entities live)
 	 */
 	private void nextTurn() {
-		logger.log(Level.INFO, "Starting players lives");
-		Player player;
+		logger.log(this.debugLevel, "Starting players lives");
 		Vector2i pos;
 
 		/* Letting the players to play */
 		for (int i = 0; i < this.players.size(); i++) {
-			player = this.players.get(i).object;
+			Player player = this.players.get(i);
 			player.live(this.mobs, this.players, this.world.getLOS(player.getPosition(), player.getLos()));
 			Pair<StorableObject> drop;
 			if ((pos = player.getRequestedMove()) != null) {
 				/*See if the player can move as he wanted to */
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
 				if (distance <= 1 && isAccessible(pos)) {
-					// TODO : los
 					player.setPosition(pos);
 				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
-					// TODO : los
 					player.setFloor(this.level + 1);
 					player.hasFallen = true;
 					player.damage(player.getMaxHitPoints() / 5);
 				} else {
-					logger.log(Level.INFO, "Player " + player.getName() + " requested an invalid move ! (from "
+					logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
 							+ player.getPosition() + " to " + pos + ")");
 					player.moveRequestDenied();
 				}
@@ -761,17 +758,24 @@ public class Game implements RequestListener {
 				/* Make the player to interact with the map */
 				this.world.triggerTile(pos);
 				fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+				player.setRequestedInteraction(null);
 			} else if ((drop = player.getObjectToDrop()) != null) {
 				pos = player.getDropPos();
 				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
 				if (drop.object != null && distance == 1) {
+					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+							drop.getId(),
+							drop.object.getGType(),
+							pos,
+							drop.object.getDescription()
+					));
 					player.dropRequestAccepted();
 					this.objectsOnGround.put(pos, drop);
 				}
 			} else {
 				String msg = "Nothing to do with player " + player.getName()
 						+ " (player #" + (player.getNumber() + 1) + ")";
-				logger.log(Level.SEVERE, msg);
+				logger.log(this.debugLevel, msg);
 				throw new RuntimeException(msg);
 			}
 		}
@@ -822,7 +826,12 @@ public class Game implements RequestListener {
 		}
 
 		for (Integer integer : toDelete) {
-			// TODO : los
+			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+					this.players.get(integer.intValue()).getId(),
+					this.world.getLOS(this.players.get(integer.intValue()).getPosition(),
+							this.players.get(integer.intValue()).getLos())
+			));
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.players.get(integer.intValue()).getId()));
 			this.players.remove(integer.intValue());
 		}
 
@@ -858,12 +867,29 @@ public class Game implements RequestListener {
 			if (player.getFloor() == this.level) {
 				nextLevel = false;
 			}
+
+			toDelete.clear();
+			for (int i = 0; i < this.interactiveObjects.size(); i++) {
+				Pair<InteractiveObject> interactiveObject = this.interactiveObjects.get(i);
+				if (interactiveObject.object.getPosition().equals(player.getPosition())) {
+					if (interactiveObject.object.trigger(player)) {
+						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
+						toDelete.add(new Integer(i));
+					}
+				}
+			}
+
+			for (Integer integer : toDelete) {
+				this.interactiveObjects.remove(integer.intValue());
+			}
 		}
 
 		if (nextLevel) {
 			++this.level;
 			this.generateLevel(); // Hot dog !
 			this.save();
+		} else {
+			this.recomputeLOS();
 		}
 	}
 
@@ -908,6 +934,15 @@ public class Game implements RequestListener {
 		} catch (IOException e) {
 			System.out.println("Failed to open the save file");
 			e.printStackTrace();
+		}
+	}
+
+	private void recomputeLOS() {
+		for (Player player : this.players) {
+			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+					player.getId(),
+					this.world.getLOS(player.getPosition(), player.getLos())
+			));
 		}
 	}
 }
