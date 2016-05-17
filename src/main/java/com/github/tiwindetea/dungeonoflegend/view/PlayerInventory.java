@@ -47,18 +47,18 @@ public class PlayerInventory extends Parent {
 
 		this.playerPicture = playerPicture;
 
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOW2));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.HELMET1));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BREAST_PLATE1));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.PANTS1));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOOTS1));
-		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.GLOVES1));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.HELMET1, "HELMET1"));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BREAST_PLATE1, "BREAST_PLATE1"));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.PANTS1, "PANTS1"));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.BOOTS1, "BOOTS1"));
+		this.equipedItemsHBox.getChildren().add(new InventoryItem(StaticEntityType.GLOVES1, "GLOVES1"));
 
 		this.itemsTilePane.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.itemsTilePane.setMinWidth(this.mainRectangle.getWidth() - (2 * SPACE));
 		this.itemsTilePane.setMaxWidth(this.mainRectangle.getWidth() - (2 * SPACE));
 		for(int i = 0; i < 17; ++i) {
-			this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2));
+			this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
 		}
 
 		HBox hBox = new HBox();
@@ -85,11 +85,11 @@ public class PlayerInventory extends Parent {
 			public void handle(MouseEvent event) {
 				if(event.getButton() == MouseButton.SECONDARY) {
 
-					PlayerInventory.this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2));
+					PlayerInventory.this.itemsTilePane.getChildren().add(new InventoryItem(StaticEntityType.BOW2, "BOW2"));
 				}
 				else {
 
-					PlayerInventory.this.itemsTilePane.getChildren().removeAll(PlayerInventory.this.itemsTilePane.getChildren());
+					PlayerInventory.this.itemsTilePane.getChildren().clear();
 				}
 			}
 		});

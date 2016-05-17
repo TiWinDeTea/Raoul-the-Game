@@ -83,14 +83,15 @@ public class PlayerHUD extends Parent {
 
 			@Override
 			public void handle(MouseEvent event) {
-				//TODO: display informations on the InformationDisplayer
+				InformationsDisplayer.setText("TODO");
+				//TODO: display real informations
 			}
 		});
 		this.setOnMouseExited(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
-				//TODO: display informations on the InformationDisplayer
+				InformationsDisplayer.clear();
 			}
 		});
 
