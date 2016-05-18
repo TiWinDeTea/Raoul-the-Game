@@ -67,6 +67,13 @@ public class PlayerInventory extends Parent {
 						}
 					}
 				}
+				if(PlayerInventory.this.equipedItems.containsValue(staticEntity)) {
+					for(Map.Entry<Long, StaticEntity> entry : PlayerInventory.this.equipedItems.entrySet()) {
+						if(entry.getValue().equals(staticEntity)) {
+							fireObjectClickEvent(new ObjectClickEvent(entry.getKey()));
+						}
+					}
+				}
 			}
 		}
 	};
