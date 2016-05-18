@@ -51,7 +51,7 @@ public class Pot implements Consumable {
 
 		if (defensePowerModifier > 0 || attackPowerModifier > 0 || healthModifier > 0 || manaModifier > 0) {
 			this.gtype = StaticEntityType.SUPER_POT;
-		} else if (heal == 0) {
+		} else if (heal != 0) {
 			this.gtype = StaticEntityType.HEALING_POT;
 		} else {
 			this.gtype = StaticEntityType.MANA_POT;
@@ -201,9 +201,45 @@ public class Pot implements Consumable {
 	public String getDescription() {
 		if (this.name == null) {
 			int i = 0;
-			this.name = this.gtype.toString().replaceAll("[0~9]+", "");
+			this.name = this.gtype.toString().replaceAll("[0-9]+", "");
+			this.name = this.name.substring(0, 1).toUpperCase() + this.name.substring(1);
 			while ((i = this.name.indexOf("-")) != -1) {
 				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
+			}
+			boolean effects = false;
+			this.name += "\n\nHealing effects:";
+			if (this.heal != 0) {
+				this.name += "\nHeal: " + this.heal;
+				effects = true;
+			}
+			if (this.mana_heal != 0) {
+				this.name += "\nMana: " + this.mana_heal;
+				effects = true;
+			}
+			if (this.turns != 0) {
+				this.name += "\nHeals duration: " + this.turns;
+				effects = true;
+			}
+			if (!effects) {
+				this.name += "\nNone.";
+			}
+
+			this.name += "\n\nPermanent effects:";
+			effects = false;
+			if (this.defensePowerModifier != 0) {
+				this.name += "\nDefense bonus: " + this.defensePowerModifier;
+				effects = true;
+			}
+			if (this.attackPowerModifier != 0) {
+				this.name += "\nAttack bonus: " + this.attackPowerModifier;
+				effects = true;
+			}
+			if (this.healthModifier != 0) {
+				this.name += "\nBonus health: " + this.healthModifier;
+				effects = true;
+			}
+			if (!effects) {
+				this.name += "\nNone.";
 			}
 		}
 		return this.name;

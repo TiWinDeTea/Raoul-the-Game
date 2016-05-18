@@ -140,9 +140,18 @@ public class Scroll implements Consumable {
 	public String getDescription() {
 		if (this.name == null) {
 			int i = 0;
-			this.name = this.gtype.toString().replaceAll("[0~9]+", "");
+			this.name = this.gtype.toString().replaceAll("[0-9]+", "");
+			this.name = this.name.substring(0, 1).toUpperCase() + this.name.substring(1);
 			while ((i = this.name.indexOf("-")) != -1) {
 				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
+			}
+
+			this.name += "\n\nDamage per turn: " + this.healthModifierPerTick;
+			if (this.healthModifierModifierPerTick != 0) {
+				this.name += "\nDamage modifier: " + this.healthModifierModifierPerTick;
+			}
+			if (this.turns != 0) {
+				this.name += "\nEffect duration: " + this.turns;
 			}
 		}
 		return this.name;

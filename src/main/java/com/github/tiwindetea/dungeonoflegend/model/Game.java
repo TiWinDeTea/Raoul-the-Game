@@ -61,11 +61,11 @@ public class Game implements RequestListener {
 	private static final int MAX_MOB_PER_LEVEL = 12;
 	private static final int MIN_MOB_PER_ROOM = 0; // >= 0 ; extra mobs (doesn't count in min_mob_per_level ; (negative to ignore)
 	private static final int MAX_MOB_PER_ROOM = 3; // > min_mob_per_room ; same
-	private static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
-	private static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
+	private static final int MIN_TRAPS_QTT_PER_LEVEL = 20;
+	private static final int MAX_TRAPS_QTT_PER_LEVEL = 50;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 20;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 30;
-	private static final int BULB_LOS = 1;
+	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 0;
 
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
@@ -606,7 +606,6 @@ public class Game implements RequestListener {
 		}
 
 		/* Generate some chests */
-		this.interactiveObjects = new ArrayList<>(chestsNbr + trapsNbr);
 		for (int i = 0; i < chestsNbr; i++) {
 			Pair<InteractiveObject> pair;
 			chestLevel = random.nextInt(3) + this.level - 1;

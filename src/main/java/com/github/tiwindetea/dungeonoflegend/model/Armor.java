@@ -170,7 +170,8 @@ public class Armor implements StorableObject {
 	public String getDescription() {
 		if (this.name == null) {
 			int i = 0;
-			this.name = this.gtype.toString().replaceAll("[0~9]+", "");
+			this.name = this.gtype.toString().replaceAll("[0-9]+", "");
+			this.name = this.name.substring(0, 1).toUpperCase() + this.name.substring(1);
 			while ((i = this.name.indexOf("-")) != -1) {
 				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
 			}
