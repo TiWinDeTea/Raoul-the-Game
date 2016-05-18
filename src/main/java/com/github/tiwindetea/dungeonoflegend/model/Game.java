@@ -57,8 +57,10 @@ import java.util.logging.Logger;
 public class Game implements RequestListener {
 
 	/* Tunning parameters for the entities generation */
-	private static final int MIN_MOB_QTT_PER_LEVEL = 25;
-	private static final int MAX_MOB_QTT_PER_LEVEL = 40;
+	private static final int MIN_MOB_PER_LEVEL = 10;
+	private static final int MAX_MOB_PER_LEVEL = 12;
+	private static final int MIN_MOB_PER_ROOM = 0; // >= 0 ; extra mobs (doesn't count in min_mob_per_level ; (negative to ignore)
+	private static final int MAX_MOB_PER_ROOM = 3; // > min_mob_per_room ; same
 	private static final int MIN_TRAPS_QTT_PER_LEVEL = 2;
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 5;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 20;
@@ -198,6 +200,13 @@ public class Game implements RequestListener {
 
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players);
+		Tile[][] tiles = new Tile[1][1];
+		for (int i = 0; i < tiles.length; i++) {
+			for (int j = 0; j < tiles[i].length; j++) {
+				tiles[i][j] = Tile.UNKNOWN;
+			}
+		}
+		fireMapCreationEvent(new MapCreationEvent(tiles));
 		for (Player player : this.players) {
 			firePlayerCreationEvent(new PlayerCreationEvent(
 					player.getNumber(),
@@ -644,25 +653,21 @@ public class Game implements RequestListener {
 
 		/* Generate the mobs */
 		Mob.setMap(this.world.copy());
-		int mobsNbr = random.nextInt(MAX_MOB_QTT_PER_LEVEL - MIN_MOB_QTT_PER_LEVEL) + MIN_MOB_QTT_PER_LEVEL;
+		int mobsNbr = random.nextInt(MAX_MOB_PER_LEVEL - MIN_MOB_PER_LEVEL) + MIN_MOB_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
-		int selectedMob, mobLevel;
-		Vector2i mobPos;
 		for (int i = 0; i < mobsNbr; ++i) {
-			selectedMob = random.nextInt(this.mobsTypes.length);
-			mobLevel = random.nextInt(3) + this.level - 1;
-			mobPos = this.selectRandomGroundPosition(rooms, random);
-			Mob mob = new Mob(
-					this.mobsName[selectedMob],
-					mobLevel,
-					mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
-					mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
-					mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
-					this.mobsChaseRange[selectedMob],
-					mobPos.copy());
-			this.mobs.add(mob);
-			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
-					mobPos.copy(), Direction.DOWN, mob.getDescription()));
+			this.addRandomMob(this.selectRandomGroundPosition(rooms, random), random);
+		}
+
+		if (MIN_MOB_PER_ROOM >= 0) {
+			for (Map.Room room : rooms) {
+				mobsNbr = random.nextInt(MAX_MOB_PER_ROOM - MIN_MOB_PER_ROOM) + MIN_MOB_PER_ROOM;
+				for (int i = 0; i < mobsNbr; i++) {
+					ArrayList<Map.Room> r = new ArrayList<>();
+					r.add(room);
+					this.addRandomMob(this.selectRandomGroundPosition(r, random), random);
+				}
+			}
 		}
 
 
@@ -676,7 +681,6 @@ public class Game implements RequestListener {
 			} else {
 				player.setPosition(this.world.getStairsUpPosition());
 			}
-			//fireLivingEntityMoveEvent(new LivingEntityMoveEvent(player.getId(), player.getPosition()));/////////////////////////////////////////////////////////////////////////////////////
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
 					player.getId(),
 					this.world.getLOS(player.getPosition(), player.getLos())
@@ -820,7 +824,7 @@ public class Game implements RequestListener {
 						if (j < 0) {
 							j = this.mobs.indexOf(new Mob(pos));
 							if (j >= 0) {
-								mob.attack(this.players.get(j));
+								mob.attack(this.mobs.get(j));
 							}
 						} else {
 							if (j >= 0) {
@@ -965,5 +969,21 @@ public class Game implements RequestListener {
 					this.world.getLOS(player.getPosition(), player.getLos())
 			));
 		}
+	}
+
+	private void addRandomMob(Vector2i mobPos, Random random) {
+		int selectedMob = random.nextInt(this.mobsTypes.length);
+		int mobLevel = random.nextInt(3) + this.level - 1;
+		Mob mob = new Mob(
+				this.mobsName[selectedMob],
+				mobLevel,
+				mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
+				mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
+				mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
+				this.mobsChaseRange[selectedMob],
+				mobPos.copy());
+		this.mobs.add(mob);
+		fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
+				mobPos.copy(), Direction.DOWN, mob.getDescription()));
 	}
 }
