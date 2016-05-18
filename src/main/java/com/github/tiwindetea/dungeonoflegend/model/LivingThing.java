@@ -148,7 +148,7 @@ public abstract class LivingThing implements Descriptable {
 	 */
 	public void damage(int damages) {
 		if (damages > 0)
-			this.hitPoints -= damages;
+			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
 	}
 
 	/**

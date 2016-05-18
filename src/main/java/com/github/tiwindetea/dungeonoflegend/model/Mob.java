@@ -234,6 +234,7 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public void attack(LivingThing target) {
+		System.out.println(this.getDescription() + "is attacking " + target.getDescription() + " by " + this.attackPower);
 		target.damage(this.attackPower);
 	}
 
@@ -253,6 +254,7 @@ public class Mob extends LivingThing {
 
 	@Override
 	public String getDescription() {
-		return this.name + " (Lv" + this.level + ".)";
+		return this.name + " (Lv" + this.level + ".)\n"
+				+ "Power grade: " + (this.attackPower + this.defensePower + this.hitPoints) / 3;
 	}
 }

@@ -699,7 +699,7 @@ public class Player extends LivingThing {
 	@Override
 	public void damage(int damages) {
 		if (damages > 0)
-			this.hitPoints -= damages;
+			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
 		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 
