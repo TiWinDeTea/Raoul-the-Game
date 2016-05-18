@@ -8,6 +8,8 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+//FIXME : Broken IA (doesn't chase when the player crosses a door)
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -159,6 +161,7 @@ public class Mob extends LivingThing {
 		if (distance <= 1) {
 			this.requestedAttack = chasedPlayer.getPosition();
 			this.requestedPath = null;
+			this.requestedPathStack.clear();
 		} else if (distance <= this.chaseRange) {
 			this.chase(shadow, chasedPlayer);
 			this.state = State.CHASING;

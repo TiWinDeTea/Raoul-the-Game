@@ -49,6 +49,9 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+//FIXME : Next level broken (see all entities, but not the map neither the players)
+//FIXME : Next level broken (when you fall into a hole, you can get outside of the map)
+
 
 /**
  * Game.
@@ -480,7 +483,9 @@ public class Game implements RequestListener {
 					}
 					++j;
 				} while (i == -1 && j < this.mobs.size());
-				if (i >= 0) {
+				if (i >= 0
+						&& this.currentPlayer.getPosition().squaredDistance(e.tilePosition) <= Math.pow(this.currentPlayer.getAttackRange(), 2)
+						) {
 					if (this.objectToUse != null) {
 						this.objectToUse.object.trigger(this.mobs.get(i));
                         this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
@@ -539,15 +544,16 @@ public class Game implements RequestListener {
                 this.objectToUse = null;
             }
         } else if (obj != null) {
-            if (obj.object.getType() == StorableObjectType.ARMOR) {
-                this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
-            } else if (obj.object.getType() == StorableObjectType.WEAPON) {
-                this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
-            }
-        } else {
-            this.currentPlayer.unequip(e.objectId);
-        }
-    }
+			this.currentPlayer.removeFromInventory(obj);
+			if (obj.object.getType() == StorableObjectType.ARMOR) {
+				this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
+			} else if (obj.object.getType() == StorableObjectType.WEAPON) {
+				this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
+			}
+		} else {
+			this.currentPlayer.unequip(e.objectId);
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -790,46 +796,46 @@ public class Game implements RequestListener {
                     }
                 } else if ((pos = player.getRequestedAttack()) != null) {
                 /* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
-                    if (Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y) <= player.getAttackRange()) {
-                        int j = this.mobs.indexOf(new Mob(pos));
-                        if (j >= 0) {
-                            player.attack(this.mobs.get(j));
-                        } else {
-                            // Healing by 20%, because why not
-                            player.heal(player.getMaxHitPoints() / 5);
-                        }
-                    }
-                    player.setRequestedAttack(null);
-                } else if ((pos = player.getRequestedInteraction()) != null) {
-                /* Make the player to interact with the map */
-                    this.world.triggerTile(pos);
-                    fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
-                    player.setRequestedInteraction(null);
-                } else if ((drop = player.getObjectToDrop()) != null) {
-                    pos = player.getDropPos();
-                    int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
-                    if (drop.object != null && distance == 1) {
-                        fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
-                                drop.getId(),
-                                drop.object.getGType(),
-                                pos,
-                                drop.object.getDescription()
-                        ));
-                        player.dropRequestAccepted();
-                        this.objectsOnGround.put(pos, drop);
-                    }
-                } else {
-                    String msg = "Nothing to do with player " + player.getName()
-                            + " (player #" + (player.getNumber() + 1) + ")";
-                    logger.log(this.debugLevel, msg);
-                    throw new RuntimeException(msg);
-                }
-            } else {
-                this.playersOnNextLevel.add(player);
-                this.players.remove(player);
-                --i;
-            }
-        }
+					if (player.getPosition().squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
+						int j = this.mobs.indexOf(new Mob(pos));
+						if (j >= 0) {
+							player.attack(this.mobs.get(j));
+						} else {
+							// Healing by 20%, because why not
+							player.heal(player.getMaxHitPoints() / 5);
+						}
+					}
+					player.setRequestedAttack(null);
+				} else if ((pos = player.getRequestedInteraction()) != null) {
+				/* Make the player to interact with the map */
+					this.world.triggerTile(pos);
+					fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+					player.setRequestedInteraction(null);
+				} else if ((drop = player.getObjectToDrop()) != null) {
+					pos = player.getDropPos();
+					int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+					if (drop.object != null && distance == 1) {
+						fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+								drop.getId(),
+								drop.object.getGType(),
+								pos,
+								drop.object.getDescription()
+						));
+						player.dropRequestAccepted();
+						this.objectsOnGround.put(pos, drop);
+					}
+				} else {
+					String msg = "Nothing to do with player " + player.getName()
+							+ " (player #" + (player.getNumber() + 1) + ")";
+					logger.log(this.debugLevel, msg);
+					throw new RuntimeException(msg);
+				}
+			} else {
+				this.playersOnNextLevel.add(player);
+				this.players.remove(player);
+				--i;
+			}
+		}
 
 		Mob mob;
 		ArrayList<Integer> toDelete = new ArrayList<>(3);

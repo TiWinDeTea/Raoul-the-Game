@@ -41,25 +41,35 @@ public class Weapon implements StorableObject {
 		Random random = new Random();
 
 		/* Setting the type and the graphical type */
-		if (manaCost != 0) {
+		if (manaCost > 0) {
 			this.type = WeaponType.WAND;
+			this.name = "Magic wand";
 			if (random.nextBoolean())
 				this.gtype = StaticEntityType.WAND1;
 			else
 				this.gtype = StaticEntityType.WAND2;
-		} else if (range != 0) {
+		} else if (range > 1) {
 			this.type = WeaponType.BOW;
-			if (random.nextBoolean())
+			if (random.nextBoolean()) {
+				this.name = "Bow";
 				this.gtype = StaticEntityType.BOW1;
-			else
+			} else {
+				this.name = "Crossbow";
 				this.gtype = StaticEntityType.BOW2;
+			}
 		} else {
 			this.type = WeaponType.SWORD;
-			if (random.nextBoolean())
+			if (random.nextBoolean()) {
+				this.name = "Sword";
 				this.gtype = StaticEntityType.SWORD1;
-			else
+			} else {
+				this.name = "Axe";
 				this.gtype = StaticEntityType.SWORD2;
+			}
 		}
+		this.name += "\n\nAttack power: " + this.attackPowerModifier;
+		this.name += "\nRange: " + this.range;
+		this.name += "\nMana cost: " + this.manaCost;
 	}
 
 	private Weapon() {
@@ -163,20 +173,6 @@ public class Weapon implements StorableObject {
 
 	@Override
 	public String getDescription() {
-		if (this.name == null) {
-			int i = 0;
-			this.name = this.gtype.toString().replaceAll("[0-9]+", "");
-			this.name = this.name.substring(0, 1).toUpperCase() + this.name.substring(1);
-			if (this.name.equals("Wand")) {
-				this.name = "Magic wand";
-			}
-			while ((i = this.name.indexOf("-")) != -1) {
-				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
-			}
-			this.name += "\nAttack power: " + this.attackPowerModifier;
-			this.name += "\nRange: " + this.range;
-			this.name += "\nMana cost: " + this.manaCost;
-		}
 		return this.name;
 	}
 }

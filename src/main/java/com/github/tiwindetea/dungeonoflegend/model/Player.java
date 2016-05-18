@@ -402,8 +402,9 @@ public class Player extends LivingThing {
 	 * @return true if the mana was consumed, false otherwise (ie : not enough mana)
 	 */
 	public boolean useMana(int consumption) {
-		if(this.mana > consumption) {
+		if (this.mana >= consumption) {
 			this.mana -= consumption;
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, this.mana));
 			return true;
 		}
 		return false;
@@ -419,7 +420,7 @@ public class Player extends LivingThing {
 		Pair<Armor> removedArmor = null;
 		for (int i = 0; i < equipedArmor.length; i++) {
 			if (equipedArmor[i] == armor.object.getArmorType()) {
-				if (this.armors.get(i).object != null) {
+				if (this.armors.get(i) != null && this.armors.get(i).object != null) {
 					removedArmor = this.armors.get(i);
 					fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
 					addToInventory(new Pair<>(removedArmor));
@@ -731,15 +732,16 @@ public class Player extends LivingThing {
 	}
 
 	public void unequip(long id) {
-		System.out.println("Unequip");
 		if (this.inventory.size() < this.maxStorageCapacity - 1) {
-			if (this.weapon.getId() == id) {
-				this.weapon = null;
+			if (this.weapon != null && this.weapon.getId() == id) {
 				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
+				addToInventory(new Pair<>(this.weapon.getId(), this.weapon.object));
+				this.weapon = null;
 			} else {
 				for (int i = 0; i < this.armors.size(); i++) {
-					if (this.armors.get(i).getId() == id) {
+					if (this.armors.get(i) != null && this.armors.get(i).getId() == id) {
 						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
+						addToInventory(new Pair<>(this.armors.get(i).getId(), this.armors.get(i).object));
 						this.armors.set(i, null);
 					}
 				}
