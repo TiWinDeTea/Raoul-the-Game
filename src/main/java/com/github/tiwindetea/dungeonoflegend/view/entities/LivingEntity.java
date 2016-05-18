@@ -12,10 +12,11 @@ public class LivingEntity extends Entity {
 	private Direction direction;
 
 	public LivingEntity(LivingEntityType livingEntityType, Vector2i position, Direction direction, String description) {
-		super(description);
+		super(position, description);
 		this.livingEntityType = livingEntityType;
-		this.setPosition(position);
 		this.imageView.setImage(livingEntityType.getImage());
+		this.imageView.translateXProperty().bind(this.XPositionProperty);
+		this.imageView.translateYProperty().bind(this.YPositionProperty);
 		this.setDirection(direction);
 
 		getChildren().add(this.imageView);
@@ -24,13 +25,6 @@ public class LivingEntity extends Entity {
 	public void setPosition(Vector2i position, Direction direction) {
 		this.setPosition(position);
 		this.setDirection(direction);
-	}
-
-	@Override
-	public void setPosition(Vector2i position) {
-		this.position = new Vector2i(position);
-		this.imageView.setTranslateX(position.x * spriteSize.x);
-		this.imageView.setTranslateY(position.y * spriteSize.y);
 	}
 
 	public void setDirection(Direction direction) {

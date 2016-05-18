@@ -15,11 +15,12 @@ public class StaticEntity extends Entity {
 	private Animation animation;
 
 	public StaticEntity(StaticEntityType staticEntityType, Vector2i position, String description) {
-		super(description);
-		this.setPosition(position);
+		super(position, description);
 		this.staticEntityType = staticEntityType;
 		this.imageView.setImage(staticEntityType.getImage());
 		this.imageView.setViewport(new Rectangle2D(staticEntityType.getSpritesPosition().x * spriteSize.x, staticEntityType.getSpritesPosition().y * spriteSize.y, spriteSize.x, spriteSize.y));
+		this.imageView.translateXProperty().bind(this.XPositionProperty);
+		this.imageView.translateYProperty().bind(this.YPositionProperty);
 
 		if(staticEntityType.getSpritesNumber() > 1) {
 			this.animate();
@@ -37,13 +38,6 @@ public class StaticEntity extends Entity {
 		this.animation = new SpriteAnimation(this.imageView, this.staticEntityType.getSpritesNumber(), this.staticEntityType.getSpritesPosition(), spriteSize, Duration.millis(this.staticEntityType.getAnimationSpeed()));
 		this.animation.setCycleCount(Animation.INDEFINITE);
 		this.animation.play();
-	}
-
-	@Override
-	public void setPosition(Vector2i position) {
-		this.position = new Vector2i(position);
-		this.imageView.setTranslateX(position.x * spriteSize.x);
-		this.imageView.setTranslateY(position.y * spriteSize.y);
 	}
 
 	public boolean isAnimated() {
