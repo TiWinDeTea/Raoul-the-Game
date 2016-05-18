@@ -250,7 +250,12 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
+		if(e.playerNumber < this.actualPlayersNumber) {
+			this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
+		}
+		else {
+			System.out.println("GUI::deleteInventory : invalid player number " + e.playerNumber);
+		}
 	}
 
 	@Override
@@ -268,8 +273,13 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.cTileMap.removeEntity(this.livingEntities.get(e.entityId));
-		this.livingEntities.remove(e.entityId);
+		if(this.livingEntities.containsKey(e.entityId)) {
+			this.cTileMap.removeEntity(this.livingEntities.get(e.entityId));
+			this.livingEntities.remove(e.entityId);
+		}
+		else {
+			System.out.println("GUI::deleteLivingEntity : invalid entity id " + e.entityId);
+		}
 	}
 
 	@Override
@@ -277,8 +287,13 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.livingEntities.get(e.entityId).setLOS(e.newLOS);
-		this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		if(this.livingEntities.containsKey(e.entityId)) {
+			this.livingEntities.get(e.entityId).setLOS(e.newLOS);
+			this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		}
+		else {
+			System.out.println("GUI::defineLivingEntityLOS : invalid entity id " + e.entityId);
+		}
 	}
 
 	@Override
@@ -286,8 +301,13 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
-		this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		if(this.livingEntities.containsKey(e.entityId)) {
+			this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
+			this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		}
+		else {
+			System.out.println("GUI::modifieLivingEntityLOS : invalid entity id " + e.entityId);
+		}
 	}
 
 	@Override
@@ -295,27 +315,32 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		Vector2i oldPosition = this.livingEntities.get(e.entityId).getPosition();
-		Vector2i newPosition = e.newPosition;
-		Direction direction;
-		if(newPosition.y > oldPosition.y) {
-			direction = Direction.DOWN;
-		}
-		else if(newPosition.y < oldPosition.y) {
-			direction = Direction.UP;
-		}
-		else if(newPosition.x > oldPosition.x) {
-			direction = Direction.RIGHT;
-		}
-		else if(newPosition.x < oldPosition.x) {
-			direction = Direction.LEFT;
+		if(this.livingEntities.containsKey(e.entityId)) {
+			Vector2i oldPosition = this.livingEntities.get(e.entityId).getPosition();
+			Vector2i newPosition = e.newPosition;
+			Direction direction;
+			if(newPosition.y > oldPosition.y) {
+				direction = Direction.DOWN;
+			}
+			else if(newPosition.y < oldPosition.y) {
+				direction = Direction.UP;
+			}
+			else if(newPosition.x > oldPosition.x) {
+				direction = Direction.RIGHT;
+			}
+			else if(newPosition.x < oldPosition.x) {
+				direction = Direction.LEFT;
+			}
+			else {
+				direction = this.livingEntities.get(e.entityId).getDirection();
+			}
+			this.livingEntities.get(e.entityId).setDirection(direction);
+			this.livingEntities.get(e.entityId).setPosition(e.newPosition);
+			this.cTileMap.setVisibleTiles(computeVisibleTiles());
 		}
 		else {
-			direction = this.livingEntities.get(e.entityId).getDirection();
+			System.out.println("GUI::moveLivingEntity : invalid entity id " + e.entityId);
 		}
-		this.livingEntities.get(e.entityId).setDirection(direction);
-		this.livingEntities.get(e.entityId).setPosition(e.newPosition);
-		this.cTileMap.setVisibleTiles(computeVisibleTiles());
 	}
 
 	@Override
@@ -346,6 +371,9 @@ public class GUI implements GameListener, TileMapListener {
 			this.blTilePane.getChildren().add(playerHUD);
 
 			this.playersInventories.add(new PlayerInventory(imageView2));
+		}
+		else {
+			System.out.println("GUI::createPlayer : too much players " + this.actualPlayersNumber);
 		}
 	}
 
@@ -382,6 +410,9 @@ public class GUI implements GameListener, TileMapListener {
 				break;
 			}
 		}
+		else {
+			System.out.println("GUI::changePlayerStat : invalid player number " + e.playerNumber);
+		}
 	}
 
 	@Override
@@ -399,8 +430,13 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.cTileMap.removeEntity(this.staticEntities.get(e.entityId));
-		this.staticEntities.remove(e.entityId);
+		if(this.staticEntities.containsKey(e.entityId)) {
+			this.cTileMap.removeEntity(this.staticEntities.get(e.entityId));
+			this.staticEntities.remove(e.entityId);
+		}
+		else {
+			System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.entityId);
+		}
 	}
 
 	@Override
@@ -408,8 +444,13 @@ public class GUI implements GameListener, TileMapListener {
 		if(e == null) {
 			return;
 		}
-		this.staticEntities.get(e.entityId).setLOS(e.newLOS);
-		this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		if(this.staticEntities.containsKey(e.entityId)) {
+			this.staticEntities.get(e.entityId).setLOS(e.newLOS);
+			this.cTileMap.setVisibleTiles(computeVisibleTiles());
+		}
+		else {
+			System.out.println("GUI::defineStaticEntityLOS : invalid entity id " + e.entityId);
+		}
 	}
 
 	@Override
