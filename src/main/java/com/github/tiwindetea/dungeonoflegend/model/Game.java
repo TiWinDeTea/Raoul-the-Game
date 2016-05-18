@@ -75,9 +75,10 @@ public class Game implements RequestListener {
 	private ArrayList<Mob> mobs = new ArrayList<>();
 	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
 	private ArrayList<Player> players = new ArrayList<>();
-	private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
-	private Seed seed;
-	private final List<GameListener> listeners = new ArrayList<>();
+    private ArrayList<Player> playersOnNextLevel = new ArrayList<>();
+    private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
+    private Seed seed;
+    private final List<GameListener> listeners = new ArrayList<>();
 
 	private int playerTurn;
 	private Player currentPlayer;
@@ -482,15 +483,16 @@ public class Game implements RequestListener {
 				if (i >= 0) {
 					if (this.objectToUse != null) {
 						this.objectToUse.object.trigger(this.mobs.get(i));
-						this.triggeredObjects.add(this.objectToUse.object);
-						this.objectToUse = null;
-					}
-					this.currentPlayer.setRequestedAttack(e.tilePosition);
-				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-					/* interaction with doors */
-					this.currentPlayer.setRequestedInteraction(e.tilePosition);
-				} else {
-					success = false; // no mob found, neither doors
+                        this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+                        this.triggeredObjects.add(this.objectToUse.object);
+                        this.objectToUse = null;
+                    }
+                    this.currentPlayer.setRequestedAttack(e.tilePosition);
+                } else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+                    /* interaction with doors */
+                    this.currentPlayer.setRequestedInteraction(e.tilePosition);
+                } else {
+                    success = false; // no mob found, neither doors
 				}
 			} else {
 				success = false; // tile not in the los
@@ -517,19 +519,35 @@ public class Game implements RequestListener {
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
 		logger.log(this.debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
-		Pair<StorableObject>[] inventory = this.currentPlayer.getInventory();
-		this.objectToUse = null;
-		for (Pair<StorableObject> pair : inventory) {
-			if (pair.object.getType() == StorableObjectType.CONSUMABLE && pair.getId() == e.objectId) {
-				this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
-			}
-		}
-		if (this.objectToUse != null && this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
-			this.triggeredObjects.add(this.objectToUse.object);
-			this.objectToUse.object.trigger(this.currentPlayer);
-			this.objectToUse = null;
-		}
-	}
+        List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
+        this.objectToUse = null;
+        Pair<StorableObject> obj = null;
+        for (Pair<StorableObject> pair : inventory) {
+            if (pair.getId() == e.objectId) {
+                if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
+                    this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
+                } else {
+                    obj = pair;
+                }
+            }
+        }
+        if (this.objectToUse != null) {
+            if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
+                this.triggeredObjects.add(this.objectToUse.object);
+                this.objectToUse.object.trigger(this.currentPlayer);
+                this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+                this.objectToUse = null;
+            }
+        } else if (obj != null) {
+            if (obj.object.getType() == StorableObjectType.ARMOR) {
+                this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
+            } else if (obj.object.getType() == StorableObjectType.WEAPON) {
+                this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
+            }
+        } else {
+            this.currentPlayer.unequip(e.objectId);
+        }
+    }
 
 	/**
 	 * {@inheritDoc}
@@ -552,6 +570,9 @@ public class Game implements RequestListener {
 	 * generates a level
 	 */
 	private void generateLevel() {
+        this.players.addAll(this.playersOnNextLevel);
+        this.playersOnNextLevel.clear();
+
 		/* Next block deletes all entities on the GUI */
 		for (Mob mob : this.mobs) {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
@@ -737,8 +758,8 @@ public class Game implements RequestListener {
 				this.currentPlayer = this.players.get(this.playerTurn);
 			}
 			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
-		} while (this.currentPlayer.isARequestPending());
-	}
+        } while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+    }
 
 	/**
 	 * Step into the next turn (all entities live)
@@ -752,57 +773,63 @@ public class Game implements RequestListener {
 			Player player = this.players.get(i);
 			player.live(this.mobs, this.players, this.world.getLOS(player.getPosition(), player.getLos()));
 			Pair<StorableObject> drop;
-			if ((pos = player.getRequestedMove()) != null) {
-				/*See if the player can move as he wanted to */
-				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
-				if (distance <= 1 && isAccessible(pos)) {
-					player.setPosition(pos);
-				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
-					player.setFloor(this.level + 1);
-					player.hasFallen = true;
-					player.damage(player.getMaxHitPoints() / 5);
-				} else {
-					logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
-							+ player.getPosition() + " to " + pos + ")");
-					player.moveRequestDenied();
-				}
-			} else if ((pos = player.getRequestedAttack()) != null) {
-				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
-				if (Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y) <= player.getAttackRange()) {
-					int j = this.mobs.indexOf(new Mob(pos));
-					if (j >= 0) {
-						player.attack(this.mobs.get(j));
-					} else {
-						// Healing by 20%, because why not
-						player.heal(player.getMaxHitPoints() / 5);
-					}
-				}
-				player.setRequestedAttack(null);
-			} else if ((pos = player.getRequestedInteraction()) != null) {
-				/* Make the player to interact with the map */
-				this.world.triggerTile(pos);
-				fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
-				player.setRequestedInteraction(null);
-			} else if ((drop = player.getObjectToDrop()) != null) {
-				pos = player.getDropPos();
-				int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
-				if (drop.object != null && distance == 1) {
-					fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
-							drop.getId(),
-							drop.object.getGType(),
-							pos,
-							drop.object.getDescription()
-					));
-					player.dropRequestAccepted();
-					this.objectsOnGround.put(pos, drop);
-				}
-			} else {
-				String msg = "Nothing to do with player " + player.getName()
-						+ " (player #" + (player.getNumber() + 1) + ")";
-				logger.log(this.debugLevel, msg);
-				throw new RuntimeException(msg);
-			}
-		}
+            if (player.getFloor() == this.level) {
+                if ((pos = player.getRequestedMove()) != null) {
+                /*See if the player can move as he wanted to */
+                    int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+                    if (distance <= 1 && isAccessible(pos)) {
+                        player.setPosition(pos);
+                    } else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
+                        player.setFloor(this.level + 1);
+                        player.hasFallen = true;
+                        player.damage(player.getMaxHitPoints() / 5);
+                    } else {
+                        logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
+                                + player.getPosition() + " to " + pos + ")");
+                        player.moveRequestDenied();
+                    }
+                } else if ((pos = player.getRequestedAttack()) != null) {
+                /* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
+                    if (Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y) <= player.getAttackRange()) {
+                        int j = this.mobs.indexOf(new Mob(pos));
+                        if (j >= 0) {
+                            player.attack(this.mobs.get(j));
+                        } else {
+                            // Healing by 20%, because why not
+                            player.heal(player.getMaxHitPoints() / 5);
+                        }
+                    }
+                    player.setRequestedAttack(null);
+                } else if ((pos = player.getRequestedInteraction()) != null) {
+                /* Make the player to interact with the map */
+                    this.world.triggerTile(pos);
+                    fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+                    player.setRequestedInteraction(null);
+                } else if ((drop = player.getObjectToDrop()) != null) {
+                    pos = player.getDropPos();
+                    int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+                    if (drop.object != null && distance == 1) {
+                        fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+                                drop.getId(),
+                                drop.object.getGType(),
+                                pos,
+                                drop.object.getDescription()
+                        ));
+                        player.dropRequestAccepted();
+                        this.objectsOnGround.put(pos, drop);
+                    }
+                } else {
+                    String msg = "Nothing to do with player " + player.getName()
+                            + " (player #" + (player.getNumber() + 1) + ")";
+                    logger.log(this.debugLevel, msg);
+                    throw new RuntimeException(msg);
+                }
+            } else {
+                this.playersOnNextLevel.add(player);
+                this.players.remove(player);
+                --i;
+            }
+        }
 
 		Mob mob;
 		ArrayList<Integer> toDelete = new ArrayList<>(3);

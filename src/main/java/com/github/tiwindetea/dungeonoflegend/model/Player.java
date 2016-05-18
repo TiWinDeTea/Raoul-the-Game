@@ -337,8 +337,8 @@ public class Player extends LivingThing {
 	 *
 	 * @return the inventory.
 	 */
-	public Pair<StorableObject>[] getInventory() {
-		return (Pair<StorableObject>[]) this.inventory.toArray();
+	public List<Pair<StorableObject>> getInventory() {
+		return this.inventory;
 	}
 
 	/**
@@ -384,6 +384,7 @@ public class Player extends LivingThing {
 		if (this.objectToDrop != null && this.inventory.remove(this.objectToDrop)) {
 			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
 			Pair<StorableObject> tmp = this.objectToDrop;
+			this.inventory.remove(this.objectToDrop);
 			this.objectToDrop = null;
 			return tmp;
 		}
@@ -420,8 +421,16 @@ public class Player extends LivingThing {
 			if (equipedArmor[i] == armor.object.getArmorType()) {
 				if (this.armors.get(i).object != null) {
 					removedArmor = this.armors.get(i);
+					fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
 					addToInventory(new Pair<>(removedArmor));
 				}
+				fireInventoryAdditionEvent(new InventoryAdditionEvent(
+						this.number,
+						armor.getId(),
+						true,
+						armor.object.getGType(),
+						armor.object.getDescription()
+				));
 				this.armors.set(i, armor);
 				return removedArmor;
 			}
@@ -440,8 +449,16 @@ public class Player extends LivingThing {
 		Pair<Weapon> removedWeapon = this.weapon;
 		this.weapon = weapon;
 		if (removedWeapon != null) {
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedWeapon.getId()));
 			this.addToInventory(new Pair<>(removedWeapon));
 		}
+		fireInventoryAdditionEvent(new InventoryAdditionEvent(
+				this.number,
+				weapon.getId(),
+				true,
+				weapon.object.getGType(),
+				weapon.object.getDescription()
+		));
 		return removedWeapon;
 	}
 
@@ -705,5 +722,28 @@ public class Player extends LivingThing {
 
 	public LivingEntityType getGType() {
 		return ENUM_VAL[this.number];
+	}
+
+	public void removeFromInventory(Pair<StorableObject> storableObject) {
+		if (this.inventory.remove(storableObject)) {
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, storableObject.getId()));
+		}
+	}
+
+	public void unequip(long id) {
+		System.out.println("Unequip");
+		if (this.inventory.size() < this.maxStorageCapacity - 1) {
+			if (this.weapon.getId() == id) {
+				this.weapon = null;
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
+			} else {
+				for (int i = 0; i < this.armors.size(); i++) {
+					if (this.armors.get(i).getId() == id) {
+						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
+						this.armors.set(i, null);
+					}
+				}
+			}
+		}
 	}
 }
