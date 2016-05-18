@@ -30,7 +30,6 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
@@ -61,13 +60,17 @@ public class GUI implements GameListener, TileMapListener {
 
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
-	private final Pane rPane = new Pane();
+
 	private final Pane cPane = new Pane();
 
 	private final Pane bPane = new Pane();
 	private final HBox bHBox = new HBox();
 	private final TilePane blTilePane = new TilePane();
 	private final Pane brMiniMapPain = new Pane();
+
+	private final Pane rPane = new Pane();
+	private final VBox rVBox = new VBox();
+	private final Pane rIventoryPane = new Pane();
 
 	private final HashMap<Long, LivingEntity> livingEntities = new HashMap<>();
 	private final HashMap<Long, StaticEntity> staticEntities = new HashMap<>();
@@ -112,6 +115,8 @@ public class GUI implements GameListener, TileMapListener {
 
 	private void init() {
 
+		this.scene.setOnKeyReleased(this.onKeyReleasedEventHandler);
+
 		//Main pane
 		//this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
 		this.borderPane.setCenter(this.cPane);
@@ -126,22 +131,15 @@ public class GUI implements GameListener, TileMapListener {
 		this.cTileMap.addTileMapListener(this);
 
 		//Right pane
-		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rIventoryPane.setBackground(new Background(new BackgroundFill(Color.CHOCOLATE, CornerRadii.EMPTY, Insets.EMPTY)));
 
-		//TODO: Real inventory creation
-		//////////////////////////////////////
-		ImageView imageView = new ImageView(LivingEntityType.PLAYER1.getImage());
-		Vector2i spritePosition = LivingEntityType.PLAYER1.getSpritePosition(Direction.DOWN);
-		imageView.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-		VBox vBox = new VBox();
-		this.rPane.getChildren().add(vBox);
-		vBox.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-		vBox.getChildren().add(new ScoreDisplayer());
-		PlayerInventory playerInventory = new PlayerInventory(imageView);
-		vBox.getChildren().add(playerInventory);
-		vBox.setAlignment(Pos.TOP_LEFT);
-		vBox.getChildren().add(InformationsDisplayer.getInstance());
-		/////////////////////////////////////
+		this.rVBox.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rVBox.getChildren().add(new ScoreDisplayer());
+		this.rVBox.getChildren().add(this.rIventoryPane);
+		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
+
+		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rPane.getChildren().add(this.rVBox);
 
 		//Bootom pane
 		this.brMiniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -370,7 +368,9 @@ public class GUI implements GameListener, TileMapListener {
 			this.playersHUD.add(playerHUD);
 			this.blTilePane.getChildren().add(playerHUD);
 
-			this.playersInventories.add(new PlayerInventory(imageView2));
+			PlayerInventory playerInventory = new PlayerInventory(imageView2);
+			this.playersInventories.add(playerInventory);
+			this.rIventoryPane.getChildren().add(playerInventory);
 		}
 		else {
 			System.out.println("GUI::createPlayer : too much players " + this.actualPlayersNumber);
@@ -476,7 +476,10 @@ public class GUI implements GameListener, TileMapListener {
 		for(PlayerHUD playerHUD : this.playersHUD) {
 			playerHUD.setMasked(true);
 		}
+		for(PlayerInventory playersInventory : this.playersInventories) {
+			playersInventory.setVisible(false);
+		}
 		this.playersHUD.get(event.playerNumber).setMasked(false);
-		//TODO
+		this.playersInventories.get(event.playerNumber).setVisible(true);
 	}
 }

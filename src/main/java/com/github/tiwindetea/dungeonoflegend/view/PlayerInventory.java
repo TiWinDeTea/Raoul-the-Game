@@ -2,13 +2,9 @@ package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
-import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -66,23 +62,6 @@ public class PlayerInventory extends Parent {
 		this.inventoryItemsTilePane.setPrefWidth(Double.MAX_VALUE);
 		this.inventoryItemsTilePane.setPadding(new Insets(SPACE));
 		this.inventoryItemsTilePane.maxWidthProperty().bind(this.mainVBox.widthProperty());
-
-
-		//For test
-		setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if(event.getButton() == MouseButton.SECONDARY) {
-
-					PlayerInventory.this.inventoryItemsTilePane.getChildren().add(new StaticEntity(StaticEntityType.SUPER_POT, new Vector2i(), "SUPER_POT"));
-				}
-				else {
-
-					PlayerInventory.this.inventoryItemsTilePane.getChildren().clear();
-				}
-			}
-		});
-
 	}
 
 	public void addInventoryItem(Long entityId, StaticEntity staticEntity) {
