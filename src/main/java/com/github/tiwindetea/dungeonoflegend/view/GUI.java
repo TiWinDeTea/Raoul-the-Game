@@ -7,6 +7,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
@@ -21,6 +22,7 @@ import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntity
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
@@ -51,7 +53,7 @@ import java.util.List;
 /**
  * Created by maxime on 5/2/16.
  */
-public class GUI implements GameListener, TileMapListener {
+public class GUI implements GameListener, TileMapListener, PlayerInventoryListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
 	public static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
@@ -236,10 +238,10 @@ public class GUI implements GameListener, TileMapListener {
 			return;
 		}
 		if(e.isEquiped) {
-			this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, new Vector2i(), e.description));
+			this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description));
 		}
 		else {
-			this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, new Vector2i(), e.description));
+			this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description));
 		}
 	}
 
@@ -371,6 +373,7 @@ public class GUI implements GameListener, TileMapListener {
 			PlayerInventory playerInventory = new PlayerInventory(imageView2);
 			this.playersInventories.add(playerInventory);
 			this.rIventoryPane.getChildren().add(playerInventory);
+			playerInventory.addPlayerInventoryListener(this);
 		}
 		else {
 			System.out.println("GUI::createPlayer : too much players " + this.actualPlayersNumber);
@@ -481,5 +484,10 @@ public class GUI implements GameListener, TileMapListener {
 		}
 		this.playersHUD.get(event.playerNumber).setMasked(false);
 		this.playersInventories.get(event.playerNumber).setVisible(true);
+	}
+
+	@Override
+	public void objectClicked(ObjectClickEvent e) {
+		fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
 	}
 }

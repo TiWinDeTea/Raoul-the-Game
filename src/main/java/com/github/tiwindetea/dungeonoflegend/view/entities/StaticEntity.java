@@ -28,6 +28,10 @@ public class StaticEntity extends Entity {
 		getChildren().add(this.imageView);
 	}
 
+	public StaticEntity(StaticEntityType staticEntityType, String description) {
+		this(staticEntityType, new Vector2i(), description);
+	}
+
 	private void animate() {
 		this.animated = true;
 		this.animation = new SpriteAnimation(this.imageView, this.staticEntityType.getSpritesNumber(), this.staticEntityType.getSpritesPosition(), spriteSize, Duration.millis(this.staticEntityType.getAnimationSpeed()));
