@@ -336,14 +336,16 @@ public class GUI implements GameListener, TileMapListener {
 			this.cTileMap.addEntity(livingEntity);
 			++this.actualPlayersNumber;
 
-			ImageView imageView = new ImageView(livingEntityType.getImage());
+			ImageView imageView1 = new ImageView(livingEntityType.getImage());
+			ImageView imageView2 = new ImageView(livingEntityType.getImage());
 			Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
-			imageView.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-			PlayerHUD playerHUD = new PlayerHUD(imageView, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
+			imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+			imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+			PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
 			this.playersHUD.add(playerHUD);
 			this.blTilePane.getChildren().add(playerHUD);
 
-			this.playersInventories.add(new PlayerInventory(imageView));
+			this.playersInventories.add(new PlayerInventory(imageView2));
 		}
 	}
 
