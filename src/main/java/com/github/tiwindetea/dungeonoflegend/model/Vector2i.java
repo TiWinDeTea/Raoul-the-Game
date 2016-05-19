@@ -137,4 +137,12 @@ public class Vector2i {
 				", y=" + this.y +
 				'}';
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return this.x + this.y;
+	}
 }
