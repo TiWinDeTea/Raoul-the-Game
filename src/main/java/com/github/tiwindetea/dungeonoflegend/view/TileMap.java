@@ -282,6 +282,7 @@ public class TileMap extends Parent {
 		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		setAllTilesFog(false);
 		setAllTilesVisibility(false);
+		updateEntitiesVisibility();
 
 		//TODO
 		/*Rectangle rect = new Rectangle(1600, 1600, 32, 32);
@@ -370,6 +371,7 @@ public class TileMap extends Parent {
 		else {
 			updateVisibleTiles(visibleTiles);
 			this.visibleTiles = visibleTiles;
+			updateEntitiesVisibility();
 		}
 	}
 
@@ -399,6 +401,7 @@ public class TileMap extends Parent {
 	public void addEntity(Entity entity) {
 		this.entities.add(entity);
 		getChildren().add(entity);
+		updateEntitiesVisibility();
 	}
 
 	public void removeEntity(Entity entity) {
@@ -449,7 +452,6 @@ public class TileMap extends Parent {
 				//drawRealTile(new Vector2i(i, j));
 			}
 		}
-		updateEntitiesVisibility();
 	}
 
 	private void updateEntitiesVisibility() {
@@ -484,6 +486,7 @@ public class TileMap extends Parent {
 				}
 			}
 		}
+		updateEntitiesVisibility();
 	}
 
 	private void drawImage(Image img, double sx, double sy, double dx, double dy) {
