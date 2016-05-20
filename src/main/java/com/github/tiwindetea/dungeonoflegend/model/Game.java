@@ -8,7 +8,6 @@
 
 
 // TODO: Fog LOS
-// TODO: Traps actions
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
@@ -49,8 +48,10 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//FIXME : Next level broken (see all entities, but not the map neither the players)
 //FIXME : Next level broken (when you fall into a hole, you can get outside of the map)
+//FIXME : level 3 of seed [8626971708176625149 ; -4303329363946094496] : there is a bonus raoul in the map
+//FIXME : Sometimes, loots can't be picked
+//FIXME : Sometimes, loots appear in walls
 
 
 /**
@@ -104,7 +105,11 @@ public class Game implements RequestListener {
 	private int[] mobsDefPerLevel;
 	private int[] mobsAttackPerLevel;
 	private int[] mobsChaseRange;
+	private int[] mobsBaseXpGain;
+	private int[] mobsXpGainPerLevel;
+	private int[] mobsLikelihood;
 	private String[] mobsName;
+	private int mobsLikelihoodSum;
 
 	private int[] trapsBaseHP;
 	private int[] trapsBaseMana;
@@ -174,6 +179,8 @@ public class Game implements RequestListener {
 					Integer.parseInt(playersBundle.getString(pString + "los")),
 					Integer.parseInt(playersBundle.getString(pString + "explorelos")),
 					1,
+					Integer.parseInt(playersBundle.getString(pString + "base-leveling-xp")),
+					Integer.parseInt(playersBundle.getString(pString + "leveling-xp-per-level")),
 					1,
 					Integer.parseInt(playersBundle.getString(pString + "maxStorageCapacity")),
 					Integer.parseInt(playersBundle.getString(pString + "baseHealth")),
@@ -236,6 +243,7 @@ public class Game implements RequestListener {
 
 	private void loadMobs() {
 		/* Loads the mobs stats from the .properties */
+		this.mobsLikelihoodSum = 0;
 		ResourceBundle mobs = ResourceBundle.getBundle(MainPackage.name + ".Mobs");
 		int mobQtt = Integer.parseInt(mobs.getString("mobs.qtt"));
 		this.mobsName = new String[mobQtt];
@@ -247,6 +255,9 @@ public class Game implements RequestListener {
 		this.mobsDefPerLevel = new int[mobQtt];
 		this.mobsAttackPerLevel = new int[mobQtt];
 		this.mobsChaseRange = new int[mobQtt];
+		this.mobsBaseXpGain = new int[mobQtt];
+		this.mobsXpGainPerLevel = new int[mobQtt];
+		this.mobsLikelihood = new int[mobQtt];
 		for (int i = 0; i < mobQtt; i++) {
 			String mobName = "mob" + i + ".";
 			this.mobsTypes[i] = LivingEntityType.parseLivingEntity(mobs.getString(mobName + "type"));
@@ -258,6 +269,10 @@ public class Game implements RequestListener {
 			this.mobsDefPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "attack-per-level"));
 			this.mobsAttackPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "hp-per-level"));
 			this.mobsChaseRange[i] = Integer.parseInt(mobs.getString(mobName + "chase-range"));
+			this.mobsBaseXpGain[i] = Integer.parseInt(mobs.getString(mobName + "base-xp-gain"));
+			this.mobsXpGainPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "xp-gain-per-level"));
+			this.mobsLikelihood[i] = Integer.parseInt(mobs.getString(mobName + "likelihood"));
+			this.mobsLikelihoodSum += this.mobsLikelihood[i];
 		}
 	}
 
@@ -678,7 +693,7 @@ public class Game implements RequestListener {
 		}
 
 		/* Generate the mobs */
-		Mob.setMap(this.world.copy());
+		Mob.setMap(this.world);
 		int mobsNbr = random.nextInt(MAX_MOB_PER_LEVEL - MIN_MOB_PER_LEVEL) + MIN_MOB_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
 		for (int i = 0; i < mobsNbr; ++i) {
@@ -699,12 +714,21 @@ public class Game implements RequestListener {
 
 		/* Move the players to the right position */
 		for (Player player : this.players) {
+			fireLivingEntityCreationEvent(new LivingEntityCreationEvent(
+					player.getId(),
+					player.getGType(),
+					new Vector2i(0, 0),
+					Direction.DOWN,
+					player.getDescription()
+			));
 			if (player.hasFallen) {
 				do {
 					player.setPosition(this.selectRandomGroundPosition(rooms, random));
 				} while (Tile.isObstructed(this.world.getTile(player.getPosition())));
 				player.hasFallen = false;
 			} else {
+				player.heal(player.getMaxHitPoints() / 3);
+				player.addMana(player.getMaxMana());
 				player.setPosition(this.world.getStairsUpPosition());
 			}
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
@@ -785,17 +809,21 @@ public class Game implements RequestListener {
                     int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
                     if (distance <= 1 && isAccessible(pos)) {
                         player.setPosition(pos);
-                    } else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
-                        player.setFloor(this.level + 1);
-                        player.hasFallen = true;
-                        player.damage(player.getMaxHitPoints() / 5);
-                    } else {
-                        logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
-                                + player.getPosition() + " to " + pos + ")");
-                        player.moveRequestDenied();
-                    }
-                } else if ((pos = player.getRequestedAttack()) != null) {
-                /* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
+						fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
+					} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
+						player.setFloor(this.level + 1);
+						player.hasFallen = true;
+						player.damage(player.getMaxHitPoints() / 5);
+						this.playersOnNextLevel.add(player);
+						this.players.remove(i);
+						--i;
+					} else {
+						logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
+								+ player.getPosition() + " to " + pos + ")");
+						player.moveRequestDenied();
+					}
+				} else if ((pos = player.getRequestedAttack()) != null) {
+				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
 					if (player.getPosition().squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
 						int j = this.mobs.indexOf(new Mob(pos));
 						if (j >= 0) {
@@ -832,9 +860,16 @@ public class Game implements RequestListener {
 				}
 			} else {
 				this.playersOnNextLevel.add(player);
-				this.players.remove(player);
+				this.players.remove(i);
 				--i;
 			}
+		}
+
+		if (this.players.size() == 0) {
+			++this.level;
+			this.generateLevel(); // Hot dog !
+			this.save();
+			return;
 		}
 
 		Mob mob;
@@ -867,6 +902,9 @@ public class Game implements RequestListener {
 				}
 			} else {
 				toDelete.add(new Integer(i)); // Woops, you're dead
+				for (Player player : this.players) {
+					player.xp(this.mobs.get(i).getXpGain());
+				}
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.mobs.get(i).getId()));
 			}
 		}
@@ -1017,5 +1055,15 @@ public class Game implements RequestListener {
 		this.mobs.add(mob);
 		fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
 				mobPos.copy(), Direction.DOWN, mob.getDescription()));
+	}
+
+	private int mobSelector(Random random) {
+		int rand = random.nextInt(this.mobsLikelihoodSum);
+		int likelihoodSum = 0;
+		int i = 0;
+		do {
+			likelihoodSum += this.mobsLikelihood[i++];
+		} while (likelihoodSum <= rand);
+		return i - 1;
 	}
 }
