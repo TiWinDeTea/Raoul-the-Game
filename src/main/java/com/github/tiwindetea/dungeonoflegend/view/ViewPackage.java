@@ -23,6 +23,6 @@ public class ViewPackage {
 
 	private final static String tilesBundleName = MainPackage.name + ".Tile";
 	private final static ResourceBundle tilesResourceBundle = ResourceBundle.getBundle(tilesBundleName);
-	public static final Vector2i fogSpritePosition = new Vector2i(Integer.parseInt(tilesResourceBundle.getString("wall-left.sprite.position.x")),
-	  Integer.parseInt(tilesResourceBundle.getString("wall-left.sprite.position.y")));
+	public static final Vector2i fogSpritePosition = new Vector2i(Integer.parseInt(tilesResourceBundle.getString("fog.sprite.position.x")),
+	  Integer.parseInt(tilesResourceBundle.getString("fog.sprite.position.y")));
 }

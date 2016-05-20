@@ -452,20 +452,6 @@ public class TileMap extends Parent {
 		updateEntitiesVisibility();
 	}
 
-	private void updateFoggedTiles(boolean[][] newFoggedTiles) {
-		for(int i = 0; i < this.realTileMap.length; i++) {
-			for(int j = 0; j < this.realTileMap[i].length; j++) {
-				if(this.foggedTiles[i][j] != newFoggedTiles[i][j]) {
-					if(newFoggedTiles[i][j] && !this.visibleTiles[i][j]) {
-						drawFoggedTile(new Vector2i(i, j));
-						//System.out.println("TileMap: tile " + i + " " + j + " fogged");
-					}
-				}
-			}
-		}
-		updateEntitiesVisibility();
-	}
-
 	private void updateEntitiesVisibility() {
 		for(Entity entity : this.entities) {
 			if(this.visibleTiles[entity.getPosition().x][entity.getPosition().y]) {
@@ -486,14 +472,15 @@ public class TileMap extends Parent {
 		if((newFoggedTiles[0].length & 1) == 0) {
 			System.out.println("Warning: newFoggedTiles height not odd: " + newFoggedTiles[0].length);
 		}
-		updateFoggedTiles(newFoggedTiles);
 		int fogPosX = fogCenterPosition.x - ((newFoggedTiles.length - 1) / 2);
 		int fogPosY = fogCenterPosition.y - ((newFoggedTiles[0].length - 1) / 2);
 		for(int i = 0; i < newFoggedTiles.length; i++) {
 			for(int j = 0; j < newFoggedTiles[i].length; j++) {
 				if(((fogPosX + i >= 0) && (fogPosX + i < this.visibleTiles.length))
 				  && ((fogPosY + j >= 0) && (fogPosY + j < this.visibleTiles[0].length))) {
-					this.foggedTiles[fogPosX + i][fogPosY + j] |= newFoggedTiles[i][j];
+					if(this.foggedTiles[fogPosX + i][fogPosY + j] |= newFoggedTiles[i][j]) {
+						drawTile(new Vector2i(fogPosX + i, fogPosY + j));
+					}
 				}
 			}
 		}
