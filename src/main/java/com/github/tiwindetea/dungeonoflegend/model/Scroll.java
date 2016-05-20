@@ -84,6 +84,7 @@ public class Scroll implements Consumable {
 	public void trigger(LivingThing livingThing) {
 		this.target = livingThing;
 		livingThing.damage(this.healthModifierPerTick);
+		--this.turns;
 	}
 
 	/**
@@ -92,7 +93,7 @@ public class Scroll implements Consumable {
 	public boolean nextTick() {
 		if (!this.target.isAlive())
 			return true;
-		if (this.turns != 0) {
+		if (this.turns > 0) {
 			--this.turns;
 			this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
 			this.target.damage(this.healthModifierPerTick);

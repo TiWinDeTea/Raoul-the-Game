@@ -230,7 +230,7 @@ public class Game implements RequestListener {
 		}
 
 		for (Player player : players) {
-			player.addToInventory(new Pair<>(new Pot(2, 15, 15, 0, 0, 0, 0)));
+			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 		}
 		this.currentPlayer = this.players.get(0);
@@ -830,6 +830,7 @@ public class Game implements RequestListener {
 						player.setFloor(this.level + 1);
 						player.hasFallen = true;
 						player.damage(player.getMaxHitPoints() / 5);
+						fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 						this.playersOnNextLevel.add(player);
 						this.players.remove(i);
 						--i;

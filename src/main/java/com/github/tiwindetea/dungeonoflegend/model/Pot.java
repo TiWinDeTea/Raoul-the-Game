@@ -131,6 +131,7 @@ public class Pot implements Consumable {
 		}
 		this.healTarget();
 		this.manaHealTarget();
+		--this.turns;
 	}
 
 	/**
@@ -139,7 +140,7 @@ public class Pot implements Consumable {
 	public boolean nextTick() {
 		if (!this.target.isAlive())
 			return true;
-		if (this.turns != 0) {
+		if (this.turns > 0) {
 			--this.turns;
 			this.healTarget();
 			this.manaHealTarget();
