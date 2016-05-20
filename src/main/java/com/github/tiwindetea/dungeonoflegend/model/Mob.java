@@ -8,9 +8,8 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
-//FIXME : Broken IA (doesn't chase when the player crosses a door)
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 import java.util.Stack;
@@ -26,7 +25,10 @@ public class Mob extends LivingThing {
 	private State state = State.SLEEPING;
 	private Vector2i requestedPath;
 	private Stack<Vector2i> requestedPathStack = new Stack<>();
+	private Direction direction = Direction.DOWN;
 	private int chaseRange;
+	private boolean nameAsked = false;
+	private int xpGain;
 
 	/**
 	 * Sets the map.
@@ -55,9 +57,10 @@ public class Mob extends LivingThing {
 	 * @param defensePower defense power
 	 * @param position     position
 	 */
-	public Mob(String name, int level, int maxHitPoints, int attackPower, int defensePower, int chaseRange, Vector2i position) {
+	public Mob(String name, int level, int xpGain, int maxHitPoints, int attackPower, int defensePower, int chaseRange, Vector2i position) {
 		this.name = name;
 		this.level = level;
+		this.xpGain = xpGain;
 		this.maxHitPoints = maxHitPoints;
 		this.attackPower = attackPower;
 		this.defensePower = defensePower;
@@ -70,33 +73,38 @@ public class Mob extends LivingThing {
 		return Mob.map.getTile(pos);
 	}
 
-	private void keepPatroling() {
-		Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
+	private void keepPatroling(Collection<Mob> mobs) {
+		if (!Tile.isObstructed(map(this.position.copy().add(this.direction))) && !mobs.contains(new Mob(this.position.copy().add(this.direction)))) {
+			return;
+		}
+		ArrayList<Direction> directions = new ArrayList<>(4);
+		directions.addAll(Arrays.asList(Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT));
+		directions.remove(this.direction);
 		int index;
 		/* Looking for a wall to follow */
-		for (index = 0; index < directions.length &&
-				!Tile.isRoomBorder(map(this.position.copy().add(directions[index]))); ++index)
+		for (index = 0; index < directions.size() &&
+				!Tile.isRoomBorder(map(this.position.copy().add(directions.get(index)))); ++index)
 			;
 
 		/* If you are in a corner (twice for corridors)*/
 		int count = 0;
-		while (Tile.isRoomBorder(map(this.position.copy().add(directions[(index + 1) % directions.length]))) && count++ < 2) {
-			index = (index + 1) % directions.length;
+		while (Tile.isRoomBorder(map(this.position.copy().add(directions.get((index + 1) % directions.size())))) && count < 2) {
+			++count;
+			index = (index + 1) % directions.size();
 		}
 
 		/* Follow the wall, or try to find one */
-		Vector2i next = this.position.copy().add(directions[(index + 1) % 4]);
+		Vector2i next = this.position.copy().add(directions.get((index + 1) % directions.size()));
 		if (!Tile.isObstructed(map(next))) {
 			this.requestedPath = next;
 		} else {
 			/* Look for the a non-obstructed tile, ignoring living entities */
-			for (index = 0; Tile.isObstructed(map(this.position.copy().add(directions[index]))) && index < directions.length; ++index)
+			for (index = 0; index < directions.size() && Tile.isObstructed(map(this.position.copy().add(directions.get(index)))); ++index)
 				;
-			next = this.position.copy().add(directions[index]);
-			if (!Tile.isObstructed(map(next))) {
-				this.requestedPath = next;
+			if (index < directions.size()) {
+				this.requestedPath = this.position.copy().add(directions.get(index));
 			} else {
-				this.requestedPath = next;
+				this.requestedPath = this.position.copy();
 			}
 		}
 	}
@@ -170,7 +178,7 @@ public class Mob extends LivingThing {
 			/* Let's do something at random, if I can't chase anyone */
 			switch (this.state) {
 				case PATROLING:
-					this.keepPatroling();
+					this.keepPatroling(mobs);
 					switch (new Random().nextInt(20)) {
 						case 0:
 							this.state = State.STANDING;
@@ -226,7 +234,7 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public Vector2i getRequestedMove() {
-		if (this.requestedPathStack.size() > 0) {
+		if (this.requestedPathStack != null && this.requestedPathStack.size() > 0) {
 			return this.requestedPathStack.pop();
 		}
 		return this.requestedPath;
@@ -255,9 +263,16 @@ public class Mob extends LivingThing {
 		return (path == null) ? Integer.MAX_VALUE : path.size();
 	}
 
+	public int getXpGain() {
+		return this.xpGain;
+	}
+
 	@Override
 	public String getDescription() {
-		return this.name + " (Lv" + this.level + ".)\n"
-				+ "Power grade: " + (this.attackPower + this.defensePower + this.hitPoints) / 3;
+		if (!this.nameAsked) {
+			this.name += " (Lv" + this.level + ".)\n"
+					+ "Power grade: " + (this.attackPower * 15 + this.defensePower * 15 + this.hitPoints) / 31;
+		}
+		return this.name;
 	}
 }
