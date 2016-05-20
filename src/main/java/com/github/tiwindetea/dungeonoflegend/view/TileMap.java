@@ -51,7 +51,7 @@ public class TileMap extends Parent {
 
 	private Tile[][] realTileMap;
 	private boolean[][] visibleTiles;
-	private boolean[][] fogedTiles;
+	private boolean[][] foggedTiles;
 
 	public double getScale() {
 		return this.scale.get();
@@ -74,6 +74,9 @@ public class TileMap extends Parent {
 			if(event.isSecondaryButtonDown()) {
 				TileMap.this.rightMouseAnchorX = event.getX();
 				TileMap.this.rightMouseAnchorY = event.getY();
+
+				//TODO: soon
+				//centerViewOnTile(new Vector2i(50, 50));
 			}
 
 		}
@@ -222,12 +225,6 @@ public class TileMap extends Parent {
 		setOnMouseReleased(this.onMouseReleasedEventHandler);
 		setOnMouseDragged(this.onMouseDraggedEventHandler);
 		setOnScroll(this.onScrollEventHandler);
-
-		// test
-		/*Random rand = new Random();
-		Map map = new Map(new Seed(rand.nextInt(), rand.nextInt()));
-		map.generateLevel(1);
-		this.setMap(map.getMapCopy());*/
 	}
 
 	public void setMap(Tile[][] map) {
@@ -236,8 +233,6 @@ public class TileMap extends Parent {
 		}
 
 		this.realTileMap = map.clone();
-
-		getChildren().clear();
 
 		int mapWidth = map.length;
 		int mapHeight = map[0].length;
@@ -276,6 +271,7 @@ public class TileMap extends Parent {
 			}
 		}
 
+		getChildren().clear();
 		for(Canvas[] canvas : this.canvases) {
 			getChildren().addAll(canvas);
 		}
@@ -283,9 +279,14 @@ public class TileMap extends Parent {
 
 		//TODO:
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
-		this.fogedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
+		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		setAllTilesFog(false);
 		setAllTilesVisibility(false);
+
+		//TODO
+		/*Rectangle rect = new Rectangle(1600, 1600, 32, 32);
+		rect.setFill(Color.YELLOW);
+		getChildren().add(rect);*/
 	}
 
 	private void drawRealTile(Vector2i tilePosition) {
@@ -299,7 +300,7 @@ public class TileMap extends Parent {
 
 	private void drawFoggedTile(Vector2i tilePosition) {
 		drawRealTile(tilePosition);
-		//TODO: fog the tile
+		drawImage(ViewPackage.objectsImage, ViewPackage.fogSpritePosition.x, ViewPackage.fogSpritePosition.y, tilePosition.x, tilePosition.y);
 	}
 
 	public void drawTile(Vector2i tilePosition) {
@@ -307,7 +308,7 @@ public class TileMap extends Parent {
 			drawRealTile(tilePosition);
 		}
 		else {
-			if(this.fogedTiles[tilePosition.x][tilePosition.y]) {
+			if(this.foggedTiles[tilePosition.x][tilePosition.y]) {
 				drawFoggedTile(tilePosition);
 			}
 			else {
@@ -321,7 +322,7 @@ public class TileMap extends Parent {
 	}
 
 	public boolean isFogged(Vector2i tilePosition) {
-		return this.fogedTiles[tilePosition.x][tilePosition.y];
+		return this.foggedTiles[tilePosition.x][tilePosition.y];
 	}
 
 	public void addOnTile(Image image, Vector2i spritePosition, Vector2i tilePosition) {
@@ -386,10 +387,10 @@ public class TileMap extends Parent {
 	}
 
 	public void setAllTilesFog(boolean fog) {
-		this.fogedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
+		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		for(int i = 0; i < this.realTileMap.length; i++) {
 			for(int j = 0; j < this.realTileMap[i].length; j++) {
-				this.fogedTiles[i][j] = fog;
+				this.foggedTiles[i][j] = fog;
 			}
 		}
 		redrawTiles();
@@ -412,7 +413,7 @@ public class TileMap extends Parent {
 					drawRealTile(new Vector2i(i, j));
 				}
 				else {
-					if(this.fogedTiles[i][j]) {
+					if(this.foggedTiles[i][j]) {
 						drawFoggedTile(new Vector2i(i, j));
 					}
 					else {
@@ -432,7 +433,7 @@ public class TileMap extends Parent {
 						//System.out.println("TileMap: tile " + i + " " + j + " visible");
 					}
 					else {
-						if(this.fogedTiles[i][j]) {
+						if(this.foggedTiles[i][j]) {
 							drawFoggedTile(new Vector2i(i, j));
 							//System.out.println("TileMap: tile " + i + " " + j + " fogged");
 						}
@@ -448,12 +449,52 @@ public class TileMap extends Parent {
 				//drawRealTile(new Vector2i(i, j));
 			}
 		}
+		updateEntitiesVisibility();
+	}
+
+	private void updateFoggedTiles(boolean[][] newFoggedTiles) {
+		for(int i = 0; i < this.realTileMap.length; i++) {
+			for(int j = 0; j < this.realTileMap[i].length; j++) {
+				if(this.foggedTiles[i][j] != newFoggedTiles[i][j]) {
+					if(newFoggedTiles[i][j] && !this.visibleTiles[i][j]) {
+						drawFoggedTile(new Vector2i(i, j));
+						//System.out.println("TileMap: tile " + i + " " + j + " fogged");
+					}
+				}
+			}
+		}
+		updateEntitiesVisibility();
+	}
+
+	private void updateEntitiesVisibility() {
 		for(Entity entity : this.entities) {
-			if(newVisibleTiles[entity.getPosition().x][entity.getPosition().y]) {
+			if(this.visibleTiles[entity.getPosition().x][entity.getPosition().y]) {
 				entity.setVisible(true);
 			}
 			else {
 				entity.setVisible(false);
+			}
+		}
+	}
+
+	public void addFoggedTiles(Vector2i fogCenterPosition, boolean[][] newFoggedTiles) {
+		if(newFoggedTiles == null || newFoggedTiles.length == 0)
+			return;
+		if((newFoggedTiles.length & 1) == 0) {
+			System.out.println("Warning: newFoggedTiles width not odd: " + newFoggedTiles.length);
+		}
+		if((newFoggedTiles[0].length & 1) == 0) {
+			System.out.println("Warning: newFoggedTiles height not odd: " + newFoggedTiles[0].length);
+		}
+		updateFoggedTiles(newFoggedTiles);
+		int fogPosX = fogCenterPosition.x - ((newFoggedTiles.length - 1) / 2);
+		int fogPosY = fogCenterPosition.y - ((newFoggedTiles[0].length - 1) / 2);
+		for(int i = 0; i < newFoggedTiles.length; i++) {
+			for(int j = 0; j < newFoggedTiles[i].length; j++) {
+				if(((fogPosX + i >= 0) && (fogPosX + i < this.visibleTiles.length))
+				  && ((fogPosY + j >= 0) && (fogPosY + j < this.visibleTiles[0].length))) {
+					this.foggedTiles[fogPosX + i][fogPosY + j] |= newFoggedTiles[i][j];
+				}
 			}
 		}
 	}

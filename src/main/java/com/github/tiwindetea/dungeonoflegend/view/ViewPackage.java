@@ -20,4 +20,9 @@ public class ViewPackage {
 	public static final Image icon = new Image(path + "/" + spriteSheetBundle.getString("icon.file"));
 
 	public static final Vector2i spritesSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution")));
+
+	private final static String tilesBundleName = MainPackage.name + ".Tile";
+	private final static ResourceBundle tilesResourceBundle = ResourceBundle.getBundle(tilesBundleName);
+	public static final Vector2i fogSpritePosition = new Vector2i(Integer.parseInt(tilesResourceBundle.getString("wall-left.sprite.position.x")),
+	  Integer.parseInt(tilesResourceBundle.getString("wall-left.sprite.position.y")));
 }

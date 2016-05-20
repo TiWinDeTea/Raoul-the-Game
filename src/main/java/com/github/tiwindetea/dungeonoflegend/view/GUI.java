@@ -5,6 +5,8 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.FogResetEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
@@ -489,5 +491,15 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	@Override
 	public void objectClicked(ObjectClickEvent e) {
 		fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
+	}
+
+	@Override
+	public void addFog(FogAdditionEvent e) {
+		this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
+	}
+
+	@Override
+	public void resetFog(FogResetEvent e) {
+		//TODO
 	}
 }
