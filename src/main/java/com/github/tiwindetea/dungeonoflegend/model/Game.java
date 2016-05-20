@@ -500,21 +500,23 @@ public class Game implements RequestListener {
 					}
 					++j;
 				} while (i == -1 && j < this.mobs.size());
-				if (i >= 0
-						&& this.currentPlayer.getPosition().squaredDistance(e.tilePosition) <= Math.pow(this.currentPlayer.getAttackRange(), 2)
-						) {
+				if (i >= 0) {
 					if (this.objectToUse != null) {
+						System.out.println("Object used : " + this.objectToUse);
 						this.objectToUse.object.trigger(this.mobs.get(i));
                         this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
                         this.triggeredObjects.add(this.objectToUse.object);
                         this.objectToUse = null;
-                    }
-                    this.currentPlayer.setRequestedAttack(e.tilePosition);
-                } else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-                    /* interaction with doors */
-                    this.currentPlayer.setRequestedInteraction(e.tilePosition);
-                } else {
-                    success = false; // no mob found, neither doors
+						success = false;
+						path = null;
+					} else {
+						this.currentPlayer.setRequestedAttack(e.tilePosition);
+					}
+				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+					/* interaction with doors */
+					this.currentPlayer.setRequestedInteraction(e.tilePosition);
+				} else {
+					success = false; // no mob found, neither doors
 				}
 			} else {
 				success = false; // tile not in the los
@@ -547,20 +549,22 @@ public class Game implements RequestListener {
         for (Pair<StorableObject> pair : inventory) {
             if (pair.getId() == e.objectId) {
                 if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
-                    this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
-                } else {
-                    obj = pair;
-                }
-            }
-        }
-        if (this.objectToUse != null) {
-            if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
-                this.triggeredObjects.add(this.objectToUse.object);
-                this.objectToUse.object.trigger(this.currentPlayer);
-                this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
-                this.objectToUse = null;
-            }
-        } else if (obj != null) {
+					System.out.println("Object selected : " + pair.object);
+					this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
+				} else {
+					obj = pair;
+				}
+			}
+		}
+		if (this.objectToUse != null) {
+			if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
+				System.out.println("Selected : Pot");
+				this.triggeredObjects.add(this.objectToUse.object);
+				this.objectToUse.object.trigger(this.currentPlayer);
+				this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+				this.objectToUse = null;
+			}
+		} else if (obj != null) {
 			this.currentPlayer.removeFromInventory(obj);
 			if (obj.object.getType() == StorableObjectType.ARMOR) {
 				this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
