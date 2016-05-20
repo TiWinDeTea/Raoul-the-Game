@@ -22,6 +22,7 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
@@ -40,8 +41,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 import java.util.Random;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -56,7 +59,7 @@ import java.util.logging.Logger;
  * Game.
  * @author Lucas LAZARE
  */
-public class Game implements RequestListener {
+public class Game implements RequestListener, Runnable, Stopable {
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 10;
@@ -68,25 +71,29 @@ public class Game implements RequestListener {
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 20;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 30;
 	private static final int BULB_LOS = 2;
-	private static final int MINIMUN_TURN_TIME_MS = 0;
+	private static final int MINIMUN_TURN_TIME_MS = 100;
+	private static final int REFRESH_TIME_MS = 250;
 
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
+
+	private Queue<RequestEvent> requestedEvent = new LinkedList<>();
+	private boolean isRunning = true;
 	private int level;
 	private Map world;
 	private HashMap<Vector2i, Pair<StorableObject>> objectsOnGround = new HashMap<>();
-	private ArrayList<Mob> mobs = new ArrayList<>();
-	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
-	private ArrayList<Player> players = new ArrayList<>();
-    private ArrayList<Player> playersOnNextLevel = new ArrayList<>();
-	private ArrayList<Pair<Vector2i>> bulbsOn = new ArrayList<>();
-	private ArrayList<Pair<Vector2i>> bulbsOff = new ArrayList<>();
+	private List<Mob> mobs = new ArrayList<>();
+	private List<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
+	private List<Player> players = new ArrayList<>();
+	private List<Player> playersOnNextLevel = new ArrayList<>();
+	private List<Pair<Vector2i>> bulbsOn = new ArrayList<>();
+	private List<Pair<Vector2i>> bulbsOff = new ArrayList<>();
 	private Seed seed;
 	private final List<GameListener> listeners = new ArrayList<>();
 
 	private int playerTurn;
 	private Player currentPlayer;
 	private Pair<Consumable> objectToUse = null;
-	private ArrayList<Consumable> triggeredObjects = new ArrayList<>();
+	private List<Consumable> triggeredObjects = new ArrayList<>();
 
 	/**
 	 * The Game name.
@@ -456,26 +463,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestDrop(DropRequestEvent e) {
-		logger.log(this.debugLevel, "drop requested on player " + this.currentPlayer.getNumber());
-		/* Take the shortest path possible to drop the item */
-		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
-			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
-			Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
-			for (Direction direction : dirs) {
-				paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.copy().add(direction), false, null));
-			}
-			if (paths.size() != 0) {
-				Stack<Vector2i> theChoosenOne = paths.get(0);
-				for (Stack<Vector2i> stack : paths) {
-					if (stack != null && stack.size() < theChoosenOne.size()) {
-						theChoosenOne = stack;
-					}
-				}
-				this.currentPlayer.setRequestedPath(theChoosenOne);
-				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
-				this.nextTick();
-			}
-		}
+		this.requestedEvent.add(e);
 	}
 
 	/**
@@ -483,62 +471,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestInteraction(InteractionRequestEvent e) {
-		logger.log(this.debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
-		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
-		boolean success = true;
-		Tile tile = this.world.getTile(e.tilePosition);
-		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
-				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
-
-
-		if (distance <= this.currentPlayer.getLos()) {
-		/* Looking for a mob to attack*/
-			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
-			Vector2i p = this.currentPlayer.getPosition();
-			if (los[los.length / 2 - p.x + e.tilePosition.x][los[0].length / 2 - p.y + e.tilePosition.y]) {
-				int i = -1;
-				int j = 0;
-				do {
-					if (this.mobs.get(j).getPosition().equals(e.tilePosition)) {
-						i = j;
-					}
-					++j;
-				} while (i == -1 && j < this.mobs.size());
-				if (i >= 0) {
-					if (this.objectToUse != null) {
-						System.out.println("Object used : " + this.objectToUse);
-						this.objectToUse.object.trigger(this.mobs.get(i));
-                        this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
-                        this.triggeredObjects.add(this.objectToUse.object);
-                        this.objectToUse = null;
-						success = false;
-						path = null;
-					} else {
-						this.currentPlayer.setRequestedAttack(e.tilePosition);
-					}
-				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-					/* interaction with doors */
-					this.currentPlayer.setRequestedInteraction(e.tilePosition);
-				} else {
-					success = false; // no mob found, neither doors
-				}
-			} else {
-				success = false; // tile not in the los
-			}
-		} else {
-			success = false; // tile too far away
-		}
-
-		/* If you weren't able to do anything, just go to the tile */
-		if (!success && path != null) {
-			this.currentPlayer.setRequestedPath(path);
-			success = true;
-		}
-
-		/* If you did something, keep going */
-		if (success) {
-			nextTick();
-		}
+		this.requestedEvent.add(e);
 	}
 
 	/**
@@ -546,38 +479,7 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestUsage(UsageRequestEvent e) {
-		logger.log(this.debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
-        List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
-        this.objectToUse = null;
-        Pair<StorableObject> obj = null;
-        for (Pair<StorableObject> pair : inventory) {
-            if (pair.getId() == e.objectId) {
-                if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
-					System.out.println("Object selected : " + pair.object);
-					this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
-				} else {
-					obj = pair;
-				}
-			}
-		}
-		if (this.objectToUse != null) {
-			if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
-				System.out.println("Selected : Pot");
-				this.triggeredObjects.add(this.objectToUse.object);
-				this.objectToUse.object.trigger(this.currentPlayer);
-				this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
-				this.objectToUse = null;
-			}
-		} else if (obj != null) {
-			this.currentPlayer.removeFromInventory(obj);
-			if (obj.object.getType() == StorableObjectType.ARMOR) {
-				this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
-			} else if (obj.object.getType() == StorableObjectType.WEAPON) {
-				this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
-			}
-		} else {
-			this.currentPlayer.unequip(e.objectId);
-		}
+		this.requestedEvent.add(e);
 	}
 
 	/**
@@ -585,16 +487,12 @@ public class Game implements RequestListener {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
-		logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
-		Vector2i pos = this.currentPlayer.getPosition().copy().add(e.moveDirection);
-		if (isAccessible(pos)) {
-			Stack<Vector2i> stack = new Stack<>();
-			stack.add(pos);
-			this.currentPlayer.setRequestedPath(stack);
-			this.nextTick();
-		} else {
-			this.requestInteraction(new InteractionRequestEvent(pos));
-		}
+		this.requestedEvent.add(e);
+	}
+
+	@Override
+	public void stop() {
+		this.isRunning = false;
 	}
 
 	/**
@@ -1081,5 +979,168 @@ public class Game implements RequestListener {
 			likelihoodSum += this.mobsLikelihood[i++];
 		} while (likelihoodSum <= rand);
 		return i - 1;
+	}
+
+	@Override
+	public void run() {
+		RequestEvent event;
+		do {
+			try {
+				Thread.sleep(REFRESH_TIME_MS);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			event = this.requestedEvent.poll();
+			while (event != null) {
+				try {
+					switch (event.getType()) {
+						case MOVE_REQUEST_EVENT:
+							treatRequestEvent((MoveRequestEvent) event);
+							break;
+						case INTERACTION_REQUEST_EVENT:
+							treatRequestEvent((InteractionRequestEvent) event);
+							break;
+						case USAGE_REQUEST_EVENT:
+							treatRequestEvent((UsageRequestEvent) event);
+							break;
+						case DROP_REQUEST_EVENT:
+							treatRequestEvent((DropRequestEvent) event);
+							break;
+					}
+					event = this.requestedEvent.poll();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		} while (this.isRunning);
+	}
+
+	private void treatRequestEvent(DropRequestEvent e) {
+		/* Take the shortest path possible to drop the item */
+		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
+			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
+			Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
+			for (Direction direction : dirs) {
+				paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.copy().add(direction), false, null));
+			}
+			if (paths.size() != 0) {
+				Stack<Vector2i> theChoosenOne = paths.get(0);
+				for (Stack<Vector2i> stack : paths) {
+					if (stack != null && stack.size() < theChoosenOne.size()) {
+						theChoosenOne = stack;
+					}
+				}
+				this.currentPlayer.setRequestedPath(theChoosenOne);
+				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
+				this.nextTick();
+			}
+		}
+	}
+
+	private void treatRequestEvent(InteractionRequestEvent e) {
+		logger.log(this.debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
+		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
+		boolean success = true;
+		Tile tile = this.world.getTile(e.tilePosition);
+		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
+				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
+
+
+		if (distance <= this.currentPlayer.getLos()) {
+		/* Looking for a mob to attack*/
+			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
+			Vector2i p = this.currentPlayer.getPosition();
+			if (los[los.length / 2 - p.x + e.tilePosition.x][los[0].length / 2 - p.y + e.tilePosition.y]) {
+				int i = -1;
+				int j = 0;
+				do {
+					if (this.mobs.get(j).getPosition().equals(e.tilePosition)) {
+						i = j;
+					}
+					++j;
+				} while (i == -1 && j < this.mobs.size());
+				if (i >= 0) {
+					if (this.objectToUse != null) {
+						System.out.println("Object used : " + this.objectToUse);
+						this.objectToUse.object.trigger(this.mobs.get(i));
+						this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+						this.triggeredObjects.add(this.objectToUse.object);
+						this.objectToUse = null;
+						success = false;
+						path = null;
+					} else {
+						this.currentPlayer.setRequestedAttack(e.tilePosition);
+					}
+				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+					/* interaction with doors */
+					this.currentPlayer.setRequestedInteraction(e.tilePosition);
+				} else {
+					success = false; // no mob found, neither doors
+				}
+			} else {
+				success = false; // tile not in the los
+			}
+		} else {
+			success = false; // tile too far away
+		}
+
+		/* If you weren't able to do anything, just go to the tile */
+		if (!success && path != null) {
+			this.currentPlayer.setRequestedPath(path);
+			success = true;
+		}
+
+		/* If you did something, keep going */
+		if (success) {
+			nextTick();
+		}
+	}
+
+	private void treatRequestEvent(UsageRequestEvent e) {
+		logger.log(this.debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
+		List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
+		this.objectToUse = null;
+		Pair<StorableObject> obj = null;
+		for (Pair<StorableObject> pair : inventory) {
+			if (pair.getId() == e.objectId) {
+				if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
+					System.out.println("Object selected : " + pair.object);
+					this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
+				} else {
+					obj = pair;
+				}
+			}
+		}
+		if (this.objectToUse != null) {
+			if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
+				System.out.println("Selected : Pot");
+				this.triggeredObjects.add(this.objectToUse.object);
+				this.objectToUse.object.trigger(this.currentPlayer);
+				this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+				this.objectToUse = null;
+			}
+		} else if (obj != null) {
+			this.currentPlayer.removeFromInventory(obj);
+			if (obj.object.getType() == StorableObjectType.ARMOR) {
+				this.currentPlayer.equipWithArmor(new Pair<>(obj.getId(), (Armor) obj.object));
+			} else if (obj.object.getType() == StorableObjectType.WEAPON) {
+				this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
+			}
+		} else {
+			this.currentPlayer.unequip(e.objectId);
+		}
+	}
+
+	private void treatRequestEvent(MoveRequestEvent e) {
+		logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
+		Vector2i pos = this.currentPlayer.getPosition().copy().add(e.moveDirection);
+		if (isAccessible(pos)) {
+			Stack<Vector2i> stack = new Stack<>();
+			stack.add(pos);
+			this.currentPlayer.setRequestedPath(stack);
+			this.nextTick();
+		} else {
+			this.requestInteraction(new InteractionRequestEvent(pos));
+		}
 	}
 }

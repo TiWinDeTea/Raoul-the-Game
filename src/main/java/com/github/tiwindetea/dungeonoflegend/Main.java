@@ -7,6 +7,9 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.stage.Stage;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Created by maxime on 5/3/16.
  */
@@ -22,6 +25,8 @@ public class Main extends Application {
         game.addGameListener(GUI);
 		GUI.addRequestListener(game);
 		game.initNew(1);
+		ExecutorService executor = Executors.newSingleThreadExecutor();
+		executor.submit(game);
 		primaryStage.getIcons().add(ViewPackage.icon);
 	}
 

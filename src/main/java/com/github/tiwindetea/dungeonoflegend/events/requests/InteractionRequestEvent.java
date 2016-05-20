@@ -11,4 +11,9 @@ public class InteractionRequestEvent extends RequestEvent {
 	public InteractionRequestEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
+
+	@Override
+	public RequestEventType getType() {
+		return RequestEventType.INTERACTION_REQUEST_EVENT;
+	}
 }
