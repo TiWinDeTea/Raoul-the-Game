@@ -80,9 +80,10 @@ public class Game implements RequestListener {
 	private ArrayList<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
 	private ArrayList<Player> players = new ArrayList<>();
     private ArrayList<Player> playersOnNextLevel = new ArrayList<>();
-    private ArrayList<Pair<Vector2i>> bulbs = new ArrayList<>();
-    private Seed seed;
-    private final List<GameListener> listeners = new ArrayList<>();
+	private ArrayList<Pair<Vector2i>> bulbsOn = new ArrayList<>();
+	private ArrayList<Pair<Vector2i>> bulbsOff = new ArrayList<>();
+	private Seed seed;
+	private final List<GameListener> listeners = new ArrayList<>();
 
 	private int playerTurn;
 	private Player currentPlayer;
@@ -232,6 +233,7 @@ public class Game implements RequestListener {
 
 		for (Player player : players) {
 			player.addToInventory(new Pair<>(new Pot(2, 15, 15, 0, 0, 0, 0)));
+			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 		}
 		this.currentPlayer = this.players.get(0);
 		this.loadMobs();
@@ -593,6 +595,7 @@ public class Game implements RequestListener {
 	private void generateLevel() {
         this.players.addAll(this.playersOnNextLevel);
         this.playersOnNextLevel.clear();
+		this.triggeredObjects.clear();
 
 		/* Next block deletes all entities on the GUI */
 		for (Mob mob : this.mobs) {
@@ -601,16 +604,11 @@ public class Game implements RequestListener {
 		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
 		}
-		for (Pair<Vector2i> bulb : this.bulbs) {
+		for (Pair<Vector2i> bulb : this.bulbsOff) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
-		for (Player player : this.players) {
-			player.heal(player.getMaxHitPoints() / 3);
-			player.addMana(player.getMaxMana());
-			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
-					player.getId(),
-					null
-			));
+		for (Pair<Vector2i> bulb : this.bulbsOn) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
@@ -618,10 +616,13 @@ public class Game implements RequestListener {
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
 
-		this.bulbs.clear();
+		this.bulbsOn.clear();
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
-			this.bulbs.add(p);
+			Pair<Vector2i> p2 = new Pair<>(bulb);
+			this.bulbsOn.add(p);
+			this.bulbsOff.add(p2);
+			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p2.getId(), StaticEntityType.UNLIT_BULB, bulb, "An Unlit bulb"));
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb, "A Lit bulb"));
 			fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(
 					p.getId(),
@@ -941,8 +942,7 @@ public class Game implements RequestListener {
 			this.triggeredObjects.remove(integer.intValue());
 		}
 
-		boolean nextLevel = true;
-		/* Scanning for loots&chests to give to players, for traps, and next level */
+		/* Scanning for loots&chests to give to players, for traps, next level & light bulb */
 		for (Player player : this.players) {
 			pos = player.getPosition();
 			Pair<StorableObject> drop = this.objectsOnGround.get(pos);
@@ -959,8 +959,11 @@ public class Game implements RequestListener {
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 			}
 
-			if (player.getFloor() == this.level) {
-				nextLevel = false;
+			for (int i = 0; i < this.bulbsOn.size(); i++) {
+				if (this.bulbsOn.get(i).object.equals(player.getPosition())) {
+					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(i).getId()));
+					this.bulbsOn.remove(i);
+				}
 			}
 
 			toDelete.clear();
@@ -978,14 +981,7 @@ public class Game implements RequestListener {
 				this.interactiveObjects.remove(integer.intValue());
 			}
 		}
-
-		if (nextLevel) {
-			++this.level;
-			this.generateLevel(); // Hot dog !
-			this.save();
-		} else {
-			this.recomputeLOS();
-		}
+		this.recomputeLOS();
 	}
 
 	//-------------------------------------//
@@ -1042,11 +1038,12 @@ public class Game implements RequestListener {
 	}
 
 	private void addRandomMob(Vector2i mobPos, Random random) {
-		int selectedMob = random.nextInt(this.mobsTypes.length);
+		int selectedMob = this.mobSelector(random);
 		int mobLevel = random.nextInt(3) + this.level - 1;
 		Mob mob = new Mob(
 				this.mobsName[selectedMob],
 				mobLevel,
+				mobLevel * this.mobsXpGainPerLevel[selectedMob] + this.mobsBaseXpGain[selectedMob],
 				mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
 				mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
 				mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
