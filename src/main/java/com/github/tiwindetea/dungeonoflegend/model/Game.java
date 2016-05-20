@@ -15,6 +15,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
@@ -50,9 +51,6 @@ import java.util.logging.Logger;
 
 //FIXME : Next level broken (when you fall into a hole, you can get outside of the map)
 //FIXME : level 3 of seed [8626971708176625149 ; -4303329363946094496] : there is a bonus raoul in the map
-//FIXME : Sometimes, loots can't be picked
-//FIXME : Sometimes, loots appear in walls
-
 
 /**
  * Game.
@@ -447,6 +445,12 @@ public class Game implements RequestListener {
 		}
 	}
 
+	private void fireFogAdditionEvent(FogAdditionEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.addFog(event);
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -597,11 +601,11 @@ public class Game implements RequestListener {
 	 * generates a level
 	 */
 	private void generateLevel() {
-        this.players.addAll(this.playersOnNextLevel);
-        this.playersOnNextLevel.clear();
-		this.triggeredObjects.clear();
 
 		/* Next block deletes all entities on the GUI */
+		for (Player player : this.players) {
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+		}
 		for (Mob mob : this.mobs) {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
 		}
@@ -614,11 +618,15 @@ public class Game implements RequestListener {
 		for (Pair<Vector2i> bulb : this.bulbsOn) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
+		for (Pair<InteractiveObject> interactiveObject : this.interactiveObjects) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
+		}
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
+
 
 		this.bulbsOn.clear();
 		for (Vector2i bulb : this.world.getBulbPosition()) {
@@ -716,6 +724,9 @@ public class Game implements RequestListener {
 			}
 		}
 
+		this.players.addAll(this.playersOnNextLevel);
+		this.playersOnNextLevel.clear();
+		this.triggeredObjects.clear();
 
 		/* Move the players to the right position */
 		for (Player player : this.players) {
@@ -872,16 +883,14 @@ public class Game implements RequestListener {
 
 		if (this.players.size() == 0) {
 			++this.level;
-			this.generateLevel(); // Hot dog !
 			this.save();
+			this.generateLevel(); // Hot dog !
 			return;
 		}
 
-		Mob mob;
-		ArrayList<Integer> toDelete = new ArrayList<>(3);
+		ArrayList<Mob> mobToDelete = new ArrayList<>(3);
 		/* Letting the mobs to play */
-		for (int i = 0; i < this.mobs.size(); i++) {
-			mob = this.mobs.get(i);
+		for (Mob mob : this.mobs) {
 			if (mob.isAlive()) {
 				mob.live(this.mobs, this.players, this.world.getLOS(mob.getPosition(), mob.getChaseRange()));
 				if ((pos = mob.getRequestedMove()) != null) {
@@ -906,44 +915,45 @@ public class Game implements RequestListener {
 					}
 				}
 			} else {
-				toDelete.add(new Integer(i)); // Woops, you're dead
+				mobToDelete.add(mob); // Woops, you're dead
 				for (Player player : this.players) {
-					player.xp(this.mobs.get(i).getXpGain());
+					player.xp(mob.getXpGain());
 				}
-				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.mobs.get(i).getId()));
 			}
 		}
-		for (Integer integer : toDelete) {
-			this.mobs.remove(integer.intValue());
+
+		for (Mob mob : mobToDelete) {
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
+			this.mobs.remove(mob);
 		}
 
-		toDelete.clear();
 		/* Scanning for dead players */
-		for (int i = 0; i < this.players.size(); i++) {
-			if (!this.players.get(i).isAlive()) {
-				toDelete.add(new Integer(i));
+		ArrayList<Player> playerToDelete = new ArrayList<>();
+		for (Player player : this.players) {
+			if (!player.isAlive()) {
+				playerToDelete.add(player);
 			}
 		}
 
-		for (Integer integer : toDelete) {
+		for (Player player : playerToDelete) {
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
-					this.players.get(integer.intValue()).getId(),
-					this.world.getLOS(this.players.get(integer.intValue()).getPosition(),
-							this.players.get(integer.intValue()).getLos())
+					player.getId(),
+					new boolean[0][]
 			));
-			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(this.players.get(integer.intValue()).getId()));
-			this.players.remove(integer.intValue());
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+			this.players.remove(player);
 		}
 
-		toDelete.clear();
 		/* Letting consumable do their effects */
-		for (int i = 0; i < this.triggeredObjects.size(); i++) {
-			if (this.triggeredObjects.get(i).nextTick()) {
-				toDelete.add(new Integer(i)); // Your effect is finished
+		ArrayList<Consumable> consumableToDelete = new ArrayList<>();
+		for (Consumable consumable : this.triggeredObjects) {
+			if (consumable.nextTick()) { // if its effect is finished
+				consumableToDelete.add(consumable);
 			}
 		}
-		for (Integer integer : toDelete) {
-			this.triggeredObjects.remove(integer.intValue());
+
+		for (Consumable consumable : consumableToDelete) {
+			this.triggeredObjects.remove(consumable);
 		}
 
 		/* Scanning for loots&chests to give to players, for traps, next level & light bulb */
@@ -970,19 +980,18 @@ public class Game implements RequestListener {
 				}
 			}
 
-			toDelete.clear();
-			for (int i = 0; i < this.interactiveObjects.size(); i++) {
-				Pair<InteractiveObject> interactiveObject = this.interactiveObjects.get(i);
+			ArrayList<Pair<InteractiveObject>> objectsToDelete = new ArrayList<>();
+			for (Pair<InteractiveObject> interactiveObject : this.interactiveObjects) {
 				if (interactiveObject.object.getPosition().equals(player.getPosition())) {
 					if (interactiveObject.object.trigger(player)) {
-						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
-						toDelete.add(new Integer(i));
+						objectsToDelete.add(interactiveObject);
 					}
 				}
 			}
 
-			for (Integer integer : toDelete) {
-				this.interactiveObjects.remove(integer.intValue());
+			for (Pair<InteractiveObject> interactiveObject : objectsToDelete) {
+				fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
+				this.interactiveObjects.remove(interactiveObject);
 			}
 		}
 		this.recomputeLOS();
@@ -1034,9 +1043,14 @@ public class Game implements RequestListener {
 
 	private void recomputeLOS() {
 		for (Player player : this.players) {
+			Vector2i pos = player.getPosition();
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
 					player.getId(),
-					this.world.getLOS(player.getPosition(), player.getLos())
+					this.world.getLOS(pos, player.getLos())
+			));
+			fireFogAdditionEvent(new FogAdditionEvent(
+					pos,
+					this.world.getLOS(pos, player.getExploreLOS())
 			));
 		}
 	}
