@@ -47,6 +47,8 @@ public class Player extends LivingThing {
 	private Pair<StorableObject> objectToDrop;
 	private int floor;
 	private int xp;
+	private int requiredXp;
+	private int requiredXpPerLevel;
 	private int los;
 	private int number;
 	private int exploreLOS;
@@ -76,8 +78,8 @@ public class Player extends LivingThing {
 	 * @param attackPowerPerLevel  his attack power per level
 	 * @param defensePowerPerLevel his defense power per level
 	 */
-	public Player(String name, int number, int los, int exploreLOS, int level, int floor,
-				  int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef,
+	public Player(String name, int number, int los, int exploreLOS, int level, int baseRequiredXp, int requiredXpPerLevel,
+				  int floor, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef,
 				  int healthPerLevel, int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
 		super();
 		this.number = number;
@@ -102,6 +104,8 @@ public class Player extends LivingThing {
 		this.defensePowerPerLevel = defensePowerPerLevel;
 		this.floor = floor;
 		this.xp = 0;
+		this.requiredXp = baseRequiredXp;
+		this.requiredXpPerLevel = requiredXpPerLevel;
 		this.los = los;
 		this.exploreLOS = exploreLOS;
 	}
@@ -368,7 +372,7 @@ public class Player extends LivingThing {
 	 * @return the attack range
 	 */
 	public int getAttackRange() {
-		if (this.weapon != null && this.weapon.object != null) {
+		if (this.weapon != null && this.weapon.object != null && this.weapon.object.getManaCost() <= this.mana) {
 			return this.weapon.object.getRange();
 		} else {
 			return 1;
@@ -721,16 +725,57 @@ public class Player extends LivingThing {
 		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 
+	/**
+	 * Gets the graphical type.
+	 *
+	 * @return the graphical type
+	 */
 	public LivingEntityType getGType() {
 		return ENUM_VAL[this.number];
 	}
 
+	/**
+	 * Adds xp to the player
+	 *
+	 * @param earnedXp Earned xp
+	 */
+	public void xp(int earnedXp) {
+		this.xp += earnedXp;
+		if (this.xp >= this.requiredXp) {
+			int levelUpping = this.xp / this.requiredXp;
+			this.xp %= this.requiredXp;
+			this.requiredXp += this.requiredXpPerLevel * levelUpping;
+			this.level += levelUpping;
+			this.maxHitPoints += this.hitPointsPerLevel * levelUpping;
+			this.maxMana += this.manaPerLevel * levelUpping;
+			this.attackPower += this.attackPowerPerLevel * levelUpping;
+			this.defensePower += this.defensePowerPerLevel * levelUpping;
+			this.hitPoints = this.maxHitPoints * levelUpping;
+			this.mana = this.maxMana * levelUpping;
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, this.maxMana));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, this.mana));
+		}
+	}
+
+	/**
+	 * Removes an object from the inventory.
+	 *
+	 * @param storableObject The object to remove
+	 */
 	public void removeFromInventory(Pair<StorableObject> storableObject) {
 		if (this.inventory.remove(storableObject)) {
 			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, storableObject.getId()));
 		}
 	}
 
+
+	/**
+	 * Unequips an weapon // armor.
+	 *
+	 * @param id the id of the equipement
+	 */
 	public void unequip(long id) {
 		if (this.inventory.size() < this.maxStorageCapacity - 1) {
 			if (this.weapon != null && this.weapon.getId() == id) {

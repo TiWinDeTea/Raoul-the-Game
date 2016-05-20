@@ -117,8 +117,6 @@ public class Pot implements Consumable {
 	 */
 	public void trigger(Player player) {
 		this.target = player;
-		this.healTarget();
-		this.manaHealTarget();
 		if (this.attackPowerModifier != 0) {
 			player.increaseAttack(this.attackPowerModifier);
 		}
@@ -131,6 +129,8 @@ public class Pot implements Consumable {
 		if (this.manaModifier != 0) {
 			player.increaseMana(this.manaModifier);
 		}
+		this.healTarget();
+		this.manaHealTarget();
 	}
 
 	/**
