@@ -15,11 +15,13 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEvent;
@@ -387,55 +389,55 @@ public class Game implements RequestListener, Runnable, Stopable {
 	}
 
 	private void fireLivingEntityCreationEvent(LivingEntityCreationEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.createLivingEntity(event);
 		}
 	}
 
 	private void fireLivingEntityDeletionEvent(LivingEntityDeletionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.deleteLivingEntity(event);
 		}
 	}
 
 	private void fireLivingEntityLOSDefinitionEvent(LivingEntityLOSDefinitionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.defineLivingEntityLOS(event);
 		}
 	}
 
 	private void fireLivingEntityLOSModificationEvent(LivingEntityLOSModificationEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.modifieLivingEntityLOS(event);
 		}
 	}
 
 	private void fireMapCreationEvent(MapCreationEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.createMap(event);
 		}
 	}
 
 	private void firePlayerCreationEvent(PlayerCreationEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.createPlayer(event);
 		}
 	}
 
 	private void fireStaticEntityCreationEvent(StaticEntityCreationEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.createStaticEntity(event);
 		}
 	}
 
 	private void fireStaticEntityDeletionEvent(StaticEntityDeletionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.deleteStaticEntity(event);
 		}
 	}
 
 	private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
-		for(GameListener listener : this.getGameListeners()) {
+		for (GameListener listener : this.getGameListeners()) {
 			listener.defineStaticEntityLOS(event);
 		}
 	}
@@ -455,6 +457,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void fireFogAdditionEvent(FogAdditionEvent event) {
 		for (GameListener listener : getGameListeners()) {
 			listener.addFog(event);
+		}
+	}
+
+	private void fireCenterOnTileEvent(CenterOnTileEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.centerOnTile(event);
 		}
 	}
 
@@ -487,6 +495,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	@Override
 	public void requestMove(MoveRequestEvent e) {
+		this.requestedEvent.add(e);
+	}
+
+	@Override
+	public void requestCenterView(CenterViewRequestEvent e) {
 		this.requestedEvent.add(e);
 	}
 
@@ -650,6 +663,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					this.world.getLOS(player.getPosition(), player.getLos())
 			));
 		}
+		fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
 	}
 
 	//-------------------------------------//
@@ -702,8 +716,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.currentPlayer = this.players.get(this.playerTurn);
 			}
 			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
-        } while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
-    }
+		} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+	}
 
 	/**
 	 * Step into the next turn (all entities live)
@@ -717,12 +731,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 			Player player = this.players.get(i);
 			player.live(this.mobs, this.players, this.world.getLOS(player.getPosition(), player.getLos()));
 			Pair<StorableObject> drop;
-            if (player.getFloor() == this.level) {
-                if ((pos = player.getRequestedMove()) != null) {
-                /*See if the player can move as he wanted to */
-                    int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
-                    if (distance <= 1 && isAccessible(pos)) {
-                        player.setPosition(pos);
+			if (player.getFloor() == this.level) {
+				if ((pos = player.getRequestedMove()) != null) {
+				/*See if the player can move as he wanted to */
+					int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+					if (distance <= 1 && isAccessible(pos)) {
+						player.setPosition(pos);
 						fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
 					} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
 						player.setFloor(this.level + 1);
@@ -1006,6 +1020,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 						case DROP_REQUEST_EVENT:
 							treatRequestEvent((DropRequestEvent) event);
 							break;
+						case CENTER_VIEW_REQUEST_EVENT:
+							treatRequestEvent((CenterViewRequestEvent) event);
+							break;
 					}
 					event = this.requestedEvent.poll();
 				} catch (Exception e) {
@@ -1013,6 +1030,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 		} while (this.isRunning);
+	}
+
+	private void treatRequestEvent(CenterViewRequestEvent e) {
+		fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
 	}
 
 	private void treatRequestEvent(DropRequestEvent e) {
