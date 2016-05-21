@@ -236,6 +236,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void addInventory(InventoryAdditionEvent e) {
+		System.out.println("addInventory Event");
 		if(e == null) {
 			return;
 		}
@@ -249,6 +250,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void deleteInventory(InventoryDeletionEvent e) {
+		System.out.println("deleteInventory Event");
 		if(e == null) {
 			return;
 		}
@@ -262,6 +264,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void createLivingEntity(LivingEntityCreationEvent e) {
+		System.out.println("createLivingEntity Event");
 		if(e == null) {
 			return;
 		}
@@ -272,6 +275,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void deleteLivingEntity(LivingEntityDeletionEvent e) {
+		System.out.println("deleteLivingEntity Event");
 		if(e == null) {
 			return;
 		}
@@ -286,6 +290,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
+		System.out.println("defineLivingEntityLOS Event");
 		if(e == null) {
 			return;
 		}
@@ -300,6 +305,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
+		System.out.println("modifieLivingEntityLOS Event");
 		if(e == null) {
 			return;
 		}
@@ -314,6 +320,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void moveLivingEntity(LivingEntityMoveEvent e) {
+		System.out.println("moveLivingEntity Event");
 		if(e == null) {
 			return;
 		}
@@ -347,6 +354,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void createPlayer(PlayerCreationEvent e) {
+		System.out.println("createPlayer Event");
 		if(e == null) {
 			return;
 		}
@@ -384,6 +392,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void changePlayerStat(PlayerStatEvent e) {
+		System.out.println("changePlayerStat Event");
 		if(e == null) {
 			return;
 		}
@@ -422,6 +431,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void createStaticEntity(StaticEntityCreationEvent e) {
+		System.out.println("createStaticEntity Event");
 		if(e == null) {
 			return;
 		}
@@ -432,6 +442,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void deleteStaticEntity(StaticEntityDeletionEvent e) {
+		System.out.println("deleteStaticEntity Event");
 		if(e == null) {
 			return;
 		}
@@ -446,6 +457,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
+		System.out.println("defineStaticEntityLOS Event");
 		if(e == null) {
 			return;
 		}
@@ -460,6 +472,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void createMap(MapCreationEvent e) {
+		System.out.println("createMap Event");
 		if(e == null) {
 			return;
 		}
@@ -473,11 +486,13 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void modifieTile(TileModificationEvent e) {
+		System.out.println("modifieTile Event");
 		this.cTileMap.setTile(e.tileType, e.tilePosition);
 	}
 
 	@Override
 	public void playerNextTick(PlayerNextTickEvent event) {
+		System.out.println("playerNextTick Event");
 		for(PlayerHUD playerHUD : this.playersHUD) {
 			playerHUD.setMasked(true);
 		}
@@ -495,11 +510,13 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void addFog(FogAdditionEvent e) {
+		System.out.println("addFog Event");
 		this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
 	}
 
 	@Override
 	public void resetFog(FogResetEvent e) {
+		System.out.println("resetFog Event");
 		//TODO
 	}
 }

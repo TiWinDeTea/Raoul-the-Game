@@ -93,5 +93,5 @@ public abstract class Entity extends Parent {
 		}
 	}
 
-	//public abstract void setPosition(Vector2i position);
+	public abstract boolean isVisibleOnFog();
 }

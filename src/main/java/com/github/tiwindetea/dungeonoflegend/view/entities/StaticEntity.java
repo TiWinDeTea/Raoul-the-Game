@@ -43,4 +43,9 @@ public class StaticEntity extends Entity {
 	public boolean isAnimated() {
 		return this.animated;
 	}
+
+	@Override
+	public boolean isVisibleOnFog() {
+		return true;
+	}
 }

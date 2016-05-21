@@ -460,7 +460,12 @@ public class TileMap extends Parent {
 				entity.setVisible(true);
 			}
 			else {
-				entity.setVisible(false);
+				if(this.foggedTiles[entity.getPosition().x][entity.getPosition().y]) {
+					entity.setVisible(entity.isVisibleOnFog());
+				}
+				else {
+					entity.setVisible(false);
+				}
 			}
 		}
 	}

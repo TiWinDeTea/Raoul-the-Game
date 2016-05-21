@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -48,17 +49,17 @@ public class PlayerInventory extends Parent {
 	private final HBox equipedItemsHBox = new HBox();
 	private final TilePane inventoryItemsTilePane = new TilePane();
 
-	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
+	private EventHandler<MouseEvent> onMouseReleaseEventHandler = new EventHandler<MouseEvent>() {
 
 		public void handle(MouseEvent event) {
 
 			// left mouse button
-			if(event.isPrimaryButtonDown()) {
+			if(event.getButton() == MouseButton.PRIMARY) {
 				//TODO
 			}
 
 			// right mouse button
-			if(event.isSecondaryButtonDown()) {
+			if(event.getButton() == MouseButton.SECONDARY) {
 				StaticEntity staticEntity = (StaticEntity) event.getSource();
 				if(PlayerInventory.this.inventoryItems.containsValue(staticEntity)) {
 					for(Map.Entry<Long, StaticEntity> entry : PlayerInventory.this.inventoryItems.entrySet()) {
@@ -120,7 +121,7 @@ public class PlayerInventory extends Parent {
 	public void addInventoryItem(Long entityId, StaticEntity staticEntity) {
 		this.inventoryItems.put(entityId, staticEntity);
 		this.inventoryItemsTilePane.getChildren().add(staticEntity);
-		staticEntity.setOnMousePressed(this.onMousePressedEventHandler);
+		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
 	}
 
 	public void removeInventoryItem(Long entityId) {
@@ -131,7 +132,7 @@ public class PlayerInventory extends Parent {
 	public void addEquipedItem(Long entityId, StaticEntity staticEntity) {
 		this.equipedItems.put(entityId, staticEntity);
 		this.equipedItemsHBox.getChildren().add(staticEntity);
-		staticEntity.setOnMousePressed(this.onMousePressedEventHandler);
+		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
 	}
 
 	public void removeEquipedItem(Long entityId) {

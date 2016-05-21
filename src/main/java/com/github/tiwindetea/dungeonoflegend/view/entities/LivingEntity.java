@@ -38,4 +38,9 @@ public class LivingEntity extends Entity {
 	public Direction getDirection() {
 		return this.direction;
 	}
+
+	@Override
+	public boolean isVisibleOnFog() {
+		return false;
+	}
 }
