@@ -7,4 +7,9 @@ public class LivingEntityDeletionEvent extends LivingEntityEvent {
 	public LivingEntityDeletionEvent(long entityId) {
 		super(entityId);
 	}
+
+    @Override
+    public LivingEntityEventType getSubType() {
+        return LivingEntityEventType.LIVING_ENTITY_DELETION_EVENT;
+    }
 }

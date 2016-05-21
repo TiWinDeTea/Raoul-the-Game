@@ -1031,7 +1031,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				event = this.requestedEvent.poll();
 				while (event != null) {
 					try {
-						switch (event.getType()) {
+						switch (event.getSubType()) {
 							case MOVE_REQUEST_EVENT:
 								treatRequestEvent((MoveRequestEvent) event);
 								break;

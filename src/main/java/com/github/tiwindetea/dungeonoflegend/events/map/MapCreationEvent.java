@@ -11,4 +11,9 @@ public class MapCreationEvent extends MapEvent {
 	public MapCreationEvent(Tile[][] map) {
 		this.map = map;
 	}
+
+    @Override
+    public MapEventType getSubType() {
+        return MapEventType.MAP_CREATION_EVENT;
+    }
 }

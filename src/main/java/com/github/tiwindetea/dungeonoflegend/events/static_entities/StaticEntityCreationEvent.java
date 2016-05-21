@@ -17,4 +17,9 @@ public class StaticEntityCreationEvent extends StaticEntityEvent {
 		this.position = position;
 		this.description = description;
 	}
+
+	@Override
+	public StaticEntityEventType getSubType() {
+		return StaticEntityEventType.STATIC_ENTITY_CREATION_EVENT;
+	}
 }

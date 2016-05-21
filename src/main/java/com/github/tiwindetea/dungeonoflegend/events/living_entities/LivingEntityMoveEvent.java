@@ -12,4 +12,9 @@ public class LivingEntityMoveEvent extends LivingEntityEvent {
 		super(entityId);
 		this.newPosition = newPosition;
 	}
+
+    @Override
+    public LivingEntityEventType getSubType() {
+        return LivingEntityEventType.LIVING_ENTITY_MOVE_EVENT;
+    }
 }

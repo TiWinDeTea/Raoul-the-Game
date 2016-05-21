@@ -9,7 +9,7 @@ public class CenterViewRequestEvent extends RequestEvent {
 	}
 
 	@Override
-	public RequestEventType getType() {
+	public RequestEventType getSubType() {
 		return RequestEventType.CENTER_VIEW_REQUEST_EVENT;
 	}
 }

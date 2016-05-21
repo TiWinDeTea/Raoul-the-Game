@@ -8,6 +8,10 @@ public class PlayerStatEvent extends PlayerEvent {
 		HEALTH,
 		MANA
 	}
+    @Override
+    public PlayerEventType getSubType() {
+        return PlayerEventType.PLAYER_STAT_EVENT;
+    }
 
 	public enum ValueType {
 		ACTUAL,

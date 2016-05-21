@@ -13,7 +13,7 @@ public class MoveRequestEvent extends RequestEvent {
 	}
 
 	@Override
-	public RequestEventType getType() {
+	public RequestEventType getSubType() {
 		return RequestEventType.MOVE_REQUEST_EVENT;
 	}
 }

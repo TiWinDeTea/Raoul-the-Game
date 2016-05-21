@@ -13,7 +13,7 @@ public class InteractionRequestEvent extends RequestEvent {
 	}
 
 	@Override
-	public RequestEventType getType() {
+	public RequestEventType getSubType() {
 		return RequestEventType.INTERACTION_REQUEST_EVENT;
 	}
 }

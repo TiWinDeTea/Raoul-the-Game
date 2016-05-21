@@ -4,8 +4,10 @@ import com.github.tiwindetea.dungeonoflegend.model.Game;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +29,14 @@ public class Main extends Application {
 		game.initNew(1);
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(game);
+		executor.shutdown();
 		primaryStage.getIcons().add(ViewPackage.icon);
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				game.stop();
+			}
+		});
 	}
 
 	public static void main(String[] args) {

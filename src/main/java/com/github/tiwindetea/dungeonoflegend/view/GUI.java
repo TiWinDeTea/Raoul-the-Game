@@ -1,7 +1,9 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
+import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
@@ -9,9 +11,12 @@ import com.github.tiwindetea.dungeonoflegend.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogResetEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.MapEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.playerinventory.PlayerInventoryEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
@@ -23,8 +28,10 @@ import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropReque
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileMapEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
@@ -34,6 +41,9 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
@@ -49,10 +59,13 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Created by maxime on 5/2/16.
@@ -87,6 +100,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private int actualPlayersNumber = 0;
 
 	private final TileMap cTileMap = new TileMap();
+
+	private Queue<Event> event = new LinkedList<>();
 
 	private EventHandler<KeyEvent> onKeyReleasedEventHandler = new EventHandler<KeyEvent>() {
 
@@ -166,6 +181,350 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.bPane.getChildren().add(this.bHBox);
 		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
+		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(100), new EventHandler<ActionEvent>() {
+
+			public void addInventory(InventoryAdditionEvent e) {
+				System.out.println("addInventory Event");
+				if (e.isEquiped) {
+					GUI.this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description));
+				} else {
+					GUI.this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description));
+				}
+			}
+
+			public void deleteInventory(InventoryDeletionEvent e) {
+				System.out.println("deleteInventory Event");
+				if (e.playerNumber < GUI.this.actualPlayersNumber) {
+					GUI.this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
+				} else {
+					System.out.println("GUI::deleteInventory : invalid player number " + e.playerNumber);
+				}
+			}
+
+			public void createLivingEntity(LivingEntityCreationEvent e) {
+				System.out.println("createLivingEntity Event");
+				LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction, e.description);
+				GUI.this.livingEntities.put(e.entityId, livingEntity);
+				GUI.this.cTileMap.addEntity(livingEntity);
+			}
+
+			public void deleteLivingEntity(LivingEntityDeletionEvent e) {
+				System.out.println("deleteLivingEntity Event");
+				if (GUI.this.livingEntities.containsKey(e.entityId)) {
+					GUI.this.cTileMap.removeEntity(GUI.this.livingEntities.get(e.entityId));
+					GUI.this.livingEntities.remove(e.entityId);
+				} else {
+					System.out.println("GUI::deleteLivingEntity : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
+				System.out.println("defineLivingEntityLOS Event");
+				if (GUI.this.livingEntities.containsKey(e.entityId)) {
+					GUI.this.livingEntities.get(e.entityId).setLOS(e.newLOS);
+					GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
+				} else {
+					System.out.println("GUI::defineLivingEntityLOS : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
+				System.out.println("modifieLivingEntityLOS Event");
+				if (GUI.this.livingEntities.containsKey(e.entityId)) {
+					GUI.this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
+					GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
+				} else {
+					System.out.println("GUI::modifieLivingEntityLOS : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void moveLivingEntity(LivingEntityMoveEvent e) {
+				System.out.println("moveLivingEntity Event");
+				if (GUI.this.livingEntities.containsKey(e.entityId)) {
+					Vector2i oldPosition = GUI.this.livingEntities.get(e.entityId).getPosition();
+					Vector2i newPosition = e.newPosition;
+					Direction direction;
+					if (newPosition.y > oldPosition.y) {
+						direction = Direction.DOWN;
+					} else if (newPosition.y < oldPosition.y) {
+						direction = Direction.UP;
+					} else if (newPosition.x > oldPosition.x) {
+						direction = Direction.RIGHT;
+					} else if (newPosition.x < oldPosition.x) {
+						direction = Direction.LEFT;
+					} else {
+						direction = GUI.this.livingEntities.get(e.entityId).getDirection();
+					}
+					GUI.this.livingEntities.get(e.entityId).setDirection(direction);
+					GUI.this.livingEntities.get(e.entityId).setPosition(e.newPosition);
+					GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
+				} else {
+					System.out.println("GUI::moveLivingEntity : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void createPlayer(PlayerCreationEvent e) {
+				if (GUI.this.actualPlayersNumber < GUI.this.maxPlayersNumber) {
+					LivingEntityType livingEntityType;
+					if (e.playerNumber == 1) {
+						livingEntityType = LivingEntityType.PLAYER2;
+					} else {
+						livingEntityType = LivingEntityType.PLAYER1;
+					}
+					LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction, e.description);
+					GUI.this.livingEntities.put(e.entityId, livingEntity);
+					GUI.this.cTileMap.addEntity(livingEntity);
+					++GUI.this.actualPlayersNumber;
+
+					ImageView imageView1 = new ImageView(livingEntityType.getImage());
+					ImageView imageView2 = new ImageView(livingEntityType.getImage());
+					Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
+					imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+					imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+					PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
+					GUI.this.playersHUD.add(playerHUD);
+					GUI.this.blTilePane.getChildren().add(playerHUD);
+
+					PlayerInventory playerInventory = new PlayerInventory(imageView2);
+					GUI.this.playersInventories.add(playerInventory);
+					GUI.this.rIventoryPane.getChildren().add(playerInventory);
+					playerInventory.addPlayerInventoryListener(GUI.this);
+				} else {
+					System.out.println("GUI::createPlayer : too much players " + GUI.this.actualPlayersNumber);
+				}
+			}
+
+			public void changePlayerStat(PlayerStatEvent e) {
+				System.out.println("changePlayerStat Event");
+				if (e == null) {
+					return;
+				}
+				if (e.playerNumber >= 0 && e.playerNumber < GUI.this.actualPlayersNumber) {
+					int value = e.value;
+					if (value < 0) {
+						value = 0;
+					}
+					switch (e.statType) {
+						case HEALTH:
+							switch (e.valueType) {
+								case ACTUAL:
+									GUI.this.playersHUD.get(e.playerNumber).setActualHealth(value);
+									break;
+								case MAX:
+									GUI.this.playersHUD.get(e.playerNumber).setMaxHealth(value);
+									break;
+							}
+							break;
+						case MANA:
+							switch (e.valueType) {
+								case ACTUAL:
+									GUI.this.playersHUD.get(e.playerNumber).setActualMana(value);
+									break;
+								case MAX:
+									GUI.this.playersHUD.get(e.playerNumber).setMaxMana(value);
+									break;
+							}
+							break;
+					}
+				} else {
+					System.out.println("GUI::changePlayerStat : invalid player number " + e.playerNumber);
+				}
+			}
+
+			public void createStaticEntity(StaticEntityCreationEvent e) {
+				System.out.println("createStaticEntity Event");
+				if (e == null) {
+					return;
+				}
+				StaticEntity staticEntity = new StaticEntity(e.type, e.position, e.description);
+				GUI.this.staticEntities.put(e.entityId, staticEntity);
+				GUI.this.cTileMap.addEntity(staticEntity);
+			}
+
+			public void deleteStaticEntity(StaticEntityDeletionEvent e) {
+				System.out.println("deleteStaticEntity Event");
+				if (e == null) {
+					return;
+				}
+				if (GUI.this.staticEntities.containsKey(e.entityId)) {
+					GUI.this.cTileMap.removeEntity(GUI.this.staticEntities.get(e.entityId));
+					GUI.this.staticEntities.remove(e.entityId);
+				} else {
+					System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
+				System.out.println("defineStaticEntityLOS Event");
+				if (e == null) {
+					return;
+				}
+				if (GUI.this.staticEntities.containsKey(e.entityId)) {
+					GUI.this.staticEntities.get(e.entityId).setLOS(e.newLOS);
+					GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
+				} else {
+					System.out.println("GUI::defineStaticEntityLOS : invalid entity id " + e.entityId);
+				}
+			}
+
+			public void createMap(MapCreationEvent e) {
+				System.out.println("createMap Event");
+				if (e == null) {
+					return;
+				}
+				GUI.this.cTileMap.setMap(e.map);
+			}
+
+			public void tileClicked(TileClickEvent e) {
+				fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
+			}
+
+			public void modifieTile(TileModificationEvent e) {
+				System.out.println("modifieTile Event");
+				GUI.this.cTileMap.setTile(e.tileType, e.tilePosition);
+			}
+
+			public void playerNextTick(PlayerNextTickEvent event) {
+				System.out.println("playerNextTick Event");
+				for (PlayerHUD playerHUD : GUI.this.playersHUD) {
+					playerHUD.setMasked(true);
+				}
+				for (PlayerInventory playersInventory : GUI.this.playersInventories) {
+					playersInventory.setVisible(false);
+				}
+				GUI.this.playersHUD.get(event.playerNumber).setMasked(false);
+				GUI.this.playersInventories.get(event.playerNumber).setVisible(true);
+			}
+
+			public void objectClicked(ObjectClickEvent e) {
+				fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
+			}
+
+			public void addFog(FogAdditionEvent e) {
+				System.out.println("addFog Event");
+				GUI.this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
+			}
+
+			public void resetFog(FogResetEvent e) {
+				System.out.println("resetFog Event");
+				GUI.this.cTileMap.setAllTilesFogged(false);
+			}
+
+			public void centerOnTile(CenterOnTileEvent e) {
+				System.out.println("centerOnTile Event");
+				GUI.this.cTileMap.centerViewOnTile(e.tilePosition);
+			}
+
+			public void handle(ActionEvent event) {
+				Event gameEvent = GUI.this.event.poll();
+				while (gameEvent != null) {
+					switch (gameEvent.getType()) {
+						case TILEMAP_EVENT: {
+							TileMapEvent e = (TileMapEvent) gameEvent;
+							switch (e.getSubType()) {
+								case TILE_CLICK_EVENT:
+									this.tileClicked((TileClickEvent) e);
+									break;
+							}
+							break;
+						}
+						case STATIC_ENTITY_EVENT: {
+							StaticEntityEvent e = (StaticEntityEvent) gameEvent;
+							switch (e.getSubType()) {
+								case STATIC_ENTITY_CREATION_EVENT:
+									this.createStaticEntity((StaticEntityCreationEvent) e);
+									break;
+								case STATIC_ENTITY_DELETION_EVENT:
+									this.deleteStaticEntity((StaticEntityDeletionEvent) e);
+									break;
+								case STATIC_ENTITY_LOS_DEFINITION_EVENT:
+									this.defineStaticEntityLOS((StaticEntityLOSDefinitionEvent) e);
+									break;
+							}
+							break;
+						}
+						case REQUEST_EVENT: {
+							break;
+						}
+						case PLAYER_EVENT: {
+							PlayerEvent e = (PlayerEvent) gameEvent;
+							switch (e.getSubType()) {
+								case INVENTORY_ADDITION_EVENT:
+									this.addInventory((InventoryAdditionEvent) e);
+									break;
+								case INVENTORY_DELETION_EVENT:
+									this.deleteInventory((InventoryDeletionEvent) e);
+									break;
+								case PLAYER_CREATION_EVENT:
+									this.createPlayer((PlayerCreationEvent) e);
+									break;
+								case PLAYER_STAT_EVENT:
+									this.changePlayerStat((PlayerStatEvent) e);
+									break;
+								case PLAYER_NEXT_TICK_EVENT:
+									this.playerNextTick((PlayerNextTickEvent) e);
+									break;
+							}
+							break;
+						}
+						case PLAYER_INVENTORY_EVENT: {
+							PlayerInventoryEvent e = (PlayerInventoryEvent) gameEvent;
+							switch (e.getSubType()) {
+								case OJECT_CLICK_EVENT:
+									this.objectClicked((ObjectClickEvent) e);
+									break;
+							}
+							break;
+						}
+						case MAP_EVENT: {
+							MapEvent e = (MapEvent) gameEvent;
+							switch (e.getSubType()) {
+								case CENTER_ON_TILE_EVENT:
+									this.centerOnTile((CenterOnTileEvent) e);
+									break;
+								case FOG_ADDITION_EVENT:
+									this.addFog((FogAdditionEvent) e);
+									break;
+								case FOG_RESET_EVENT:
+									this.resetFog((FogResetEvent) e);
+									break;
+								case MAP_CREATION_EVENT:
+									this.createMap((MapCreationEvent) e);
+									break;
+								case TILE_MODIFICATION_EVENT:
+									this.modifieTile((TileModificationEvent) e);
+									break;
+							}
+							break;
+						}
+						case LIVING_ENTITY_EVENT: {
+							LivingEntityEvent e = (LivingEntityEvent) gameEvent;
+							switch (e.getSubType()) {
+								case LIVING_ENTITY_CREATION_EVENT:
+									this.createLivingEntity((LivingEntityCreationEvent) e);
+									break;
+								case LIVING_ENTITY_DELETION_EVENT:
+									this.deleteLivingEntity((LivingEntityDeletionEvent) e);
+									break;
+								case LIVING_ENTITY_LOS_DEFINITION_EVENT:
+									this.defineLivingEntityLOS((LivingEntityLOSDefinitionEvent) e);
+									break;
+								case LIVING_ENTITY_LOS_MODIFICATION_EVENT:
+									this.modifieLivingEntityLOS((LivingEntityLOSModificationEvent) e);
+									break;
+								case LIVING_ENTITY_MOVE_EVENT:
+									this.moveLivingEntity((LivingEntityMoveEvent) e);
+									break;
+							}
+							break;
+						}
+					}
+					gameEvent = GUI.this.event.poll();
+				}
+			}
+		}));
+		timeline.setCycleCount(Timeline.INDEFINITE);
+		timeline.play();
 	}
 
 	public Scene getScene() {
@@ -249,293 +608,101 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void addInventory(InventoryAdditionEvent e) {
-		System.out.println("addInventory Event");
-		if(e == null) {
-			return;
-		}
-		if(e.isEquiped) {
-			this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description));
-		}
-		else {
-			this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description));
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void deleteInventory(InventoryDeletionEvent e) {
-		System.out.println("deleteInventory Event");
-		if(e == null) {
-			return;
-		}
-		if(e.playerNumber < this.actualPlayersNumber) {
-			this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
-		}
-		else {
-			System.out.println("GUI::deleteInventory : invalid player number " + e.playerNumber);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void createLivingEntity(LivingEntityCreationEvent e) {
-		System.out.println("createLivingEntity Event");
-		if(e == null) {
-			return;
-		}
-		LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction, e.description);
-		this.livingEntities.put(e.entityId, livingEntity);
-		this.cTileMap.addEntity(livingEntity);
+		this.event.add(e);
 	}
 
 	@Override
 	public void deleteLivingEntity(LivingEntityDeletionEvent e) {
-		System.out.println("deleteLivingEntity Event");
-		if(e == null) {
-			return;
-		}
-		if(this.livingEntities.containsKey(e.entityId)) {
-			this.cTileMap.removeEntity(this.livingEntities.get(e.entityId));
-			this.livingEntities.remove(e.entityId);
-		}
-		else {
-			System.out.println("GUI::deleteLivingEntity : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
-		System.out.println("defineLivingEntityLOS Event");
-		if(e == null) {
-			return;
-		}
-		if(this.livingEntities.containsKey(e.entityId)) {
-			this.livingEntities.get(e.entityId).setLOS(e.newLOS);
-			this.cTileMap.setVisibleTiles(computeVisibleTiles());
-		}
-		else {
-			System.out.println("GUI::defineLivingEntityLOS : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
-		System.out.println("modifieLivingEntityLOS Event");
-		if(e == null) {
-			return;
-		}
-		if(this.livingEntities.containsKey(e.entityId)) {
-			this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
-			this.cTileMap.setVisibleTiles(computeVisibleTiles());
-		}
-		else {
-			System.out.println("GUI::modifieLivingEntityLOS : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void moveLivingEntity(LivingEntityMoveEvent e) {
-		System.out.println("moveLivingEntity Event");
-		if(e == null) {
-			return;
-		}
-		if(this.livingEntities.containsKey(e.entityId)) {
-			Vector2i oldPosition = this.livingEntities.get(e.entityId).getPosition();
-			Vector2i newPosition = e.newPosition;
-			Direction direction;
-			if(newPosition.y > oldPosition.y) {
-				direction = Direction.DOWN;
-			}
-			else if(newPosition.y < oldPosition.y) {
-				direction = Direction.UP;
-			}
-			else if(newPosition.x > oldPosition.x) {
-				direction = Direction.RIGHT;
-			}
-			else if(newPosition.x < oldPosition.x) {
-				direction = Direction.LEFT;
-			}
-			else {
-				direction = this.livingEntities.get(e.entityId).getDirection();
-			}
-			this.livingEntities.get(e.entityId).setDirection(direction);
-			this.livingEntities.get(e.entityId).setPosition(e.newPosition);
-			this.cTileMap.setVisibleTiles(computeVisibleTiles());
-		}
-		else {
-			System.out.println("GUI::moveLivingEntity : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void createPlayer(PlayerCreationEvent e) {
-		System.out.println("createPlayer Event");
-		if(e == null) {
-			return;
-		}
-		if(this.actualPlayersNumber < this.maxPlayersNumber) {
-			LivingEntityType livingEntityType;
-			if(e.playerNumber == 1) {
-				livingEntityType = LivingEntityType.PLAYER2;
-			}
-			else {
-				livingEntityType = LivingEntityType.PLAYER1;
-			}
-			LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction, e.description);
-			this.livingEntities.put(e.entityId, livingEntity);
-			this.cTileMap.addEntity(livingEntity);
-			++this.actualPlayersNumber;
-
-			ImageView imageView1 = new ImageView(livingEntityType.getImage());
-			ImageView imageView2 = new ImageView(livingEntityType.getImage());
-			Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
-			imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-			imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-			PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
-			this.playersHUD.add(playerHUD);
-			this.blTilePane.getChildren().add(playerHUD);
-
-			PlayerInventory playerInventory = new PlayerInventory(imageView2);
-			this.playersInventories.add(playerInventory);
-			this.rIventoryPane.getChildren().add(playerInventory);
-			playerInventory.addPlayerInventoryListener(this);
-		}
-		else {
-			System.out.println("GUI::createPlayer : too much players " + this.actualPlayersNumber);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void changePlayerStat(PlayerStatEvent e) {
-		System.out.println("changePlayerStat Event");
-		if(e == null) {
-			return;
-		}
-		if(e.playerNumber >= 0 && e.playerNumber < this.actualPlayersNumber) {
-			int value = e.value;
-			if(value < 0) {
-				value = 0;
-			}
-			switch(e.statType) {
-			case HEALTH:
-				switch(e.valueType) {
-				case ACTUAL:
-					this.playersHUD.get(e.playerNumber).setActualHealth(value);
-					break;
-				case MAX:
-					this.playersHUD.get(e.playerNumber).setMaxHealth(value);
-					break;
-				}
-				break;
-			case MANA:
-				switch(e.valueType) {
-				case ACTUAL:
-					this.playersHUD.get(e.playerNumber).setActualMana(value);
-					break;
-				case MAX:
-					this.playersHUD.get(e.playerNumber).setMaxMana(value);
-					break;
-				}
-				break;
-			}
-		}
-		else {
-			System.out.println("GUI::changePlayerStat : invalid player number " + e.playerNumber);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void createStaticEntity(StaticEntityCreationEvent e) {
-		System.out.println("createStaticEntity Event");
-		if(e == null) {
-			return;
-		}
-		StaticEntity staticEntity = new StaticEntity(e.type, e.position, e.description);
-		this.staticEntities.put(e.entityId, staticEntity);
-		this.cTileMap.addEntity(staticEntity);
+		this.event.add(e);
 	}
 
 	@Override
 	public void deleteStaticEntity(StaticEntityDeletionEvent e) {
-		System.out.println("deleteStaticEntity Event");
-		if(e == null) {
-			return;
-		}
-		if(this.staticEntities.containsKey(e.entityId)) {
-			this.cTileMap.removeEntity(this.staticEntities.get(e.entityId));
-			this.staticEntities.remove(e.entityId);
-		}
-		else {
-			System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
-		System.out.println("defineStaticEntityLOS Event");
-		if(e == null) {
-			return;
-		}
-		if(this.staticEntities.containsKey(e.entityId)) {
-			this.staticEntities.get(e.entityId).setLOS(e.newLOS);
-			this.cTileMap.setVisibleTiles(computeVisibleTiles());
-		}
-		else {
-			System.out.println("GUI::defineStaticEntityLOS : invalid entity id " + e.entityId);
-		}
+		this.event.add(e);
 	}
 
 	@Override
 	public void createMap(MapCreationEvent e) {
-		System.out.println("createMap Event");
-		if(e == null) {
-			return;
-		}
-		this.cTileMap.setMap(e.map);
+		this.event.add(e);
 	}
 
 	@Override
 	public void tileClicked(TileClickEvent e) {
-		fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
+		this.event.add(e);
 	}
 
 	@Override
 	public void modifieTile(TileModificationEvent e) {
-		System.out.println("modifieTile Event");
-		this.cTileMap.setTile(e.tileType, e.tilePosition);
+		this.event.add(e);
 	}
 
 	@Override
-	public void playerNextTick(PlayerNextTickEvent event) {
-		System.out.println("playerNextTick Event");
-		for(PlayerHUD playerHUD : this.playersHUD) {
-			playerHUD.setMasked(true);
-		}
-		for(PlayerInventory playersInventory : this.playersInventories) {
-			playersInventory.setVisible(false);
-		}
-		this.playersHUD.get(event.playerNumber).setMasked(false);
-		this.playersInventories.get(event.playerNumber).setVisible(true);
+	public void playerNextTick(PlayerNextTickEvent e) {
+		this.event.add(e);
 	}
 
 	@Override
 	public void objectClicked(ObjectClickEvent e) {
-		fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
+		this.event.add(e);
 	}
 
 	@Override
 	public void addFog(FogAdditionEvent e) {
-		System.out.println("addFog Event");
-		this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
+		this.event.add(e);
 	}
 
 	@Override
 	public void resetFog(FogResetEvent e) {
-		System.out.println("resetFog Event");
-		this.cTileMap.setAllTilesFogged(false);
+		this.event.add(e);
 	}
 
 	@Override
 	public void centerOnTile(CenterOnTileEvent e) {
-		System.out.println("centerOnTile Event");
-		this.cTileMap.centerViewOnTile(e.tilePosition);
+		this.event.add(e);
 	}
 }

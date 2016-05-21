@@ -14,4 +14,9 @@ public class LivingEntityLOSModificationEvent extends LivingEntityEvent {
 		super(entityId);
 		this.modifiedTilesPositions = modifiedTilesPositions;
 	}
+
+    @Override
+    public LivingEntityEventType getSubType() {
+        return LivingEntityEventType.LIVING_ENTITY_LOS_MODIFICATION_EVENT;
+    }
 }

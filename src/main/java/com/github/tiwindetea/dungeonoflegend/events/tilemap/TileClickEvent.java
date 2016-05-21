@@ -11,4 +11,9 @@ public class TileClickEvent extends TileMapEvent {
 	public TileClickEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
+
+    @Override
+    public TileMapEventType getSubType() {
+        return TileMapEventType.TILE_CLICK_EVENT;
+    }
 }

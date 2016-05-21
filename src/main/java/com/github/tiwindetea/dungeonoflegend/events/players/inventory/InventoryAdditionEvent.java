@@ -1,5 +1,6 @@
 package com.github.tiwindetea.dungeonoflegend.events.players.inventory;
 
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEventType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
 /**
@@ -15,5 +16,10 @@ public class InventoryAdditionEvent extends InventoryEvent {
 		this.isEquiped = isEquiped;
 		this.type = type;
 		this.description = description;
+	}
+
+	@Override
+	public PlayerEventType getSubType() {
+		return PlayerEventType.INVENTORY_ADDITION_EVENT;
 	}
 }

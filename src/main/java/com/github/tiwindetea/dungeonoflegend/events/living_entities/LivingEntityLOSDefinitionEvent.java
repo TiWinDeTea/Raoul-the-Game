@@ -10,4 +10,9 @@ public class LivingEntityLOSDefinitionEvent extends LivingEntityEvent {
 		super(entityId);
 		this.newLOS = newLOS;
 	}
+
+    @Override
+    public LivingEntityEventType getSubType() {
+        return LivingEntityEventType.LIVING_ENTITY_LOS_DEFINITION_EVENT;
+    }
 }

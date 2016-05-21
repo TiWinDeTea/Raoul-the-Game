@@ -15,7 +15,7 @@ public class DropRequestEvent extends InventoryRequestEvent {
 	}
 
 	@Override
-	public RequestEventType getType() {
+	public RequestEventType getSubType() {
 		return RequestEventType.DROP_REQUEST_EVENT;
 	}
 }

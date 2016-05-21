@@ -14,4 +14,9 @@ public class TileModificationEvent extends MapEvent {
 		this.tilePosition = tilePosition;
 		this.tileType = tileType;
 	}
+
+    @Override
+    public MapEventType getSubType() {
+        return MapEventType.TILE_MODIFICATION_EVENT;
+    }
 }

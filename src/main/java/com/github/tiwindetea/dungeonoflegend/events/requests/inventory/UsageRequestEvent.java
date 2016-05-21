@@ -12,7 +12,7 @@ public class UsageRequestEvent extends InventoryRequestEvent {
 	}
 
 	@Override
-	public RequestEventType getType() {
+	public RequestEventType getSubType() {
 		return RequestEventType.USAGE_REQUEST_EVENT;
 	}
 }

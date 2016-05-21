@@ -13,4 +13,9 @@ public class FogAdditionEvent extends MapEvent {
 		this.fogCenterPosition = fogCenterPosition;
 		this.fog = fog;
 	}
+
+    @Override
+    public MapEventType getSubType() {
+        return MapEventType.FOG_ADDITION_EVENT;
+    }
 }

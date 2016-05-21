@@ -7,4 +7,9 @@ public class FogResetEvent extends MapEvent {
 
 	public FogResetEvent() {
 	}
+
+    @Override
+    public MapEventType getSubType() {
+        return MapEventType.FOG_RESET_EVENT;
+    }
 }

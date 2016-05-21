@@ -7,4 +7,9 @@ public class StaticEntityDeletionEvent extends StaticEntityEvent {
 	public StaticEntityDeletionEvent(long entityId) {
 		super(entityId);
 	}
+    @Override
+    public StaticEntityEventType getSubType() {
+        return StaticEntityEventType.STATIC_ENTITY_DELETION_EVENT;
+    }
+
 }

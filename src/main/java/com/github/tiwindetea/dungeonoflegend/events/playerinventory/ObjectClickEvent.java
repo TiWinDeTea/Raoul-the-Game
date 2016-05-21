@@ -9,4 +9,8 @@ public class ObjectClickEvent extends PlayerInventoryEvent {
 	public ObjectClickEvent(Long objectId) {
 		this.objectId = objectId;
 	}
+    @Override
+    public PlayerInventoryEventType getSubType() {
+        return PlayerInventoryEventType.OJECT_CLICK_EVENT;
+    }
 }

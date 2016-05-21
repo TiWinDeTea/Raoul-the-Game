@@ -11,4 +11,9 @@ public class CenterOnTileEvent extends MapEvent {
 	public CenterOnTileEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
+
+    @Override
+    public MapEventType getSubType() {
+        return MapEventType.CENTER_ON_TILE_EVENT;
+    }
 }

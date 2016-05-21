@@ -20,4 +20,8 @@ public class LivingEntityCreationEvent extends LivingEntityEvent {
 		this.direction = direction;
 		this.description = description;
 	}
+    @Override
+    public LivingEntityEventType getSubType() {
+        return LivingEntityEventType.LIVING_ENTITY_CREATION_EVENT;
+    }
 }

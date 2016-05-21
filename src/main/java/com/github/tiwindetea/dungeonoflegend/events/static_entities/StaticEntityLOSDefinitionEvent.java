@@ -10,4 +10,9 @@ public class StaticEntityLOSDefinitionEvent extends StaticEntityEvent {
 		super(entityId);
 		this.newLOS = newLOS;
 	}
+
+    @Override
+    public StaticEntityEventType getSubType() {
+        return StaticEntityEventType.STATIC_ENTITY_LOS_DEFINITION_EVENT;
+    }
 }

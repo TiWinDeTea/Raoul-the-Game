@@ -23,4 +23,9 @@ public class PlayerCreationEvent extends PlayerEvent {
 		this.maxMana = maxMana;
 		this.description = description;
 	}
+
+    @Override
+    public PlayerEventType getSubType() {
+        return PlayerEventType.PLAYER_CREATION_EVENT;
+    }
 }
