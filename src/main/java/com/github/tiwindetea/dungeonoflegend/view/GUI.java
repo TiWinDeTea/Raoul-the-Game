@@ -530,11 +530,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	@Override
 	public void resetFog(FogResetEvent e) {
 		System.out.println("resetFog Event");
-		//TODO
+		this.cTileMap.setAllTilesFogged(false);
 	}
 
 	@Override
 	public void centerOnTile(CenterOnTileEvent e) {
+		System.out.println("centerOnTile Event");
 		this.cTileMap.centerViewOnTile(e.tilePosition);
 	}
 }

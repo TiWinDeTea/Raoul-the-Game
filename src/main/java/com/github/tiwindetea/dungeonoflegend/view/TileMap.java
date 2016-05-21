@@ -277,7 +277,7 @@ public class TileMap extends Parent {
 		//TODO:
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
-		setAllTilesFog(false);
+		setAllTilesFogged(false);
 		setAllTilesVisibility(false);
 		updateEntitiesVisibility();
 	}
@@ -369,25 +369,28 @@ public class TileMap extends Parent {
 
 	public void setAllTilesVisibility(boolean visibility) {
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
-		for(int i = 0; i < this.realTileMap.length; i++) {
-			for(int j = 0; j < this.realTileMap[i].length; j++) {
-				this.visibleTiles[i][j] = visibility;
+		if(visibility) {
+			for(int i = 0; i < this.realTileMap.length; i++) {
+				for(int j = 0; j < this.realTileMap[i].length; j++) {
+					this.visibleTiles[i][j] = true;
+				}
 			}
 		}
-		for(Entity entity : this.entities) {
-			entity.setVisible(true);
-		}
 		redrawTiles();
+		updateEntitiesVisibility();
 	}
 
-	public void setAllTilesFog(boolean fog) {
+	public void setAllTilesFogged(boolean fogged) {
 		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
-		for(int i = 0; i < this.realTileMap.length; i++) {
-			for(int j = 0; j < this.realTileMap[i].length; j++) {
-				this.foggedTiles[i][j] = fog;
+		if(fogged) {
+			for(int i = 0; i < this.realTileMap.length; i++) {
+				for(int j = 0; j < this.realTileMap[i].length; j++) {
+					this.foggedTiles[i][j] = true;
+				}
 			}
 		}
 		redrawTiles();
+		updateEntitiesVisibility();
 	}
 
 	public void addEntity(Entity entity) {
