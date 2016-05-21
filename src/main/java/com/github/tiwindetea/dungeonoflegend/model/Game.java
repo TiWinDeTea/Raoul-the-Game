@@ -1094,7 +1094,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 
-		if (tile == Tile.CLOSED_DOOR && distance > 1) {
+		if ((tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR) && distance > 1) {
 			Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
 			for (Direction direction : directions) {
 				Vector2i arr = e.tilePosition.copy().add(direction);
@@ -1107,10 +1107,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.currentPlayer.setRequestedPath(path);
 				this.currentPlayer.setRequestedInteraction(e.tilePosition);
 			}
-			return;
-		}
-
-		if (distance <= this.currentPlayer.getLos()) {
+		} else if (distance <= this.currentPlayer.getLos()) {
 		/* Looking for a mob to attack*/
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
@@ -1157,6 +1154,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* If you did something, keep going */
 		if (success) {
 			nextTick();
+		} else {
+			this.currentPlayer.setRequestedAttack(null);
+			this.currentPlayer.setRequestedPath(null);
+			this.currentPlayer.setRequestedInteraction(null);
 		}
 	}
 
