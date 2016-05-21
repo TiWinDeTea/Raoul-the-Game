@@ -64,22 +64,23 @@ import java.util.logging.Logger;
 public class Game implements RequestListener, Runnable, Stopable {
 
 	/* Tunning parameters for the entities generation */
-	private static final int MIN_MOB_PER_LEVEL = 10;
-	private static final int MAX_MOB_PER_LEVEL = 12;
+	private static final int MIN_MOB_PER_LEVEL = 1;
+	private static final int MAX_MOB_PER_LEVEL = 3;
 	private static final int MIN_MOB_PER_ROOM = 0; // >= 0 ; extra mobs (doesn't count in min_mob_per_level ; (negative to ignore)
 	private static final int MAX_MOB_PER_ROOM = 3; // > min_mob_per_room ; same
-	private static final int MIN_TRAPS_QTT_PER_LEVEL = 20;
-	private static final int MAX_TRAPS_QTT_PER_LEVEL = 50;
-	private static final int MIN_CHEST_QTT_PER_LEVEL = 20;
-	private static final int MAX_CHEST_QTT_PER_LEVEL = 30;
+	private static final int MIN_TRAPS_QTT_PER_LEVEL = 8;
+	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
+	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
+	private static final int MAX_CHEST_QTT_PER_LEVEL = 10;
 	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 100;
-	private static final int REFRESH_TIME_MS = 250;
+	private static final int REFRESH_TIME_MS = 100;
 
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
 
 	private Queue<RequestEvent> requestedEvent = new LinkedList<>();
-	private boolean isRunning = true;
+
+	private volatile boolean isRunning = false;
 	private int level;
 	private Map world;
 	private HashMap<Vector2i, Pair<StorableObject>> objectsOnGround = new HashMap<>();
@@ -152,6 +153,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private int[] lootsScrollDamageModPerTurnPerLevel;
 	private int[] lootsScrollTurns;
 
+	private int bulbXp;
+	private int bulbXpGainPerLevel;
+
 	/**
 	 * Instantiates a new Game.
 	 *
@@ -162,6 +166,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.loadMobs();
 		this.loadChests();
 		this.loadTraps();
+		this.loadBulb();
 	}
 
 	/**
@@ -372,6 +377,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.trapsHPPerLevel[i] = Integer.parseInt(traps.getString(trapName + "hp-per-level"));
 			this.trapsManaPerLevel[i] = Integer.parseInt(traps.getString(trapName + "mana-per-level"));
 		}
+	}
+
+	private void loadBulb() {
+		ResourceBundle bulbs = ResourceBundle.getBundle(MainPackage.name + ".StaticEntity", Locale.getDefault());
+		this.bulbXp = Integer.parseInt(bulbs.getString("lit-bulb.xp.gain"));
+		this.bulbXpGainPerLevel = Integer.parseInt(bulbs.getString("lit-bulb.xp.gain-per-level"));
 	}
 
 	/**
@@ -691,6 +702,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 * Step into the next tick (next player)
 	 */
 	private void nextTick() {
+		if (this.players.isEmpty()) {
+			return;
+		}
 		this.objectToUse = null;
 		do {
 			++this.playerTurn;
@@ -727,12 +741,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Letting the players to play */
 		for (int i = 0; i < this.players.size(); i++) {
 			Player player = this.players.get(i);
-			player.live(this.mobs, this.players, this.world.getLOS(player.getPosition(), player.getLos()));
+			Vector2i playerPos = player.getPosition();
+			int distance;
 			Pair<StorableObject> drop;
 			if (player.getFloor() == this.level) {
 				if ((pos = player.getRequestedMove()) != null) {
 				/*See if the player can move as he wanted to */
-					int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
 					if (distance <= 1 && isAccessible(pos)) {
 						player.setPosition(pos);
 						fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
@@ -746,12 +761,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 						--i;
 					} else {
 						logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
-								+ player.getPosition() + " to " + pos + ")");
+								+ playerPos + " to " + pos + ")");
 						player.moveRequestDenied();
 					}
 				} else if ((pos = player.getRequestedAttack()) != null) {
 				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
-					if (player.getPosition().squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
+					if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
 						int j = this.mobs.indexOf(new Mob(pos));
 						if (j >= 0) {
 							player.attack(this.mobs.get(j));
@@ -763,12 +778,15 @@ public class Game implements RequestListener, Runnable, Stopable {
 					player.setRequestedAttack(null);
 				} else if ((pos = player.getRequestedInteraction()) != null) {
 				/* Make the player to interact with the map */
-					this.world.triggerTile(pos);
-					fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
+					if (distance == 1) {
+						this.world.triggerTile(pos);
+						fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+					}
 					player.setRequestedInteraction(null);
 				} else if ((drop = player.getObjectToDrop()) != null) {
 					pos = player.getDropPos();
-					int distance = Math.abs(player.getPosition().x - pos.x) + Math.abs(player.getPosition().y - pos.y);
+					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
 					if (drop.object != null && distance == 1) {
 						fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
 								drop.getId(),
@@ -784,6 +802,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 							+ " (player #" + (player.getNumber() + 1) + ")";
 					logger.log(this.debugLevel, msg);
 				}
+				player.live(this.mobs, this.players, this.world.getLOS(playerPos, player.getLos()));
 			} else {
 				this.playersOnNextLevel.add(player);
 				this.players.remove(i);
@@ -853,6 +872,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 			this.players.remove(player);
 		}
+		if (this.players.isEmpty() && this.playersOnNextLevel.isEmpty()) {
+			this.isRunning = false;
+		}
 
 		/* Letting consumable do their effects */
 		ArrayList<Consumable> consumableToDelete = new ArrayList<>();
@@ -887,6 +909,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 				if (this.bulbsOn.get(i).object.equals(player.getPosition())) {
 					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(i).getId()));
 					this.bulbsOn.remove(i);
+					player.heal(2 * player.getMaxHitPoints() / 3);
+					player.xp(this.bulbXp + this.bulbXpGainPerLevel * this.level);
 				}
 			}
 
@@ -1019,6 +1043,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	@Override
 	public void run() {
+		this.isRunning = true;
 		RequestEvent event;
 		do {
 			try {
@@ -1029,7 +1054,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 			do {
 				event = this.requestedEvent.poll();
 				while (event != null) {
-					try {
+					try { // debug
 						switch (event.getSubType()) {
 							case MOVE_REQUEST_EVENT:
 								treatRequestEvent((MoveRequestEvent) event);
@@ -1049,14 +1074,32 @@ public class Game implements RequestListener, Runnable, Stopable {
 						}
 						event = this.requestedEvent.poll();
 					} catch (Exception e) {
+						// debug
 						e.printStackTrace();
 					}
 				}
 				if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
-					this.nextTick();
+					this.nextTick(); // modifies the here-above boolean
 				}
 			} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
 		} while (this.isRunning);
+
+		boolean[][] bool = new boolean[(this.world.getSize().x / 2) * 2 + 1][(this.world.getSize().y / 2) * 2 + 1];
+		for (int i = 0; i < bool.length; i++) {
+			for (int j = 0; j < bool[i].length; j++) {
+				bool[i][j] = true;
+			}
+		}
+		fireLivingEntityCreationEvent(new LivingEntityCreationEvent(
+				Pair.ERROR_VAL,
+				LivingEntityType.LITTLE_SATANIC_DUCK,
+				new Vector2i(this.world.getSize().x / 2, this.world.getSize().y / 2),
+				Direction.DOWN,
+				""
+		));
+		fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, bool));
+		fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
+
 	}
 
 	private void treatRequestEvent(CenterViewRequestEvent e) {
@@ -1204,5 +1247,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		} else {
 			this.requestInteraction(new InteractionRequestEvent(pos));
 		}
+	}
+
+	public boolean isRunning() {
+		return this.isRunning;
 	}
 }

@@ -15,6 +15,7 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.Pla
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * LivingThing.
@@ -165,7 +166,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @param players Players around this
 	 * @param los LOS of this
 	 */
-	public abstract void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los);
+	public abstract void live(List<Mob> mobs, Collection<Player> players, boolean[][] los);
 
 	/**
 	 * Gets the requested move.

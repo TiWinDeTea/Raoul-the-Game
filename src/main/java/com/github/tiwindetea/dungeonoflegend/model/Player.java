@@ -55,6 +55,7 @@ public class Player extends LivingThing {
 	private Vector2i requestedInteraction;
 	private Vector2i dropPos;
 	public boolean hasFallen = false;
+	private boolean sawDuck = false;
 	private static final LivingEntityType[] ENUM_VAL = Arrays.copyOfRange(LivingEntityType.values(),
 			LivingEntityType.PLAYER1.ordinal(),
 			LivingEntityType.values().length
@@ -685,20 +686,23 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los) {
-		for (Mob mob : mobs) {
-			Vector2i pos = mob.getPosition();
+	public void live(List<Mob> mobs, Collection<Player> players, boolean[][] los) {
+		boolean localSawDuck = false;
+		for (int i = 0; i < mobs.size() && !localSawDuck; ++i) {
+			Vector2i pos = mobs.get(i).getPosition();
 			int distance = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
 			if (distance <= this.los) {
 				if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
-					if (this.requestedPath.size() > 0) {
-						Vector2i tmp = this.requestedPath.peek();
-						this.requestedPath.clear();
-						this.requestedPath.add(tmp);
-					}
+					localSawDuck = true;
 				}
 			}
 		}
+		if (localSawDuck && !this.sawDuck) {
+			if (this.requestedPath.size() > 0) {
+				this.requestedPath.clear();
+			}
+		}
+		this.sawDuck = localSawDuck;
 	}
 
 	/**
@@ -721,8 +725,7 @@ public class Player extends LivingThing {
 	 */
 	@Override
 	public void damage(int damages) {
-		if (damages > 0)
-			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
+		super.damage(damages);
 		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 	}
 

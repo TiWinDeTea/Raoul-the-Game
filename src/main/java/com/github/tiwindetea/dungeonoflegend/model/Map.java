@@ -38,21 +38,21 @@ public class Map {
     private static final int MAX_ROOM_WIDTH = 12; // > MIN_ROOM_WIDTH
     private static final int MIN_ROOM_HEIGHT = 3; // >= 3
     private static final int MAX_ROOM_HEIGHT = 12; // > MIN_ROOM_HEIGHT
-    private static final int MIN_ROOM_NUMBER = 60; // >= 1
-    private static final int MAX_ROOM_NUMBER = 61; // > MIN_ROOM_NUMBER
-    private static final int MIN_CORRIDOR_NBR = 20; // >= 1
-    private static final int MAX_CORRIDOR_NBR = 30; // > MIN_CORRIDOR_NBR
+    private static final int MIN_ROOM_NUMBER = 13; // >= 1
+    private static final int MAX_ROOM_NUMBER = 23; // > MIN_ROOM_NUMBER
+    private static final int MIN_CORRIDOR_NBR = 4; // >= 1
+    private static final int MAX_CORRIDOR_NBR = 8; // > MIN_CORRIDOR_NBR
     private static final int MIN_CORRIDOR_LENGTH = 6; // >= 1
     private static final int MAX_CORRIDOR_LENGTH = 18; // > MIN_CORRIDOR_LENGTH
-    private static final int MIN_LEVEL_WIDTH = 75; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
-    private static final int MAX_LEVEL_WIDTH = 125; // > MIN_LEVEL_WIDTH
-    private static final int MIN_LEVEL_HEIGHT = 75; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
-    private static final int MAX_LEVEL_HEIGHT = 125; // > MIN_LEVEL_HEIGHT
+    private static final int MIN_LEVEL_WIDTH = 50; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_WIDTH = 275; // > MIN_LEVEL_WIDTH
+    private static final int MIN_LEVEL_HEIGHT = 50; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_HEIGHT = 275; // > MIN_LEVEL_HEIGHT
     private static final int RETRIES_NBR = 5000; // < Integer.MAX_VALUE / 2
     private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
-    private static final int BULB_FIX_NBR = 1; // negative to ignore this value
+    private static final int BULB_FIX_NBR = -1; // negative to ignore this value
     private static final int BULB_MINIMUM_NBR = 2; // >= 0 ; ignored if BULB_FIX_NBR is > 0
-    private static final int BULB_MAXIMUM_NBR = 5; // > BULB_MINIMUM_NBR ; ignored if BULB_FIX_NBR is > 0
+    private static final int BULB_MAXIMUM_NBR = 3; // > BULB_MINIMUM_NBR ; ignored if BULB_FIX_NBR is > 0
 
     private static final int PROBABILITY_UNIT = 100; // > 0
     /* Following values should be between 0 and PROBABILITY_UNIT (both included) */
@@ -231,9 +231,11 @@ public class Map {
             float currentX = watcherPosition.x;
             float currentY = watcherPosition.y;
             int x, y;
+            int i;
 
             /* Cast a ray from the watcher to the tile, stopping if a block is found to be obstructed (ie : wall) */
-            for (int i = (int) (Math.floor(distance)); i > 0; --i) {
+            i = (int) (Math.floor(distance));
+            while (i > 0) {
                 currentX += xShifting;
                 currentY += yShifting;
                 x = Math.round(currentX);
@@ -241,6 +243,7 @@ public class Map {
                 if (isObstructed(this.map[x][y]) && !tilePosition.equals(new Vector2i(x, y))
                         && this.map[x][y] != Tile.HOLE)
                     return false;
+                --i;
             }
         }
         return true;

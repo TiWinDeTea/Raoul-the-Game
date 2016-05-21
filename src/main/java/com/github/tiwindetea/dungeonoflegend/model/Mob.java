@@ -11,6 +11,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
@@ -145,7 +146,7 @@ public class Mob extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void live(Collection<Mob> mobs, Collection<Player> players, boolean[][] los) {
+	public void live(List<Mob> mobs, Collection<Player> players, boolean[][] los) {
 		int distance = this.chaseRange + 1;
 		Collection<LivingThing> shadow = new ArrayList<>();
 		Player chasedPlayer = null;
@@ -265,6 +266,12 @@ public class Mob extends LivingThing {
 
 	public int getXpGain() {
 		return this.xpGain;
+	}
+
+	@Override
+	public void damage(int damages) {
+		super.damage(damages);
+		this.state = State.WANDERING;
 	}
 
 	@Override
