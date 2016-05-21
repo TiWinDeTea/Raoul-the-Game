@@ -5,5 +5,5 @@ import com.github.tiwindetea.dungeonoflegend.listeners.request.inventory.Invento
 /**
  * Created by maxime on 5/6/16.
  */
-public interface RequestListener extends InventoryRequestListener, MoveRequestListener, InteractionRequestListener {
+public interface RequestListener extends CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener {
 }
