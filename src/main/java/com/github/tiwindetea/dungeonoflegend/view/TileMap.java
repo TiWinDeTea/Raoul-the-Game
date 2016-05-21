@@ -74,9 +74,6 @@ public class TileMap extends Parent {
 			if(event.isSecondaryButtonDown()) {
 				TileMap.this.rightMouseAnchorX = event.getX();
 				TileMap.this.rightMouseAnchorY = event.getY();
-
-				//TODO: soon
-				//centerViewOnTile(new Vector2i(50, 50));
 			}
 
 		}
@@ -283,11 +280,6 @@ public class TileMap extends Parent {
 		setAllTilesFog(false);
 		setAllTilesVisibility(false);
 		updateEntitiesVisibility();
-
-		//TODO
-		/*Rectangle rect = new Rectangle(1600, 1600, 32, 32);
-		rect.setFill(Color.YELLOW);
-		getChildren().add(rect);*/
 	}
 
 	private void drawRealTile(Vector2i tilePosition) {
@@ -523,5 +515,18 @@ public class TileMap extends Parent {
 		for(TileMapListener listener : this.getTileMapListeners()) {
 			listener.tileClicked(event);
 		}
+	}
+
+	public void centerViewOnTile(Vector2i tilePosition) {
+
+		Pane parent = (Pane) (getParent());
+
+		double Xdiff = (parent.getWidth() / 2) - (ViewPackage.spritesSize.x / 2) - (tilePosition.x * ViewPackage.spritesSize.x) - getTranslateX();
+		double Ydiff = (parent.getHeight() / 2) - (ViewPackage.spritesSize.y / 2) - (tilePosition.y * ViewPackage.spritesSize.y) - getTranslateY();
+
+		this.scale.set(1);
+
+		setTranslateX(getTranslateX() + Xdiff);
+		setTranslateY(getTranslateY() + Ydiff);
 	}
 }

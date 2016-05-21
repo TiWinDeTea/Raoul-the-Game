@@ -5,6 +5,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.dungeonoflegend.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogResetEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
@@ -518,5 +519,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	public void resetFog(FogResetEvent e) {
 		System.out.println("resetFog Event");
 		//TODO
+	}
+
+	@Override
+	public void centerOnTile(CenterOnTileEvent e) {
+		this.cTileMap.centerViewOnTile(e.tilePosition);
 	}
 }
