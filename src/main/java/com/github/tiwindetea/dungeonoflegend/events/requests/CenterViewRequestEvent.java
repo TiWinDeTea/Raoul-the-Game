@@ -5,6 +5,9 @@ package com.github.tiwindetea.dungeonoflegend.events.requests;
  */
 public class CenterViewRequestEvent extends RequestEvent {
 
+	public CenterViewRequestEvent() {
+	}
+
 	@Override
 	public RequestEventType getType() {
 		return RequestEventType.CENTER_VIEW_REQUEST_EVENT;

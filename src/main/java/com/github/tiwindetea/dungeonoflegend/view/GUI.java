@@ -16,6 +16,7 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
@@ -109,6 +110,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			case DOWN:
 			case S:
 				fireMoveRequestEvent(new MoveRequestEvent(Direction.DOWN));
+				break;
+			case SPACE:
+				fireCenterViewRequestEvent(new CenterViewRequestEvent());
+				break;
+			default:
 				break;
 			}
 		}
@@ -232,6 +238,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private void fireInteractionRequestEvent(InteractionRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
 			listener.requestInteraction(event);
+		}
+	}
+
+	private void fireCenterViewRequestEvent(CenterViewRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.requestCenterView(event);
 		}
 	}
 
