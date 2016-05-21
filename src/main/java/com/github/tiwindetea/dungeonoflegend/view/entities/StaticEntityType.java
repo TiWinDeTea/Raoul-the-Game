@@ -9,7 +9,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 5/2/16.
+ * The enum StaticEntityType.
+ *
+ * @author Maxime PINARD.
  */
 public enum StaticEntityType {
 	HELMET1 {
@@ -178,35 +180,60 @@ public enum StaticEntityType {
 		return null;
 	}
 
+	/**
+	 * Gets sprites position.
+	 *
+	 * @return the sprites position
+	 */
 	public Vector2i getSpritesPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.position.y")));
 	}
 
+	/**
+	 * Gets sprites number.
+	 *
+	 * @return the sprites number
+	 */
 	public int getSpritesNumber() {
 		return Integer.parseInt(resourceBundle.getString(this.toString() + ".sprites.number"));
 	}
 
+	/**
+	 * Gets animation speed.
+	 *
+	 * @return the animation speed
+	 */
 	public int getAnimationSpeed() {
 		if(this.getSpritesNumber() > 1)
 			return Integer.parseInt(resourceBundle.getString(this.toString() + ".animation.speed.millseconds"));
 		return -1;
 	}
 
+	/**
+	 * Gets StaticEntity image.
+	 *
+	 * @return the StaticEntity image
+	 */
 	public Image getImage() {
 		switch(resourceBundle.getString(this.toString() + ".sprites.file")) {
 		case "Objects.png":
 			return ViewPackage.objectsImage;
 		case "Players.png":
 			return ViewPackage.playersImage;
-		case "Enemies.png":
-			//return ViewPackage.enemiesImage;
+		case "Mobs.png":
+			return ViewPackage.mobsImage;
 		default:
-			return ViewPackage.playersImage; // for tests
-		//return null;
+			return null;
 		}
 	}
 
+	/**
+	 * Parse a static entity type.
+	 *
+	 * @param str the static entity string
+	 * @return the StaticEntityType
+	 */
 	public static StaticEntityType parseStaticEntityType(String str) {
 		if (str.equals(HELMET1.toString())) {
 			return HELMET1;

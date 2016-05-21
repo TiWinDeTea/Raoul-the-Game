@@ -14,7 +14,9 @@ import javafx.scene.shape.Rectangle;
 import java.util.List;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type Entity.
+ *
+ * @author Maxime PINARD.
  */
 public abstract class Entity extends Parent {
 	protected static final Vector2i spriteSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution")));
@@ -23,11 +25,17 @@ public abstract class Entity extends Parent {
 	protected Vector2i position;
 	protected boolean[][] LOS;
 
-	SimpleIntegerProperty XPositionProperty = new SimpleIntegerProperty();
-	SimpleIntegerProperty YPositionProperty = new SimpleIntegerProperty();
+	protected SimpleIntegerProperty XPositionProperty = new SimpleIntegerProperty();
+	protected SimpleIntegerProperty YPositionProperty = new SimpleIntegerProperty();
 
 	private String description;
 
+	/**
+	 * Instantiates a new Entity.
+	 *
+	 * @param position    the position
+	 * @param description the description
+	 */
 	public Entity(Vector2i position, String description) {
 		setPosition(position);
 		this.description = description;
@@ -53,20 +61,40 @@ public abstract class Entity extends Parent {
 		});
 	}
 
+	/**
+	 * Sets position.
+	 *
+	 * @param position the position
+	 */
 	public void setPosition(Vector2i position) {
 		this.position = new Vector2i(position);
 		this.XPositionProperty.set(position.x * spriteSize.x);
 		this.YPositionProperty.set(position.y * spriteSize.y);
 	}
 
+	/**
+	 * Gets image view.
+	 *
+	 * @return the image view
+	 */
 	public ImageView getImageView() {
 		return this.imageView;
 	}
 
+	/**
+	 * Gets position.
+	 *
+	 * @return the position
+	 */
 	public Vector2i getPosition() {
 		return this.position;
 	}
 
+	/**
+	 * Sets LOS.
+	 *
+	 * @param LOS the LOS
+	 */
 	public void setLOS(boolean[][] LOS) {
 		if(LOS == null || LOS.length == 0)
 			return;
@@ -79,10 +107,20 @@ public abstract class Entity extends Parent {
 		this.LOS = LOS;
 	}
 
+	/**
+	 * Gets LOS.
+	 *
+	 * @return the LOS
+	 */
 	public boolean[][] getLOS() {
 		return this.LOS;
 	}
 
+	/**
+	 * Modifie los.
+	 *
+	 * @param modifiedTilesPositions the modified tiles positions
+	 */
 	public void modifieLOS(List<Vector2i> modifiedTilesPositions) {
 		if(this.LOS != null && this.LOS.length > 0) {
 			for(Vector2i modifiedTilesPosition : modifiedTilesPositions) {
@@ -93,5 +131,10 @@ public abstract class Entity extends Parent {
 		}
 	}
 
+	/**
+	 * Gets visibility on fog.
+	 *
+	 * @return the boolean
+	 */
 	public abstract boolean isVisibleOnFog();
 }

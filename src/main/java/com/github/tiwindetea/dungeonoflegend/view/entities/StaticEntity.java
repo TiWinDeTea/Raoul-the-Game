@@ -7,13 +7,22 @@ import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
 
 /**
- * Created by maxime on 5/2/16.
+ * The type StaticEntity.
+ *
+ * @author Maxime PINARD.
  */
 public class StaticEntity extends Entity {
 	private StaticEntityType staticEntityType;
 	private boolean animated;
 	private Animation animation;
 
+	/**
+	 * Instantiates a new StaticEntity.
+	 *
+	 * @param staticEntityType the static entity type
+	 * @param position         the position
+	 * @param description      the description
+	 */
 	public StaticEntity(StaticEntityType staticEntityType, Vector2i position, String description) {
 		super(position, description);
 		this.staticEntityType = staticEntityType;
@@ -29,6 +38,12 @@ public class StaticEntity extends Entity {
 		getChildren().add(this.imageView);
 	}
 
+	/**
+	 * Instantiates a new StaticEntity.
+	 *
+	 * @param staticEntityType the static entity type
+	 * @param description      the description
+	 */
 	public StaticEntity(StaticEntityType staticEntityType, String description) {
 		this(staticEntityType, new Vector2i(), description);
 	}
@@ -40,6 +55,11 @@ public class StaticEntity extends Entity {
 		this.animation.play();
 	}
 
+	/**
+	 * Determines if the entity is animated.
+	 *
+	 * @return true if animated, false otherwise
+	 */
 	public boolean isAnimated() {
 		return this.animated;
 	}

@@ -10,7 +10,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Created by maxime on 5/5/16.
+ * The enum LivingEntityType
+ *
+ * @author Maxime PINARD..
  */
 public enum LivingEntityType {
 	PLAYER1 {
@@ -95,26 +97,52 @@ public enum LivingEntityType {
 		return null;
 	}
 
+	/**
+	 * Gets sprite with down direction position.
+	 *
+	 * @return the sprite with down direction position
+	 */
 	public Vector2i getSpriteDownPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.down.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.down.position.y")));
 	}
 
+	/**
+	 * Gets sprite with up direction position.
+	 *
+	 * @return the sprite with up direction position
+	 */
 	public Vector2i getSpriteUpPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.up.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.up.position.y")));
 	}
 
+	/**
+	 * Gets sprite with right direction position.
+	 *
+	 * @return the sprite with right direction position
+	 */
 	public Vector2i getSpriteRightPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.right.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.right.position.y")));
 	}
 
+	/**
+	 * Gets sprite with left direction position.
+	 *
+	 * @return the sprite with left direction position
+	 */
 	public Vector2i getSpriteLeftPosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.left.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.left.position.y")));
 	}
 
+	/**
+	 * Gets sprite position.
+	 *
+	 * @param direction the direction of the wanted sprite
+	 * @return the sprite position
+	 */
 	public Vector2i getSpritePosition(Direction direction) {
 		switch(direction) {
 		case UP:
@@ -130,6 +158,11 @@ public enum LivingEntityType {
 		}
 	}
 
+	/**
+	 * Gets LivingEntity image.
+	 *
+	 * @return the LivingEntity image
+	 */
 	public Image getImage() {
 		switch(resourceBundle.getString(this.toString() + ".sprites.file")) {
 		case "Objects.png":
@@ -139,13 +172,18 @@ public enum LivingEntityType {
 			case "Mobs.png":
 				return ViewPackage.mobsImage;
 		default:
-			return ViewPackage.playersImage; // for tests
-		//return null;
+			return null;
 		}
 	}
 
+	/**
+	 * Parse a living entity type.
+	 *
+	 * @param str the living entity string
+	 * @return the LivingEntityType
+	 */
 	public static LivingEntityType parseLivingEntity(String str) {
-		str.toLowerCase();
+		//str = str.toLowerCase();
 		if (PLAYER1.toString().equals(str)) {
 			return PLAYER1;
 		} else if (PLAYER2.toString().equals(str)) {
