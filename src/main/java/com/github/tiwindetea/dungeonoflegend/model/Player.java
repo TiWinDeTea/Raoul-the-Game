@@ -161,6 +161,7 @@ public class Player extends LivingThing {
 	 * @param requestedPath the requested path
 	 */
 	public void setRequestedPath(Stack<Vector2i> requestedPath) {
+		this.doNothing();
 		if (requestedPath == null) {
 			this.requestedPath.clear();
 		} else {
@@ -792,5 +793,11 @@ public class Player extends LivingThing {
 				}
 			}
 		}
+	}
+
+	public void doNothing() {
+		this.requestedAttack = null;
+		this.requestedInteraction = null;
+		this.requestedPath.clear();
 	}
 }

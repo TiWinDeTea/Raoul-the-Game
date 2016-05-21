@@ -783,7 +783,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 					String msg = "Nothing to do with player " + player.getName()
 							+ " (player #" + (player.getNumber() + 1) + ")";
 					logger.log(this.debugLevel, msg);
-					throw new RuntimeException(msg);
 				}
 			} else {
 				this.playersOnNextLevel.add(player);
@@ -1155,9 +1154,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		if (success) {
 			nextTick();
 		} else {
-			this.currentPlayer.setRequestedAttack(null);
-			this.currentPlayer.setRequestedPath(null);
-			this.currentPlayer.setRequestedInteraction(null);
+			this.currentPlayer.doNothing();
 		}
 	}
 
