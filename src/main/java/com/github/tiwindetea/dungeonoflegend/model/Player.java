@@ -162,7 +162,7 @@ public class Player extends LivingThing {
 	 */
 	public void setRequestedPath(Stack<Vector2i> requestedPath) {
 		if (requestedPath == null) {
-			requestedPath.clear();
+			this.requestedPath.clear();
 		} else {
 			this.requestedPath = requestedPath;
 		}
