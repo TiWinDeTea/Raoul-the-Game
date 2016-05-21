@@ -103,11 +103,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private final TileMap cTileMap = new TileMap();
 
-	private final Timeline timeline = new Timeline(new KeyFrame(REFRESH_DURATION, this.eventExecutor));
+	private final Queue<Event> eventQueue = new LinkedList<>();
 
-	private Queue<Event> eventQueue = new LinkedList<>();
-
-	private EventHandler<KeyEvent> onKeyReleasedEventHandler = new EventHandler<KeyEvent>() {
+	private final EventHandler<KeyEvent> onKeyReleasedEventHandler = new EventHandler<KeyEvent>() {
 
 		@Override
 		public void handle(KeyEvent event) {
@@ -139,7 +137,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 	};
 
-	private EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
+	private final EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
 
 		public void addInventory(InventoryAdditionEvent e) {
 			System.out.println("addInventory Event");
@@ -495,6 +493,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			}
 		}
 	};
+
+	private final Timeline timeline = new Timeline(new KeyFrame(REFRESH_DURATION, this.eventExecutor));
 
 	public GUI() {
 		this.init();
