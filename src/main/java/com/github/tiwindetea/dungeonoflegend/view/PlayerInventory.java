@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by maxime on 5/11/16.
+ * The type PlayerInventory.
+ *
+ * @author Maxime PINARD
  */
 public class PlayerInventory extends Parent {
 	private final List<PlayerInventoryListener> listeners = new ArrayList<>();
@@ -79,6 +81,11 @@ public class PlayerInventory extends Parent {
 		}
 	};
 
+	/**
+	 * Instantiates a new PlayerInventory.
+	 *
+	 * @param playerPicture the player picture
+	 */
 	public PlayerInventory(ImageView playerPicture) {
 
 		this.playerPicture = playerPicture;
@@ -104,10 +111,20 @@ public class PlayerInventory extends Parent {
 		this.inventoryItemsTilePane.maxWidthProperty().bind(this.mainVBox.widthProperty());
 	}
 
+	/**
+	 * Add a PlayerInventoryListener.
+	 *
+	 * @param listener the listener
+	 */
 	public void addPlayerInventoryListener(PlayerInventoryListener listener) {
 		this.listeners.add(listener);
 	}
 
+	/**
+	 * Get a copy of the list of PlayerInventoryListener as an array.
+	 *
+	 * @return the PlayerInventoryListener array
+	 */
 	public PlayerInventoryListener[] getPlayerInventoryListener() {
 		return this.listeners.toArray(new PlayerInventoryListener[this.listeners.size()]);
 	}
@@ -118,28 +135,55 @@ public class PlayerInventory extends Parent {
 		}
 	}
 
+	/**
+	 * Add a inventory item (a StaticEntity to the inventory).
+	 *
+	 * @param entityId     the entity id
+	 * @param staticEntity the static entity
+	 */
 	public void addInventoryItem(Long entityId, StaticEntity staticEntity) {
 		this.inventoryItems.put(entityId, staticEntity);
 		this.inventoryItemsTilePane.getChildren().add(staticEntity);
 		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
 	}
 
+	/**
+	 * Remove a inventory item.
+	 *
+	 * @param entityId the entity id
+	 */
 	public void removeInventoryItem(Long entityId) {
 		this.inventoryItemsTilePane.getChildren().remove(this.inventoryItems.get(entityId));
 		this.inventoryItems.remove(entityId);
 	}
 
+	/**
+	 * Add a staticEntity as equiped item.
+	 *
+	 * @param entityId     the entity id
+	 * @param staticEntity the static entity
+	 */
 	public void addEquipedItem(Long entityId, StaticEntity staticEntity) {
 		this.equipedItems.put(entityId, staticEntity);
 		this.equipedItemsHBox.getChildren().add(staticEntity);
 		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
 	}
 
+	/**
+	 * Remove a equiped item.
+	 *
+	 * @param entityId the entity id
+	 */
 	public void removeEquipedItem(Long entityId) {
 		this.equipedItemsHBox.getChildren().remove(this.equipedItems.get(entityId));
 		this.equipedItems.remove(entityId);
 	}
 
+	/**
+	 * Remove an item, equiped or not.
+	 *
+	 * @param entityId the entity id
+	 */
 	public void removeItem(Long entityId) {
 		if(this.equipedItems.containsKey(entityId)) {
 			removeEquipedItem(entityId);

@@ -68,7 +68,9 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * Created by maxime on 5/2/16.
+ * The type GUI.
+ *
+ * @author Maxime PINARD.
  */
 public class GUI implements GameListener, TileMapListener, PlayerInventoryListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
@@ -496,6 +498,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private final Timeline timeline = new Timeline(new KeyFrame(REFRESH_DURATION, this.eventExecutor));
 
+	/**
+	 * Instantiates a new GUI.
+	 */
 	public GUI() {
 		this.init();
 	}
@@ -547,10 +552,20 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.timeline.play();
 	}
 
+	/**
+	 * Gets the scene.
+	 *
+	 * @return the scene
+	 */
 	public Scene getScene() {
 		return this.scene;
 	}
 
+	/**
+	 * Compute visible tiles.
+	 *
+	 * @return the tiles visibility
+	 */
 	public boolean[][] computeVisibleTiles() {
 		boolean[][] visibleTiles = new boolean[this.cTileMap.getGridSize().x][this.cTileMap.getGridSize().y];
 		for(Long currentKey : this.livingEntities.keySet()) {
@@ -588,10 +603,20 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		return visibleTiles;
 	}
 
+	/**
+	 * Add a RequestListener.
+	 *
+	 * @param listener the listener
+	 */
 	public void addRequestListener(RequestListener listener) {
 		this.listeners.add(listener);
 	}
 
+	/**
+	 * Get a copy of the list of RequestListener as an array.
+	 *
+	 * @return the RequestListener array
+	 */
 	public RequestListener[] getRequestListener() {
 		return this.listeners.toArray(new RequestListener[this.listeners.size()]);
 	}

@@ -12,18 +12,25 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
- * Created by maxime on 5/17/16.
+ * The type InformationsDisplayer
+ *
+ * @author Maxime PINARD.
  */
 public class InformationsDisplayer extends Parent {
 	private static final int WIDTH = 300;
-	public static final Font TEXT_FONT = Font.font("Arial", FontWeight.NORMAL, 20);
-	public static final Color TEXT_COLOR = Color.WHITE;
+	private static final Font TEXT_FONT = Font.font("Arial", FontWeight.NORMAL, 20);
+	private static final Color TEXT_COLOR = Color.WHITE;
 
 	private static final StackPane MAIN_PANE = new StackPane();
 	private static final Label MAIN_LABEL = new Label();
 
 	private static InformationsDisplayer ourInstance = new InformationsDisplayer();
 
+	/**
+	 * Gets instance.
+	 *
+	 * @return the instance
+	 */
 	public static InformationsDisplayer getInstance() {
 		return ourInstance;
 	}
@@ -38,16 +45,21 @@ public class InformationsDisplayer extends Parent {
 		MAIN_LABEL.setTextFill(TEXT_COLOR);
 		MAIN_LABEL.setWrapText(true);
 		MAIN_PANE.getChildren().add(MAIN_LABEL);
-		//MAIN_PANE.prefHeightProperty().bind(MAIN_LABEL.heightProperty());
-
-		//TODO: Real information displayer
 	}
 
+	/**
+	 * Sets the text.
+	 *
+	 * @param text the text
+	 */
 	public static void setText(String text) {
 		MAIN_LABEL.setText(text);
 		MAIN_PANE.setPrefWidth(MAIN_LABEL.getWidth());
 	}
 
+	/**
+	 * Clear the text.
+	 */
 	public static void clear() {
 		MAIN_LABEL.setText("");
 	}

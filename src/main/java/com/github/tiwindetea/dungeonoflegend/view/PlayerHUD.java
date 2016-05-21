@@ -14,7 +14,9 @@ import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 /**
- * Created by maxime on 5/5/16.
+ * The type PlayerHUD.
+ *
+ * @author Maxime PINARD
  */
 public class PlayerHUD extends Parent {
 	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(400, 100);
@@ -33,13 +35,13 @@ public class PlayerHUD extends Parent {
 
 	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
 
-	public static final Font HEALTH_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
-	public static final Color HEALTH_LABEL_TEXT_COLOR = Color.WHITE;
-	public static final int HEALTH_LABEL_TRANSLATE_Y = 33;
-	public static final Font MANA_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 10);
-	public static final Color MANA_LABEL_TEXT_COLOR = Color.WHITE;
-	public static final int MANA_LABEL_TRANSLATE_Y = 53;
-	public static final int LABELS_OFFSET = 5;
+	private static final Font HEALTH_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
+	private static final Color HEALTH_LABEL_TEXT_COLOR = Color.WHITE;
+	private static final int HEALTH_LABEL_TRANSLATE_Y = 33;
+	private static final Font MANA_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 10);
+	private static final Color MANA_LABEL_TEXT_COLOR = Color.WHITE;
+	private static final int MANA_LABEL_TRANSLATE_Y = 53;
+	private static final int LABELS_OFFSET = 5;
 
 	private final ImageView playerPicture;
 	private final Rectangle maxHealthRectangle = new Rectangle();
@@ -59,6 +61,15 @@ public class PlayerHUD extends Parent {
 	private int maxMana;
 	private int actualMana;
 
+	/**
+	 * Instantiates a new PlayerHUD.
+	 *
+	 * @param playerPicture the player picture
+	 * @param maxHealth     the max health
+	 * @param actualHealth  the actual health
+	 * @param maxMana       the max mana
+	 * @param actualMana    the actual mana
+	 */
 	public PlayerHUD(ImageView playerPicture, int maxHealth, int actualHealth, int maxMana, int actualMana) {
 		this.playerPicture = playerPicture;
 		this.maxHealth = maxHealth;
@@ -146,6 +157,11 @@ public class PlayerHUD extends Parent {
 		this.maskRectangle.setVisible(false);
 	}
 
+	/**
+	 * Gets the main Pane size.
+	 *
+	 * @return the size
+	 */
 	public static Vector2i getSize() {
 		return MAIN_PANE_SIZE;
 	}
@@ -164,42 +180,87 @@ public class PlayerHUD extends Parent {
 		transition.play();
 	}
 
+	/**
+	 * Sets masked (with a transparent black rectangle over).
+	 *
+	 * @param masked true for masked, false for not masked
+	 */
 	public void setMasked(boolean masked) {
 		this.maskRectangle.setVisible(masked);
 	}
 
+	/**
+	 * Sets max health.
+	 *
+	 * @param maxHealth the max health
+	 */
 	public void setMaxHealth(int maxHealth) {
 		this.maxHealth = maxHealth;
 		this.updateHealth();
 	}
 
+	/**
+	 * Sets actual health.
+	 *
+	 * @param actualHealth the actual health
+	 */
 	public void setActualHealth(int actualHealth) {
 		this.actualHealth = actualHealth;
 		this.updateHealth();
 	}
 
+	/**
+	 * Sets max mana.
+	 *
+	 * @param maxMana the max mana
+	 */
 	public void setMaxMana(int maxMana) {
 		this.maxMana = maxMana;
 		this.updateMana();
 	}
 
+	/**
+	 * Sets actual mana.
+	 *
+	 * @param actualMana the actual mana
+	 */
 	public void setActualMana(int actualMana) {
 		this.actualMana = actualMana;
 		this.updateMana();
 	}
 
+	/**
+	 * Gets actual mana.
+	 *
+	 * @return the actual mana
+	 */
 	public int getActualMana() {
 		return this.actualMana;
 	}
 
+	/**
+	 * Gets max health.
+	 *
+	 * @return the max health
+	 */
 	public int getMaxHealth() {
 		return this.maxHealth;
 	}
 
+	/**
+	 * Gets actual health.
+	 *
+	 * @return the actual health
+	 */
 	public int getActualHealth() {
 		return this.actualHealth;
 	}
 
+	/**
+	 * Gets max mana.
+	 *
+	 * @return the max mana
+	 */
 	public int getMaxMana() {
 		return this.maxMana;
 	}

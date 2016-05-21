@@ -6,7 +6,9 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 /**
- * Created by maxime on 5/5/16.
+ * The type RectangleSizeTransition.
+ *
+ * @author Maxime PINARD
  */
 public class RectangleSizeTransition extends Transition {
 
@@ -14,6 +16,13 @@ public class RectangleSizeTransition extends Transition {
 	private final double initialWidth;
 	private final double finalWidth;
 
+	/**
+	 * Instantiates a new RectangleSizeTransition.
+	 *
+	 * @param rectangle  the rectangle
+	 * @param finalWidth the final width
+	 * @param duration   the duration
+	 */
 	public RectangleSizeTransition(Rectangle rectangle, double finalWidth, Duration duration) {
 		this.rectangle = rectangle;
 		this.initialWidth = this.rectangle.getWidth();

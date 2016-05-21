@@ -19,8 +19,11 @@ import javafx.scene.layout.Pane;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * Created by maxime on 5/6/16.
+ * The type TileMap.
+ *
+ * @author Maxime PINARD
  */
 public class TileMap extends Parent {
 
@@ -52,10 +55,6 @@ public class TileMap extends Parent {
 	private Tile[][] realTileMap;
 	private boolean[][] visibleTiles;
 	private boolean[][] foggedTiles;
-
-	public double getScale() {
-		return this.scale.get();
-	}
 
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
@@ -201,19 +200,47 @@ public class TileMap extends Parent {
 		}
 	};
 
+	/**
+	 * Gets scale.
+	 *
+	 * @return the scale
+	 */
+	public double getScale() {
+		return this.scale.get();
+	}
+
+	/**
+	 * Gets width.
+	 *
+	 * @return the width
+	 */
 	public double getWidth() {
 		return (this.canvases.length - 1) * RCANVAS_MAX_WIDTH + this.canvases[this.canvases.length - 1][0].getWidth();
 	}
 
+	/**
+	 * Gets height.
+	 *
+	 * @return the height
+	 */
 	public double getHeight() {
 		return (this.canvases[0].length - 1) * RCANVAS_MAX_HEIGHT + this.canvases[0][this.canvases[0].length - 1].getHeight();
 	}
 
+	/**
+	 * Sets scaling pivot.
+	 *
+	 * @param x the x pivot position
+	 * @param y the y pivot position
+	 */
 	public void setPivot(double x, double y) {
 		setTranslateX(getTranslateX() - x);
 		setTranslateY(getTranslateY() - y);
 	}
 
+	/**
+	 * Instantiates a new TileMap.
+	 */
 	public TileMap() {
 
 		scaleXProperty().bind(this.scale);
@@ -224,6 +251,12 @@ public class TileMap extends Parent {
 		setOnScroll(this.onScrollEventHandler);
 	}
 
+	/**
+	 * Sets the real map, create and place canevases, draw the real map onthe canevases.
+	 * Multiple canevases are used for old graphical cards that can't manage large textures.
+	 *
+	 * @param map the map
+	 */
 	public void setMap(Tile[][] map) {
 		if(map == null || map.length == 0) {
 			return;
@@ -296,6 +329,14 @@ public class TileMap extends Parent {
 		drawImage(ViewPackage.objectsImage, ViewPackage.fogSpritePosition.x, ViewPackage.fogSpritePosition.y, tilePosition.x, tilePosition.y);
 	}
 
+	/**
+	 * Draw a tile.
+	 * Draw the real tile is the tile is visible,
+	 * the fogged tile if the tile isn't visible and is fogged
+	 * and the unknow tile if the tile isn't visible and fogged.
+	 *
+	 * @param tilePosition the tile position
+	 */
 	public void drawTile(Vector2i tilePosition) {
 		if(this.visibleTiles[tilePosition.x][tilePosition.y]) {
 			drawRealTile(tilePosition);
@@ -310,22 +351,52 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Determine if a tile is visible.
+	 *
+	 * @param tilePosition the tile position
+	 * @return True if visible, False otherwise
+	 */
 	public boolean isVisible(Vector2i tilePosition) {
 		return this.visibleTiles[tilePosition.x][tilePosition.y];
 	}
 
+	/**
+	 * Determine if a tile is fogged.
+	 *
+	 * @param tilePosition the tile position
+	 * @return True if fogged, False otherwise
+	 */
 	public boolean isFogged(Vector2i tilePosition) {
 		return this.foggedTiles[tilePosition.x][tilePosition.y];
 	}
 
+	/**
+	 * Add a sprite on a tile.
+	 *
+	 * @param image          the image
+	 * @param spritePosition the sprite position
+	 * @param tilePosition   the tile position
+	 */
 	public void addOnTile(Image image, Vector2i spritePosition, Vector2i tilePosition) {
 		drawImage(image, spritePosition.x, spritePosition.y, tilePosition.x, tilePosition.y);
 	}
 
+	/**
+	 * Draw real tiles.
+	 *
+	 * @param tilesPosition the tiles position
+	 */
 	public void drawRealTiles(List<Vector2i> tilesPosition) {
 		tilesPosition.forEach(this::drawRealTile);
 	}
 
+	/**
+	 * Sets real tile and draw it.
+	 *
+	 * @param tileType     the tile type
+	 * @param tilePosition the tile position
+	 */
 	public void setTile(Tile tileType, Vector2i tilePosition) {
 		if(tilePosition.x < this.realTileMap.length && tilePosition.y < this.realTileMap[0].length) {
 			this.realTileMap[tilePosition.x][tilePosition.y] = tileType;
@@ -333,12 +404,23 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Sets real tiles and draw them.
+	 *
+	 * @param tileType      the tile type
+	 * @param tilesPosition the tiles position
+	 */
 	public void setTiles(Tile tileType, List<Vector2i> tilesPosition) {
 		for(Vector2i tilePosition : tilesPosition) {
 			setTile(tileType, tilePosition);
 		}
 	}
 
+	/**
+	 * Sets all real tiles and draw them.
+	 *
+	 * @param tileType the tile type
+	 */
 	public void setAllTiles(Tile tileType) {
 		for(int i = 0; i < this.realTileMap.length; i++) {
 			for(int j = 0; j < this.realTileMap[i].length; j++) {
@@ -348,10 +430,20 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Gets grid size(the size of the map in tiles).
+	 *
+	 * @return the grid size
+	 */
 	public Vector2i getGridSize() {
 		return new Vector2i(this.realTileMap.length, this.realTileMap[0].length);
 	}
 
+	/**
+	 * Sets tiles visibility and update the canevases.
+	 *
+	 * @param visibleTiles the visible tiles
+	 */
 	public void setVisibleTiles(boolean[][] visibleTiles) {
 		if(visibleTiles.length != this.realTileMap.length || visibleTiles[0].length != this.realTileMap[0].length) {
 			System.out.println("~NOPE");
@@ -367,6 +459,11 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Sets all tiles visibility.
+	 *
+	 * @param visibility true for visible, false for not visible
+	 */
 	public void setAllTilesVisibility(boolean visibility) {
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		if(visibility) {
@@ -380,6 +477,11 @@ public class TileMap extends Parent {
 		updateEntitiesVisibility();
 	}
 
+	/**
+	 * Sets all tiles fogged.
+	 *
+	 * @param fogged true for fogged, false for not fogged
+	 */
 	public void setAllTilesFogged(boolean fogged) {
 		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		if(fogged) {
@@ -393,12 +495,22 @@ public class TileMap extends Parent {
 		updateEntitiesVisibility();
 	}
 
+	/**
+	 * Add an entity and set it visibility.
+	 *
+	 * @param entity the entity
+	 */
 	public void addEntity(Entity entity) {
 		this.entities.add(entity);
 		getChildren().add(entity);
 		updateEntitiesVisibility();
 	}
 
+	/**
+	 * Remove an entity.
+	 *
+	 * @param entity the entity
+	 */
 	public void removeEntity(Entity entity) {
 		this.entities.remove(entity);
 		getChildren().remove(entity);
@@ -465,6 +577,12 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Add fogged tiles.
+	 *
+	 * @param fogCenterPosition the fogged tiles array center position on the map
+	 * @param newFoggedTiles    the new fogged tiles
+	 */
 	public void addFoggedTiles(Vector2i fogCenterPosition, boolean[][] newFoggedTiles) {
 		if(newFoggedTiles == null || newFoggedTiles.length == 0)
 			return;
@@ -506,6 +624,11 @@ public class TileMap extends Parent {
 		return value;
 	}
 
+	/**
+	 * Add a TileMapListener.
+	 *
+	 * @param listener the listener
+	 */
 	public void addTileMapListener(TileMapListener listener) {
 		this.listeners.add(listener);
 	}
@@ -520,6 +643,11 @@ public class TileMap extends Parent {
 		}
 	}
 
+	/**
+	 * Center the view on a tile.
+	 *
+	 * @param tilePosition the tile position
+	 */
 	public void centerViewOnTile(Vector2i tilePosition) {
 
 		Pane parent = (Pane) (getParent());
