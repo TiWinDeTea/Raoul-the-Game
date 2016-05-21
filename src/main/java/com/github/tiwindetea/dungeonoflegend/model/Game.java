@@ -159,6 +159,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	public Game(String gameName) {
 		this.gameName = gameName;
+		this.loadMobs();
+		this.loadChests();
+		this.loadTraps();
 	}
 
 	/**
@@ -243,11 +246,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 		}
 		this.currentPlayer = this.players.get(0);
-		this.loadMobs();
-		this.loadChests();
-		this.loadTraps();
-		this.generateLevel();
 		fireNextTickEvent(new PlayerNextTickEvent(0));
+		this.generateLevel();
 	}
 
 	private void loadMobs() {
@@ -693,30 +693,28 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void nextTick() {
 		this.objectToUse = null;
 		do {
-			do {
-				++this.playerTurn;
-			}
-			while (this.playerTurn < this.players.size()
-					&& this.players.get(this.playerTurn).getFloor() != this.level);
+			++this.playerTurn;
+		}
+		while (this.playerTurn < this.players.size()
+				&& this.players.get(this.playerTurn).getFloor() != this.level);
 
-			if (this.playerTurn >= this.players.size()) {
-				this.playerTurn = 0;
-				this.currentPlayer = this.players.get(0);
-				long time = System.currentTimeMillis();
-				this.nextTurn();
-				time = System.currentTimeMillis() - time;
-				if (time < MINIMUN_TURN_TIME_MS) {
-					try {
-						Thread.sleep(MINIMUN_TURN_TIME_MS - time);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+		if (this.playerTurn >= this.players.size()) {
+			this.playerTurn = 0;
+			this.currentPlayer = this.players.get(0);
+			long time = System.currentTimeMillis();
+			this.nextTurn();
+			time = System.currentTimeMillis() - time;
+			if (time < MINIMUN_TURN_TIME_MS) {
+				try {
+					Thread.sleep(MINIMUN_TURN_TIME_MS - time);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			} else {
-				this.currentPlayer = this.players.get(this.playerTurn);
 			}
-			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
-		} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+		} else {
+			this.currentPlayer = this.players.get(this.playerTurn);
+		}
+		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
 	}
 
 	/**
@@ -928,10 +926,35 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.level = Integer.parseInt(lvl.substring(lvl.indexOf('=') + 1));
 			this.players.clear();
 			while (file.hasNext()) {
-				String line = file.nextLine();
-				this.players.add(Player.parsePlayer(line));
+				this.players.add(Player.parsePlayer(file.nextLine()));
 			}
 			file.close();
+			Tile[][] tiles = new Tile[1][1];
+			for (int i = 0; i < tiles.length; i++) {
+				for (int j = 0; j < tiles[i].length; j++) {
+					tiles[i][j] = Tile.UNKNOWN;
+				}
+			}
+			fireMapCreationEvent(new MapCreationEvent(tiles));
+			for (Player player : this.players) {
+				firePlayerCreationEvent(new PlayerCreationEvent(
+						player.getNumber(),
+						player.getId(),
+						new Vector2i(0, 0),
+						Direction.DOWN,
+						player.getMaxHitPoints(),
+						player.getMaxMana(),
+						player.getDescription()
+				));
+			}
+
+			for (Player player : this.players) {
+				player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
+				player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
+			}
+			this.currentPlayer = this.players.get(0);
+			fireNextTickEvent(new PlayerNextTickEvent(0));
+			this.generateLevel();
 		} catch (FileNotFoundException e) {
 			System.out.println("Failed to open the save file");
 			e.printStackTrace();
@@ -1004,31 +1027,36 @@ public class Game implements RequestListener, Runnable, Stopable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			event = this.requestedEvent.poll();
-			while (event != null) {
-				try {
-					switch (event.getType()) {
-						case MOVE_REQUEST_EVENT:
-							treatRequestEvent((MoveRequestEvent) event);
-							break;
-						case INTERACTION_REQUEST_EVENT:
-							treatRequestEvent((InteractionRequestEvent) event);
-							break;
-						case USAGE_REQUEST_EVENT:
-							treatRequestEvent((UsageRequestEvent) event);
-							break;
-						case DROP_REQUEST_EVENT:
-							treatRequestEvent((DropRequestEvent) event);
-							break;
-						case CENTER_VIEW_REQUEST_EVENT:
-							treatRequestEvent((CenterViewRequestEvent) event);
-							break;
+			do {
+				event = this.requestedEvent.poll();
+				while (event != null) {
+					try {
+						switch (event.getType()) {
+							case MOVE_REQUEST_EVENT:
+								treatRequestEvent((MoveRequestEvent) event);
+								break;
+							case INTERACTION_REQUEST_EVENT:
+								treatRequestEvent((InteractionRequestEvent) event);
+								break;
+							case USAGE_REQUEST_EVENT:
+								treatRequestEvent((UsageRequestEvent) event);
+								break;
+							case DROP_REQUEST_EVENT:
+								treatRequestEvent((DropRequestEvent) event);
+								break;
+							case CENTER_VIEW_REQUEST_EVENT:
+								treatRequestEvent((CenterViewRequestEvent) event);
+								break;
+						}
+						event = this.requestedEvent.poll();
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					event = this.requestedEvent.poll();
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
-			}
+				if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
+					this.nextTick();
+				}
+			} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
 		} while (this.isRunning);
 	}
 
@@ -1066,6 +1094,21 @@ public class Game implements RequestListener, Runnable, Stopable {
 		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 
+		if (tile == Tile.CLOSED_DOOR && distance > 1) {
+			Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
+			for (Direction direction : directions) {
+				Vector2i arr = e.tilePosition.copy().add(direction);
+				Stack<Vector2i> path2 = this.world.getPath(this.currentPlayer.getPosition(), arr, false, null);
+				if (path2 != null && (path == null || path.size() > path2.size())) {
+					path = path2;
+				}
+			}
+			if (path != null) {
+				this.currentPlayer.setRequestedPath(path);
+				this.currentPlayer.setRequestedInteraction(e.tilePosition);
+			}
+			return;
+		}
 
 		if (distance <= this.currentPlayer.getLos()) {
 		/* Looking for a mob to attack*/
