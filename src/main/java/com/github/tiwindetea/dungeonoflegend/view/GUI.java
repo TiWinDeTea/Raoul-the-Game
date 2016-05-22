@@ -97,8 +97,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final VBox rVBox = new VBox();
 	private final Pane rIventoryPane = new Pane();
 
-	private final HashMap<Long, LivingEntity> livingEntities = new HashMap<>();
-	private final HashMap<Long, StaticEntity> staticEntities = new HashMap<>();
+	private final HashMap<Long, LivingEntity> livingEntities = new HashMap<>(32, 7);
+	private final HashMap<Long, StaticEntity> staticEntities = new HashMap<>(32, 7);
 
 	private final List<PlayerHUD> playersHUD = new ArrayList<>();
 	private final List<PlayerInventory> playersInventories = new ArrayList<>();
