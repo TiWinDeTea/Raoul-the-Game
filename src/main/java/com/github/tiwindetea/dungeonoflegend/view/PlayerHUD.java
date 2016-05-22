@@ -32,11 +32,11 @@ public class PlayerHUD extends Parent {
 
 	private static final Color MASK_COLOR = Color.rgb(0, 0, 0, 0.5);
 	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.DARKRED;
-	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
+	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.CRIMSON;
 	private static final Color MAX_MANA_RECTANGLE_COLOR = Color.DARKBLUE;
 	private static final Color ACTUAL_MANA_RECTANGLE_COLOR = Color.BLUE;
 	private static final Color MAX_XP_RECTANGLE_COLOR = Color.DARKGREEN;
-	private static final Color ACTUAL_XP_RECTANGLE_COLOR = Color.GREEN;
+	private static final Color ACTUAL_XP_RECTANGLE_COLOR = Color.CHARTREUSE;
 	private static final Color BACKGROUND_COLOR = Color.PURPLE;
 
 	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
@@ -326,7 +326,7 @@ public class PlayerHUD extends Parent {
 	 * @return the max xp
 	 */
 	public int getMaxXP() {
-		return maxXP;
+		return this.maxXP;
 	}
 
 	/**
@@ -335,6 +335,6 @@ public class PlayerHUD extends Parent {
 	 * @return the actual xp
 	 */
 	public int getActualXP() {
-		return actualXP;
+		return this.actualXP;
 	}
 }
