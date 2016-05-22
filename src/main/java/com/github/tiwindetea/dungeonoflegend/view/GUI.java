@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.events.Event;
+import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityEvent;
@@ -95,6 +96,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private final Pane rPane = new Pane();
 	private final VBox rVBox = new VBox();
+	private final ScoreDisplayer rScoreDisplayer = new ScoreDisplayer();
 	private final Pane rIventoryPane = new Pane();
 
 	private final HashMap<Long, LivingEntity> livingEntities = new HashMap<>(32, 7);
@@ -399,6 +401,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			}
 		}
 
+		public void updateScore(ScoreUpdateEvent e) {
+			GUI.this.rScoreDisplayer.setScore(e.newScore);
+		}
+
 		@Override
 		public void handle(ActionEvent event) {
 			Event gameEvent = GUI.this.eventQueue.poll();
@@ -509,6 +515,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					}
 					break;
 				}
+				case SCORE_UPDATE_EVENT: {
+					updateScore((ScoreUpdateEvent) gameEvent);
+					break;
+				}
 				}
 				gameEvent = GUI.this.eventQueue.poll();
 			}
@@ -545,7 +555,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.rIventoryPane.setBackground(new Background(new BackgroundFill(Color.CHOCOLATE, CornerRadii.EMPTY, Insets.EMPTY)));
 
 		this.rVBox.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.rVBox.getChildren().add(new ScoreDisplayer());
+		this.rVBox.getChildren().add(this.rScoreDisplayer);
 		this.rVBox.getChildren().add(this.rIventoryPane);
 		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
 
@@ -776,6 +786,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void updateScore(ScoreUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 }
