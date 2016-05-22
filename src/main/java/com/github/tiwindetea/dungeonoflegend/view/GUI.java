@@ -142,7 +142,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
 
 		public void addInventory(InventoryAdditionEvent e) {
-			System.out.println("addInventory Event");
 			if(e.isEquiped) {
 				GUI.this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description));
 			}
@@ -152,7 +151,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void deleteInventory(InventoryDeletionEvent e) {
-			System.out.println("deleteInventory Event");
 			if(e.playerNumber < GUI.this.actualPlayersNumber) {
 				GUI.this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
 			}
@@ -162,14 +160,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void createLivingEntity(LivingEntityCreationEvent e) {
-			System.out.println("createLivingEntity Event");
 			LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction, e.description);
 			GUI.this.livingEntities.put(e.entityId, livingEntity);
 			GUI.this.cTileMap.addEntity(livingEntity);
 		}
 
 		public void deleteLivingEntity(LivingEntityDeletionEvent e) {
-			System.out.println("deleteLivingEntity Event");
 			if(GUI.this.livingEntities.containsKey(e.entityId)) {
 				GUI.this.cTileMap.removeEntity(GUI.this.livingEntities.get(e.entityId));
 				GUI.this.livingEntities.remove(e.entityId);
@@ -180,7 +176,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
-			System.out.println("defineLivingEntityLOS Event");
 			if(GUI.this.livingEntities.containsKey(e.entityId)) {
 				GUI.this.livingEntities.get(e.entityId).setLOS(e.newLOS);
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
@@ -191,7 +186,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
-			System.out.println("modifieLivingEntityLOS Event");
 			if(GUI.this.livingEntities.containsKey(e.entityId)) {
 				GUI.this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
@@ -202,7 +196,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void moveLivingEntity(LivingEntityMoveEvent e) {
-			System.out.println("moveLivingEntity Event");
 			if(GUI.this.livingEntities.containsKey(e.entityId)) {
 				Vector2i oldPosition = GUI.this.livingEntities.get(e.entityId).getPosition();
 				Vector2i newPosition = e.newPosition;
@@ -263,7 +256,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void changePlayerStat(PlayerStatEvent e) {
-			System.out.println("changePlayerStat Event");
 			if(e == null) {
 				return;
 			}
@@ -301,7 +293,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void createStaticEntity(StaticEntityCreationEvent e) {
-			System.out.println("createStaticEntity Event");
 			if(e == null) {
 				return;
 			}
@@ -311,7 +302,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void deleteStaticEntity(StaticEntityDeletionEvent e) {
-			System.out.println("deleteStaticEntity Event");
 			if(e == null) {
 				return;
 			}
@@ -325,7 +315,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
-			System.out.println("defineStaticEntityLOS Event");
 			if(e == null) {
 				return;
 			}
@@ -339,7 +328,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void createMap(MapCreationEvent e) {
-			System.out.println("createMap Event");
 			if(e == null) {
 				return;
 			}
@@ -351,12 +339,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void modifieTile(TileModificationEvent e) {
-			System.out.println("modifieTile Event");
 			GUI.this.cTileMap.setTile(e.tileType, e.tilePosition);
 		}
 
 		public void playerNextTick(PlayerNextTickEvent event) {
-			System.out.println("playerNextTick Event");
 			for(PlayerHUD playerHUD : GUI.this.playersHUD) {
 				playerHUD.setMasked(true);
 			}
@@ -372,17 +358,14 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void addFog(FogAdditionEvent e) {
-			System.out.println("addFog Event");
 			GUI.this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
 		}
 
 		public void resetFog(FogResetEvent e) {
-			System.out.println("resetFog Event");
 			GUI.this.cTileMap.setAllTilesFogged(false);
 		}
 
 		public void centerOnTile(CenterOnTileEvent e) {
-			System.out.println("centerOnTile Event");
 			GUI.this.cTileMap.centerViewOnTile(e.tilePosition);
 		}
 
