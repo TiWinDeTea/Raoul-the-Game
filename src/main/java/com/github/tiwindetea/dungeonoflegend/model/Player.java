@@ -861,4 +861,8 @@ public class Player extends LivingThing {
 		this.requestedPath.clear();
 	}
 
+	public static int parsePlayerNumber(String str) {
+		int nbr = str.indexOf("nbr=", 17) + 4;
+		return Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
+	}
 }

@@ -7,8 +7,6 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-// TODO: Fog LOS
-
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
@@ -22,6 +20,7 @@ import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
@@ -54,9 +53,6 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-//FIXME : Next level broken (when you fall into a hole, you can get outside of the map)
-//FIXME : level 3 of seed [8626971708176625149 ; -4303329363946094496] : there is a bonus raoul in the map
 
 /**
  * Game.
@@ -103,7 +99,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 * The Game name.
 	 */
 	private String gameName;
-	private static final Level debugLevel = Level.INFO; //debug
+	private static final Level debugLevel = Level.FINEST; //debug
 
 
 	/* Level generation variables. Charged at the creation of a game */
@@ -515,6 +511,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 	}
 
+
+	private void firePlayerStatEvent(PlayerStatEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.changePlayerStat(event);
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -713,7 +716,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					this.world.getLOS(player.getPosition(), player.getLos())
 			));
 		}
-		fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
+		fireCenterOnTileEvent(new CenterOnTileEvent(this.players.get(0).getPosition()));
 	}
 
 	//-------------------------------------//
@@ -768,6 +771,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.currentPlayer = this.players.get(this.playerTurn);
 		}
 		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+
+		if (this.players.size() == 0) {
+			++this.level;
+			this.save();
+			this.generateLevel(); // Hot dog !
+			return;
+		}
 	}
 
 	/**
@@ -846,13 +856,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.players.remove(i);
 				--i;
 			}
-		}
-
-		if (this.players.size() == 0) {
-			++this.level;
-			this.save();
-			this.generateLevel(); // Hot dog !
-			return;
 		}
 
 		ArrayList<Mob> mobToDelete = new ArrayList<>(3);
@@ -974,8 +977,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	//-------------------------------------//
 	private boolean isAccessible(Vector2i pos) {
 		return !(Tile.isObstructed(this.world.getTile(pos))
-				|| this.mobs.contains(new Mob(pos))
-				|| this.players.contains(new Mob(pos)));
+				|| this.mobs.contains(new Mob(pos)));
 	}
 
 	/**
@@ -999,13 +1001,35 @@ public class Game implements RequestListener, Runnable, Stopable {
 			str = file.nextLine();
 			this.globalScore = Integer.parseInt(str.substring(str.indexOf('=') + 1));
 			this.players.clear();
+			int playerCount = 0;
 			while (file.hasNext()) {
-				this.players.add(Player.parsePlayer(file.nextLine()));
+				str = file.nextLine();
+				int nextNumber = Player.parsePlayerNumber(str);
+				System.out.println(nextNumber);
+				while (nextNumber > playerCount) {
+					System.out.println("Creating ghost " + playerCount);
+					firePlayerCreationEvent(new PlayerCreationEvent(
+							playerCount,
+							Pair.getNewId(),
+							new Vector2i(0, 0),
+							Direction.LEFT,
+							1,
+							1,
+							1,
+							""
+					));
+					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, 0));
+					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 0));
+					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, 0));
+					++playerCount;
+				}
+				++playerCount;
+				this.players.add(Player.parsePlayer(str));
 				this.players.get(this.players.size() - 1).setFloor(this.level);
 			}
 			file.close();
 			this.currentPlayer = this.players.get(0);
-			fireNextTickEvent(new PlayerNextTickEvent(0));
+			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
 			fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
 			this.generateLevel();
 		} catch (FileNotFoundException e) {
@@ -1164,19 +1188,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void treatRequestEvent(DropRequestEvent e) {
 		/* Take the shortest path possible to drop the item */
 		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
-			ArrayList<Stack<Vector2i>> paths = new ArrayList<>(4);
-			Direction[] dirs = {Direction.LEFT, Direction.RIGHT, Direction.UP, Direction.DOWN};
-			for (Direction direction : dirs) {
-				paths.add(this.world.getPath(this.currentPlayer.getPosition(), e.dropPosition.copy().add(direction), false, null));
-			}
-			if (paths.size() != 0) {
-				Stack<Vector2i> theChoosenOne = paths.get(0);
-				for (Stack<Vector2i> stack : paths) {
-					if (stack != null && stack.size() < theChoosenOne.size()) {
-						theChoosenOne = stack;
-					}
-				}
-				this.currentPlayer.setRequestedPath(theChoosenOne);
+			Stack<Vector2i> path = this.shortestPathApprox(this.currentPlayer.getPosition(), e.dropPosition, false, null);
+			if (path != null) {
+				this.currentPlayer.setRequestedPath(path);
 				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
 				this.nextTick();
 			}
@@ -1192,17 +1206,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
 
 		if ((tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR) && distance > 1) {
-			Direction[] directions = {Direction.DOWN, Direction.LEFT, Direction.UP, Direction.RIGHT};
-			for (Direction direction : directions) {
-				Vector2i arr = e.tilePosition.copy().add(direction);
-				Stack<Vector2i> path2 = this.world.getPath(this.currentPlayer.getPosition(), arr, false, null);
-				if (path2 != null && (path == null || path.size() > path2.size())) {
-					path = path2;
-				}
-			}
+			path = shortestPathApprox(this.currentPlayer.getPosition(), e.tilePosition, false, null);
 			if (path != null) {
 				this.currentPlayer.setRequestedPath(path);
 				this.currentPlayer.setRequestedInteraction(e.tilePosition);
+			} else {
+				success = false;
 			}
 		} else if (distance <= this.currentPlayer.getLos()) {
 		/* Looking for a mob to attack*/
@@ -1219,7 +1228,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 				if (i >= 0) {
 					if (this.objectToUse != null) {
-						System.out.println("Object used : " + this.objectToUse);
 						this.objectToUse.object.trigger(this.mobs.get(i));
 						this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
 						this.triggeredObjects.add(this.objectToUse.object);
@@ -1228,6 +1236,16 @@ public class Game implements RequestListener, Runnable, Stopable {
 						path = null;
 					} else {
 						this.currentPlayer.setRequestedAttack(e.tilePosition);
+						if (p.squaredDistance(e.tilePosition) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
+							Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
+							for (Mob mob : this.mobs) {
+								shadow.add(mob);
+							}
+							for (Player player : this.players) {
+								shadow.add(player);
+							}
+							this.currentPlayer.setRequestedPath(shortestPathApprox(p, e.tilePosition, false, shadow));
+						}
 					}
 				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
 					/* interaction with doors */
@@ -1264,7 +1282,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Pair<StorableObject> pair : inventory) {
 			if (pair.getId() == e.objectId) {
 				if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
-					System.out.println("Object selected : " + pair.object);
 					this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
 				} else {
 					obj = pair;
@@ -1273,7 +1290,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 		if (this.objectToUse != null) {
 			if (this.objectToUse.object.getConsumableType() == ConsumableType.POT) {
-				System.out.println("Selected : Pot");
 				this.triggeredObjects.add(this.objectToUse.object);
 				this.objectToUse.object.trigger(this.currentPlayer);
 				this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
@@ -1306,5 +1322,18 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	public boolean isRunning() {
 		return this.isRunning;
+	}
+
+	private Stack<Vector2i> shortestPathApprox(Vector2i dep, Vector2i arr, boolean ignoreDoors, Collection<LivingThing> entities) {
+		Direction[] directions = {Direction.LEFT, Direction.DOWN, Direction.RIGHT, Direction.UP};
+		Stack<Vector2i> ans = null;
+		Stack<Vector2i> tmp;
+		for (Direction direction : directions) {
+			tmp = this.world.getPath(dep, arr.copy().add(direction), ignoreDoors, entities);
+			if ((tmp != null) && (ans == null || tmp.size() < ans.size())) {
+				ans = tmp;
+			}
+		}
+		return ans;
 	}
 }

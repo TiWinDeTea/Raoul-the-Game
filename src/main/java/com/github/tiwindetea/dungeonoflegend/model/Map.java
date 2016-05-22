@@ -239,8 +239,8 @@ public class Map {
                 while (i > 0 && visible) {
                     currentX += xShifting;
                     currentY += yShifting;
-                    x = (int) Math.min(currentX, map.length - 1);
-                    y = (int) Math.min(currentY, map[0].length - 1);
+                    x = (int) Math.min(currentX, this.map.length - 1);
+                    y = (int) Math.min(currentY, this.map[0].length - 1);
                     if (Tile.isObstructed(this.map[x][y]) && !tilePosition.equals(new Vector2i(x, y))
                             && this.map[x][y] != Tile.HOLE)
                         visible = false;

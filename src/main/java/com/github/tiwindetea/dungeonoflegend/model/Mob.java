@@ -261,7 +261,6 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public void attack(LivingThing target) {
-		System.out.println(this.getDescription() + "is attacking " + target.getDescription() + " by " + this.attackPower);
 		target.damage(this.attackPower);
 	}
 
