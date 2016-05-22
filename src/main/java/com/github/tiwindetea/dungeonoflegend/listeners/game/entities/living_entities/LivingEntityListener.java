@@ -3,5 +3,5 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 /**
  * Created by maxime on 5/6/16.
  */
-public interface LivingEntityListener extends LivingEntityCreationListener, LivingEntityDeletionListener, LivingEntityLOSDefinitionListener, LivingEntityLOSModificationListener, LivingEntityMoveListener {
+public interface LivingEntityListener extends LivingEntityCreationListener, LivingEntityDeletionListener, LivingEntityHealthUpdateListener, LivingEntityHealthVisibilityListener, LivingEntityLOSDefinitionListener, LivingEntityLOSModificationListener, LivingEntityMoveListener {
 }
