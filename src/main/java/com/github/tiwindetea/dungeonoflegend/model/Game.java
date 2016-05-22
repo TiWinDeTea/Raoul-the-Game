@@ -130,12 +130,16 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private double[] lootsArmorBaseAttack;
 	private double[] lootsArmorDefensePerLevel;
 	private double[] lootsArmorAttackPerLevel;
+	private int[] lootsArmorLikelihood;
+	private int lootsArmorLikelihoodSum;
 
 	private int[] lootsWeaponRange;
 	private double[] lootsWeaponBaseAttack;
 	private double[] lootsWeaponManaCost;
 	private double[] lootsWeaponAttackPerLevel;
 	private double[] lootsWeaponManaCostPerLevel;
+	private int[] lootsWeaponLikelihood;
+	private int lootsWeaponLikelihoodSum;
 
 	private int[] lootsPotTurns;
 	private double[] lootsPotHeal;
@@ -146,12 +150,18 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private double[] lootsPotManaMod;
 	private double[] lootsPotHealPerLevel;
 	private double[] lootsPotManaPerLevel;
+	private int[] lootsPotLikelihood;
+	private int lootsPotLikelihoodSum;
 
 	private double[] lootsScrollBaseDamagePerTurn;
 	private double[] lootsScrollBaseDamageModPerTurn;
 	private double[] lootsScrollDamagePerTurnPerLevel;
 	private double[] lootsScrollDamageModPerTurnPerLevel;
 	private int[] lootsScrollTurns;
+	private int[] lootsScrollLikelihood;
+	private int lootsScrollLikelihoodSum;
+
+	private int lootsLikelihoodSum;
 
 	private int bulbXp;
 	private int bulbXpGainPerLevel;
@@ -299,6 +309,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.lootsArmorBaseAttack = new double[armorQtt];
 		this.lootsArmorDefensePerLevel = new double[armorQtt];
 		this.lootsArmorAttackPerLevel = new double[armorQtt];
+		this.lootsArmorLikelihood = new int[armorQtt];
+		this.lootsArmorLikelihoodSum = 0;
 		for (int i = 0; i < armorQtt; i++) {
 			String armorName = "armor" + i + ".";
 			this.lootsArmorType[i] = ArmorType.parseArmorType(loots.getString(armorName + "type"));
@@ -306,6 +318,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.lootsArmorBaseAttack[i] = Double.parseDouble(loots.getString(armorName + "base-attack"));
 			this.lootsArmorDefensePerLevel[i] = Double.parseDouble(loots.getString(armorName + "defense-per-level"));
 			this.lootsArmorAttackPerLevel[i] = Double.parseDouble(loots.getString(armorName + "attack-per-level"));
+			this.lootsArmorLikelihood[i] = Integer.parseInt(loots.getString(armorName + "likelihood"));
+			this.lootsArmorLikelihoodSum += this.lootsArmorLikelihood[i];
 		}
 
 		int weaponQtt = Integer.parseInt(loots.getString("weapons.qtt"));
@@ -314,6 +328,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.lootsWeaponManaCost = new double[weaponQtt];
 		this.lootsWeaponAttackPerLevel = new double[weaponQtt];
 		this.lootsWeaponManaCostPerLevel = new double[weaponQtt];
+		this.lootsWeaponLikelihood = new int[weaponQtt];
+		this.lootsWeaponLikelihoodSum = 0;
 		for (int i = 0; i < weaponQtt; i++) {
 			String weaponName = "weapon" + i + ".";
 			this.lootsWeaponRange[i] = Integer.parseInt(loots.getString(weaponName + "range"));
@@ -321,6 +337,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.lootsWeaponManaCost[i] = Double.parseDouble(loots.getString(weaponName + "mana-cost"));
 			this.lootsWeaponAttackPerLevel[i] = Double.parseDouble(loots.getString(weaponName + "attack-per-level"));
 			this.lootsWeaponManaCostPerLevel[i] = Double.parseDouble(loots.getString(weaponName + "mana-cost-per-level"));
+			this.lootsWeaponLikelihood[i] = Integer.parseInt(loots.getString(weaponName + "likelihood"));
+			this.lootsWeaponLikelihoodSum += this.lootsWeaponLikelihood[i];
 		}
 
 		int potQtt = Integer.parseInt(loots.getString("pots.qtt"));
@@ -333,6 +351,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.lootsPotManaMod = new double[potQtt];
 		this.lootsPotHealPerLevel = new double[potQtt];
 		this.lootsPotManaPerLevel = new double[potQtt];
+		this.lootsPotLikelihood = new int[potQtt];
+		this.lootsPotLikelihoodSum = 0;
 		for (int i = 0; i < potQtt; i++) {
 			String potName = "pot" + i + ".";
 			this.lootsPotTurns[i] = Integer.parseInt(loots.getString(potName + "turns"));
@@ -344,6 +364,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.lootsPotManaMod[i] = Double.parseDouble(loots.getString(potName + "mana-mod"));
 			this.lootsPotHealPerLevel[i] = Double.parseDouble(loots.getString(potName + "hp-per-level"));
 			this.lootsPotManaPerLevel[i] = Double.parseDouble(loots.getString(potName + "mana-per-level"));
+			this.lootsPotLikelihood[i] = Integer.parseInt(loots.getString(potName + "likelihood"));
+			this.lootsPotLikelihoodSum += this.lootsPotLikelihood[i];
 		}
 
 		int scrollQtt = Integer.parseInt(loots.getString("scrolls.qtt"));
@@ -352,6 +374,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.lootsScrollDamagePerTurnPerLevel = new double[scrollQtt];
 		this.lootsScrollDamageModPerTurnPerLevel = new double[scrollQtt];
 		this.lootsScrollTurns = new int[scrollQtt];
+		this.lootsScrollLikelihood = new int[scrollQtt];
+		this.lootsScrollLikelihoodSum = 0;
 		for (int i = 0; i < scrollQtt; i++) {
 			String scrollName = "scroll" + i + ".";
 			this.lootsScrollBaseDamagePerTurn[i] = Double.parseDouble(loots.getString(scrollName + "base-damage-per-turn"));
@@ -359,7 +383,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 			this.lootsScrollDamagePerTurnPerLevel[i] = Double.parseDouble(loots.getString(scrollName + "damage-per-turn-per-level"));
 			this.lootsScrollDamageModPerTurnPerLevel[i] = Double.parseDouble(loots.getString(scrollName + "damage-mod-per-turn-per-level"));
 			this.lootsScrollTurns[i] = Integer.parseInt(loots.getString(scrollName + "turns"));
+			this.lootsScrollLikelihood[i] = Integer.parseInt(loots.getString(scrollName + "likelihood"));
+			this.lootsScrollLikelihoodSum += this.lootsScrollLikelihood[i];
 		}
+
+		this.lootsLikelihoodSum = this.lootsScrollLikelihoodSum + this.lootsPotLikelihoodSum + this.lootsWeaponLikelihoodSum + this.lootsArmorLikelihoodSum;
 	}
 
 	private void loadTraps() {
@@ -584,23 +612,22 @@ public class Game implements RequestListener, Runnable, Stopable {
 			Pair<InteractiveObject> pair;
 			chestLevel = random.nextInt(3) + this.level - 1;
 			pos = selectRandomGroundPosition(rooms, random);
-			switch (random.nextInt(4)) {
+			Vector2i selectedChest = chestSelector(random);
+			selection = selectedChest.y;
+			switch (selectedChest.x) {
 				case 0:
-					selection = random.nextInt(this.lootsArmorType.length);
 					Armor armor = new Armor(this.lootsArmorDefensePerLevel[selection] * chestLevel + this.lootsArmorBaseDefense[selection],
 							this.lootsArmorAttackPerLevel[selection] * chestLevel + this.lootsArmorBaseAttack[selection],
 							this.lootsArmorType[selection]);
 					pair = new Pair<>(new InteractiveObject(pos, armor));
 					break;
 				case 1:
-					selection = random.nextInt(this.lootsWeaponRange.length);
 					Weapon weapon = new Weapon(this.lootsWeaponBaseAttack[selection] + this.lootsWeaponAttackPerLevel[selection] * chestLevel,
 							this.lootsWeaponRange[selection],
 							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
 					pair = new Pair<>(new InteractiveObject(pos, weapon));
 					break;
 				case 2:
-					selection = random.nextInt(this.lootsScrollTurns.length);
 					Scroll scroll = new Scroll(this.lootsScrollTurns[selection],
 							this.lootsScrollBaseDamagePerTurn[selection] + chestLevel * this.lootsScrollDamagePerTurnPerLevel[selection],
 							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
@@ -609,7 +636,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				case 3:
 					/* Falls through */
 				default:
-					selection = random.nextInt(this.lootsPotHeal.length);
 					Pot pot = new Pot(this.lootsPotTurns[selection],
 							this.lootsPotHeal[selection] + this.lootsPotHealPerLevel[selection] * chestLevel,
 							this.lootsPotMana[selection] + this.lootsPotManaPerLevel[selection] * chestLevel,
@@ -1019,7 +1045,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	}
 
 	private void addRandomMob(Vector2i mobPos, Random random) {
-		int selectedMob = this.mobSelector(random);
+		int selectedMob = randomSelector(random, this.mobsLikelihoodSum, this.mobsLikelihood);
 		int mobLevel = random.nextInt(3) + this.level - 1;
 		Mob mob = new Mob(
 				this.mobsName[selectedMob],
@@ -1035,13 +1061,35 @@ public class Game implements RequestListener, Runnable, Stopable {
 				mobPos.copy(), Direction.DOWN, mob.getDescription()));
 	}
 
-	private int mobSelector(Random random) {
-		int rand = random.nextInt(this.mobsLikelihoodSum);
-		int likelihoodSum = 0;
+	private Vector2i chestSelector(Random random) {
+		Vector2i ans = new Vector2i();
+		int rand = random.nextInt(this.lootsLikelihoodSum);
+		int i = 0;
+		if (rand >= this.lootsArmorLikelihoodSum) {
+			ans.x = 0;
+			ans.y = randomSelector(random, this.lootsArmorLikelihoodSum, this.lootsArmorLikelihood);
+
+		} else if ((rand -= this.lootsArmorLikelihoodSum) >= this.lootsWeaponLikelihoodSum) {
+			ans.x = 1;
+			ans.y = randomSelector(random, this.lootsWeaponLikelihoodSum, this.lootsWeaponLikelihood);
+
+		} else if ((rand - this.lootsWeaponLikelihoodSum) >= this.lootsScrollLikelihoodSum) {
+			ans.x = 2;
+			ans.y = randomSelector(random, this.lootsScrollLikelihoodSum, this.lootsScrollLikelihood);
+
+		} else {
+			ans.x = 3;
+			ans.y = randomSelector(random, this.lootsPotLikelihoodSum, this.lootsPotLikelihood);
+		}
+		return ans;
+	}
+
+	private int randomSelector(Random random, int likelihoodSum, int[] table) {
+		int rand = random.nextInt(likelihoodSum);
 		int i = 0;
 		do {
-			likelihoodSum += this.mobsLikelihood[i++];
-		} while (likelihoodSum <= rand);
+			rand -= table[i++];
+		} while (rand >= 0);
 		return i - 1;
 	}
 
