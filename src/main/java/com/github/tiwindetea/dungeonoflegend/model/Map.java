@@ -35,29 +35,28 @@ public class Map {
      * Tuning parameters for the map generation
      */
     private static final int MIN_ROOM_WIDTH = 3; // >= 3
-    private static final int MAX_ROOM_WIDTH = 12; // > MIN_ROOM_WIDTH
+    private static final int MAX_ROOM_WIDTH = 12; // >= MIN_ROOM_WIDTH
     private static final int MIN_ROOM_HEIGHT = 3; // >= 3
-    private static final int MAX_ROOM_HEIGHT = 12; // > MIN_ROOM_HEIGHT
+    private static final int MAX_ROOM_HEIGHT = 12; // >= MIN_ROOM_HEIGHT
     private static final int MIN_ROOM_NUMBER = 13; // >= 1
-    private static final int MAX_ROOM_NUMBER = 23; // > MIN_ROOM_NUMBER
+    private static final int MAX_ROOM_NUMBER = 23; // >= MIN_ROOM_NUMBER
     private static final int MIN_CORRIDOR_NBR = 4; // >= 1
-    private static final int MAX_CORRIDOR_NBR = 8; // > MIN_CORRIDOR_NBR
+    private static final int MAX_CORRIDOR_NBR = 8; // >= MIN_CORRIDOR_NBR
     private static final int MIN_CORRIDOR_LENGTH = 6; // >= 1
-    private static final int MAX_CORRIDOR_LENGTH = 18; // > MIN_CORRIDOR_LENGTH
-    private static final int MIN_LEVEL_WIDTH = 50; // > MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
-    private static final int MAX_LEVEL_WIDTH = 275; // > MIN_LEVEL_WIDTH
-    private static final int MIN_LEVEL_HEIGHT = 50; // > MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
-    private static final int MAX_LEVEL_HEIGHT = 275; // > MIN_LEVEL_HEIGHT
+    private static final int MAX_CORRIDOR_LENGTH = 18; // >= MIN_CORRIDOR_LENGTH
+    private static final int MIN_LEVEL_WIDTH = 50; // >= MIN_ROM_WIDTH + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_WIDTH = 275; // >= MIN_LEVEL_WIDTH
+    private static final int MIN_LEVEL_HEIGHT = 50; // >= MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
+    private static final int MAX_LEVEL_HEIGHT = 275; // >= MIN_LEVEL_HEIGHT
     private static final int RETRIES_NBR = 5000; // < Integer.MAX_VALUE / 2
     private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
-    private static final int BULB_FIX_NBR = -1; // negative to ignore this value
-    private static final int BULB_MINIMUM_NBR = 2; // >= 0 ; ignored if BULB_FIX_NBR is > 0
-    private static final int BULB_MAXIMUM_NBR = 3; // > BULB_MINIMUM_NBR ; ignored if BULB_FIX_NBR is > 0
+    private static final int BULB_MINIMUM_NBR = 2; // >= 0 ;
+    private static final int BULB_MAXIMUM_NBR = 3; // >= BULB_MINIMUM_NBR
 
     private static final int PROBABILITY_UNIT = 100; // > 0
     /* Following values should be between 0 and PROBABILITY_UNIT (both included) */
     private static final int MIN_HOLE_COVERAGE = 25;
-    private static final int MAX_HOLE_COVERAGE = 65; // > MIN_HOLE_COVERAGE
+    private static final int MAX_HOLE_COVERAGE = 65; // >= MIN_HOLE_COVERAGE
     private static final int HOLE_CHANCE = 5;
     private static final int ROOM_BINDED_TO_CORRIDOR_CHANCE = 95;
     private static final int CORRIDOR_BINDED_TO_CORRIDOR_CHANCE = 25;
@@ -262,8 +261,8 @@ public class Map {
 
         /* Generate the base of the level (its size) and set all the blocks to Tile.UNKNOWN*/
         this.random = this.seed.getRandomizer(level);
-        this.map = new Tile[this.random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH) + MIN_LEVEL_WIDTH]
-                [this.random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT) + MIN_LEVEL_HEIGHT];
+        this.map = new Tile[this.random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH + 1) + MIN_LEVEL_WIDTH]
+                [this.random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT + 1) + MIN_LEVEL_HEIGHT];
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[i].length; j++) {
                 this.map[i][j] = Tile.UNKNOWN;
@@ -271,16 +270,16 @@ public class Map {
         }
 
         /* Generate the numbers of corridors and the number of rooms*/
-        int roomNbr = this.random.nextInt(MAX_ROOM_NUMBER - MIN_ROOM_NUMBER) + MIN_ROOM_NUMBER;
-        int corridorNbr = this.random.nextInt(MAX_CORRIDOR_NBR - MIN_CORRIDOR_NBR) + MIN_CORRIDOR_NBR;
+        int roomNbr = this.random.nextInt(MAX_ROOM_NUMBER - MIN_ROOM_NUMBER + 1) + MIN_ROOM_NUMBER;
+        int corridorNbr = this.random.nextInt(MAX_CORRIDOR_NBR - MIN_CORRIDOR_NBR + 1) + MIN_CORRIDOR_NBR;
         int x, y, width, height;
         Room room, corridor;
 
         /* Dig the first room */
         do {
-            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH + 1) + MIN_ROOM_WIDTH;
             x = this.random.nextInt(width + 1) + this.map.length / 2 - 4 * width / 5;
-            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
+            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT + 1) + MIN_ROOM_HEIGHT;
             y = this.random.nextInt(height + 1) + this.map[0].length / 2 - 4 * height / 5;
             room = new Room(x, y, x + width, y + height);
         } while (!isPlaceable(room));
@@ -299,7 +298,7 @@ public class Map {
 
             // If we are going to generate a corridor
             if (this.random.nextInt(roomNbr - rooms.size() + corridorNbr - corridors.size()) < (corridorNbr - corridors.size())) {
-                if (CORRIDOR_BINDED_TO_CORRIDOR_CHANCE >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
+                if (CORRIDOR_BINDED_TO_CORRIDOR_CHANCE >= Map.this.random.nextInt(PROBABILITY_UNIT + 1)) {
                     corridor = generateRoom(corridors.get(this.random.nextInt(corridors.size())), true, false);
                 } else {
                     corridor = generateRoom(rooms.get(this.random.nextInt(rooms.size())), true, true);
@@ -309,7 +308,7 @@ public class Map {
                     corridors.add(corridor);
                 }
             } else { // We are going to generate a room
-                if (ROOM_BINDED_TO_CORRIDOR_CHANCE >= this.random.nextInt(PROBABILITY_UNIT)) {
+                if (ROOM_BINDED_TO_CORRIDOR_CHANCE >= this.random.nextInt(PROBABILITY_UNIT + 1)) {
                     room = generateRoom(corridors.get(this.random.nextInt(corridors.size())), false, true);
                 } else {
                     room = generateRoom(rooms.get(this.random.nextInt(rooms.size())), false, true);
@@ -330,26 +329,26 @@ public class Map {
         /* Randomly remove some walls and make passages (when possible) */
         for (int i = 0; i < rooms.size(); ++i) {
             for (int j = i + 1; j < rooms.size(); ++j) {
-                if (REBIND_ROOM_TO_ROOM_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                if (REBIND_ROOM_TO_ROOM_CHANCE > this.random.nextInt(PROBABILITY_UNIT + 1)) {
                     rebind(rooms.get(i), rooms.get(j), true);
                 }
             }
             for (Room corridor1 : corridors) {
-                if (REBIND_ROOM_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                if (REBIND_ROOM_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT + 1)) {
                     rebind(rooms.get(i), corridor1, true);
                 }
             }
         }
         for (int i = 0; i < corridors.size(); ++i) {
             for (int j = i + 1; j < corridors.size(); ++j) {
-                if (REBIND_CORRIDOR_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+                if (REBIND_CORRIDOR_TO_CORRIDOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT + 1)) {
                     rebind(corridors.get(i), corridors.get(j), false);
                 }
             }
         }
 
         /* How may bulbs ? */
-        int bulbs_nbr = BULB_FIX_NBR < 0 ? this.random.nextInt(BULB_MAXIMUM_NBR - BULB_MINIMUM_NBR) + BULB_MINIMUM_NBR : BULB_FIX_NBR;
+        int bulbs_nbr = this.random.nextInt(BULB_MAXIMUM_NBR - BULB_MINIMUM_NBR + 1) + BULB_MINIMUM_NBR;
         boolean done;
 
         /* Computes possible positions for stairs and bulbs*/
@@ -537,8 +536,8 @@ public class Map {
             height = 0;
             width = 0;
         } else {
-            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT) + MIN_ROOM_HEIGHT;
-            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH) + MIN_ROOM_WIDTH;
+            height = this.random.nextInt(MAX_ROOM_HEIGHT - MIN_ROOM_HEIGHT + 1) + MIN_ROOM_HEIGHT;
+            width = this.random.nextInt(MAX_ROOM_WIDTH - MIN_ROOM_WIDTH + 1) + MIN_ROOM_WIDTH;
         }
 
         /* Choose wether the new room will be binded to given previous room at the North, South, East, or West */
@@ -554,7 +553,7 @@ public class Map {
                 doorX = x - 1;
                 doorY = y;
                 if (isCorridor) {
-                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH + 1) + MIN_CORRIDOR_LENGTH;
                 } else {
                     if (this.random.nextBoolean()) {
                         y -= height;
@@ -572,7 +571,7 @@ public class Map {
                 doorX = x + 1;
                 doorY = y;
                 if (isCorridor) {
-                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                    width = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH + 1) + MIN_CORRIDOR_LENGTH;
                 } else {
                     if (this.random.nextBoolean()) {
                         y -= height;
@@ -591,7 +590,7 @@ public class Map {
                 doorX = x;
                 doorY = y - 1;
                 if (isCorridor) {
-                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH + 1) + MIN_CORRIDOR_LENGTH;
                 } else {
                     if (this.random.nextBoolean()) {
                         x -= width;
@@ -611,7 +610,7 @@ public class Map {
                 doorX = x;
                 doorY = y + 1;
                 if (isCorridor) {
-                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH) + MIN_CORRIDOR_LENGTH;
+                    height = this.random.nextInt(MAX_CORRIDOR_LENGTH - MIN_CORRIDOR_LENGTH + 1) + MIN_CORRIDOR_LENGTH;
                 } else {
                     if (this.random.nextBoolean()) {
                         x -= width;
@@ -626,7 +625,7 @@ public class Map {
         }
         room.print();
         if (withDoor) {
-            if (DOOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT)) {
+            if (DOOR_CHANCE > this.random.nextInt(PROBABILITY_UNIT + 1)) {
                 this.map[doorX][doorY] = DEFAULT_DOOR;
             } else {
                 this.map[doorX][doorY] = Tile.GROUND;
@@ -718,8 +717,8 @@ public class Map {
             // If it's not a corridor, try to add some holes or some pillars
             int minimum = Math.min(this.bottom.x - this.top.x, this.bottom.y - this.top.y);
             if (minimum > 2) {
-                if (HOLE_CHANCE > Map.this.random.nextInt(PROBABILITY_UNIT)) {
-                    int holesNbr = Map.this.random.nextInt(MAX_HOLE_COVERAGE - MIN_HOLE_COVERAGE) + MIN_HOLE_COVERAGE;
+                if (HOLE_CHANCE > Map.this.random.nextInt(PROBABILITY_UNIT + 1)) {
+                    int holesNbr = Map.this.random.nextInt(MAX_HOLE_COVERAGE - MIN_HOLE_COVERAGE + 1) + MIN_HOLE_COVERAGE;
                     holesNbr = (holesNbr * (this.top.x - this.bottom.x) * (this.top.y - this.bottom.y)) / PROBABILITY_UNIT;
                     Vector2i start = this.top.copy();
                     Vector2i end = this.bottom.copy();
@@ -763,8 +762,9 @@ public class Map {
                         }
                     }
                 }
+                int usableSurface = (this.bottom.x - this.top.x - 2) * (this.bottom.y - this.top.y - 2);
                 for (int i = 0; i < MAX_PILLAR_NBR_PER_ROOM; ++i) {
-                    if (minimum > 2 + i && PILLAR_PROBABILITY >= Map.this.random.nextInt(PROBABILITY_UNIT)) {
+                    if (usableSurface > 2 + i && PILLAR_PROBABILITY >= Map.this.random.nextInt(PROBABILITY_UNIT + 1)) {
                         this.randomPillar();
                     }
                 }
@@ -777,8 +777,8 @@ public class Map {
         private void randomPillar() {
             int x, y;
             do {
-                x = Map.this.random.nextInt(this.bottom.x - this.top.x - 2) + this.top.x + 1;
-                y = Map.this.random.nextInt(this.bottom.y - this.top.y - 2) + this.top.y + 1;
+                x = Map.this.random.nextInt(this.bottom.x - this.top.x - 1) + this.top.x + 1;
+                y = Map.this.random.nextInt(this.bottom.y - this.top.y - 1) + this.top.y + 1;
             } while (Map.this.map[x][y] != Tile.GROUND && Map.this.map[x][y] != Tile.HOLE);
             Map.this.map[x][y] = Tile.PILLAR;
         }

@@ -32,7 +32,7 @@ public abstract class LivingThing implements Descriptable {
 	protected Vector2i position;
 	protected Vector2i requestedAttack;
 	protected String name;
-	protected long id = Pair.getNewId();
+	protected long id;
 	protected static final ArrayList<GameListener> listeners = new ArrayList<>();
 
 
@@ -62,7 +62,7 @@ public abstract class LivingThing implements Descriptable {
 	 * Instantiates a new Living thing.
 	 */
 	public LivingThing() {
-
+		this.id = Pair.getNewId();
 	}
 
 	/**

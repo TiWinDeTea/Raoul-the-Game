@@ -67,7 +67,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private static final int MIN_MOB_PER_LEVEL = 1;
 	private static final int MAX_MOB_PER_LEVEL = 3;
 	private static final int MIN_MOB_PER_ROOM = 0; // >= 0 ; extra mobs (doesn't count in min_mob_per_level ; (negative to ignore)
-	private static final int MAX_MOB_PER_ROOM = 3; // > min_mob_per_room ; same
+	private static final int MAX_MOB_PER_ROOM = 3; // >= min_mob_per_room ; same
 	private static final int MIN_TRAPS_QTT_PER_LEVEL = 8;
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
@@ -540,9 +540,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Pair<Vector2i> bulb : this.bulbsOn) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
-		for (Pair<InteractiveObject> interactiveObject : this.interactiveObjects) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
-		}
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
@@ -565,8 +562,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 
 		Random random = this.seed.getRandomizer(this.level);
-		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL) + MIN_CHEST_QTT_PER_LEVEL;
-		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL) + MIN_TRAPS_QTT_PER_LEVEL;
+		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL + 1) + MIN_CHEST_QTT_PER_LEVEL;
+		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL + 1) + MIN_TRAPS_QTT_PER_LEVEL;
 		int selection, chestLevel;
 		Vector2i pos;
 
@@ -629,19 +626,25 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 		/* Generate the mobs */
 		Mob.setMap(this.world);
-		int mobsNbr = random.nextInt(MAX_MOB_PER_LEVEL - MIN_MOB_PER_LEVEL) + MIN_MOB_PER_LEVEL;
+		int mobsNbr = random.nextInt(MAX_MOB_PER_LEVEL - MIN_MOB_PER_LEVEL + 1) + MIN_MOB_PER_LEVEL;
 		this.mobs = new ArrayList<>(mobsNbr);
 		for (int i = 0; i < mobsNbr; ++i) {
-			this.addRandomMob(this.selectRandomGroundPosition(rooms, random), random);
+			do {
+				pos = selectRandomGroundPosition(rooms, random);
+			} while (pos.equals(this.world.getStairsUpPosition()));
+			this.addRandomMob(pos, random);
 		}
 
 		if (MIN_MOB_PER_ROOM >= 0) {
 			for (Map.Room room : rooms) {
-				mobsNbr = random.nextInt(MAX_MOB_PER_ROOM - MIN_MOB_PER_ROOM) + MIN_MOB_PER_ROOM;
+				mobsNbr = random.nextInt(MAX_MOB_PER_ROOM - MIN_MOB_PER_ROOM + 1) + MIN_MOB_PER_ROOM;
 				for (int i = 0; i < mobsNbr; i++) {
 					ArrayList<Map.Room> r = new ArrayList<>();
 					r.add(room);
-					this.addRandomMob(this.selectRandomGroundPosition(r, random), random);
+					do {
+						pos = selectRandomGroundPosition(r, random);
+					} while (pos.equals(this.world.getStairsUpPosition()));
+					this.addRandomMob(pos, random);
 				}
 			}
 		}
@@ -694,7 +697,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 			} else {
 				pos.y = selectedRoom.top.y;
 			}
-		} while (Tile.isObstructed(this.world.getTile(pos)));
+		} while (!isAccessible(pos));
 		return pos;
 	}
 
@@ -778,7 +781,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					player.setRequestedAttack(null);
 				} else if ((pos = player.getRequestedInteraction()) != null) {
 				/* Make the player to interact with the map */
-					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
+					distance = Math.max(Math.abs(playerPos.x - pos.x), Math.abs(playerPos.y - pos.y));
 					if (distance == 1) {
 						this.world.triggerTile(pos);
 						fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
@@ -802,7 +805,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 							+ " (player #" + (player.getNumber() + 1) + ")";
 					logger.log(this.debugLevel, msg);
 				}
-				player.live(this.mobs, this.players, this.world.getLOS(playerPos, player.getLos()));
 			} else {
 				this.playersOnNextLevel.add(player);
 				this.players.remove(i);
@@ -899,7 +901,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				drop = this.objectsOnGround.get(pos);
 			}
 
-			if (player.getPosition().equals(this.world.getStairsDownPosition())) {
+			if (player.getPosition().equals(this.world.getStairsDownPosition()) && !player.isARequestPending()) {
 				player.setFloor(this.level + 1);
 				player.setPosition(new Vector2i(0, 0));
 				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
@@ -928,7 +930,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.interactiveObjects.remove(interactiveObject);
 			}
 		}
-		this.recomputeLOS();
+		this.recomputePlayersLoses();
 	}
 
 	//-------------------------------------//
@@ -1000,12 +1002,14 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 	}
 
-	private void recomputeLOS() {
+	private void recomputePlayersLoses() {
 		for (Player player : this.players) {
 			Vector2i pos = player.getPosition();
+			boolean[][] playerLOS = this.world.getLOS(pos, player.getLos());
+			player.live(this.mobs, this.players, playerLOS);
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
 					player.getId(),
-					this.world.getLOS(pos, player.getLos())
+					playerLOS
 			));
 			fireFogAdditionEvent(new FogAdditionEvent(
 					pos,
@@ -1156,12 +1160,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 			if (los[los.length / 2 - p.x + e.tilePosition.x][los[0].length / 2 - p.y + e.tilePosition.y]) {
 				int i = -1;
 				int j = 0;
-				do {
+				while (i == -1 && j < this.mobs.size()) {
 					if (this.mobs.get(j).getPosition().equals(e.tilePosition)) {
 						i = j;
 					}
 					++j;
-				} while (i == -1 && j < this.mobs.size());
+				}
 				if (i >= 0) {
 					if (this.objectToUse != null) {
 						System.out.println("Object used : " + this.objectToUse);
