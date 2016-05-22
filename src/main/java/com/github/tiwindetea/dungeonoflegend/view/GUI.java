@@ -4,6 +4,8 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthVisibilityEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
@@ -369,6 +371,24 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			GUI.this.cTileMap.centerViewOnTile(e.tilePosition);
 		}
 
+		public void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e) {
+			if(GUI.this.livingEntities.containsKey(e.entityId)) {
+				GUI.this.livingEntities.get(e.entityId).setHealthProportion(e.newHealthProportion);
+			}
+			else {
+				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.entityId);
+			}
+		}
+
+		public void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e) {
+			if(GUI.this.livingEntities.containsKey(e.entityId)) {
+				GUI.this.livingEntities.get(e.entityId).setHealthBarVisible(e.healthVisibility);
+			}
+			else {
+				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.entityId);
+			}
+		}
+
 		@Override
 		public void handle(ActionEvent event) {
 			Event gameEvent = GUI.this.eventQueue.poll();
@@ -469,6 +489,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					case LIVING_ENTITY_MOVE_EVENT:
 						this.moveLivingEntity((LivingEntityMoveEvent) e);
+						break;
+					case LIVING_ENTITY_HEALTH_UPDATE_EVENT:
+						updateLivingEntityHealth((LivingEntityHealthUpdateEvent) e);
+						break;
+					case LIVING_ENTITY_HEALTH_VISIBILITY_EVENT:
+						setLivingEntityHealthVisibility((LivingEntityHealthVisibilityEvent) e);
 						break;
 					}
 					break;
@@ -731,6 +757,16 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void centerOnTile(CenterOnTileEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e) {
 		this.eventQueue.add(e);
 	}
 }
