@@ -3,6 +3,7 @@ package com.github.tiwindetea.dungeonoflegend.view.entities;
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.InformationsDisplayer;
+import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
@@ -25,9 +26,6 @@ public abstract class Entity extends Parent {
 	protected Vector2i position;
 	protected boolean[][] LOS;
 
-	protected SimpleIntegerProperty XPositionProperty = new SimpleIntegerProperty();
-	protected SimpleIntegerProperty YPositionProperty = new SimpleIntegerProperty();
-
 	private String description;
 
 	/**
@@ -42,8 +40,8 @@ public abstract class Entity extends Parent {
 
 		getChildren().add(this.backgroundRectangle);
 		this.backgroundRectangle.setFill(Color.TRANSPARENT);
-		this.backgroundRectangle.translateXProperty().bind(this.XPositionProperty);
-		this.backgroundRectangle.translateYProperty().bind(this.YPositionProperty);
+		backgroundRectangle.setTranslateX(0);
+		backgroundRectangle.setTranslateY(0);
 
 		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
@@ -68,8 +66,8 @@ public abstract class Entity extends Parent {
 	 */
 	public void setPosition(Vector2i position) {
 		this.position = new Vector2i(position);
-		this.XPositionProperty.set(position.x * spriteSize.x);
-		this.YPositionProperty.set(position.y * spriteSize.y);
+		setTranslateX(position.x * ViewPackage.spritesSize.x);
+		setTranslateY(position.y * ViewPackage.spritesSize.y);
 	}
 
 	/**

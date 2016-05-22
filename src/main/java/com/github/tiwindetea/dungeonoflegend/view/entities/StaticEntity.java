@@ -28,8 +28,8 @@ public class StaticEntity extends Entity {
 		this.staticEntityType = staticEntityType;
 		this.imageView.setImage(staticEntityType.getImage());
 		this.imageView.setViewport(new Rectangle2D(staticEntityType.getSpritesPosition().x * spriteSize.x, staticEntityType.getSpritesPosition().y * spriteSize.y, spriteSize.x, spriteSize.y));
-		this.imageView.translateXProperty().bind(this.XPositionProperty);
-		this.imageView.translateYProperty().bind(this.YPositionProperty);
+		this.imageView.setTranslateX(0);
+		this.imageView.setTranslateY(0);
 
 		if(staticEntityType.getSpritesNumber() > 1) {
 			this.animate();
