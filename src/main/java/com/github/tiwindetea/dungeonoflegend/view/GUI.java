@@ -79,7 +79,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
 
-	private static final Color BOTTOM_BACKGROUND_COLOR = Color.GREEN;
+	private static final Color BOTTOM_BACKGROUND_COLOR = Color.rgb(0x2E, 0x26, 0x25);
 	private static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
@@ -561,7 +561,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		this.bHBox.getChildren().addAll(this.blTilePane, this.brMiniMapPain);
 		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
-		this.bHBox.setBackground(new Background(new BackgroundFill(Color.rgb(0x2E, 0x26, 0x25), CornerRadii.EMPTY, Insets.EMPTY)));
 
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.bPane.getChildren().add(this.bHBox);
