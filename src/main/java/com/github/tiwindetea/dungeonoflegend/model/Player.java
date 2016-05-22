@@ -756,8 +756,8 @@ public class Player extends LivingThing {
 			this.maxMana += this.manaPerLevel * levelUpping;
 			this.attackPower += this.attackPowerPerLevel * levelUpping;
 			this.defensePower += this.defensePowerPerLevel * levelUpping;
-			this.hitPoints = this.maxHitPoints * levelUpping;
-			this.mana = this.maxMana * levelUpping;
+			this.hitPoints = this.maxHitPoints;
+			this.mana = this.maxMana;
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, this.maxMana));
