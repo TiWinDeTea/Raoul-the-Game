@@ -1,10 +1,12 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
+import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -94,6 +96,7 @@ public class PlayerHUD extends Parent {
 	}
 
 	private void init() {
+		ImageView test = new ImageView(new Image(MainPackage.path + "/HUD.png"));
 		this.getChildren().add(this.backGroundRectangle);
 		this.getChildren().add(this.backgroundImage);
 

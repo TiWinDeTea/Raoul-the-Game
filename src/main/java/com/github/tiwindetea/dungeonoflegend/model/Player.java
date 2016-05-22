@@ -282,6 +282,16 @@ public class Player extends LivingThing {
 		return this.los;
 	}
 
+
+	/**
+	 * Gets the xp required to go to the next level.
+	 *
+	 * @return the xp required to go to the next level
+	 */
+	public int getMaxXp() {
+		return this.requiredXp;
+	}
+
 	/**
 	 * Sets the requested attack.
 	 *
@@ -764,8 +774,10 @@ public class Player extends LivingThing {
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, (int) this.maxMana));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.MAX, this.requiredXp));
 			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints));
 		}
+		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, this.xp));
 	}
 
 	/**
@@ -808,4 +820,5 @@ public class Player extends LivingThing {
 		this.requestedInteraction = null;
 		this.requestedPath.clear();
 	}
+
 }

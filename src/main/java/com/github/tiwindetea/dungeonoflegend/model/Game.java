@@ -252,6 +252,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					Direction.DOWN,
 					(int) player.getMaxHitPoints(),
 					(int) player.getMaxMana(),
+					player.getMaxXp(),
 					player.getDescription()
 			));
 		}
@@ -995,6 +996,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 						Direction.DOWN,
 						(int) player.getMaxHitPoints(),
 						(int) player.getMaxMana(),
+						player.getMaxXp(),
 						player.getDescription()
 				));
 			}
