@@ -53,9 +53,9 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -85,10 +85,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private static final Color RIGHT_BACKGROUND_COLOR2 = Color.DARKGRAY;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
-	private static final Vector2i BORDER_PANE_MIN_SIZE = new Vector2i(1000, 500);
+	private static final Vector2i ANCHOR_PANE_MIN_SIZE = new Vector2i(1000, 500);
 
-	private final BorderPane borderPane = new BorderPane();
-	private final Scene scene = new Scene(this.borderPane);
+	private final AnchorPane anchorPane = new AnchorPane();
+	private final Scene scene = new Scene(this.anchorPane);
 
 	private final Pane cPane = new Pane();
 
@@ -541,34 +541,40 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.scene.setOnKeyReleased(this.onKeyReleasedEventHandler);
 
 		//Main pane
-		//this.rPane.setPrefSize(Double.MAX_VALUE, Double.MAX_VALUE);
-		this.borderPane.setCenter(this.cPane);
-		this.borderPane.setRight(this.rPane);
-		this.borderPane.setBottom(this.bPane);
-		this.borderPane.setMinWidth(BORDER_PANE_MIN_SIZE.x);
-		this.borderPane.setMinHeight(BORDER_PANE_MIN_SIZE.y);
+		this.anchorPane.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.anchorPane.setMinWidth(ANCHOR_PANE_MIN_SIZE.x);
+		this.anchorPane.setMinHeight(ANCHOR_PANE_MIN_SIZE.y);
 
 		//Center pane
+		this.anchorPane.getChildren().add(this.cPane);
+		AnchorPane.setLeftAnchor(this.cPane, 0d);
+		this.cPane.prefHeightProperty().bind(this.anchorPane.heightProperty());
+		this.cPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
 		this.cPane.setBackground(new Background(new BackgroundFill(CENTER_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.cPane.getChildren().add(this.cTileMap);
 		this.cTileMap.addTileMapListener(this);
 
 		//Right pane
+		this.anchorPane.getChildren().add(this.rPane);
+		AnchorPane.setRightAnchor(this.rPane, 0d);
+		this.bPane.prefHeightProperty().bind(this.anchorPane.heightProperty());
 		this.rVBox.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR1, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rVBox.getChildren().add(this.rScoreDisplayer);
 		this.rVBox.getChildren().add(this.rIventoryPane);
 		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
-
 		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR2, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rPane.getChildren().add(this.rVBox);
 
 		//Bootom pane
+		this.anchorPane.getChildren().add(this.bPane);
+		AnchorPane.setBottomAnchor(this.bPane, 0d);
 		this.bHBox.getChildren().add(this.blTilePane);
 		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
-
-		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.bPane.getChildren().add(this.bHBox);
+		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.bPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
 		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
+		this.bPane.maxHeightProperty().bind(this.bHBox.heightProperty());
 
 		this.timeline.setCycleCount(Timeline.INDEFINITE);
 		this.timeline.play();
