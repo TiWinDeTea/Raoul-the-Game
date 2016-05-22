@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
@@ -48,6 +49,13 @@ public abstract class LivingThing implements Descriptable {
 	protected void fireStatEvent(PlayerStatEvent event) {
 		for (PlayerStatListener listener : getPlayersListeners()) {
 			listener.changePlayerStat(event);
+		}
+	}
+
+	protected void fireHealthUpdate(LivingEntityHealthUpdateEvent event) {
+
+		for (GameListener listener : getPlayersListeners()) {
+			listener.updateLivingEntityHealth(event);
 		}
 	}
 
@@ -148,8 +156,10 @@ public abstract class LivingThing implements Descriptable {
 	 * @param damages damages taken by this
 	 */
 	public void damage(int damages) {
-		if (damages > 0)
+		if (damages > 0) {
 			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
+			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
+		}
 	}
 
 	/**

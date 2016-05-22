@@ -235,7 +235,7 @@ public class Map {
                 int i;
 
             /* Cast a ray from the watcher to the tile, stopping if a block is found to be obstructed (ie : wall) */
-                i = (int) (Math.floor(distance));
+                i = (int) distance;
                 while (i > 0 && visible) {
                     currentX += xShifting;
                     currentY += yShifting;
@@ -352,16 +352,18 @@ public class Map {
         }
 
         /* How may bulbs ? */
-        int bulbs_nbr = this.random.nextInt(BULB_MAXIMUM_NBR - BULB_MINIMUM_NBR + 1) + BULB_MINIMUM_NBR;
+        int bulbsNbr = this.random.nextInt(BULB_MAXIMUM_NBR - BULB_MINIMUM_NBR + 1) + BULB_MINIMUM_NBR;
         boolean done;
 
         /* Computes possible positions for stairs and bulbs*/
-        Vector2i[] positions = new Vector2i[2 + bulbs_nbr];
+        Vector2i[] positions = new Vector2i[2 + bulbsNbr];
         for (int i = 0; i < positions.length; i++) {
             positions[i] = new Vector2i(0, 0);
         }
+        int i = 0;
+        retries = 0;
         do {
-            for (int i = 0; i < positions.length; i++) {
+            for (; i < positions.length; i++) {
                 do {
                     room = rooms.get(this.random.nextInt(rooms.size()));
                     positions[i].x = this.random.nextInt(room.bottom.x - room.top.x - 2) + room.top.x + 1;
@@ -369,12 +371,15 @@ public class Map {
                 } while (Tile.isObstructed(this.map[positions[i].x][positions[i].y]));
             }
             done = true;
-            for (int i = 1; i < positions.length; i++) {
+            for (i = 1; i < positions.length && done; i++) {
                 if (this.getPath(positions[i - 1], positions[i], true, null) == null) {
                     done = false;
                 }
             }
-        } while (!done);
+            --i;
+            System.out.println(retries + " - " + i + "bulbs");
+            ++retries;
+        } while (!done && retries < RETRIES_NBR);
 
         this.stairsDownPosition = positions[0];
         this.stairsUpPosition = positions[1];

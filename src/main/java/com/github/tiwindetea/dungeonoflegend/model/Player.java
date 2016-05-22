@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
@@ -497,6 +498,7 @@ public class Player extends LivingThing {
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
 				PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
+		super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
 	}
 
 	/**
@@ -762,6 +764,7 @@ public class Player extends LivingThing {
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, this.maxMana));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, this.mana));
+			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
 		}
 	}
 
