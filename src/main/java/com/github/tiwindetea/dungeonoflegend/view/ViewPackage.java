@@ -19,6 +19,7 @@ public class ViewPackage {
 	public final static Image mobsImage = new Image(path + "/" + spriteSheetBundle.getString("mobs.file"));
 	public static final Image iconImage = new Image(path + "/" + spriteSheetBundle.getString("icon.file"));
 	public static final Image HUDImage = new Image(path + "/" + spriteSheetBundle.getString("playerhud.file"));
+	public static final Image InventoryImage = new Image(path + "/" + spriteSheetBundle.getString("playerinventory.file"));
 
 	public static final Vector2i spritesSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.x")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.y")));
 
