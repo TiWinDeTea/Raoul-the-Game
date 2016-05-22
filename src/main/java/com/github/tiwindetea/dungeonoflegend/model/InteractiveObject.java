@@ -14,9 +14,9 @@ package com.github.tiwindetea.dungeonoflegend.model;
 public class InteractiveObject implements Descriptable {
 
 	private boolean isTrap;
-	private int manaModifier;
-	private int hpModifier;
-	private StorableObject loot;
+    private double manaModifier;
+    private double hpModifier;
+    private StorableObject loot;
     private Vector2i position;
 
     /**
@@ -47,7 +47,7 @@ public class InteractiveObject implements Descriptable {
      * @param hpModifier   the hp modifier
      * @param manaModifier the mana modifier
      */
-    public InteractiveObject(Vector2i position, int hpModifier, int manaModifier) {
+    public InteractiveObject(Vector2i position, double hpModifier, double manaModifier) {
         this.position = position;
         this.hpModifier = hpModifier;
         this.manaModifier = manaModifier;

@@ -377,7 +377,6 @@ public class Map {
                 }
             }
             --i;
-            System.out.println(retries + " - " + i + "bulbs");
             ++retries;
         } while (!done && retries < RETRIES_NBR);
 

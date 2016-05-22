@@ -26,10 +26,10 @@ public abstract class LivingThing implements Descriptable {
 
 	protected Tile[][] sight;
 	protected int level;
-	protected int maxHitPoints;
-	protected int hitPoints;
-	protected int attackPower;
-	protected int defensePower;
+	protected double maxHitPoints;
+	protected double hitPoints;
+	protected double attackPower;
+	protected double defensePower;
 	protected Vector2i position;
 	protected Vector2i requestedAttack;
 	protected String name;
@@ -96,7 +96,7 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @return the max hit points
 	 */
-	public int getMaxHitPoints() {
+	public double getMaxHitPoints() {
 		return this.maxHitPoints;
 	}
 
@@ -105,7 +105,7 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @return the hit points
 	 */
-	public int getHitPoints() {
+	public double getHitPoints() {
 		return this.hitPoints;
 	}
 
@@ -114,7 +114,7 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @return the attack power
 	 */
-	public int getAttackPower() {
+	public double getAttackPower() {
 		return this.attackPower;
 	}
 
@@ -123,7 +123,7 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @return the defense power
 	 */
-	public int getDefensePower() {
+	public double getDefensePower() {
 		return this.defensePower;
 	}
 
@@ -155,7 +155,7 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @param damages damages taken by this
 	 */
-	public void damage(int damages) {
+	public void damage(double damages) {
 		if (damages > 0) {
 			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
 			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
@@ -166,7 +166,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @return true if the LivingThing is alive, false otherwise
 	 */
 	public boolean isAlive() {
-		return (this.hitPoints > 0);
+		return (((int) this.hitPoints) > 0);
 	}
 
 	/**

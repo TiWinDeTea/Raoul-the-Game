@@ -62,7 +62,7 @@ public class Mob extends LivingThing {
 	 * @param defensePower defense power
 	 * @param position     position
 	 */
-	public Mob(String name, int level, int xpGain, int maxHitPoints, int attackPower, int defensePower, int chaseRange, Vector2i position) {
+	public Mob(String name, int level, int xpGain, double maxHitPoints, double attackPower, double defensePower, int chaseRange, Vector2i position) {
 		super();
 		this.name = name;
 		this.level = level;
@@ -287,7 +287,7 @@ public class Mob extends LivingThing {
 	}
 
 	@Override
-	public void damage(int damages) {
+	public void damage(double damages) {
 		super.damage(damages);
 		this.state = State.CHASING;
 		this.wasHit = true;
@@ -297,7 +297,7 @@ public class Mob extends LivingThing {
 	public String getDescription() {
 		if (!this.nameAsked) {
 			this.name += " (Lv" + this.level + ".)\n"
-					+ "Power grade: " + (this.attackPower * 15 + this.defensePower * 15 + this.hitPoints) / 31;
+					+ "Power grade: " + (int) (this.attackPower * 10 + this.defensePower * 10 + this.hitPoints) / 21;
 		}
 		return this.name;
 	}

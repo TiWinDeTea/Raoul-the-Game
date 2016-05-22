@@ -36,14 +36,14 @@ public class Player extends LivingThing {
 	private List<Pair<StorableObject>> inventory;
 	private static ArmorType[] equipedArmor = {HELMET, BREAST_PLATE, GLOVES, PANTS, BOOTS}; // Order of the armors in the player's amors' array
 	private int maxStorageCapacity;
-	private int maxMana;
-	private int mana;
+	private double maxMana;
+	private double mana;
 	private List<Pair<Armor>> armors; // armor of the player (equiped)
 	private Pair<Weapon> weapon; // equiped armor
-	private int hitPointsPerLevel;
-	private int manaPerLevel;
-	private int attackPowerPerLevel;
-	private int defensePowerPerLevel;
+	private double hitPointsPerLevel;
+	private double manaPerLevel;
+	private double attackPowerPerLevel;
+	private double defensePowerPerLevel;
 	private Stack<Vector2i> requestedPath = new Stack<>();
 	private Pair<StorableObject> objectToDrop;
 	private int floor;
@@ -82,8 +82,8 @@ public class Player extends LivingThing {
 	 * @param defensePowerPerLevel his defense power per level
 	 */
 	public Player(String name, int number, int los, int exploreLOS, int level, int baseRequiredXp, int requiredXpPerLevel,
-				  int floor, int maxStorageCapacity, int baseHealth, int baseMana, int baseAttack, int baseDef,
-				  int healthPerLevel, int manaPerLevel, int attackPowerPerLevel, int defensePowerPerLevel) {
+				  int floor, int maxStorageCapacity, double baseHealth, double baseMana, double baseAttack, double baseDef,
+				  double healthPerLevel, double manaPerLevel, double attackPowerPerLevel, double defensePowerPerLevel) {
 		super();
 		this.number = number;
 		this.inventory = new ArrayList<>();
@@ -224,7 +224,7 @@ public class Player extends LivingThing {
 	 *
 	 * @return the mana
 	 */
-	public int getMana() {
+	public double getMana() {
 		return this.mana;
 	}
 
@@ -233,7 +233,7 @@ public class Player extends LivingThing {
 	 *
 	 * @return the max mana
 	 */
-	public int getMaxMana() {
+	public double getMaxMana() {
 		return this.maxMana;
 	}
 
@@ -301,7 +301,7 @@ public class Player extends LivingThing {
 	@Override
 	public void attack(LivingThing target) {
 		if (target.getType() == LivingThingType.MOB) {
-			int damages = this.attackPower;
+			double damages = this.attackPower;
 			for (Pair<Armor> armorPair : this.armors) {
 				if (armorPair != null && armorPair.object != null)
 					damages += armorPair.object.getAttackPowerModifier();
@@ -412,10 +412,10 @@ public class Player extends LivingThing {
 	 * @param consumption the mana consumption
 	 * @return true if the mana was consumed, false otherwise (ie : not enough mana)
 	 */
-	public boolean useMana(int consumption) {
+	public boolean useMana(double consumption) {
 		if (this.mana >= consumption) {
 			this.mana -= consumption;
-			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, this.mana));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
 			return true;
 		}
 		return false;
@@ -479,12 +479,12 @@ public class Player extends LivingThing {
 	 *
 	 * @param mana the mana
 	 */
-	public void addMana(int mana) {
+	public void addMana(double mana) {
 		if (mana < 0)
 			throw new IllegalArgumentException("mana must be positive");
 		this.mana = Math.min(this.maxMana, mana + this.mana);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
-				PlayerStatEvent.ValueType.ACTUAL, this.mana));
+				PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
 	}
 
 	/**
@@ -492,13 +492,13 @@ public class Player extends LivingThing {
 	 *
 	 * @param hp the hp
 	 */
-	public void heal(int hp) {
+	public void heal(double hp) {
 		if (hp < 0)
 			throw new IllegalArgumentException("hp must be positive");
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
-				PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
-		super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
+				PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
+		super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints));
 	}
 
 	/**
@@ -506,7 +506,7 @@ public class Player extends LivingThing {
 	 *
 	 * @param ad the attack upgrade (or downgrade)
 	 */
-	public void increaseAttack(int ad) {
+	public void increaseAttack(double ad) {
 		this.attackPower += ad;
 	}
 
@@ -515,11 +515,11 @@ public class Player extends LivingThing {
 	 *
 	 * @param hp the hp upgrade (or downgrade)
 	 */
-	public void increaseHP(int hp) {
+	public void increaseHP(double hp) {
 		this.maxHitPoints = Math.max(hp + this.maxHitPoints, 1);
 		this.hitPoints = Math.max(hp + this.hitPoints, 1);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
-				PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
+				PlayerStatEvent.ValueType.MAX, (int) this.maxHitPoints));
 	}
 
 	/**
@@ -527,7 +527,7 @@ public class Player extends LivingThing {
 	 *
 	 * @param def the defense upgrade (or downgrade)
 	 */
-	public void increaseDefense(int def) {
+	public void increaseDefense(double def) {
 		this.defensePower += def;
 	}
 
@@ -536,11 +536,11 @@ public class Player extends LivingThing {
 	 *
 	 * @param manaModifier the mana upgrade (or downgrade)
 	 */
-	public void increaseMana(int manaModifier) {
+	public void increaseMana(double manaModifier) {
 		this.maxMana = Math.max(this.maxMana + manaModifier, 1);
 		this.mana = Math.max(this.mana + manaModifier, 1);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
-				PlayerStatEvent.ValueType.MAX, this.maxMana));
+				PlayerStatEvent.ValueType.MAX, (int) this.maxMana));
 	}
 
 	/**
@@ -582,18 +582,18 @@ public class Player extends LivingThing {
 		p.exploreLOS = Integer.parseInt(str.substring(elos, str.indexOf(',', elos)));
 		p.hasFallen = Boolean.parseBoolean(str.substring(hasFallen, str.indexOf(',', hasFallen)));
 		p.maxStorageCapacity = Integer.parseInt(str.substring(capa, str.indexOf(',', capa)));
-		p.maxHitPoints = Integer.parseInt(str.substring(mhp, str.indexOf(',', mhp)));
-		p.maxMana = Integer.parseInt(str.substring(mm, str.indexOf(',', mm)));
-		p.hitPoints = Integer.parseInt(str.substring(hp, str.indexOf(',', hp)));
-		p.mana = Integer.parseInt(str.substring(mana, str.indexOf(',', mana)));
-		p.hitPointsPerLevel = Integer.parseInt(str.substring(hppl, str.indexOf(',', hppl)));
-		p.manaPerLevel = Integer.parseInt(str.substring(mpl, str.indexOf(',', mpl)));
+		p.maxHitPoints = Double.parseDouble(str.substring(mhp, str.indexOf(',', mhp)));
+		p.maxMana = Double.parseDouble(str.substring(mm, str.indexOf(',', mm)));
+		p.hitPoints = Double.parseDouble(str.substring(hp, str.indexOf(',', hp)));
+		p.mana = Double.parseDouble(str.substring(mana, str.indexOf(',', mana)));
+		p.hitPointsPerLevel = Double.parseDouble(str.substring(hppl, str.indexOf(',', hppl)));
+		p.manaPerLevel = Double.parseDouble(str.substring(mpl, str.indexOf(',', mpl)));
 		p.level = Integer.parseInt(str.substring(level, str.indexOf(',', level)));
 		p.xp = Integer.parseInt(str.substring(xp, str.indexOf(',', xp)));
-		p.attackPower = Integer.parseInt(str.substring(ap, str.indexOf(',', ap)));
-		p.defensePower = Integer.parseInt(str.substring(dp, str.indexOf(',', dp)));
-		p.attackPowerPerLevel = Integer.parseInt(str.substring(appl, str.indexOf(',', appl)));
-		p.defensePowerPerLevel = Integer.parseInt(str.substring(adpl, str.indexOf(',', adpl)));
+		p.attackPower = Double.parseDouble(str.substring(ap, str.indexOf(',', ap)));
+		p.defensePower = Double.parseDouble(str.substring(dp, str.indexOf(',', dp)));
+		p.attackPowerPerLevel = Double.parseDouble(str.substring(appl, str.indexOf(',', appl)));
+		p.defensePowerPerLevel = Double.parseDouble(str.substring(adpl, str.indexOf(',', adpl)));
 
 		/* parsing the equipement */
 		String weapon = str.substring(str.indexOf("weapon={"));
@@ -728,9 +728,9 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void damage(int damages) {
+	public void damage(double damages) {
 		super.damage(damages);
-		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
+		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
 	}
 
 	/**
@@ -760,11 +760,11 @@ public class Player extends LivingThing {
 			this.defensePower += this.defensePowerPerLevel * levelUpping;
 			this.hitPoints = this.maxHitPoints;
 			this.mana = this.maxMana;
-			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, this.maxHitPoints));
-			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, this.hitPoints));
-			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, this.maxMana));
-			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, this.mana));
-			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, (int) this.maxHitPoints));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, (int) this.maxMana));
+			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
+			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints));
 		}
 	}
 

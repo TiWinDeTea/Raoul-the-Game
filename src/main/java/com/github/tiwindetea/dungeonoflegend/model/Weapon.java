@@ -19,9 +19,9 @@ import java.util.Random;
  */
 public class Weapon implements StorableObject {
 
-	private int attackPowerModifier;
+	private double attackPowerModifier;
 	private int range;
-	private int manaCost;
+	private double manaCost;
 	private WeaponType type;
 	String name;
 
@@ -34,7 +34,7 @@ public class Weapon implements StorableObject {
 	 * @param range               the range
 	 * @param manaCost            the mana cost
 	 */
-	public Weapon(int attackPowerModifier, int range, int manaCost) {
+	public Weapon(double attackPowerModifier, int range, double manaCost) {
 		this.attackPowerModifier = attackPowerModifier;
 		this.range = range;
 		this.manaCost = manaCost;
@@ -43,7 +43,6 @@ public class Weapon implements StorableObject {
 		/* Setting the type and the graphical type */
 		if (manaCost > 0) {
 			this.type = WeaponType.WAND;
-			this.name = "Magic wand";
 			if (random.nextBoolean())
 				this.gtype = StaticEntityType.WAND1;
 			else
@@ -51,25 +50,19 @@ public class Weapon implements StorableObject {
 		} else if (range > 1) {
 			this.type = WeaponType.BOW;
 			if (random.nextBoolean()) {
-				this.name = "Bow";
 				this.gtype = StaticEntityType.BOW1;
 			} else {
-				this.name = "Crossbow";
 				this.gtype = StaticEntityType.BOW2;
 			}
 		} else {
 			this.type = WeaponType.SWORD;
 			if (random.nextBoolean()) {
-				this.name = "Sword";
 				this.gtype = StaticEntityType.SWORD1;
 			} else {
-				this.name = "Axe";
 				this.gtype = StaticEntityType.SWORD2;
 			}
 		}
-		this.name += "\n\nAttack power: " + this.attackPowerModifier;
-		this.name += "\nRange: " + this.range;
-		this.name += "\nMana cost: " + this.manaCost;
+		this.setName();
 	}
 
 	private Weapon() {
@@ -100,9 +93,10 @@ public class Weapon implements StorableObject {
 		Weapon weapon = new Weapon();
 		weapon.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
 		weapon.type = WeaponType.parseWeaponType(str.substring(type, str.indexOf(',', type)));
-		weapon.attackPowerModifier = Integer.parseInt(str.substring(attack, str.indexOf(',', attack)));
+		weapon.attackPowerModifier = Double.parseDouble(str.substring(attack, str.indexOf(',', attack)));
 		weapon.range = Integer.parseInt(str.substring(range, str.indexOf(',', range)));
-		weapon.manaCost = Integer.parseInt(str.substring(mana, str.indexOf(',', mana)));
+		weapon.manaCost = Double.parseDouble(str.substring(mana, str.indexOf(',', mana)));
+		weapon.setName();
 		return weapon;
 	}
 
@@ -129,7 +123,7 @@ public class Weapon implements StorableObject {
 	 *
 	 * @return the attack power modifier
 	 */
-	public int getAttackPowerModifier() {
+	public double getAttackPowerModifier() {
 		return this.attackPowerModifier;
 	}
 
@@ -147,7 +141,7 @@ public class Weapon implements StorableObject {
 	 *
 	 * @return the mana cost
 	 */
-	public int getManaCost() {
+	public double getManaCost() {
 		return this.manaCost;
 	}
 
@@ -156,6 +150,33 @@ public class Weapon implements StorableObject {
 	 */
 	public StorableObjectType getType() {
 		return StorableObjectType.WEAPON;
+	}
+
+	private void setName() {
+		switch (this.gtype) {
+			case BOW1:
+				this.name = "Bow";
+				break;
+			case BOW2:
+				this.name = "Crossbow";
+				break;
+			case SWORD1:
+				this.name = "Sword";
+				break;
+			case SWORD2:
+				this.name = "Axe";
+				break;
+			case WAND1:
+				/* Falls through */
+			case WAND2:
+				this.name = "Magic wand";
+				break;
+			default:
+				break;
+		}
+		this.name += "\n\nAttack power: " + (int) this.attackPowerModifier;
+		this.name += "\nRange: " + this.range;
+		this.name += "\nMana cost: " + (int) this.manaCost;
 	}
 
 	/**

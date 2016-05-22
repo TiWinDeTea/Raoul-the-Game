@@ -19,8 +19,8 @@ import java.util.Random;
  */
 public class Armor implements StorableObject {
 
-	private int defensePowerModifier;
-	private int attackPowerModifier;
+	private double defensePowerModifier;
+	private double attackPowerModifier;
 	private ArmorType type;
 	private StaticEntityType gtype;
 	private String name;
@@ -32,7 +32,7 @@ public class Armor implements StorableObject {
 	 * @param attackPowerModifier  the attack power modifier
 	 * @param type                 the type
 	 */
-	public Armor(int defensePowerModifier, int attackPowerModifier, ArmorType type) {
+	public Armor(double defensePowerModifier, double attackPowerModifier, ArmorType type) {
 		this.defensePowerModifier = defensePowerModifier;
 		this.attackPowerModifier = attackPowerModifier;
 		this.type = type;
@@ -104,8 +104,8 @@ public class Armor implements StorableObject {
 
 		/* Parsing values */
 		Armor armor = new Armor();
-		armor.defensePowerModifier = Integer.parseInt(str.substring(def, str.indexOf(',', def)));
-		armor.attackPowerModifier = Integer.parseInt(str.substring(attack, str.indexOf(',', attack)));
+		armor.defensePowerModifier = Double.parseDouble(str.substring(def, str.indexOf(',', def)));
+		armor.attackPowerModifier = Double.parseDouble(str.substring(attack, str.indexOf(',', attack)));
 		armor.type = ArmorType.parseArmorType(str.substring(type, str.indexOf(',', type)));
 		armor.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
 		return armor;
@@ -124,7 +124,7 @@ public class Armor implements StorableObject {
 	 *
 	 * @return the defense power modifier
 	 */
-	public int getDefensePowerModifier() {
+	public double getDefensePowerModifier() {
 		return this.defensePowerModifier;
 	}
 
@@ -133,7 +133,7 @@ public class Armor implements StorableObject {
 	 *
 	 * @return the attack power modifier
 	 */
-	public int getAttackPowerModifier() {
+	public double getAttackPowerModifier() {
 		return this.attackPowerModifier;
 	}
 
@@ -175,8 +175,8 @@ public class Armor implements StorableObject {
 			while ((i = this.name.indexOf("-")) != -1) {
 				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2) + "\n";
 			}
-			this.name += "\nDefense power: " + this.defensePowerModifier;
-			this.name += "\nAttack power: " + this.attackPowerModifier;
+			this.name += "\nDefense power: " + (int) this.defensePowerModifier;
+			this.name += "\nAttack power: " + (int) this.attackPowerModifier;
 		}
 		return this.name;
 	}

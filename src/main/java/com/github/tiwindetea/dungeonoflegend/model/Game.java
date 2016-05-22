@@ -107,12 +107,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	/* Level generation variables. Charged at the creation of a game */
 	private LivingEntityType[] mobsTypes;
-	private int[] mobsBaseHP;
-	private int[] mobsBaseDef;
-	private int[] mobsBaseAttack;
-	private int[] mobsHPPerLevel;
-	private int[] mobsDefPerLevel;
-	private int[] mobsAttackPerLevel;
+	private double[] mobsBaseHP;
+	private double[] mobsBaseDef;
+	private double[] mobsBaseAttack;
+	private double[] mobsHPPerLevel;
+	private double[] mobsDefPerLevel;
+	private double[] mobsAttackPerLevel;
 	private int[] mobsChaseRange;
 	private int[] mobsBaseXpGain;
 	private int[] mobsXpGainPerLevel;
@@ -120,37 +120,37 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private String[] mobsName;
 	private int mobsLikelihoodSum;
 
-	private int[] trapsBaseHP;
-	private int[] trapsBaseMana;
-	private int[] trapsHPPerLevel;
-	private int[] trapsManaPerLevel;
+	private double[] trapsBaseHP;
+	private double[] trapsBaseMana;
+	private double[] trapsHPPerLevel;
+	private double[] trapsManaPerLevel;
 
 	private ArmorType[] lootsArmorType;
-	private int[] lootsArmorBaseDefense;
-	private int[] lootsArmorBaseAttack;
-	private int[] lootsArmorDefensePerLevel;
-	private int[] lootsArmorAttackPerLevel;
+	private double[] lootsArmorBaseDefense;
+	private double[] lootsArmorBaseAttack;
+	private double[] lootsArmorDefensePerLevel;
+	private double[] lootsArmorAttackPerLevel;
 
 	private int[] lootsWeaponRange;
-	private int[] lootsWeaponBaseAttack;
-	private int[] lootsWeaponManaCost;
-	private int[] lootsWeaponAttackPerLevel;
-	private int[] lootsWeaponManaCostPerLevel;
+	private double[] lootsWeaponBaseAttack;
+	private double[] lootsWeaponManaCost;
+	private double[] lootsWeaponAttackPerLevel;
+	private double[] lootsWeaponManaCostPerLevel;
 
 	private int[] lootsPotTurns;
-	private int[] lootsPotHeal;
-	private int[] lootsPotMana;
-	private int[] lootsPotAttackMod;
-	private int[] lootsPotDefMod;
-	private int[] lootsPotHPMod;
-	private int[] lootsPotManaMod;
-	private int[] lootsPotHealPerLevel;
-	private int[] lootsPotManaPerLevel;
+	private double[] lootsPotHeal;
+	private double[] lootsPotMana;
+	private double[] lootsPotAttackMod;
+	private double[] lootsPotDefMod;
+	private double[] lootsPotHPMod;
+	private double[] lootsPotManaMod;
+	private double[] lootsPotHealPerLevel;
+	private double[] lootsPotManaPerLevel;
 
-	private int[] lootsScrollBaseDamagePerTurn;
-	private int[] lootsScrollBaseDamageModPerTurn;
-	private int[] lootsScrollDamagePerTurnPerLevel;
-	private int[] lootsScrollDamageModPerTurnPerLevel;
+	private double[] lootsScrollBaseDamagePerTurn;
+	private double[] lootsScrollBaseDamageModPerTurn;
+	private double[] lootsScrollDamagePerTurnPerLevel;
+	private double[] lootsScrollDamageModPerTurnPerLevel;
 	private int[] lootsScrollTurns;
 
 	private int bulbXp;
@@ -199,14 +199,14 @@ public class Game implements RequestListener, Runnable, Stopable {
 					Integer.parseInt(playersBundle.getString(pString + "leveling-xp-per-level")),
 					1,
 					Integer.parseInt(playersBundle.getString(pString + "maxStorageCapacity")),
-					Integer.parseInt(playersBundle.getString(pString + "baseHealth")),
-					Integer.parseInt(playersBundle.getString(pString + "baseMana")),
-					Integer.parseInt(playersBundle.getString(pString + "baseAttack")),
-					Integer.parseInt(playersBundle.getString(pString + "baseDef")),
-					Integer.parseInt(playersBundle.getString(pString + "healthPerLevel")),
-					Integer.parseInt(playersBundle.getString(pString + "manaPerLevel")),
-					Integer.parseInt(playersBundle.getString(pString + "attackPerLevel")),
-					Integer.parseInt(playersBundle.getString(pString + "defensePerLevel"))
+					Double.parseDouble(playersBundle.getString(pString + "baseHealth")),
+					Double.parseDouble(playersBundle.getString(pString + "baseMana")),
+					Double.parseDouble(playersBundle.getString(pString + "baseAttack")),
+					Double.parseDouble(playersBundle.getString(pString + "baseDef")),
+					Double.parseDouble(playersBundle.getString(pString + "healthPerLevel")),
+					Double.parseDouble(playersBundle.getString(pString + "manaPerLevel")),
+					Double.parseDouble(playersBundle.getString(pString + "attackPerLevel")),
+					Double.parseDouble(playersBundle.getString(pString + "defensePerLevel"))
 			));
 		}
 		this.initNew(players, new Seed(), 1);
@@ -240,8 +240,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 					player.getId(),
 					new Vector2i(0, 0),
 					Direction.DOWN,
-					player.getMaxHitPoints(),
-					player.getMaxMana(),
+					(int) player.getMaxHitPoints(),
+					(int) player.getMaxMana(),
 					player.getDescription()
 			));
 		}
@@ -262,12 +262,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 		int mobQtt = Integer.parseInt(mobs.getString("mobs.qtt"));
 		this.mobsName = new String[mobQtt];
 		this.mobsTypes = new LivingEntityType[mobQtt];
-		this.mobsBaseHP = new int[mobQtt];
-		this.mobsBaseDef = new int[mobQtt];
-		this.mobsBaseAttack = new int[mobQtt];
-		this.mobsHPPerLevel = new int[mobQtt];
-		this.mobsDefPerLevel = new int[mobQtt];
-		this.mobsAttackPerLevel = new int[mobQtt];
+		this.mobsBaseHP = new double[mobQtt];
+		this.mobsBaseDef = new double[mobQtt];
+		this.mobsBaseAttack = new double[mobQtt];
+		this.mobsHPPerLevel = new double[mobQtt];
+		this.mobsDefPerLevel = new double[mobQtt];
+		this.mobsAttackPerLevel = new double[mobQtt];
 		this.mobsChaseRange = new int[mobQtt];
 		this.mobsBaseXpGain = new int[mobQtt];
 		this.mobsXpGainPerLevel = new int[mobQtt];
@@ -276,12 +276,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 			String mobName = "mob" + i + ".";
 			this.mobsTypes[i] = LivingEntityType.parseLivingEntity(mobs.getString(mobName + "type"));
 			this.mobsName[i] = mobs.getString(mobName + "name");
-			this.mobsBaseHP[i] = Integer.parseInt(mobs.getString(mobName + "base-hp"));
-			this.mobsBaseDef[i] = Integer.parseInt(mobs.getString(mobName + "base-def"));
-			this.mobsBaseAttack[i] = Integer.parseInt(mobs.getString(mobName + "base-attack"));
-			this.mobsHPPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "defense-per-level"));
-			this.mobsDefPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "attack-per-level"));
-			this.mobsAttackPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "hp-per-level"));
+			this.mobsBaseHP[i] = Double.parseDouble(mobs.getString(mobName + "base-hp"));
+			this.mobsBaseDef[i] = Double.parseDouble(mobs.getString(mobName + "base-def"));
+			this.mobsBaseAttack[i] = Double.parseDouble(mobs.getString(mobName + "base-attack"));
+			this.mobsHPPerLevel[i] = Double.parseDouble(mobs.getString(mobName + "defense-per-level"));
+			this.mobsDefPerLevel[i] = Double.parseDouble(mobs.getString(mobName + "attack-per-level"));
+			this.mobsAttackPerLevel[i] = Double.parseDouble(mobs.getString(mobName + "hp-per-level"));
 			this.mobsChaseRange[i] = Integer.parseInt(mobs.getString(mobName + "chase-range"));
 			this.mobsBaseXpGain[i] = Integer.parseInt(mobs.getString(mobName + "base-xp-gain"));
 			this.mobsXpGainPerLevel[i] = Integer.parseInt(mobs.getString(mobName + "xp-gain-per-level"));
@@ -295,69 +295,69 @@ public class Game implements RequestListener, Runnable, Stopable {
 		ResourceBundle loots = ResourceBundle.getBundle(MainPackage.name + ".Chests");
 		int armorQtt = Integer.parseInt(loots.getString("armors.qtt"));
 		this.lootsArmorType = new ArmorType[armorQtt];
-		this.lootsArmorBaseDefense = new int[armorQtt];
-		this.lootsArmorBaseAttack = new int[armorQtt];
-		this.lootsArmorDefensePerLevel = new int[armorQtt];
-		this.lootsArmorAttackPerLevel = new int[armorQtt];
+		this.lootsArmorBaseDefense = new double[armorQtt];
+		this.lootsArmorBaseAttack = new double[armorQtt];
+		this.lootsArmorDefensePerLevel = new double[armorQtt];
+		this.lootsArmorAttackPerLevel = new double[armorQtt];
 		for (int i = 0; i < armorQtt; i++) {
 			String armorName = "armor" + i + ".";
 			this.lootsArmorType[i] = ArmorType.parseArmorType(loots.getString(armorName + "type"));
-			this.lootsArmorBaseDefense[i] = Integer.parseInt(loots.getString(armorName + "base-defense"));
-			this.lootsArmorBaseAttack[i] = Integer.parseInt(loots.getString(armorName + "base-attack"));
-			this.lootsArmorDefensePerLevel[i] = Integer.parseInt(loots.getString(armorName + "defense-per-level"));
-			this.lootsArmorAttackPerLevel[i] = Integer.parseInt(loots.getString(armorName + "attack-per-level"));
+			this.lootsArmorBaseDefense[i] = Double.parseDouble(loots.getString(armorName + "base-defense"));
+			this.lootsArmorBaseAttack[i] = Double.parseDouble(loots.getString(armorName + "base-attack"));
+			this.lootsArmorDefensePerLevel[i] = Double.parseDouble(loots.getString(armorName + "defense-per-level"));
+			this.lootsArmorAttackPerLevel[i] = Double.parseDouble(loots.getString(armorName + "attack-per-level"));
 		}
 
 		int weaponQtt = Integer.parseInt(loots.getString("weapons.qtt"));
 		this.lootsWeaponRange = new int[weaponQtt];
-		this.lootsWeaponBaseAttack = new int[weaponQtt];
-		this.lootsWeaponManaCost = new int[weaponQtt];
-		this.lootsWeaponAttackPerLevel = new int[weaponQtt];
-		this.lootsWeaponManaCostPerLevel = new int[weaponQtt];
+		this.lootsWeaponBaseAttack = new double[weaponQtt];
+		this.lootsWeaponManaCost = new double[weaponQtt];
+		this.lootsWeaponAttackPerLevel = new double[weaponQtt];
+		this.lootsWeaponManaCostPerLevel = new double[weaponQtt];
 		for (int i = 0; i < weaponQtt; i++) {
 			String weaponName = "weapon" + i + ".";
 			this.lootsWeaponRange[i] = Integer.parseInt(loots.getString(weaponName + "range"));
-			this.lootsWeaponBaseAttack[i] = Integer.parseInt(loots.getString(weaponName + "base-attack"));
-			this.lootsWeaponManaCost[i] = Integer.parseInt(loots.getString(weaponName + "mana-cost"));
-			this.lootsWeaponAttackPerLevel[i] = Integer.parseInt(loots.getString(weaponName + "attack-per-level"));
-			this.lootsWeaponManaCostPerLevel[i] = Integer.parseInt(loots.getString(weaponName + "mana-cost-per-level"));
+			this.lootsWeaponBaseAttack[i] = Double.parseDouble(loots.getString(weaponName + "base-attack"));
+			this.lootsWeaponManaCost[i] = Double.parseDouble(loots.getString(weaponName + "mana-cost"));
+			this.lootsWeaponAttackPerLevel[i] = Double.parseDouble(loots.getString(weaponName + "attack-per-level"));
+			this.lootsWeaponManaCostPerLevel[i] = Double.parseDouble(loots.getString(weaponName + "mana-cost-per-level"));
 		}
 
 		int potQtt = Integer.parseInt(loots.getString("pots.qtt"));
 		this.lootsPotTurns = new int[potQtt];
-		this.lootsPotHeal = new int[potQtt];
-		this.lootsPotMana = new int[potQtt];
-		this.lootsPotAttackMod = new int[potQtt];
-		this.lootsPotDefMod = new int[potQtt];
-		this.lootsPotHPMod = new int[potQtt];
-		this.lootsPotManaMod = new int[potQtt];
-		this.lootsPotHealPerLevel = new int[potQtt];
-		this.lootsPotManaPerLevel = new int[potQtt];
+		this.lootsPotHeal = new double[potQtt];
+		this.lootsPotMana = new double[potQtt];
+		this.lootsPotAttackMod = new double[potQtt];
+		this.lootsPotDefMod = new double[potQtt];
+		this.lootsPotHPMod = new double[potQtt];
+		this.lootsPotManaMod = new double[potQtt];
+		this.lootsPotHealPerLevel = new double[potQtt];
+		this.lootsPotManaPerLevel = new double[potQtt];
 		for (int i = 0; i < potQtt; i++) {
 			String potName = "pot" + i + ".";
 			this.lootsPotTurns[i] = Integer.parseInt(loots.getString(potName + "turns"));
-			this.lootsPotHeal[i] = Integer.parseInt(loots.getString(potName + "base-hp"));
-			this.lootsPotMana[i] = Integer.parseInt(loots.getString(potName + "base-mana"));
-			this.lootsPotAttackMod[i] = Integer.parseInt(loots.getString(potName + "attack-mod"));
-			this.lootsPotDefMod[i] = Integer.parseInt(loots.getString(potName + "def-mod"));
-			this.lootsPotHPMod[i] = Integer.parseInt(loots.getString(potName + "hp-mod"));
-			this.lootsPotManaMod[i] = Integer.parseInt(loots.getString(potName + "mana-mod"));
-			this.lootsPotHealPerLevel[i] = Integer.parseInt(loots.getString(potName + "hp-per-level"));
-			this.lootsPotManaPerLevel[i] = Integer.parseInt(loots.getString(potName + "mana-per-level"));
+			this.lootsPotHeal[i] = Double.parseDouble(loots.getString(potName + "base-hp"));
+			this.lootsPotMana[i] = Double.parseDouble(loots.getString(potName + "base-mana"));
+			this.lootsPotAttackMod[i] = Double.parseDouble(loots.getString(potName + "attack-mod"));
+			this.lootsPotDefMod[i] = Double.parseDouble(loots.getString(potName + "def-mod"));
+			this.lootsPotHPMod[i] = Double.parseDouble(loots.getString(potName + "hp-mod"));
+			this.lootsPotManaMod[i] = Double.parseDouble(loots.getString(potName + "mana-mod"));
+			this.lootsPotHealPerLevel[i] = Double.parseDouble(loots.getString(potName + "hp-per-level"));
+			this.lootsPotManaPerLevel[i] = Double.parseDouble(loots.getString(potName + "mana-per-level"));
 		}
 
 		int scrollQtt = Integer.parseInt(loots.getString("scrolls.qtt"));
-		this.lootsScrollBaseDamagePerTurn = new int[scrollQtt];
-		this.lootsScrollBaseDamageModPerTurn = new int[scrollQtt];
-		this.lootsScrollDamagePerTurnPerLevel = new int[scrollQtt];
-		this.lootsScrollDamageModPerTurnPerLevel = new int[scrollQtt];
+		this.lootsScrollBaseDamagePerTurn = new double[scrollQtt];
+		this.lootsScrollBaseDamageModPerTurn = new double[scrollQtt];
+		this.lootsScrollDamagePerTurnPerLevel = new double[scrollQtt];
+		this.lootsScrollDamageModPerTurnPerLevel = new double[scrollQtt];
 		this.lootsScrollTurns = new int[scrollQtt];
 		for (int i = 0; i < scrollQtt; i++) {
 			String scrollName = "scroll" + i + ".";
-			this.lootsScrollBaseDamagePerTurn[i] = Integer.parseInt(loots.getString(scrollName + "base-damage-per-turn"));
-			this.lootsScrollBaseDamageModPerTurn[i] = Integer.parseInt(loots.getString(scrollName + "base-damage-mod-per-turn"));
-			this.lootsScrollDamagePerTurnPerLevel[i] = Integer.parseInt(loots.getString(scrollName + "damage-per-turn-per-level"));
-			this.lootsScrollDamageModPerTurnPerLevel[i] = Integer.parseInt(loots.getString(scrollName + "damage-mod-per-turn-per-level"));
+			this.lootsScrollBaseDamagePerTurn[i] = Double.parseDouble(loots.getString(scrollName + "base-damage-per-turn"));
+			this.lootsScrollBaseDamageModPerTurn[i] = Double.parseDouble(loots.getString(scrollName + "base-damage-mod-per-turn"));
+			this.lootsScrollDamagePerTurnPerLevel[i] = Double.parseDouble(loots.getString(scrollName + "damage-per-turn-per-level"));
+			this.lootsScrollDamageModPerTurnPerLevel[i] = Double.parseDouble(loots.getString(scrollName + "damage-mod-per-turn-per-level"));
 			this.lootsScrollTurns[i] = Integer.parseInt(loots.getString(scrollName + "turns"));
 		}
 	}
@@ -366,16 +366,16 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Loads the possible traps from the .properties */
 		ResourceBundle traps = ResourceBundle.getBundle(MainPackage.name + ".Traps", Locale.getDefault());
 		int trapsQtt = Integer.parseInt(traps.getString("traps.qtt"));
-		this.trapsBaseHP = new int[trapsQtt];
-		this.trapsBaseMana = new int[trapsQtt];
-		this.trapsHPPerLevel = new int[trapsQtt];
-		this.trapsManaPerLevel = new int[trapsQtt];
+		this.trapsBaseHP = new double[trapsQtt];
+		this.trapsBaseMana = new double[trapsQtt];
+		this.trapsHPPerLevel = new double[trapsQtt];
+		this.trapsManaPerLevel = new double[trapsQtt];
 		for (int i = 0; i < trapsQtt; i++) {
 			String trapName = "trap" + i + ".";
-			this.trapsBaseHP[i] = Integer.parseInt(traps.getString(trapName + "base-hp"));
-			this.trapsBaseMana[i] = Integer.parseInt(traps.getString(trapName + "base-mana"));
-			this.trapsHPPerLevel[i] = Integer.parseInt(traps.getString(trapName + "hp-per-level"));
-			this.trapsManaPerLevel[i] = Integer.parseInt(traps.getString(trapName + "mana-per-level"));
+			this.trapsBaseHP[i] = Double.parseDouble(traps.getString(trapName + "base-hp"));
+			this.trapsBaseMana[i] = Double.parseDouble(traps.getString(trapName + "base-mana"));
+			this.trapsHPPerLevel[i] = Double.parseDouble(traps.getString(trapName + "hp-per-level"));
+			this.trapsManaPerLevel[i] = Double.parseDouble(traps.getString(trapName + "mana-per-level"));
 		}
 	}
 
@@ -967,8 +967,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 						player.getId(),
 						new Vector2i(0, 0),
 						Direction.DOWN,
-						player.getMaxHitPoints(),
-						player.getMaxMana(),
+						(int) player.getMaxHitPoints(),
+						(int) player.getMaxMana(),
 						player.getDescription()
 				));
 			}

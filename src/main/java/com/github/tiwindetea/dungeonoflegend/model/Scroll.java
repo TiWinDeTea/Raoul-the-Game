@@ -20,8 +20,8 @@ import java.util.Random;
 public class Scroll implements Consumable {
 
 	private int turns;
-	private int healthModifierPerTick;
-	private int healthModifierModifierPerTick;
+	private double healthModifierPerTick;
+	private double healthModifierModifierPerTick;
 	private LivingThing target;
 	private StaticEntityType gtype;
 	private String name;
@@ -33,7 +33,7 @@ public class Scroll implements Consumable {
 	 * @param healthModifierPerTick         the health modifier per tick
 	 * @param healthModifierModifierPerTick the health modifier modifier per tick
 	 */
-	public Scroll(int turns, int healthModifierPerTick, int healthModifierModifierPerTick) {
+	public Scroll(int turns, double healthModifierPerTick, double healthModifierModifierPerTick) {
 		this.turns = turns;
 		this.healthModifierPerTick = healthModifierPerTick;
 		this.healthModifierModifierPerTick = healthModifierModifierPerTick;
@@ -73,8 +73,8 @@ public class Scroll implements Consumable {
 		Scroll scroll = new Scroll();
 		scroll.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(",", SEType)));
 		scroll.turns = Integer.parseInt(str.substring(turns, str.indexOf(",", turns)));
-		scroll.healthModifierPerTick = Integer.parseInt(str.substring(hmpt, str.indexOf(",", hmpt)));
-		scroll.healthModifierModifierPerTick = Integer.parseInt(str.substring(hmmpt, str.indexOf(",", hmmpt)));
+		scroll.healthModifierPerTick = Double.parseDouble(str.substring(hmpt, str.indexOf(",", hmpt)));
+		scroll.healthModifierModifierPerTick = Double.parseDouble(str.substring(hmmpt, str.indexOf(",", hmmpt)));
 		return scroll;
 	}
 
@@ -147,12 +147,12 @@ public class Scroll implements Consumable {
 				this.name = this.name.substring(0, i) + " " + this.name.substring(i + 1, i + 2).toUpperCase() + this.name.substring(i + 2);
 			}
 
-			this.name += "\n\nDamage per turn: " + this.healthModifierPerTick;
+			this.name += "\n\nDamage per turn: " + (int) this.healthModifierPerTick;
 			if (this.healthModifierModifierPerTick != 0) {
-				this.name += "\nDamage modifier: " + this.healthModifierModifierPerTick;
+				this.name += "\nDamage modifier: " + (int) this.healthModifierModifierPerTick;
 			}
 			if (this.turns != 0) {
-				this.name += "\nEffect duration: " + this.turns;
+				this.name += "\nEffect duration: " + (int) this.turns;
 			}
 		}
 		return this.name;

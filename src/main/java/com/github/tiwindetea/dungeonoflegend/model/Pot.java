@@ -18,12 +18,12 @@ import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 public class Pot implements Consumable {
 
 	private int turns;
-	private int heal;
-	private int defensePowerModifier;
-	private int attackPowerModifier;
-	private int mana_heal;
-	private int healthModifier;
-	private int manaModifier;
+	private double heal;
+	private double defensePowerModifier;
+	private double attackPowerModifier;
+	private double mana_heal;
+	private double healthModifier;
+	private double manaModifier;
 	private String name;
 	private Player target;
 	private StaticEntityType gtype;
@@ -39,8 +39,8 @@ public class Pot implements Consumable {
 	 * @param healthModifier       the health modifier
 	 * @param manaModifier         the mana modifier
 	 */
-	public Pot(int turns, int heal, int mana_heal, int defensePowerModifier, int attackPowerModifier,
-			   int healthModifier, int manaModifier) {
+	public Pot(int turns, double heal, double mana_heal, double defensePowerModifier, double attackPowerModifier,
+			   double healthModifier, double manaModifier) {
 		this.turns = turns;
 		this.heal = heal;
 		this.mana_heal = mana_heal;
@@ -89,12 +89,12 @@ public class Pot implements Consumable {
 		Pot pot = new Pot();
 		pot.gtype = StaticEntityType.parseStaticEntityType(str.substring(SEType, str.indexOf(',', SEType)));
 		pot.turns = Integer.parseInt(str.substring(turns, str.indexOf(',', turns)));
-		pot.heal = Integer.parseInt(str.substring(heal, str.indexOf(',', heal)));
-		pot.defensePowerModifier = Integer.parseInt(str.substring(defenseMod, str.indexOf(',', defenseMod)));
-		pot.attackPowerModifier = Integer.parseInt(str.substring(attackMod, str.indexOf(',', attackMod)));
-		pot.mana_heal = Integer.parseInt(str.substring(mana, str.indexOf(',', mana)));
-		pot.healthModifier = Integer.parseInt(str.substring(healthMod, str.indexOf(',', healthMod)));
-		pot.manaModifier = Integer.parseInt(str.substring(manaMod, str.indexOf(',', manaMod)));
+		pot.heal = Double.parseDouble(str.substring(heal, str.indexOf(',', heal)));
+		pot.defensePowerModifier = Double.parseDouble(str.substring(defenseMod, str.indexOf(',', defenseMod)));
+		pot.attackPowerModifier = Double.parseDouble(str.substring(attackMod, str.indexOf(',', attackMod)));
+		pot.mana_heal = Double.parseDouble(str.substring(mana, str.indexOf(',', mana)));
+		pot.healthModifier = Double.parseDouble(str.substring(healthMod, str.indexOf(',', healthMod)));
+		pot.manaModifier = Double.parseDouble(str.substring(manaMod, str.indexOf(',', manaMod)));
 		return pot;
 	}
 
@@ -210,15 +210,15 @@ public class Pot implements Consumable {
 			boolean effects = false;
 			this.name += "\n\nHealing effects:";
 			if (this.heal != 0) {
-				this.name += "\nHeal: " + this.heal;
+				this.name += "\nHeal: " + (int) this.heal;
 				effects = true;
 			}
 			if (this.mana_heal != 0) {
-				this.name += "\nMana: " + this.mana_heal;
+				this.name += "\nMana: " + (int) this.mana_heal;
 				effects = true;
 			}
 			if (this.turns != 0) {
-				this.name += "\nHeals duration: " + this.turns;
+				this.name += "\nHeals duration: " + (int) this.turns;
 				effects = true;
 			}
 			if (!effects) {
@@ -228,15 +228,15 @@ public class Pot implements Consumable {
 			this.name += "\n\nPermanent effects:";
 			effects = false;
 			if (this.defensePowerModifier != 0) {
-				this.name += "\nDefense bonus: " + this.defensePowerModifier;
+				this.name += "\nDefense bonus: " + (int) this.defensePowerModifier;
 				effects = true;
 			}
 			if (this.attackPowerModifier != 0) {
-				this.name += "\nAttack bonus: " + this.attackPowerModifier;
+				this.name += "\nAttack bonus: " + (int) this.attackPowerModifier;
 				effects = true;
 			}
 			if (this.healthModifier != 0) {
-				this.name += "\nBonus health: " + this.healthModifier;
+				this.name += "\nBonus health: " + (int) this.healthModifier;
 				effects = true;
 			}
 			if (!effects) {
