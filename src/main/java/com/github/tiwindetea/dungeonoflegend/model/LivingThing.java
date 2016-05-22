@@ -241,7 +241,6 @@ public abstract class LivingThing implements Descriptable {
 	}
 
 	public String getDescription() {
-		System.out.println("name = " + this.name);
 		return this.name;
 	}
 }

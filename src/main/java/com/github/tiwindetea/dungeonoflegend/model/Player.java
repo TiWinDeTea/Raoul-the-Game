@@ -9,6 +9,7 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
@@ -134,6 +135,18 @@ public class Player extends LivingThing {
 	private void fireInventoryDeletionEvent(InventoryDeletionEvent event) {
 		for (GameListener listener : this.getPlayersListeners()) {
 			listener.deleteInventory(event);
+		}
+	}
+
+	private static void firePlayerStatEvent(PlayerStatEvent event) {
+		for (GameListener listener : getPlayersListeners()) {
+			listener.changePlayerStat(event);
+		}
+	}
+
+	private static void firePlayerCreationEvent(PlayerCreationEvent playerCreationEvent) {
+		for (GameListener listener : getPlayersListeners()) {
+			listener.createPlayer(playerCreationEvent);
 		}
 	}
 
@@ -579,7 +592,9 @@ public class Player extends LivingThing {
 		int mpl = str.indexOf("manaPerLevel=", hppl) + 13;
 		int level = str.indexOf("level=", mpl) + 6;
 		int xp = str.indexOf("xp=", level) + 3;
-		int ap = str.indexOf("attackPower=", xp) + 12;
+		int rqxp = str.indexOf("requiredXp=", xp) + 11;
+		int rqxppl = str.indexOf("requiredXpPerLevel", rqxp) + 19;
+		int ap = str.indexOf("attackPower=", rqxppl) + 12;
 		int dp = str.indexOf("defensePower=", ap) + 13;
 		int appl = str.indexOf("attackPowerPerLevel=", dp) + 20;
 		int adpl = str.indexOf("defensePowerPerLevel=", appl) + 21;
@@ -600,15 +615,35 @@ public class Player extends LivingThing {
 		p.manaPerLevel = Double.parseDouble(str.substring(mpl, str.indexOf(',', mpl)));
 		p.level = Integer.parseInt(str.substring(level, str.indexOf(',', level)));
 		p.xp = Integer.parseInt(str.substring(xp, str.indexOf(',', xp)));
+		p.requiredXp = Integer.parseInt(str.substring(rqxp, str.indexOf(",", rqxp)));
+		p.requiredXpPerLevel = Integer.parseInt(str.substring(rqxppl, str.indexOf(",", rqxppl)));
 		p.attackPower = Double.parseDouble(str.substring(ap, str.indexOf(',', ap)));
 		p.defensePower = Double.parseDouble(str.substring(dp, str.indexOf(',', dp)));
 		p.attackPowerPerLevel = Double.parseDouble(str.substring(appl, str.indexOf(',', appl)));
 		p.defensePowerPerLevel = Double.parseDouble(str.substring(adpl, str.indexOf(',', adpl)));
 
+
+		firePlayerCreationEvent(new PlayerCreationEvent(
+				p.number,
+				p.id,
+				new Vector2i(0, 0),
+				Direction.DOWN,
+				(int) p.maxHitPoints,
+				(int) p.maxMana,
+				p.requiredXp,
+				p.getDescription()
+		));
+
+		firePlayerStatEvent(new PlayerStatEvent(p.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, p.xp));
+
+
 		/* parsing the equipement */
 		String weapon = str.substring(str.indexOf("weapon={"));
 		weapon = weapon.substring(0, weapon.indexOf('}') + 1);
-		p.weapon = new Pair<>(Weapon.parseWeapon(weapon));
+		Weapon weaponParsed = Weapon.parseWeapon(weapon);
+		if (weaponParsed != null) {
+			p.equipWithWeapon(new Pair<>(weaponParsed));
+		}
 
 		ArmorType[] armorTypes = {
 				BREAST_PLATE,
@@ -622,27 +657,30 @@ public class Player extends LivingThing {
 		for (int i = 0; i < armorTypes.length; i++) {
 			armorIndex = str.indexOf("armor={", armorIndex + 1);
 			String armor = str.substring(armorIndex, str.indexOf('}', armorIndex) + 1);
-			p.armors.set(i, new Pair<>(Armor.parseArmor(armor)));
+			Armor armorParsed = Armor.parseArmor(armor);
+			if (armorParsed != null) {
+				p.equipWithArmor(new Pair<>(Armor.parseArmor(armor)));
+			}
 		}
 
 		/* Parsing for the inventory */
-		str = "," + str.substring(str.indexOf("inventory={") + 11);
+		str = "," + str.substring(str.indexOf("inventory=") + 11);
 		String item;
 		while (!str.equals(",},}")) {
 			item = str.substring(str.indexOf(',') + 1, str.indexOf('}') + 1);
 			str = str.substring(str.indexOf("}") + 1);
 			switch (item.substring(0, item.indexOf('='))) {
 				case "weapon":
-					p.inventory.add(new Pair<>(Weapon.parseWeapon(item)));
+					p.addToInventory(new Pair<>(Weapon.parseWeapon(item)));
 					break;
 				case "armor":
-					p.inventory.add(new Pair<>(Armor.parseArmor(item)));
+					p.addToInventory(new Pair<>(Armor.parseArmor(item)));
 					break;
 				case "pot":
-					p.inventory.add(new Pair<>(Pot.parsePot(item)));
+					p.addToInventory(new Pair<>(Pot.parsePot(item)));
 					break;
 				case "scroll":
-					p.inventory.add(new Pair<>(Scroll.parseScroll(item)));
+					p.addToInventory(new Pair<>(Scroll.parseScroll(item)));
 					break;
 				default:
 					System.out.println("Unexpected item when parsing the inventory of " + p.name);
@@ -665,16 +703,18 @@ public class Player extends LivingThing {
 				+ ",elos=" + this.exploreLOS
 				+ ",hasFallen=" + this.hasFallen
 				+ ",capacity=" + this.maxStorageCapacity
-				+ ",maxHitPoints=" + this.maxHitPoints
-				+ ",maxMana=" + this.maxMana
-				+ ",hitPoints=" + this.hitPoints
-				+ ",mana=" + this.mana
+				+ ",maxHitPoints=" + Math.round(100 * this.maxHitPoints) / 100
+				+ ",maxMana=" + Math.round(100 * this.maxMana) / 100
+				+ ",hitPoints=" + Math.round(100 * this.hitPoints) / 100
+				+ ",mana=" + Math.round(100 * this.mana) / 100
 				+ ",hitPointsPerLevel=" + this.hitPointsPerLevel
 				+ ",manaPerLevel=" + this.manaPerLevel
 				+ ",level=" + this.level
 				+ ",xp=" + this.xp
-				+ ",attackPower=" + this.attackPower
-				+ ",defensePower=" + this.defensePower
+				+ ",requiredXp=" + this.requiredXp
+				+ ",requiredXpPerLevel=" + this.requiredXpPerLevel
+				+ ",attackPower=" + Math.round(100 * this.attackPower) / 100
+				+ ",defensePower=" + Math.round(100 * this.defensePower) / 100
 				+ ",attackPowerPerLevel=" + this.attackPowerPerLevel
 				+ ",defensePowerPerLevel=" + this.defensePowerPerLevel;
 

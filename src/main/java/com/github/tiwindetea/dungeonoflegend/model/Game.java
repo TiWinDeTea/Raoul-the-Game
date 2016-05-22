@@ -11,6 +11,7 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
@@ -162,7 +163,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private int lootsScrollLikelihoodSum;
 
 	private int lootsLikelihoodSum;
-
+	private int globalScore;
 	private int bulbXp;
 	private int bulbXpGainPerLevel;
 
@@ -260,10 +261,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Player player : players) {
 			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
+			player.addToInventory(new Pair<>(new Weapon(1, 1, 1)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
 		this.generateLevel();
+		this.globalScore = 0;
 	}
 
 	private void loadMobs() {
@@ -449,6 +452,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void fireLivingEntityLOSModificationEvent(LivingEntityLOSModificationEvent event) {
 		for (GameListener listener : this.getGameListeners()) {
 			listener.modifieLivingEntityLOS(event);
+		}
+	}
+
+	private void fireScoreUpdateEvent(ScoreUpdateEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.updateScore(event);
 		}
 	}
 
@@ -940,6 +949,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 					this.bulbsOn.remove(i);
 					player.heal(2 * player.getMaxHitPoints() / 3);
 					player.xp(this.bulbXp + this.bulbXpGainPerLevel * this.level);
+					++this.globalScore;
+					fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
 				}
 			}
 
@@ -972,15 +983,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	public void loadSave() {
 		try {
-			Scanner file = new Scanner(new FileInputStream(this.gameName));
-			this.seed = Seed.parseSeed(file.nextLine());
-			String lvl = file.nextLine();
-			this.level = Integer.parseInt(lvl.substring(lvl.indexOf('=') + 1));
-			this.players.clear();
-			while (file.hasNext()) {
-				this.players.add(Player.parsePlayer(file.nextLine()));
-			}
-			file.close();
 			Tile[][] tiles = new Tile[1][1];
 			for (int i = 0; i < tiles.length; i++) {
 				for (int j = 0; j < tiles[i].length; j++) {
@@ -988,25 +990,23 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 			fireMapCreationEvent(new MapCreationEvent(tiles));
-			for (Player player : this.players) {
-				firePlayerCreationEvent(new PlayerCreationEvent(
-						player.getNumber(),
-						player.getId(),
-						new Vector2i(0, 0),
-						Direction.DOWN,
-						(int) player.getMaxHitPoints(),
-						(int) player.getMaxMana(),
-						player.getMaxXp(),
-						player.getDescription()
-				));
-			}
 
-			for (Player player : this.players) {
-				player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
-				player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
+			Scanner file = new Scanner(new FileInputStream(this.gameName));
+			this.seed = Seed.parseSeed(file.nextLine());
+			this.world = new Map(this.seed);
+			String str = file.nextLine();
+			this.level = Integer.parseInt(str.substring(str.indexOf('=') + 1));
+			str = file.nextLine();
+			this.globalScore = Integer.parseInt(str.substring(str.indexOf('=') + 1));
+			this.players.clear();
+			while (file.hasNext()) {
+				this.players.add(Player.parsePlayer(file.nextLine()));
+				this.players.get(this.players.size() - 1).setFloor(this.level);
 			}
+			file.close();
 			this.currentPlayer = this.players.get(0);
 			fireNextTickEvent(new PlayerNextTickEvent(0));
+			fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
 			this.generateLevel();
 		} catch (FileNotFoundException e) {
 			System.out.println("Failed to open the save file");
@@ -1020,7 +1020,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			FileWriter file = new FileWriter(new File(this.gameName));
 			file.write(this.seed.toString() + "\n");
 			file.write("level=" + this.level + "\n");
-			for (Player player : this.players) {
+			file.write("score=" + this.globalScore + "\n");
+			for (Player player : this.playersOnNextLevel) {
 				file.write(player.toString() + "\n");
 			}
 			file.close();

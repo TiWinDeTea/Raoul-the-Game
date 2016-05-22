@@ -171,7 +171,7 @@ public class Mob extends LivingThing {
 			if (distanceToPlayer < los.length / 2) {
 				if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
 					int dist = this.distanceTo(pos, shadow);
-					if (distance > dist) {
+					if (distance >= dist) {
 						chasedPlayer = player;
 						distance = dist;
 					}
