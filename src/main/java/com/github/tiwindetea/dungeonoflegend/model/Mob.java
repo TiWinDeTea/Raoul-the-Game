@@ -21,6 +21,9 @@ import java.util.Stack;
  * @author Lucas LAZARE
  */
 public class Mob extends LivingThing {
+
+	private final int ON_DAMAGE_CHASE_RANGE_BONUS = 100;
+
 	// Mobs know the map perfectly.
 	private static Map map;
 	private State state = State.SLEEPING;
@@ -30,6 +33,7 @@ public class Mob extends LivingThing {
 	private int chaseRange;
 	private boolean nameAsked = false;
 	private int xpGain;
+	private boolean wasHit;
 
 	/**
 	 * Sets the map.
@@ -77,6 +81,7 @@ public class Mob extends LivingThing {
 
 	private void keepPatroling(Collection<Mob> mobs) {
 		if (!Tile.isObstructed(map(this.position.copy().add(this.direction))) && !mobs.contains(new Mob(this.position.copy().add(this.direction)))) {
+			this.requestedPath = this.position.copy().add(this.direction);
 			return;
 		}
 		ArrayList<Direction> directions = new ArrayList<>(4);
@@ -96,7 +101,8 @@ public class Mob extends LivingThing {
 		}
 
 		/* Follow the wall, or try to find one */
-		Vector2i next = this.position.copy().add(directions.get((index + 1) % directions.size()));
+		this.direction = directions.get((index + 1) % directions.size());
+		Vector2i next = this.position.copy().add(this.direction);
 		if (!Tile.isObstructed(map(next))) {
 			this.requestedPath = next;
 		} else {
@@ -104,7 +110,8 @@ public class Mob extends LivingThing {
 			for (index = 0; index < directions.size() && Tile.isObstructed(map(this.position.copy().add(directions.get(index)))); ++index)
 				;
 			if (index < directions.size()) {
-				this.requestedPath = this.position.copy().add(directions.get(index));
+				this.direction = directions.get(index);
+				this.requestedPath = this.position.copy().add(this.direction);
 			} else {
 				this.requestedPath = this.position.copy();
 			}
@@ -148,11 +155,14 @@ public class Mob extends LivingThing {
 	 */
 	@Override
 	public void live(List<Mob> mobs, Collection<Player> players, boolean[][] los) {
-		int distance = this.chaseRange + 1;
+
+		if (this.wasHit) {
+			this.chaseRange += this.ON_DAMAGE_CHASE_RANGE_BONUS;
+		}
+		int distance = Integer.MAX_VALUE;
 		Collection<LivingThing> shadow = new ArrayList<>();
 		Player chasedPlayer = null;
 		shadow.addAll(mobs);
-
 
 		for (Player player : players) {
 			Vector2i pos = player.getPosition();
@@ -224,10 +234,14 @@ public class Mob extends LivingThing {
 					this.wander();
 					break;
 				default:
-					wander();
-					this.state = State.WANDERING;
+					keepPatroling(mobs);
+					this.state = State.PATROLING;
 					break;
 			}
+		}
+		if (this.wasHit) {
+			this.chaseRange -= this.ON_DAMAGE_CHASE_RANGE_BONUS;
+			this.wasHit = false;
 		}
 	}
 
@@ -257,6 +271,9 @@ public class Mob extends LivingThing {
 	}
 
 	public int getChaseRange() {
+		if (this.wasHit) {
+			return this.chaseRange + this.ON_DAMAGE_CHASE_RANGE_BONUS;
+		}
 		return this.chaseRange;
 	}
 
@@ -272,7 +289,8 @@ public class Mob extends LivingThing {
 	@Override
 	public void damage(int damages) {
 		super.damage(damages);
-		this.state = State.WANDERING;
+		this.state = State.CHASING;
+		this.wasHit = true;
 	}
 
 	@Override
