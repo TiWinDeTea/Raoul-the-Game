@@ -554,17 +554,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.cPane.getChildren().add(this.cTileMap);
 		this.cTileMap.addTileMapListener(this);
 
-		//Right pane
-		this.anchorPane.getChildren().add(this.rPane);
-		AnchorPane.setRightAnchor(this.rPane, 0d);
-		this.bPane.prefHeightProperty().bind(this.anchorPane.heightProperty());
-		this.rVBox.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR1, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.rVBox.getChildren().add(this.rScoreDisplayer);
-		this.rVBox.getChildren().add(this.rIventoryPane);
-		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
-		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR2, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.rPane.getChildren().add(this.rVBox);
-
 		//Bootom pane
 		this.anchorPane.getChildren().add(this.bPane);
 		AnchorPane.setBottomAnchor(this.bPane, 0d);
@@ -575,6 +564,17 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.bPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
 		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
 		this.bPane.maxHeightProperty().bind(this.bHBox.heightProperty());
+
+		//Right pane
+		this.anchorPane.getChildren().add(this.rPane);
+		AnchorPane.setRightAnchor(this.rPane, 0d);
+		this.bPane.prefHeightProperty().bind(this.anchorPane.heightProperty());
+		this.rVBox.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR1, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rVBox.getChildren().add(this.rScoreDisplayer);
+		this.rVBox.getChildren().add(this.rIventoryPane);
+		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
+		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR2, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rPane.getChildren().add(this.rVBox);
 
 		this.timeline.setCycleCount(Timeline.INDEFINITE);
 		this.timeline.play();
