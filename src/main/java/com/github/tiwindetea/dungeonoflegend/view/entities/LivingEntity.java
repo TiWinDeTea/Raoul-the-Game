@@ -15,13 +15,15 @@ import javafx.util.Duration;
  * @author Maxime PINARD.
  */
 public class LivingEntity extends Entity {
-	private static final int HEALTH_RECTANGLES_HEIGHT = 1;
-	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.YELLOW;
+	private static final double HEALTH_RECTANGLES_HEIGHT = 1;
+	private static final double HEALTH_RECTANGLES_WIDTH_RATIO = 0.8;
+	private static final double HEALTH_RECTANGLES_WIDTH = HEALTH_RECTANGLES_WIDTH_RATIO * ViewPackage.spritesSize.x;
+	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.DARKRED;
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 
-	private final Rectangle maxHealthRectangle = new Rectangle(ViewPackage.spritesSize.x, HEALTH_RECTANGLES_HEIGHT,MAX_HEALTH_RECTANGLE_COLOR);
-	private final Rectangle actualHealthRectangle = new Rectangle(ViewPackage.spritesSize.x, HEALTH_RECTANGLES_HEIGHT,ACTUAL_HEALTH_RECTANGLE_COLOR);
+	private final Rectangle maxHealthRectangle = new Rectangle(HEALTH_RECTANGLES_WIDTH, HEALTH_RECTANGLES_HEIGHT,MAX_HEALTH_RECTANGLE_COLOR);
+	private final Rectangle actualHealthRectangle = new Rectangle(HEALTH_RECTANGLES_WIDTH, HEALTH_RECTANGLES_HEIGHT,ACTUAL_HEALTH_RECTANGLE_COLOR);
 
 	private double healthProportion = 1;
 	private LivingEntityType livingEntityType;
@@ -45,9 +47,9 @@ public class LivingEntity extends Entity {
 
 		getChildren().add(this.imageView);
 
-		maxHealthRectangle.setTranslateX(0);
+		maxHealthRectangle.setTranslateX((ViewPackage.spritesSize.x - HEALTH_RECTANGLES_WIDTH) / 2);
 		maxHealthRectangle.setTranslateY(ViewPackage.spritesSize.y);
-		actualHealthRectangle.setTranslateX(0);
+		actualHealthRectangle.setTranslateX((ViewPackage.spritesSize.x - HEALTH_RECTANGLES_WIDTH) / 2);
 		actualHealthRectangle.setTranslateY(ViewPackage.spritesSize.y);
 
 		getChildren().add(maxHealthRectangle);
