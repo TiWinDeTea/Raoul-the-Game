@@ -17,8 +17,6 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-import static com.github.tiwindetea.dungeonoflegend.model.Tile.isObstructed;
-
 
 /**
  * The type Map.
@@ -224,26 +222,32 @@ public class Map {
         float distance = (float) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
                 + Math.pow(tilePosition.y - watcherPosition.y, 2));
 
+
         if (distance != 0) {
-            float xShifting = (tilePosition.x - watcherPosition.x) / distance;
-            float yShifting = (tilePosition.y - watcherPosition.y) / distance;
-            float currentX = watcherPosition.x;
-            float currentY = watcherPosition.y;
-            int x, y;
-            int i;
+            boolean visible = false;
+            for (int j = 0; j < 4 && !visible; j++) {
+                visible = true;
+                float xShifting = (tilePosition.x + j / 2 - watcherPosition.x) / distance;
+                float yShifting = (tilePosition.y + j % 2 - watcherPosition.y) / distance;
+                float currentX = watcherPosition.x;
+                float currentY = watcherPosition.y;
+                int x, y;
+                int i;
 
             /* Cast a ray from the watcher to the tile, stopping if a block is found to be obstructed (ie : wall) */
-            i = (int) (Math.floor(distance));
-            while (i > 0) {
-                currentX += xShifting;
-                currentY += yShifting;
-                x = Math.round(currentX);
-                y = Math.round(currentY);
-                if (isObstructed(this.map[x][y]) && !tilePosition.equals(new Vector2i(x, y))
-                        && this.map[x][y] != Tile.HOLE)
-                    return false;
-                --i;
+                i = (int) (Math.floor(distance));
+                while (i > 0 && visible) {
+                    currentX += xShifting;
+                    currentY += yShifting;
+                    x = (int) currentX;
+                    y = (int) currentY;
+                    if (Tile.isObstructed(this.map[x][y]) && !tilePosition.equals(new Vector2i(x, y))
+                            && this.map[x][y] != Tile.HOLE)
+                        visible = false;
+                    --i;
+                }
             }
+            return visible;
         }
         return true;
     }
@@ -362,7 +366,7 @@ public class Map {
                     room = rooms.get(this.random.nextInt(rooms.size()));
                     positions[i].x = this.random.nextInt(room.bottom.x - room.top.x - 2) + room.top.x + 1;
                     positions[i].y = this.random.nextInt(room.bottom.y - room.top.y - 2) + room.top.y + 1;
-                } while (isObstructed(this.map[positions[i].x][positions[i].y]));
+                } while (Tile.isObstructed(this.map[positions[i].x][positions[i].y]));
             }
             done = true;
             for (int i = 1; i < positions.length; i++) {
@@ -405,7 +409,7 @@ public class Map {
                 tmp = source.top.y - 1;
                 // Don't do anything if the rooms already have a passage
                 for (int i = min; i <= max; ++i) {
-                    if (!isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
                         return;
                 }
 
@@ -429,7 +433,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.bottom.y + 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
+                    if (!Tile.isObstructed(this.map[i][tmp]) || this.map[i][tmp] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -449,7 +453,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.top.x - 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -469,7 +473,7 @@ public class Map {
                 min = min + tmp - max;
                 tmp = source.bottom.x + 1;
                 for (int i = min; i <= max; ++i) {
-                    if (!isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
+                    if (!Tile.isObstructed(this.map[tmp][i]) || this.map[tmp][i] == Tile.CLOSED_DOOR)
                         return;
                 }
                 if (max != min) {
@@ -828,7 +832,7 @@ public class Map {
                 if (next.equals(arrival)) {
                     notDone = false;
                     arr = new Node(next.copy(), node);
-                } else if (((!isObstructed(this.map[next.x][next.y]))
+                } else if (((!Tile.isObstructed(this.map[next.x][next.y]))
                         || (this.map[next.x][next.y] == Tile.CLOSED_DOOR && ignoreDoor))
                         && !entities.contains(new Mob(next))) {
                     openListNode = openList.find(next);
