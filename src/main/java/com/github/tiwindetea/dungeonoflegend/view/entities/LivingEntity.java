@@ -18,7 +18,7 @@ public class LivingEntity extends Entity {
 	private static final double HEALTH_RECTANGLES_HEIGHT = 1;
 	private static final double HEALTH_RECTANGLES_WIDTH_RATIO = 0.8;
 	private static final double HEALTH_RECTANGLES_WIDTH = HEALTH_RECTANGLES_WIDTH_RATIO * ViewPackage.spritesSize.x;
-	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.DARKRED;
+	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.MAROON;
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 

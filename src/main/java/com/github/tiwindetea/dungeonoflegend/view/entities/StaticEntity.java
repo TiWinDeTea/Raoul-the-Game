@@ -1,8 +1,12 @@
 package com.github.tiwindetea.dungeonoflegend.view.entities;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
-import com.github.tiwindetea.dungeonoflegend.view.SpriteAnimation;
+import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.util.Duration;
 
@@ -15,6 +19,8 @@ public class StaticEntity extends Entity {
 	private StaticEntityType staticEntityType;
 	private boolean animated;
 	private Animation animation;
+	private int actualSpriteNumber;
+	private int spritesNumber;
 
 	/**
 	 * Instantiates a new StaticEntity.
@@ -50,9 +56,20 @@ public class StaticEntity extends Entity {
 
 	private void animate() {
 		this.animated = true;
-		this.animation = new SpriteAnimation(this.imageView, this.staticEntityType.getSpritesNumber(), this.staticEntityType.getSpritesPosition(), spriteSize, Duration.millis(this.staticEntityType.getAnimationSpeed()));
-		this.animation.setCycleCount(Animation.INDEFINITE);
-		this.animation.play();
+
+		final EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				actualSpriteNumber = (actualSpriteNumber + 1) % spritesNumber;
+				imageView.setViewport(new Rectangle2D((staticEntityType.getSpritesPosition().x + actualSpriteNumber) * ViewPackage.spritesSize.x, staticEntityType.getSpritesPosition().y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+			}
+		};
+		final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(this.staticEntityType.getAnimationSpeed()), eventExecutor));
+		spritesNumber = staticEntityType.getSpritesNumber();
+		actualSpriteNumber = 0;
+		timeline.setCycleCount(Timeline.INDEFINITE);
+		timeline.play();
 	}
 
 	/**
