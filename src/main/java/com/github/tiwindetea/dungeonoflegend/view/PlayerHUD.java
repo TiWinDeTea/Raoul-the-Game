@@ -62,6 +62,8 @@ public class PlayerHUD extends Parent {
 	private final SimpleStringProperty healthString = new SimpleStringProperty();
 	private final SimpleStringProperty manaString = new SimpleStringProperty();
 
+	private final ImageView backgroundImage = new ImageView(ViewPackage.HUDImage);
+
 	private int maxHealth;
 	private int actualHealth;
 	private int maxMana;
@@ -93,6 +95,7 @@ public class PlayerHUD extends Parent {
 
 	private void init() {
 		this.getChildren().add(this.backGroundRectangle);
+		this.getChildren().add(this.backgroundImage);
 
 		this.getChildren().add(this.playerPicture);
 		double originalWidth = this.playerPicture.getViewport().getWidth();

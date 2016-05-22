@@ -4,7 +4,6 @@ import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.InformationsDisplayer;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
@@ -20,7 +19,7 @@ import java.util.List;
  * @author Maxime PINARD.
  */
 public abstract class Entity extends Parent {
-	protected static final Vector2i spriteSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("xresolution")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("yresolution")));
+	protected static final Vector2i spriteSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.x")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.y")));
 	private final Rectangle backgroundRectangle = new Rectangle(spriteSize.x, spriteSize.y);
 	protected final ImageView imageView = new ImageView();
 	protected Vector2i position;

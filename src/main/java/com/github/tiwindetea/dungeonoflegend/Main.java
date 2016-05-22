@@ -30,7 +30,7 @@ public class Main extends Application {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(game);
 		executor.shutdown();
-		primaryStage.getIcons().add(ViewPackage.icon);
+		primaryStage.getIcons().add(ViewPackage.iconImage);
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override
 			public void handle(WindowEvent event) {
