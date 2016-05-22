@@ -37,7 +37,9 @@ public class PlayerInventory extends Parent {
 	private static final Vector2i ITEM_PICTURE_SIZE = new Vector2i(64, 64);
 	private static final int SPACE = 20;
 
-	private static final Color BACKGROUND_COLOR = Color.PURPLE;
+	private static final Color BACKGROUND_COLOR = Color.rgb(53, 53, 53);
+	private static final Color IVENTORY_ITEMS_BACKGROUND_COLOR = Color.rgb(53, 53, 53);
+
 
 	private final Rectangle mainRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
 	private final ImageView backgroundImage = new ImageView(ViewPackage.InventoryImage);
@@ -104,7 +106,7 @@ public class PlayerInventory extends Parent {
 		this.equipedItemsHBox.setPadding(new Insets(0, 0, 0, SPACE));
 
 		this.mainVBox.getChildren().add(this.inventoryItemsTilePane);
-		this.inventoryItemsTilePane.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.inventoryItemsTilePane.setBackground(new Background(new BackgroundFill(IVENTORY_ITEMS_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.inventoryItemsTilePane.setMaxWidth(this.mainRectangle.getWidth() - (2 * SPACE));
 		this.inventoryItemsTilePane.setPrefWidth(Double.MAX_VALUE);
 		this.inventoryItemsTilePane.setPadding(new Insets(SPACE));

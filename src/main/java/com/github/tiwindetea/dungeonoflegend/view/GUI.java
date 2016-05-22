@@ -81,7 +81,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
 
 	private static final Color BOTTOM_BACKGROUND_COLOR = Color.rgb(0x2E, 0x26, 0x25);
-	private static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
+	private static final Color RIGHT_BACKGROUND_COLOR1 = Color.rgb(53, 53, 53);
+	private static final Color RIGHT_BACKGROUND_COLOR2 = Color.DARKGRAY;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
 	private static final Vector2i BORDER_PANE_MIN_SIZE = new Vector2i(1000, 500);
@@ -94,7 +95,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final Pane bPane = new Pane();
 	private final HBox bHBox = new HBox();
 	private final TilePane blTilePane = new TilePane();
-	private final Pane brMiniMapPain = new Pane();
 
 	private final Pane rPane = new Pane();
 	private final VBox rVBox = new VBox();
@@ -554,24 +554,16 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.cTileMap.addTileMapListener(this);
 
 		//Right pane
-		this.rIventoryPane.setBackground(new Background(new BackgroundFill(Color.CHOCOLATE, CornerRadii.EMPTY, Insets.EMPTY)));
-
-		this.rVBox.setBackground(new Background(new BackgroundFill(Color.BLUE, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rVBox.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR1, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rVBox.getChildren().add(this.rScoreDisplayer);
 		this.rVBox.getChildren().add(this.rIventoryPane);
 		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
 
-		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR2, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rPane.getChildren().add(this.rVBox);
 
 		//Bootom pane
-		this.brMiniMapPain.setBackground(new Background(new BackgroundFill(Color.CYAN, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.brMiniMapPain.setMinWidth(300);
-		this.brMiniMapPain.setMaxWidth(300);
-		this.brMiniMapPain.setMaxHeight(200);
-		this.brMiniMapPain.setMaxHeight(200);
-
-		this.bHBox.getChildren().addAll(this.blTilePane, this.brMiniMapPain);
+		this.bHBox.getChildren().add(this.blTilePane);
 		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
 
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
