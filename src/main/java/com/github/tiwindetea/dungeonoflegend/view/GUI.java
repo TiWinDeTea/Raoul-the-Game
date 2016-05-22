@@ -84,6 +84,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private static final Color RIGHT_BACKGROUND_COLOR = Color.CRIMSON;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
 
+	private static final Vector2i BORDER_PANE_MIN_SIZE = new Vector2i(1000, 500);
+
 	private final BorderPane borderPane = new BorderPane();
 	private final Scene scene = new Scene(this.borderPane);
 
@@ -543,8 +545,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.borderPane.setCenter(this.cPane);
 		this.borderPane.setRight(this.rPane);
 		this.borderPane.setBottom(this.bPane);
-		this.borderPane.setMinWidth(500);
-		this.borderPane.setMinHeight(500);
+		this.borderPane.setMinWidth(BORDER_PANE_MIN_SIZE.x);
+		this.borderPane.setMinHeight(BORDER_PANE_MIN_SIZE.y);
 
 		//Center pane
 		this.cPane.setBackground(new Background(new BackgroundFill(CENTER_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
