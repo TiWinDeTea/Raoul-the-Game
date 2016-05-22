@@ -21,9 +21,11 @@ import javafx.util.Duration;
 public class PlayerHUD extends Parent {
 	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(400, 100);
 	private static final Vector2i PLAYER_PICTURE_SIZE = new Vector2i(64, 64);
-	private static final int HEALTH_RECTANGLES_HEIGHT = 20;
-	private static final int MANA_RECTANGLES_HEIGHT = 15;
+	private static final double HEALTH_RECTANGLES_HEIGHT = 20;
+	private static final double MANA_RECTANGLES_HEIGHT = 15;
 	private static final double MANA_RECTANGLES_WIDTH = 0.75; //relative to healthRectangleWidth (auto computed)
+	private static final double XP_RECTANGLES_HEIGHT = 5;
+	private static final double XP_RECTANGLES_WIDTH = 0.9; //relative to healthRectangleWidth (auto computed)
 	private static final int SPACE = 20;
 
 	private static final Color MASK_COLOR = Color.rgb(0, 0, 0, 0.5);
@@ -31,16 +33,18 @@ public class PlayerHUD extends Parent {
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Color MAX_MANA_RECTANGLE_COLOR = Color.DARKBLUE;
 	private static final Color ACTUAL_MANA_RECTANGLE_COLOR = Color.BLUE;
+	private static final Color MAX_XP_RECTANGLE_COLOR = Color.DARKGREEN;
+	private static final Color ACTUAL_XP_RECTANGLE_COLOR = Color.GREEN;
 	private static final Color BACKGROUND_COLOR = Color.PURPLE;
 
 	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
 
 	private static final Font HEALTH_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
 	private static final Color HEALTH_LABEL_TEXT_COLOR = Color.WHITE;
-	private static final int HEALTH_LABEL_TRANSLATE_Y = 33;
+	private static final int HEALTH_LABEL_TRANSLATE_Y = 37;
 	private static final Font MANA_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 10);
 	private static final Color MANA_LABEL_TEXT_COLOR = Color.WHITE;
-	private static final int MANA_LABEL_TRANSLATE_Y = 53;
+	private static final int MANA_LABEL_TRANSLATE_Y = 57;
 	private static final int LABELS_OFFSET = 5;
 
 	private final ImageView playerPicture;
@@ -48,6 +52,8 @@ public class PlayerHUD extends Parent {
 	private final Rectangle actualHealthRectangle = new Rectangle();
 	private final Rectangle maxManaRectangle = new Rectangle();
 	private final Rectangle actualManaRectangle = new Rectangle();
+	private final Rectangle maxXPRectangle = new Rectangle();
+	private final Rectangle actualXPRectangle = new Rectangle();
 	private final Rectangle backGroundRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
 	private final Rectangle maskRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
 
@@ -60,22 +66,28 @@ public class PlayerHUD extends Parent {
 	private int actualHealth;
 	private int maxMana;
 	private int actualMana;
+	private int maxXP;
+	private int actualXP;
 
 	/**
 	 * Instantiates a new PlayerHUD.
 	 *
 	 * @param playerPicture the player picture
-	 * @param maxHealth     the max health
 	 * @param actualHealth  the actual health
-	 * @param maxMana       the max mana
+	 * @param maxHealth     the max health
 	 * @param actualMana    the actual mana
+	 * @param maxMana       the max mana
+	 * @param actualXP      the actual xp
+	 * @param maxXP         the max xp
 	 */
-	public PlayerHUD(ImageView playerPicture, int maxHealth, int actualHealth, int maxMana, int actualMana) {
+	public PlayerHUD(ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP) {
 		this.playerPicture = playerPicture;
-		this.maxHealth = maxHealth;
 		this.actualHealth = actualHealth;
-		this.maxMana = maxMana;
+		this.maxHealth = maxHealth;
 		this.actualMana = actualMana;
+		this.maxMana = maxMana;
+		this.actualXP = actualXP;
+		this.maxXP = maxXP;
 		this.init();
 	}
 
@@ -110,7 +122,7 @@ public class PlayerHUD extends Parent {
 
 		this.getChildren().add(this.maxHealthRectangle);
 		this.maxHealthRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
-		this.maxHealthRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT) / 2);
+		this.maxHealthRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT);
 		this.maxHealthRectangle.setWidth(MAIN_PANE_SIZE.x - 3 * SPACE - PLAYER_PICTURE_SIZE.x);
 		this.maxHealthRectangle.setHeight(HEALTH_RECTANGLES_HEIGHT);
 		this.maxHealthRectangle.setFill(MAX_HEALTH_RECTANGLE_COLOR);
@@ -124,7 +136,7 @@ public class PlayerHUD extends Parent {
 
 		this.getChildren().add(this.maxManaRectangle);
 		this.maxManaRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
-		this.maxManaRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT) / 2 + HEALTH_RECTANGLES_HEIGHT);
+		this.maxManaRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT + HEALTH_RECTANGLES_HEIGHT);
 		this.maxManaRectangle.setWidth(MANA_RECTANGLES_WIDTH * this.maxHealthRectangle.getWidth());
 		this.maxManaRectangle.setHeight(MANA_RECTANGLES_HEIGHT);
 		this.maxManaRectangle.setFill(MAX_MANA_RECTANGLE_COLOR);
@@ -135,6 +147,20 @@ public class PlayerHUD extends Parent {
 		this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
 		this.actualManaRectangle.setHeight(MANA_RECTANGLES_HEIGHT);
 		this.actualManaRectangle.setFill(ACTUAL_MANA_RECTANGLE_COLOR);
+
+		this.getChildren().add(this.maxXPRectangle);
+		this.maxXPRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
+		this.maxXPRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d);
+		this.maxXPRectangle.setWidth(XP_RECTANGLES_WIDTH * this.maxHealthRectangle.getWidth());
+		this.maxXPRectangle.setHeight(XP_RECTANGLES_HEIGHT);
+		this.maxXPRectangle.setFill(MAX_XP_RECTANGLE_COLOR);
+
+		this.getChildren().add(this.actualXPRectangle);
+		this.actualXPRectangle.setTranslateX(this.maxXPRectangle.getTranslateX());
+		this.actualXPRectangle.setTranslateY(this.maxXPRectangle.getTranslateY());
+		this.actualXPRectangle.setWidth(((double) (this.actualXP) / this.maxXP) * this.maxXPRectangle.getWidth());
+		this.actualXPRectangle.setHeight(XP_RECTANGLES_HEIGHT);
+		this.actualXPRectangle.setFill(ACTUAL_XP_RECTANGLE_COLOR);
 
 		this.getChildren().add(this.healthLabel);
 		this.healthLabel.setFont(HEALTH_LABEL_FONT);
@@ -167,16 +193,19 @@ public class PlayerHUD extends Parent {
 	}
 
 	private void updateHealth() {
-		//this.actualHealthRectangle.setWidth((double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth());
 		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, (double) (this.actualHealth) / this.maxHealth * this.maxHealthRectangle.getWidth(), ANIMATION_DURATION);
 		this.healthString.set(this.actualHealth + " / " + this.maxHealth);
 		transition.play();
 	}
 
 	private void updateMana() {
-		//this.actualManaRectangle.setWidth((double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth());
 		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualManaRectangle, (double) (this.actualMana) / this.maxMana * this.maxManaRectangle.getWidth(), ANIMATION_DURATION);
 		this.manaString.set(this.actualMana + " / " + this.maxMana);
+		transition.play();
+	}
+
+	private void updateXP() {
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualXPRectangle, (double) (this.actualXP) / this.maxXP * this.maxXPRectangle.getWidth(), ANIMATION_DURATION);
 		transition.play();
 	}
 
@@ -230,12 +259,23 @@ public class PlayerHUD extends Parent {
 	}
 
 	/**
-	 * Gets actual mana.
+	 * Sets max xp.
 	 *
-	 * @return the actual mana
+	 * @param maxXP the max xp
 	 */
-	public int getActualMana() {
-		return this.actualMana;
+	public void setMaxXP(int maxXP) {
+		this.maxXP = maxXP;
+		this.updateXP();
+	}
+
+	/**
+	 * Sets actual xp.
+	 *
+	 * @param actualXP the actual xp
+	 */
+	public void setActualXP(int actualXP) {
+		this.actualXP = actualXP;
+		this.updateXP();
 	}
 
 	/**
@@ -263,5 +303,32 @@ public class PlayerHUD extends Parent {
 	 */
 	public int getMaxMana() {
 		return this.maxMana;
+	}
+
+	/**
+	 * Gets actual mana.
+	 *
+	 * @return the actual mana
+	 */
+	public int getActualMana() {
+		return this.actualMana;
+	}
+
+	/**
+	 * Gets max xp.
+	 *
+	 * @return the max xp
+	 */
+	public int getMaxXP() {
+		return maxXP;
+	}
+
+	/**
+	 * Gets actual xp.
+	 *
+	 * @return the actual xp
+	 */
+	public int getActualXP() {
+		return actualXP;
 	}
 }

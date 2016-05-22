@@ -6,13 +6,9 @@ package com.github.tiwindetea.dungeonoflegend.events.players;
 public class PlayerStatEvent extends PlayerEvent {
 	public enum StatType {
 		HEALTH,
-		MANA
+		MANA,
+		XP
 	}
-    @Override
-    public PlayerEventType getSubType() {
-        return PlayerEventType.PLAYER_STAT_EVENT;
-    }
-
 	public enum ValueType {
 		ACTUAL,
 		MAX
@@ -27,5 +23,10 @@ public class PlayerStatEvent extends PlayerEvent {
 		this.statType = statType;
 		this.valueType = valueType;
 		this.value = value;
+	}
+
+	@Override
+	public PlayerEventType getSubType() {
+		return PlayerEventType.PLAYER_STAT_EVENT;
 	}
 }
