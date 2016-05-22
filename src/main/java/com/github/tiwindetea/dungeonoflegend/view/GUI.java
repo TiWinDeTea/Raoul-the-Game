@@ -243,7 +243,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
 				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
 				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana);
+				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana,0,e.maxXP);
 				GUI.this.playersHUD.add(playerHUD);
 				GUI.this.blTilePane.getChildren().add(playerHUD);
 
@@ -284,6 +284,16 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					case MAX:
 						GUI.this.playersHUD.get(e.playerNumber).setMaxMana(value);
+						break;
+					}
+					break;
+				case XP:
+					switch(e.valueType) {
+					case ACTUAL:
+						GUI.this.playersHUD.get(e.playerNumber).setActualXP(value);
+						break;
+					case MAX:
+						GUI.this.playersHUD.get(e.playerNumber).setMaxXP(value);
 						break;
 					}
 					break;
