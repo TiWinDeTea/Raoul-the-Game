@@ -69,6 +69,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * The type GUI.
@@ -79,6 +81,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final List<RequestListener> listeners = new ArrayList<>();
 
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
+	private static final int MOVE_REQUEST_DELAY = 80;
 
 	private static final Color BOTTOM_BACKGROUND_COLOR = Color.rgb(0x2E, 0x26, 0x25);
 	private static final Color RIGHT_BACKGROUND_COLOR1 = Color.rgb(53, 53, 53);
@@ -113,34 +116,54 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private final Queue<Event> eventQueue = new LinkedList<>();
 
+	private boolean moveRencentlyRequested = false;
+
 	private final EventHandler<KeyEvent> onKeyReleasedEventHandler = new EventHandler<KeyEvent>() {
 
 		@Override
 		public void handle(KeyEvent event) {
-			switch(event.getCode()) {
-			case LEFT:
-			case Q:
-			case A:
-				fireMoveRequestEvent(new MoveRequestEvent(Direction.LEFT));
-				break;
-			case RIGHT:
-			case D:
-				fireMoveRequestEvent(new MoveRequestEvent(Direction.RIGHT));
-				break;
-			case UP:
-			case Z:
-			case W:
-				fireMoveRequestEvent(new MoveRequestEvent(Direction.UP));
-				break;
-			case DOWN:
-			case S:
-				fireMoveRequestEvent(new MoveRequestEvent(Direction.DOWN));
-				break;
-			case SPACE:
-				fireCenterViewRequestEvent(new CenterViewRequestEvent());
-				break;
-			default:
-				break;
+			if(!GUI.this.moveRencentlyRequested) {
+
+				GUI.this.moveRencentlyRequested = true;
+				ExecutorService executorService = Executors.newSingleThreadExecutor();
+				executorService.submit(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(MOVE_REQUEST_DELAY);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+						GUI.this.moveRencentlyRequested = false;
+					}
+				});
+				executorService.shutdown();
+
+				switch(event.getCode()) {
+				case LEFT:
+				case Q:
+				case A:
+					fireMoveRequestEvent(new MoveRequestEvent(Direction.LEFT));
+					break;
+				case RIGHT:
+				case D:
+					fireMoveRequestEvent(new MoveRequestEvent(Direction.RIGHT));
+					break;
+				case UP:
+				case Z:
+				case W:
+					fireMoveRequestEvent(new MoveRequestEvent(Direction.UP));
+					break;
+				case DOWN:
+				case S:
+					fireMoveRequestEvent(new MoveRequestEvent(Direction.DOWN));
+					break;
+				case SPACE:
+					fireCenterViewRequestEvent(new CenterViewRequestEvent());
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	};
@@ -538,7 +561,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private void init() {
 
-		this.scene.setOnKeyReleased(this.onKeyReleasedEventHandler);
+		this.scene.setOnKeyPressed(this.onKeyReleasedEventHandler);
 
 		//Main pane
 		this.anchorPane.setBackground(new Background(new BackgroundFill(Color.RED, CornerRadii.EMPTY, Insets.EMPTY)));
