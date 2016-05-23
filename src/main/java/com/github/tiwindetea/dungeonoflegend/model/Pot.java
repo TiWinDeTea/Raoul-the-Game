@@ -125,9 +125,11 @@ public class Pot implements Consumable {
 		}
 		if (this.healthModifier != 0) {
 			player.increaseHP(this.healthModifier);
+			player.heal(this.healthModifier);
 		}
 		if (this.manaModifier != 0) {
 			player.increaseMana(this.manaModifier);
+			player.addMana(this.manaModifier);
 		}
 		this.healTarget();
 		this.manaHealTarget();

@@ -257,7 +257,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Player player : players) {
 			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
-			player.addToInventory(new Pair<>(new Weapon(1, 1, 1)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -772,7 +771,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
 
-		if (this.players.size() == 0) {
+		if (this.players.size() == 0 && this.playersOnNextLevel.size() > 0) {
 			++this.level;
 			this.save();
 			this.generateLevel(); // Hot dog !
@@ -1091,22 +1090,30 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private Vector2i chestSelector(Random random) {
 		Vector2i ans = new Vector2i();
 		int rand = random.nextInt(this.lootsLikelihoodSum);
-		int i = 0;
-		if (rand >= this.lootsArmorLikelihoodSum) {
+		int sum = this.lootsArmorLikelihoodSum;
+		if (rand <= sum) {
 			ans.x = 0;
 			ans.y = randomSelector(random, this.lootsArmorLikelihoodSum, this.lootsArmorLikelihood);
 
-		} else if ((rand -= this.lootsArmorLikelihoodSum) >= this.lootsWeaponLikelihoodSum) {
-			ans.x = 1;
-			ans.y = randomSelector(random, this.lootsWeaponLikelihoodSum, this.lootsWeaponLikelihood);
-
-		} else if ((rand - this.lootsWeaponLikelihoodSum) >= this.lootsScrollLikelihoodSum) {
-			ans.x = 2;
-			ans.y = randomSelector(random, this.lootsScrollLikelihoodSum, this.lootsScrollLikelihood);
-
 		} else {
-			ans.x = 3;
-			ans.y = randomSelector(random, this.lootsPotLikelihoodSum, this.lootsPotLikelihood);
+			sum += this.lootsWeaponLikelihoodSum;
+			if (rand <= sum) {
+				System.out.println("Weapon");
+				ans.x = 1;
+				ans.y = randomSelector(random, this.lootsWeaponLikelihoodSum, this.lootsWeaponLikelihood);
+
+			} else {
+				sum += this.lootsScrollLikelihoodSum;
+				if (rand <= sum) {
+					System.out.println("Scroll");
+					ans.x = 2;
+					ans.y = randomSelector(random, this.lootsScrollLikelihoodSum, this.lootsScrollLikelihood);
+
+				} else {
+					ans.x = 3;
+					ans.y = randomSelector(random, this.lootsPotLikelihoodSum, this.lootsPotLikelihood);
+				}
+			}
 		}
 		return ans;
 	}
