@@ -42,7 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +69,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 10;
+	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 10;
+	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 15;
 	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 100;
 	private static final int REFRESH_TIME_MS = 100;
@@ -80,7 +82,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private volatile boolean isRunning = false;
 	private int level;
 	private Map world;
-	private HashMap<Vector2i, Pair<StorableObject>> objectsOnGround = new HashMap<>();
+	private List<javafx.util.Pair<Vector2i, Pair<StorableObject>>> objectsOnGround = new LinkedList<>();
 	private List<Mob> mobs = new ArrayList<>();
 	private List<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
 	private List<Player> players = new ArrayList<>();
@@ -88,6 +90,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private List<Pair<Vector2i>> bulbsOn = new ArrayList<>();
 	private List<Pair<Vector2i>> bulbsOff = new ArrayList<>();
 	private Seed seed;
+	private int mobsLootsQtt;
 	private final List<GameListener> listeners = new ArrayList<>();
 
 	private int playerTurn;
@@ -216,7 +219,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					Double.parseDouble(playersBundle.getString(pString + "defensePerLevel"))
 			));
 		}
-		this.initNew(players, new Seed(), 1);
+		this.initNew(players, new Seed(-8855273568813872615L, 1490071196521359074L), 1);
 	}
 
 	/**
@@ -256,7 +259,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 		for (Player player : players) {
 			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
+			player.addToInventory(new Pair<>(new Pot(3, 0, 15, 0, 0, 0, 0)));
+			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 1, 1, 1, 1)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
+			player.addToInventory(new Pair<>(new Weapon(5, 5, 0)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -580,11 +586,17 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Pair<Vector2i> bulb : this.bulbsOn) {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
 		}
+
+		for (javafx.util.Pair<Vector2i, Pair<StorableObject>> pair : this.objectsOnGround) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(pair.getValue().getId()));
+		}
+		this.objectsOnGround.clear();
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
+		System.out.println(this.world.getSize());
 
 
 		this.bulbsOn.clear();
@@ -622,42 +634,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Generate some chests */
 		for (int i = 0; i < chestsNbr; i++) {
 			Pair<InteractiveObject> pair;
-			chestLevel = random.nextInt(3) + this.level - 1;
+			//TODOchestLevel = random.nextInt(3) + this.level - 1;
 			pos = selectRandomGroundPosition(rooms, random);
-			Vector2i selectedChest = chestSelector(random);
-			selection = selectedChest.y;
-			switch (selectedChest.x) {
-				case 0:
-					Armor armor = new Armor(this.lootsArmorDefensePerLevel[selection] * chestLevel + this.lootsArmorBaseDefense[selection],
-							this.lootsArmorAttackPerLevel[selection] * chestLevel + this.lootsArmorBaseAttack[selection],
-							this.lootsArmorType[selection]);
-					pair = new Pair<>(new InteractiveObject(pos, armor));
-					break;
-				case 1:
-					Weapon weapon = new Weapon(this.lootsWeaponBaseAttack[selection] + this.lootsWeaponAttackPerLevel[selection] * chestLevel,
-							this.lootsWeaponRange[selection],
-							this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
-					pair = new Pair<>(new InteractiveObject(pos, weapon));
-					break;
-				case 2:
-					Scroll scroll = new Scroll(this.lootsScrollTurns[selection],
-							this.lootsScrollBaseDamagePerTurn[selection] + chestLevel * this.lootsScrollDamagePerTurnPerLevel[selection],
-							this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
-					pair = new Pair<>(new InteractiveObject(pos, scroll));
-					break;
-				case 3:
-					/* Falls through */
-				default:
-					Pot pot = new Pot(this.lootsPotTurns[selection],
-							this.lootsPotHeal[selection] + this.lootsPotHealPerLevel[selection] * chestLevel,
-							this.lootsPotMana[selection] + this.lootsPotManaPerLevel[selection] * chestLevel,
-							this.lootsPotDefMod[selection],
-							this.lootsPotAttackMod[selection],
-							this.lootsPotHPMod[selection],
-							this.lootsPotManaMod[selection]);
-					pair = new Pair<>(new InteractiveObject(pos, pot));
-					break;
-			}
+			pair = new Pair<>(new InteractiveObject(pos, lootSelector(random)));
 			this.interactiveObjects.add(pair);
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.CHEST, pos, pair.object.getDescription()));
 		}
@@ -686,6 +665,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 		}
+
+		this.mobsLootsQtt = random.nextInt(MAX_MOBS_LOOTS_PER_LEVEL - MIN_MOBS_LOOTS_PER_LEVEL + 1) + MIN_MOBS_LOOTS_PER_LEVEL;
 
 		this.players.addAll(this.playersOnNextLevel);
 		this.playersOnNextLevel.clear();
@@ -724,17 +705,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		Vector2i pos = new Vector2i();
 		do {
 			selectedRoom = rooms.get(random.nextInt(rooms.size()));
-			if (selectedRoom.top.x != selectedRoom.bottom.x) {
-				pos.x = random.nextInt(selectedRoom.bottom.x - selectedRoom.top.x) + selectedRoom.top.x;
-			} else {
-				pos.x = selectedRoom.top.x;
-			}
-
-			if (selectedRoom.top.y != selectedRoom.bottom.y) {
-				pos.y = random.nextInt(selectedRoom.bottom.y - selectedRoom.top.y) + selectedRoom.top.y;
-			} else {
-				pos.y = selectedRoom.top.y;
-			}
+			pos.x = random.nextInt(selectedRoom.bottom.x - selectedRoom.top.x + 1) + selectedRoom.top.x;
+			pos.y = random.nextInt(selectedRoom.bottom.y - selectedRoom.top.y + 1) + selectedRoom.top.y;
 		} while (!isAccessible(pos));
 		return pos;
 	}
@@ -815,12 +787,15 @@ public class Game implements RequestListener, Runnable, Stopable {
 				} else if ((pos = player.getRequestedAttack()) != null) {
 				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
 					if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
-						int j = this.mobs.indexOf(new Mob(pos));
-						if (j >= 0) {
-							player.attack(this.mobs.get(j));
-						} else {
-							// Healing by 20%, because why not
-							player.heal(player.getMaxHitPoints() / 5);
+						boolean[][] los = this.world.getLOS(playerPos, player.getLos());
+						if (los[los.length / 2 - playerPos.x + pos.x][los[0].length / 2 - playerPos.y + pos.y]) {
+							int j = this.mobs.indexOf(new Mob(pos));
+							if (j >= 0) {
+								player.attack(this.mobs.get(j));
+							} else {
+								// Healing by 20%, because why not
+								player.heal(player.getMaxHitPoints() / 5);
+							}
 						}
 					}
 					player.setRequestedAttack(null);
@@ -843,7 +818,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 								drop.object.getDescription()
 						));
 						player.dropRequestAccepted();
-						this.objectsOnGround.put(pos, drop);
+						this.objectsOnGround.add(new javafx.util.Pair<>(pos, drop));
 					}
 				} else {
 					String msg = "Nothing to do with player " + player.getName()
@@ -891,8 +866,20 @@ public class Game implements RequestListener, Runnable, Stopable {
 			}
 		}
 
+		Random random = new Random();
 		for (Mob mob : mobToDelete) {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
+			if (random.nextInt(101) < 100 * this.mobsLootsQtt / this.mobs.size()) {
+				this.mobsLootsQtt--;
+				Pair<StorableObject> loot = new Pair<>(lootSelector(random));
+				this.objectsOnGround.add(new javafx.util.Pair<>(mob.getPosition(), loot));
+				fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+						loot.getId(),
+						loot.object.getGType(),
+						mob.getPosition(),
+						loot.object.getDescription()
+				));
+			}
 			this.mobs.remove(mob);
 		}
 
@@ -931,18 +918,23 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Scanning for loots&chests to give to players, for traps, next level & light bulb */
 		for (Player player : this.players) {
 			pos = player.getPosition();
-			Pair<StorableObject> drop = this.objectsOnGround.get(pos);
 
-			while (drop != null && player.addToInventory(drop)) {
-				fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(drop.getId()));
-				this.objectsOnGround.remove(pos, drop);
-				drop = this.objectsOnGround.get(pos);
-			}
+			if (!player.isARequestPending()) {
+				Iterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.iterator();
+				while (iter.hasNext()) {
+					javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();
+					System.out.println(objPair.getKey());
+					if (objPair.getKey().equals(pos) && player.addToInventory(objPair.getValue())) {
+						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+						iter.remove();
+					}
+				}
 
-			if (player.getPosition().equals(this.world.getStairsDownPosition()) && !player.isARequestPending()) {
-				player.setFloor(this.level + 1);
-				player.setPosition(new Vector2i(0, 0));
-				fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+				if (player.getPosition().equals(this.world.getStairsDownPosition())) {
+					player.setFloor(this.level + 1);
+					player.setPosition(new Vector2i(0, 0));
+					fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+				}
 			}
 
 			for (int i = 0; i < this.bulbsOn.size(); i++) {
@@ -1083,11 +1075,48 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.mobsChaseRange[selectedMob],
 				mobPos.copy());
 		this.mobs.add(mob);
+		System.out.println("mobPos = " + mobPos);
 		fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
 				mobPos.copy(), Direction.DOWN, mob.getDescription()));
 	}
 
-	private Vector2i chestSelector(Random random) {
+	private StorableObject lootSelector(Random random) {
+		int chestLevel = random.nextInt(3) + this.level - 1;
+		Vector2i selectedChest = stuffSelector(random);
+		int selection = selectedChest.y;
+		StorableObject ans;
+		switch (selectedChest.x) {
+			case 0:
+				ans = new Armor(this.lootsArmorDefensePerLevel[selection] * chestLevel + this.lootsArmorBaseDefense[selection],
+						this.lootsArmorAttackPerLevel[selection] * chestLevel + this.lootsArmorBaseAttack[selection],
+						this.lootsArmorType[selection]);
+				break;
+			case 1:
+				ans = new Weapon(this.lootsWeaponBaseAttack[selection] + this.lootsWeaponAttackPerLevel[selection] * chestLevel,
+						this.lootsWeaponRange[selection],
+						this.lootsWeaponManaCost[selection] + this.lootsWeaponManaCostPerLevel[selection] * chestLevel);
+				break;
+			case 2:
+				ans = new Scroll(this.lootsScrollTurns[selection],
+						this.lootsScrollBaseDamagePerTurn[selection] + chestLevel * this.lootsScrollDamagePerTurnPerLevel[selection],
+						this.lootsScrollBaseDamageModPerTurn[selection] + chestLevel * this.lootsScrollDamageModPerTurnPerLevel[selection]);
+				break;
+			case 3:
+					/* Falls through */
+			default:
+				ans = new Pot(this.lootsPotTurns[selection],
+						this.lootsPotHeal[selection] + this.lootsPotHealPerLevel[selection] * chestLevel,
+						this.lootsPotMana[selection] + this.lootsPotManaPerLevel[selection] * chestLevel,
+						this.lootsPotDefMod[selection],
+						this.lootsPotAttackMod[selection],
+						this.lootsPotHPMod[selection],
+						this.lootsPotManaMod[selection]);
+				break;
+		}
+		return ans;
+	}
+
+	private Vector2i stuffSelector(Random random) {
 		Vector2i ans = new Vector2i();
 		int rand = random.nextInt(this.lootsLikelihoodSum);
 		int sum = this.lootsArmorLikelihoodSum;
@@ -1098,14 +1127,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 		} else {
 			sum += this.lootsWeaponLikelihoodSum;
 			if (rand <= sum) {
-				System.out.println("Weapon");
 				ans.x = 1;
 				ans.y = randomSelector(random, this.lootsWeaponLikelihoodSum, this.lootsWeaponLikelihood);
 
 			} else {
 				sum += this.lootsScrollLikelihoodSum;
 				if (rand <= sum) {
-					System.out.println("Scroll");
 					ans.x = 2;
 					ans.y = randomSelector(random, this.lootsScrollLikelihoodSum, this.lootsScrollLikelihood);
 
@@ -1158,10 +1185,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 								treatRequestEvent((CenterViewRequestEvent) event);
 								break;
 						}
-						event = this.requestedEvent.poll();
 					} catch (Exception e) {
 						// debug
 						e.printStackTrace();
+					} finally {
+						event = this.requestedEvent.poll();
 					}
 				}
 				if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {

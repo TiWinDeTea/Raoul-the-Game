@@ -742,13 +742,12 @@ public class Player extends LivingThing {
 	 * {@inheritDoc}
 	 */
 	@Override
-	// FIXME : I can see imaginary mobs
 	public void live(List<Mob> mobs, Collection<Player> players, boolean[][] los) {
 		boolean localSawDuck = false;
 		for (int i = 0; i < mobs.size() && !localSawDuck; ++i) {
 			Vector2i pos = mobs.get(i).getPosition();
 			if (pos.squaredDistance(this.position) <= this.squaredLOS) {
-				if (los[los.length / 2 + this.position.x - pos.x][los[0].length / 2 + this.position.y - pos.y]) {
+				if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
 					localSawDuck = true;
 				}
 			}

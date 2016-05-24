@@ -56,6 +56,12 @@ public class Vector2i {
 		this.y = y;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		/* Asserting o to be a Vector2i */
+		return ((Vector2i) o).equals(this);
+	}
+
 	/**
 	 * Equals.
 	 *
