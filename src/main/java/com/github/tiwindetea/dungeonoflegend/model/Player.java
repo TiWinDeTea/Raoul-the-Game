@@ -211,6 +211,7 @@ public class Player extends LivingThing {
 	 */
 	public void moveRequestDenied() {
 		this.requestedPath.clear();
+		this.objectToDrop = null;
 	}
 
 	/**
