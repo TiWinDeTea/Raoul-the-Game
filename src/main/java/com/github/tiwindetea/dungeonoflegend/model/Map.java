@@ -810,7 +810,10 @@ public class Map {
      * @return the path
      */
     public Stack<Vector2i> getPath(Vector2i departure, Vector2i arrival, boolean ignoreDoor, Collection<LivingThing> entities) {
-        if (departure.equals(arrival) || (Tile.isObstructed(this.map[arrival.x][arrival.y]) && this.map[arrival.x][arrival.y] != Tile.HOLE))
+        if (departure.equals(arrival)) {
+            return new Stack<>();
+        }
+        if (Tile.isObstructed(this.map[arrival.x][arrival.y]) && this.map[arrival.x][arrival.y] != Tile.HOLE)
             return null;
         ArrayList<Node> closedList = new ArrayList<>();
         NodePriorityQueue openList = new NodePriorityQueue(new NodeComparator());

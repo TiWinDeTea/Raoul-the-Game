@@ -670,14 +670,12 @@ public class TileMap extends Parent {
 	}
 
 	private void fireTileClickEvent(TileClickEvent event) {
-		System.out.println(event.tilePosition);
 		for(TileMapListener listener : this.getTileMapListeners()) {
 			listener.tileClicked(event);
 		}
 	}
 
 	private void fireTileDragEvent(TileDragEvent event) {
-		System.out.println(event.tilePosition);
 		for (TileMapListener listener : this.getTileMapListeners()) {
 			listener.tileDragged(event);
 		}

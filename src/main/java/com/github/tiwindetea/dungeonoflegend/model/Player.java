@@ -57,7 +57,7 @@ public class Player extends LivingThing {
 	private Vector2i requestedInteraction;
 	private Vector2i dropPos;
 	public boolean hasFallen = false;
-	private boolean sawDuck = false;
+	private boolean sawDuck = true;
 	private int squaredLOS;
 	private static final LivingEntityType[] ENUM_VAL = Arrays.copyOfRange(LivingEntityType.values(),
 			LivingEntityType.PLAYER1.ordinal(),
@@ -171,6 +171,7 @@ public class Player extends LivingThing {
 			this.dropPos = dropPos;
 		} else {
 			this.objectToDrop = null;
+			this.requestedPath.clear();
 		}
 	}
 
@@ -181,9 +182,7 @@ public class Player extends LivingThing {
 	 */
 	public void setRequestedPath(Stack<Vector2i> requestedPath) {
 		this.doNothing();
-		if (requestedPath == null) {
-			this.requestedPath.clear();
-		} else {
+		if (requestedPath != null) {
 			this.requestedPath = requestedPath;
 		}
 	}
@@ -753,7 +752,7 @@ public class Player extends LivingThing {
 			}
 		}
 		if (localSawDuck && !this.sawDuck) {
-			this.requestedPath.clear();
+			this.doNothing();
 		}
 		this.sawDuck = localSawDuck;
 	}
@@ -858,6 +857,7 @@ public class Player extends LivingThing {
 		this.requestedAttack = null;
 		this.requestedInteraction = null;
 		this.requestedPath.clear();
+		this.objectToDrop = null;
 	}
 
 	public static int parsePlayerNumber(String str) {

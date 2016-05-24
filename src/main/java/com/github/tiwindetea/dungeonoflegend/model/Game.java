@@ -42,6 +42,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -762,6 +763,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void nextTurn() {
 		logger.log(this.debugLevel, "Starting players lives");
 		Vector2i pos;
+		HashMap<Integer, Pair<StorableObject>> objectsJustDropped = new HashMap<>();
 
 		/* Letting the players to play */
 		for (int i = 0; i < this.players.size(); i++) {
@@ -815,7 +817,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 				} else if ((drop = player.getObjectToDrop()) != null) {
 					pos = player.getDropPos();
 					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
-					if (drop.object != null && distance == 1) {
+					if (drop.object != null && distance <= 1) {
+						objectsJustDropped.put(new Integer(player.getNumber()), drop);
 						fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
 								drop.getId(),
 								drop.object.getGType(),
@@ -924,16 +927,24 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Player player : this.players) {
 			pos = player.getPosition();
 
-			if (!player.isARequestPending()) {
-				Iterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.iterator();
-				while (iter.hasNext()) {
-					javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();
-					if (objPair.getKey().equals(pos) && player.addToInventory(objPair.getValue())) {
-						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
-						iter.remove();
-					}
+			/* Loots */
+			Iterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.iterator();
+			while (iter.hasNext()) {
+				javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();//TODO
+				Pair<StorableObject> objDroppedByPlayer = objectsJustDropped.get(new Integer(player.getNumber()));
+				if (objDroppedByPlayer != null)
+					System.out.println(objDroppedByPlayer.getId());
+				System.out.println(objPair.getValue().getId());
+				if (objPair.getKey().equals(pos)
+						&& (objDroppedByPlayer == null || objDroppedByPlayer.getId() != objPair.getValue().getId())
+						&& player.addToInventory(objPair.getValue())) {
+					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+					iter.remove();
 				}
+			}
 
+			/* Next floor */
+			if (!player.isARequestPending()) {
 				if (player.getPosition().equals(this.world.getStairsDownPosition())) {
 					player.setFloor(this.level + 1);
 					player.setPosition(new Vector2i(0, 0));
@@ -941,6 +952,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 
+			/* bulbs */
 			for (int i = 0; i < this.bulbsOn.size(); i++) {
 				if (this.bulbsOn.get(i).object.equals(player.getPosition())) {
 					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(i).getId()));
@@ -952,6 +964,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 
+			/* chests and traps */
 			ArrayList<Pair<InteractiveObject>> objectsToDelete = new ArrayList<>();
 			for (Pair<InteractiveObject> interactiveObject : this.interactiveObjects) {
 				if (interactiveObject.object.getPosition().equals(player.getPosition())) {
@@ -1370,6 +1383,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 			if ((tmp != null) && (ans == null || tmp.size() < ans.size())) {
 				ans = tmp;
 			}
+		}
+		tmp = this.world.getPath(dep, arr, ignoreDoors, entities);
+		if ((tmp != null) && (ans == null || tmp.size() < ans.size())) {
+			ans = tmp;
 		}
 		return ans;
 	}
