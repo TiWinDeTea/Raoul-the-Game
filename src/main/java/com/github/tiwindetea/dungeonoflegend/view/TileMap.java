@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileDragEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Tile;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
@@ -11,9 +12,12 @@ import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
@@ -249,6 +253,34 @@ public class TileMap extends Parent {
 		setOnMouseReleased(this.onMouseReleasedEventHandler);
 		setOnMouseDragged(this.onMouseDraggedEventHandler);
 		setOnScroll(this.onScrollEventHandler);
+		setOnDragOver(new EventHandler<DragEvent>() {
+			@Override
+			public void handle(DragEvent event) {
+				if (event.getGestureSource() != TileMap.this && event.getDragboard().hasString()) {
+					event.acceptTransferModes(TransferMode.COPY);
+				}
+				event.consume();
+			}
+		});
+		setOnDragDropped(new EventHandler<DragEvent>() {
+			@Override
+			public void handle(DragEvent event) {
+				System.out.println("lol");
+				boolean success = false;
+				Dragboard db = event.getDragboard();
+				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));
+				if (db.hasString()) {
+					try {
+						fireTileDragEvent(new TileDragEvent(tilePosition, Long.parseLong(db.getString())));
+						success = true;
+					} catch (Exception e) {
+						System.out.println("Cannot parse " + db.getString() + " to a long");
+					}
+				}
+				event.setDropCompleted(success);
+				event.consume();
+			}
+		});
 	}
 
 	/**
@@ -638,8 +670,16 @@ public class TileMap extends Parent {
 	}
 
 	private void fireTileClickEvent(TileClickEvent event) {
+		System.out.println(event.tilePosition);
 		for(TileMapListener listener : this.getTileMapListeners()) {
 			listener.tileClicked(event);
+		}
+	}
+
+	private void fireTileDragEvent(TileDragEvent event) {
+		System.out.println(event.tilePosition);
+		for (TileMapListener listener : this.getTileMapListeners()) {
+			listener.tileDragged(event);
 		}
 	}
 

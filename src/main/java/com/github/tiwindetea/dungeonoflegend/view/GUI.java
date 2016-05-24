@@ -34,6 +34,7 @@ import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntity
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileDragEvent;
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileMapEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.playerinventory.PlayerInventoryListener;
@@ -83,7 +84,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
 	private static final int MOVE_REQUEST_DELAY = 80;
 
-	private static final Color BOTTOM_BACKGROUND_COLOR = Color.rgb(0x2E, 0x26, 0x25);
+	private static final Color BOTTOM_BACKGROUND_COLOR = Color.TRANSPARENT;
 	private static final Color RIGHT_BACKGROUND_COLOR1 = Color.rgb(53, 53, 53);
 	private static final Color RIGHT_BACKGROUND_COLOR2 = Color.DARKGRAY;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
@@ -172,10 +173,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		public void addInventory(InventoryAdditionEvent e) {
 			if(e.isEquiped) {
-				GUI.this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description));
+				GUI.this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description, e.objectId));
 			}
 			else {
-				GUI.this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description));
+				GUI.this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description, e.objectId));
 			}
 		}
 
@@ -377,6 +378,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
 		}
 
+		public void tileDragged(TileDragEvent e) {
+			fireDropRequestEvent(new DropRequestEvent(e.objectId, e.tilePosition));
+		}
+
 		public void modifieTile(TileModificationEvent e) {
 			GUI.this.cTileMap.setTile(e.tileType, e.tilePosition);
 		}
@@ -441,6 +446,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					case TILE_CLICK_EVENT:
 						this.tileClicked((TileClickEvent) e);
 						break;
+						case TILE_DRAG_EVENT:
+							this.tileDragged((TileDragEvent) e);
+							break;
 					}
 					break;
 				}
@@ -584,7 +592,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
 		this.bPane.getChildren().add(this.bHBox);
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.bPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
+//		this.bPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
 		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
 		this.bPane.maxHeightProperty().bind(this.bHBox.heightProperty());
 
@@ -814,6 +822,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void updateScore(ScoreUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void tileDragged(TileDragEvent e) {
 		this.eventQueue.add(e);
 	}
 }

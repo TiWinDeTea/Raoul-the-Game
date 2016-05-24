@@ -8,6 +8,10 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.util.Duration;
 
 /**
@@ -50,8 +54,20 @@ public class StaticEntity extends Entity {
 	 * @param staticEntityType the static entity type
 	 * @param description      the description
 	 */
-	public StaticEntity(StaticEntityType staticEntityType, String description) {
+	public StaticEntity(StaticEntityType staticEntityType, String description, long id) {
 		this(staticEntityType, new Vector2i(), description);
+
+		setOnDragDetected(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				System.out.println("Drag start");
+				Dragboard db = StaticEntity.this.startDragAndDrop(TransferMode.COPY);
+				ClipboardContent content = new ClipboardContent();
+				content.putString(Long.toString(id));
+				db.setContent(content);
+				event.consume();
+			}
+		});
 	}
 
 	private void animate() {
@@ -61,13 +77,13 @@ public class StaticEntity extends Entity {
 
 			@Override
 			public void handle(ActionEvent event) {
-				actualSpriteNumber = (actualSpriteNumber + 1) % spritesNumber;
-				imageView.setViewport(new Rectangle2D((staticEntityType.getSpritesPosition().x + actualSpriteNumber) * ViewPackage.spritesSize.x, staticEntityType.getSpritesPosition().y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+				StaticEntity.this.actualSpriteNumber = (StaticEntity.this.actualSpriteNumber + 1) % StaticEntity.this.spritesNumber;
+				StaticEntity.this.imageView.setViewport(new Rectangle2D((StaticEntity.this.staticEntityType.getSpritesPosition().x + StaticEntity.this.actualSpriteNumber) * ViewPackage.spritesSize.x, StaticEntity.this.staticEntityType.getSpritesPosition().y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
 			}
 		};
 		final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(this.staticEntityType.getAnimationSpeed()), eventExecutor));
-		spritesNumber = staticEntityType.getSpritesNumber();
-		actualSpriteNumber = 0;
+		this.spritesNumber = this.staticEntityType.getSpritesNumber();
+		this.actualSpriteNumber = 0;
 		timeline.setCycleCount(Timeline.INDEFINITE);
 		timeline.play();
 	}

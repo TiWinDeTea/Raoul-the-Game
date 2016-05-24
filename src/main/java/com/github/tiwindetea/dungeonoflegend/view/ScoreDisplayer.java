@@ -1,5 +1,6 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
+import com.github.tiwindetea.dungeonoflegend.model.Pair;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
@@ -25,7 +26,7 @@ public class ScoreDisplayer extends Parent {
 	private static final Color LABEL_TEXT_COLOR = Color.WHITE;
 
 	private final Rectangle mainRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, Color.rgb(0x2E, 0x26, 0x25));
-	private final StaticEntity staticEntity = new StaticEntity(StaticEntityType.LIT_BULB, "");
+	private final StaticEntity staticEntity = new StaticEntity(StaticEntityType.LIT_BULB, "", Pair.ERROR_VAL);
 	private final Label label = new Label("0");
 	private final HBox hBox = new HBox();
 	private int score = 0;
