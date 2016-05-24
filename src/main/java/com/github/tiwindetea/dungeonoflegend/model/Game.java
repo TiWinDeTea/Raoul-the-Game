@@ -555,11 +555,17 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.requestedEvent.add(e);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestCenterView(CenterViewRequestEvent e) {
 		this.requestedEvent.add(e);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void stop() {
 		this.isRunning = false;
@@ -596,7 +602,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
-		System.out.println(this.world.getSize());
 
 
 		this.bulbsOn.clear();
@@ -923,7 +928,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				Iterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.iterator();
 				while (iter.hasNext()) {
 					javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();
-					System.out.println(objPair.getKey());
 					if (objPair.getKey().equals(pos) && player.addToInventory(objPair.getValue())) {
 						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
 						iter.remove();
@@ -996,7 +1000,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 			while (file.hasNext()) {
 				str = file.nextLine();
 				int nextNumber = Player.parsePlayerNumber(str);
-				System.out.println(nextNumber);
 				while (nextNumber > playerCount) {
 					System.out.println("Creating ghost " + playerCount);
 					firePlayerCreationEvent(new PlayerCreationEvent(
@@ -1075,7 +1078,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.mobsChaseRange[selectedMob],
 				mobPos.copy());
 		this.mobs.add(mob);
-		System.out.println("mobPos = " + mobPos);
 		fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
 				mobPos.copy(), Direction.DOWN, mob.getDescription()));
 	}

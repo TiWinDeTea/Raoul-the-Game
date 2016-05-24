@@ -37,6 +37,11 @@ public abstract class LivingThing implements Descriptable {
 	protected static final ArrayList<GameListener> listeners = new ArrayList<>();
 
 
+	/**
+	 * Adds a LivingEntity listener
+	 *
+	 * @param listener Listener to add
+	 */
 	public static void addGameListener(GameListener listener) {
 		if (!listeners.contains(listener))
 			listeners.add(listener);
@@ -240,6 +245,9 @@ public abstract class LivingThing implements Descriptable {
 		return this.position.equals(livingThing.position);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getDescription() {
 		return this.name;
 	}

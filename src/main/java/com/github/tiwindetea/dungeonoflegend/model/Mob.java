@@ -264,11 +264,18 @@ public class Mob extends LivingThing {
 		target.damage(this.attackPower);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public LivingThingType getType() {
 		return LivingThingType.MOB;
 	}
 
+	/**
+	 * Gets the chase range
+	 * @return the chase range
+	 */
 	public int getChaseRange() {
 		if (this.wasHit) {
 			return this.chaseRange + this.ON_DAMAGE_CHASE_RANGE_BONUS;
@@ -281,10 +288,17 @@ public class Mob extends LivingThing {
 		return (path == null) ? Integer.MAX_VALUE : path.size();
 	}
 
+	/**
+	 * Gets the xp gain for players on death
+	 * @return the xp gain
+	 */
 	public int getXpGain() {
 		return this.xpGain;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void damage(double damages) {
 		super.damage(damages);
@@ -292,6 +306,9 @@ public class Mob extends LivingThing {
 		this.wasHit = true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDescription() {
 		if (!this.nameAsked) {

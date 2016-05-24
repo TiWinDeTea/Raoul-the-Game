@@ -1,8 +1,12 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Created by organic-code on 5/20/16.
+ * Stopable
+ * @author Lucas LAZARE
  */
 public interface Stopable {
+    /**
+     * Asks the object to stop
+     */
     void stop();
 }
