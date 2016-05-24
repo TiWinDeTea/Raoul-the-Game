@@ -265,7 +265,6 @@ public class TileMap extends Parent {
 		setOnDragDropped(new EventHandler<DragEvent>() {
 			@Override
 			public void handle(DragEvent event) {
-				System.out.println("lol");
 				boolean success = false;
 				Dragboard db = event.getDragboard();
 				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));

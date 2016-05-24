@@ -60,7 +60,6 @@ public class StaticEntity extends Entity {
 		setOnDragDetected(new EventHandler<MouseEvent>() {
 			@Override
 			public void handle(MouseEvent event) {
-				System.out.println("Drag start");
 				Dragboard db = StaticEntity.this.startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();
 				content.putString(Long.toString(id));

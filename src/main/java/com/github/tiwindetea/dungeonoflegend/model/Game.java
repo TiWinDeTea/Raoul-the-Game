@@ -220,7 +220,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					Double.parseDouble(playersBundle.getString(pString + "defensePerLevel"))
 			));
 		}
-		this.initNew(players, new Seed(-8855273568813872615L, 1490071196521359074L), 1);
+		this.initNew(players, new Seed(), 1);
 	}
 
 	/**
@@ -771,53 +771,54 @@ public class Game implements RequestListener, Runnable, Stopable {
 			Vector2i playerPos = player.getPosition();
 			int distance;
 			Pair<StorableObject> drop;
-			if (player.getFloor() == this.level) {
-				if ((pos = player.getRequestedMove()) != null) {
-				/*See if the player can move as he wanted to */
-					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
-					if (distance <= 1 && isAccessible(pos)) {
-						player.setPosition(pos);
-						fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
-					} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
-						player.setFloor(this.level + 1);
-						player.hasFallen = true;
-						player.damage(player.getMaxHitPoints() / 5);
-						fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
-						this.playersOnNextLevel.add(player);
-						this.players.remove(i);
-						--i;
-					} else {
-						logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
-								+ playerPos + " to " + pos + ")");
-						player.moveRequestDenied();
-					}
-				} else if ((pos = player.getRequestedAttack()) != null) {
-				/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
-					if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
-						boolean[][] los = this.world.getLOS(playerPos, player.getLos());
-						if (los[los.length / 2 - playerPos.x + pos.x][los[0].length / 2 - playerPos.y + pos.y]) {
-							int j = this.mobs.indexOf(new Mob(pos));
-							if (j >= 0) {
-								player.attack(this.mobs.get(j));
-							} else {
-								// Healing by 20%, because why not
-								player.heal(player.getMaxHitPoints() / 5);
-							}
+			if ((pos = player.getRequestedMove()) != null) {
+			/*See if the player can move as he wanted to */
+				distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
+				if (distance <= 1 && isAccessible(pos)) {
+					player.setPosition(pos);
+					fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
+				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
+					player.setFloor(this.level + 1);
+					player.hasFallen = true;
+					player.damage(player.getMaxHitPoints() / 5);
+					fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+					this.playersOnNextLevel.add(player);
+					this.players.remove(i);
+					--i;
+				} else {
+					logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
+							+ playerPos + " to " + pos + ")");
+					player.moveRequestDenied();
+				}
+			} else if ((pos = player.getRequestedAttack()) != null) {
+			/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
+				if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
+					boolean[][] los = this.world.getLOS(playerPos, player.getLos());
+					if (los[los.length / 2 - playerPos.x + pos.x][los[0].length / 2 - playerPos.y + pos.y]) {
+						int j = this.mobs.indexOf(new Mob(pos));
+						if (j >= 0) {
+							player.attack(this.mobs.get(j));
+						} else {
+							// Healing by 20%, because why not
+							player.heal(player.getMaxHitPoints() / 5);
 						}
 					}
-					player.setRequestedAttack(null);
-				} else if ((pos = player.getRequestedInteraction()) != null) {
-				/* Make the player to interact with the map */
-					distance = Math.max(Math.abs(playerPos.x - pos.x), Math.abs(playerPos.y - pos.y));
-					if (distance == 1) {
-						this.world.triggerTile(pos);
-						fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
-					}
-					player.setRequestedInteraction(null);
-				} else if ((drop = player.getObjectToDrop()) != null) {
-					pos = player.getDropPos();
-					distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
-					if (drop.object != null && distance <= 1) {
+				}
+				player.setRequestedAttack(null);
+			} else if ((pos = player.getRequestedInteraction()) != null) {
+			/* Make the player to interact with the map */
+				distance = Math.max(Math.abs(playerPos.x - pos.x), Math.abs(playerPos.y - pos.y));
+				if (distance == 1) {
+					this.world.triggerTile(pos);
+					fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
+				}
+				player.setRequestedInteraction(null);
+			} else if ((drop = player.getObjectToDrop()) != null) {
+				pos = player.getDropPos();
+				distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
+				if (drop.object != null && distance <= 1) {
+					player.dropRequestAccepted();
+					if (this.world.getTile(pos) != Tile.HOLE) {
 						objectsJustDropped.put(new Integer(player.getNumber()), drop);
 						fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
 								drop.getId(),
@@ -825,18 +826,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 								pos,
 								drop.object.getDescription()
 						));
-						player.dropRequestAccepted();
 						this.objectsOnGround.add(new javafx.util.Pair<>(pos, drop));
 					}
-				} else {
-					String msg = "Nothing to do with player " + player.getName()
-							+ " (player #" + (player.getNumber() + 1) + ")";
-					logger.log(this.debugLevel, msg);
 				}
 			} else {
-				this.playersOnNextLevel.add(player);
-				this.players.remove(i);
-				--i;
+				String msg = "Nothing to do with player " + player.getName()
+						+ " (player #" + (player.getNumber() + 1) + ")";
+				logger.log(this.debugLevel, msg);
 			}
 		}
 
@@ -924,7 +920,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 
 		/* Scanning for loots&chests to give to players, for traps, next level & light bulb */
-		for (Player player : this.players) {
+		for (int i = 0; i < this.players.size(); ++i) {
+			Player player = this.players.get(i);
 			pos = player.getPosition();
 
 			/* Loots */
@@ -932,9 +929,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 			while (iter.hasNext()) {
 				javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();//TODO
 				Pair<StorableObject> objDroppedByPlayer = objectsJustDropped.get(new Integer(player.getNumber()));
-				if (objDroppedByPlayer != null)
-					System.out.println(objDroppedByPlayer.getId());
-				System.out.println(objPair.getValue().getId());
 				if (objPair.getKey().equals(pos)
 						&& (objDroppedByPlayer == null || objDroppedByPlayer.getId() != objPair.getValue().getId())
 						&& player.addToInventory(objPair.getValue())) {
@@ -949,14 +943,17 @@ public class Game implements RequestListener, Runnable, Stopable {
 					player.setFloor(this.level + 1);
 					player.setPosition(new Vector2i(0, 0));
 					fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+					this.playersOnNextLevel.add(player);
+					this.players.remove(i);
+					--i;
 				}
 			}
 
 			/* bulbs */
-			for (int i = 0; i < this.bulbsOn.size(); i++) {
-				if (this.bulbsOn.get(i).object.equals(player.getPosition())) {
-					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(i).getId()));
-					this.bulbsOn.remove(i);
+			for (int j = 0; j < this.bulbsOn.size(); j++) {
+				if (this.bulbsOn.get(j).object.equals(player.getPosition())) {
+					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(j).getId()));
+					this.bulbsOn.remove(j);
 					player.heal(2 * player.getMaxHitPoints() / 3);
 					player.xp(this.bulbXp + this.bulbXpGainPerLevel * this.level);
 					++this.globalScore;
@@ -1237,7 +1234,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void treatRequestEvent(DropRequestEvent e) {
 		/* Take the shortest path possible to drop the item */
-		if (!Tile.isObstructed(this.world.getTile(e.dropPosition))) {
+		if (!Tile.isObstructed(this.world.getTile(e.dropPosition)) || this.world.getTile(e.dropPosition) == Tile.HOLE) {
 			Stack<Vector2i> path = this.shortestPathApprox(this.currentPlayer.getPosition(), e.dropPosition, false, null);
 			if (path != null) {
 				this.currentPlayer.setRequestedPath(path);
