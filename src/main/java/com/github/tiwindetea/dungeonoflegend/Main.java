@@ -33,12 +33,23 @@ public class Main extends Application {
 	private final String SAVE_FILE_NAME = "Save";
 	private Game game = new Game(this.SAVE_FILE_NAME);
 	private VBox root = new VBox();
-	private Scene scene = new Scene(this.root);
+	private Scene menu = new Scene(this.root);
 	private Button solo = new Button("Solo");
 	private Button multiplayer = new Button("2 Players");
 	private Button load = new Button("Load game");
 	private Button resume = new Button("Resume game");
 	private Button exit = new Button("exit");
+	private final String buttonStyle =
+			".button {" +
+					"-fx-background-color:" +
+					"		linear-gradient(#f2f2f2, #d6d6d6)," +
+					"		linear-gradient(#fcfcfc 0%, #d9d9d9 20%, #d6d6d6 100%)," +
+					"		linear-gradient(#dddddd 0%, #f6f6f6 50%);" +
+					"	-fx-background-radius: 8,7,6;" +
+					"	-fx-background-insets: 0,1,2;" +
+					"	-fx-text-fill: black;" +
+					"	-fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );" +
+					"}";
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -48,7 +59,8 @@ public class Main extends Application {
 			public void handle(KeyEvent event) {
 				if (event.getCode() == KeyCode.ESCAPE) {
 					updateButtons();
-					primaryStage.setScene(Main.this.scene);
+					primaryStage.setScene(Main.this.menu);
+					Main.this.root.setAlignment(Pos.CENTER);
 					Main.this.game.pause();
 				}
 			}
@@ -56,15 +68,16 @@ public class Main extends Application {
 
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.getIcons().add(ViewPackage.iconImage);
-		this.scene.setFill(Color.LIGHTSLATEGREY);
+		this.menu.setFill(Color.DARKSLATEGRAY);
 		this.game.addGameListener(this.GUI);
 		this.GUI.addRequestListener(this.game);
 		this.root.setAlignment(Pos.CENTER);
 		this.root.setPadding(new Insets(20));
 		this.root.setSpacing(10);
-		this.root.setBackground(new Background(new BackgroundFill(Color.LIGHTSLATEGREY, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.root.setBackground(new Background(new BackgroundFill(Color.DARKSLATEGREY, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.root.getChildren().addAll(this.solo, this.multiplayer, this.resume, this.load, this.exit);
 		this.solo.defaultButtonProperty().bind(this.solo.focusedProperty());
+		this.solo.setStyle(this.buttonStyle);
 		this.solo.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -73,6 +86,7 @@ public class Main extends Application {
 			}
 		});
 		this.multiplayer.defaultButtonProperty().bind(this.multiplayer.focusedProperty());
+		this.multiplayer.setStyle(this.buttonStyle);
 		this.multiplayer.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -81,6 +95,7 @@ public class Main extends Application {
 			}
 		});
 		this.load.defaultButtonProperty().bind(this.load.focusedProperty());
+		this.load.setStyle(this.buttonStyle);
 		this.load.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -89,6 +104,7 @@ public class Main extends Application {
 			}
 		});
 		this.resume.defaultButtonProperty().bind(this.resume.focusedProperty());
+		this.resume.setStyle(this.buttonStyle);
 		this.resume.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -97,6 +113,7 @@ public class Main extends Application {
 			}
 		});
 		this.exit.setCancelButton(true);
+		this.exit.setStyle(this.buttonStyle);
 		this.exit.defaultButtonProperty().bind(this.exit.focusedProperty());
 		this.exit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -108,7 +125,7 @@ public class Main extends Application {
 		});
 
 		updateButtons();
-		primaryStage.setScene(this.scene);
+		primaryStage.setScene(this.menu);
 		primaryStage.show();
 	}
 

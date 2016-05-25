@@ -201,7 +201,7 @@ public class Player extends LivingThing {
 	@Override
 	public void setPosition(Vector2i position) {
 		super.setPosition(position);
-		if (this.requestedPath.size() > 0 && this.position.equals(this.requestedPath.peek())) {
+		if (!this.requestedPath.empty() && this.position.equals(this.requestedPath.peek())) {
 			this.requestedPath.pop();
 		}
 	}
@@ -864,5 +864,19 @@ public class Player extends LivingThing {
 	public static int parsePlayerNumber(String str) {
 		int nbr = str.indexOf("nbr=", 17) + 4;
 		return Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
+	}
+
+	public void deleteEquipedObjects() {
+		for (int i = 0; i < this.armors.size(); i++) {
+			Pair<Armor> pair = this.armors.get(i);
+			if (pair != null && pair.object != null) {
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, pair.getId()));
+				this.armors.set(i, null);
+			}
+		}
+		if (this.weapon != null && this.weapon.object != null) {
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.weapon.getId()));
+			this.weapon = null;
+		}
 	}
 }

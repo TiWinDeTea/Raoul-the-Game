@@ -1390,12 +1390,14 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private void clearAll() {
 		this.clearLevel();
 		for (Player player : this.players) {
+			player.deleteEquipedObjects();
 			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
 			playerInventory.addAll(player.getInventory());
 			playerInventory.forEach(player::removeFromInventory);
 			//todo : clear hud // inventory
 		}
 		for (Player player : this.playersOnNextLevel) {
+			player.deleteEquipedObjects();
 			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
 			playerInventory.addAll(player.getInventory());
 			playerInventory.forEach(player::removeFromInventory);
