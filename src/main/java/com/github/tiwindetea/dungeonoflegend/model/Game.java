@@ -42,11 +42,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -69,9 +71,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private static final int MIN_TRAPS_QTT_PER_LEVEL = 8;
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
-	private static final int MAX_CHEST_QTT_PER_LEVEL = 10;
-	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 10;
-	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 15;
+	private static final int MAX_CHEST_QTT_PER_LEVEL = 4;
+	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 5;
+	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 10;
 	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 100;
 	private static final int REFRESH_TIME_MS = 100;
@@ -235,6 +237,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.level = level;
 		this.seed = seed;
 		this.world = new Map(this.seed);
+		this.clearAll();
 
 		this.players = new ArrayList<>(players.size());
 		this.players.addAll(players);
@@ -577,35 +580,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	private void generateLevel() {
 
-		/* Next block deletes all entities on the GUI */
-		for (Player player : this.players) {
-			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
-		}
-		for (Mob mob : this.mobs) {
-			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
-		}
-		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
-		}
-		for (Pair<Vector2i> bulb : this.bulbsOff) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
-		}
-		for (Pair<Vector2i> bulb : this.bulbsOn) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
-		}
-
-		for (javafx.util.Pair<Vector2i, Pair<StorableObject>> pair : this.objectsOnGround) {
-			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(pair.getValue().getId()));
-		}
-		this.objectsOnGround.clear();
+		this.clearLevel();
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
 		fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
 
-
-		this.bulbsOn.clear();
 		for (Vector2i bulb : this.world.getBulbPosition()) {
 			Pair<Vector2i> p = new Pair<>(bulb);
 			Pair<Vector2i> p2 = new Pair<>(bulb);
@@ -622,11 +603,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 		Random random = this.seed.getRandomizer(this.level);
 		int chestsNbr = random.nextInt(MAX_CHEST_QTT_PER_LEVEL - MIN_CHEST_QTT_PER_LEVEL + 1) + MIN_CHEST_QTT_PER_LEVEL;
 		int trapsNbr = random.nextInt(MAX_TRAPS_QTT_PER_LEVEL - MIN_TRAPS_QTT_PER_LEVEL + 1) + MIN_TRAPS_QTT_PER_LEVEL;
-		int selection, chestLevel;
+		int selection;
 		Vector2i pos;
 
 		/* Generate traps */
-		this.interactiveObjects.clear();
 		for (int i = 0; i < trapsNbr; i++) {
 			selection = random.nextInt(this.trapsBaseHP.length);
 			pos = selectRandomGroundPosition(rooms, random);
@@ -990,6 +970,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	public void loadSave() {
 		try {
+
+			Scanner file = new Scanner(new FileInputStream(this.gameName));
+			clearAll();
 			Tile[][] tiles = new Tile[1][1];
 			for (int i = 0; i < tiles.length; i++) {
 				for (int j = 0; j < tiles[i].length; j++) {
@@ -997,8 +980,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 				}
 			}
 			fireMapCreationEvent(new MapCreationEvent(tiles));
-
-			Scanner file = new Scanner(new FileInputStream(this.gameName));
 			this.seed = Seed.parseSeed(file.nextLine());
 			this.world = new Map(this.seed);
 			String str = file.nextLine();
@@ -1044,13 +1025,20 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	//-------------------------------------//
 	private void save() {
+		PriorityQueue<Player> playerPriorityQueue = new PriorityQueue<>(new Comparator<Player>() {
+			@Override
+			public int compare(Player o1, Player o2) {
+				return o1.getNumber() - o2.getNumber();
+			}
+		});
+		playerPriorityQueue.addAll(this.playersOnNextLevel);
 		try {
 			FileWriter file = new FileWriter(new File(this.gameName));
 			file.write(this.seed.toString() + "\n");
 			file.write("level=" + this.level + "\n");
 			file.write("score=" + this.globalScore + "\n");
-			for (Player player : this.playersOnNextLevel) {
-				file.write(player.toString() + "\n");
+			while (!playerPriorityQueue.isEmpty()) {
+				file.write(playerPriorityQueue.poll().toString() + "\n");
 			}
 			file.close();
 		} catch (IOException e) {
@@ -1169,6 +1157,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	@Override
 	public void run() {
 		this.isRunning = true;
+		// TODO : run slower and slower up to n
 		RequestEvent event;
 		do {
 			try {
@@ -1225,7 +1214,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 		));
 		fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, bool));
 		fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
-
 	}
 
 	private void treatRequestEvent(CenterViewRequestEvent e) {
@@ -1386,5 +1374,64 @@ public class Game implements RequestListener, Runnable, Stopable {
 			ans = tmp;
 		}
 		return ans;
+	}
+
+	public void pause() {
+		this.requestedEvent.clear();
+		for (Player player : this.players) {
+			player.doNothing();
+		}
+	}
+
+	public void resume() {
+
+	}
+
+	private void clearAll() {
+		this.clearLevel();
+		for (Player player : this.players) {
+			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
+			playerInventory.addAll(player.getInventory());
+			playerInventory.forEach(player::removeFromInventory);
+			//todo : clear hud // inventory
+		}
+		for (Player player : this.playersOnNextLevel) {
+			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
+			playerInventory.addAll(player.getInventory());
+			playerInventory.forEach(player::removeFromInventory);
+		}
+	}
+
+	private void clearLevel() {
+		/* Next block deletes all entities on the GUI */
+		this.pause();
+		for (Player player : this.players) {
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+		}
+
+		for (Mob mob : this.mobs) {
+			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
+		}
+		this.mobs.clear();
+
+		for (Pair<InteractiveObject> obj : this.interactiveObjects) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
+		}
+		this.interactiveObjects.clear();
+
+		for (Pair<Vector2i> bulb : this.bulbsOff) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
+		}
+		this.bulbsOff.clear();
+
+		for (Pair<Vector2i> bulb : this.bulbsOn) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
+		}
+		this.bulbsOn.clear();
+
+		for (javafx.util.Pair<Vector2i, Pair<StorableObject>> pair : this.objectsOnGround) {
+			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(pair.getValue().getId()));
+		}
+		this.objectsOnGround.clear();
 	}
 }
