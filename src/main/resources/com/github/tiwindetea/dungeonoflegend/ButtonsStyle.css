@@ -1,0 +1,33 @@
+.button {
+    //-fx-padding: 5 22 5 22;
+    -fx-border-color: black;
+    -fx-border-width: 1;
+    -fx-border-style: segments(1, 1);
+    -fx-background-insets: 0 0 0 0, 0, 1, 2;
+    -fx-background-radius: 0;
+    -fx-background-color: #2DAAE4;
+    -fx-font-size: 16pt;
+    -fx-text-fill: black;
+}
+
+.button:hover{
+    -fx-background-color: #48D1CC;
+}
+
+.button:pressed, .button:default:hover:pressed
+{
+  -fx-background-color: #008B8B;
+  -fx-text-fill: white;
+}
+
+.button:focused
+{
+    -fx-background-color: #48D1CC;
+}
+
+.button:disabled, .button:default:disabled
+{
+    -fx-opacity: 0.4;
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #212121;
+}

@@ -166,11 +166,11 @@ public enum LivingEntityType {
 	public Image getImage() {
 		switch(resourceBundle.getString(this.toString() + ".sprites.file")) {
 		case "Objects.png":
-			return ViewPackage.objectsImage;
+			return ViewPackage.OBJECTS_IMAGE;
 		case "Players.png":
-			return ViewPackage.playersImage;
+			return ViewPackage.PLAYERS_IMAGE;
 			case "Mobs.png":
-				return ViewPackage.mobsImage;
+				return ViewPackage.MOBS_IMAGE;
 		default:
 			return null;
 		}

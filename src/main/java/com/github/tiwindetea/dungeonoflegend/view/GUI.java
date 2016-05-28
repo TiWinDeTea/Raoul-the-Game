@@ -269,8 +269,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				ImageView imageView1 = new ImageView(livingEntityType.getImage());
 				ImageView imageView2 = new ImageView(livingEntityType.getImage());
 				Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
-				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
-				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.spritesSize.x, spritePosition.y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
+				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana,0,e.maxXP);
 				GUI.this.playersHUD.add(playerHUD);
 				GUI.this.blTilePane.getChildren().add(playerHUD);

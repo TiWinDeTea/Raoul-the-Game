@@ -1,6 +1,5 @@
 package com.github.tiwindetea.dungeonoflegend.view.entities;
 
-import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.InformationsDisplayer;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
@@ -19,7 +18,7 @@ import java.util.List;
  * @author Maxime PINARD.
  */
 public abstract class Entity extends Parent {
-	protected static final Vector2i spriteSize = new Vector2i(Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.x")), Integer.parseInt(MainPackage.spriteSheetBundle.getString("sprites.size.y")));
+	protected static final Vector2i spriteSize = ViewPackage.SPRITES_SIZE;
 	private final Rectangle backgroundRectangle = new Rectangle(spriteSize.x, spriteSize.y);
 	protected final ImageView imageView = new ImageView();
 	protected Vector2i position;
@@ -39,8 +38,8 @@ public abstract class Entity extends Parent {
 
 		getChildren().add(this.backgroundRectangle);
 		this.backgroundRectangle.setFill(Color.TRANSPARENT);
-		backgroundRectangle.setTranslateX(0);
-		backgroundRectangle.setTranslateY(0);
+		this.backgroundRectangle.setTranslateX(0);
+		this.backgroundRectangle.setTranslateY(0);
 
 		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
@@ -65,8 +64,8 @@ public abstract class Entity extends Parent {
 	 */
 	public void setPosition(Vector2i position) {
 		this.position = new Vector2i(position);
-		setTranslateX(position.x * ViewPackage.spritesSize.x);
-		setTranslateY(position.y * ViewPackage.spritesSize.y);
+		setTranslateX(position.x * ViewPackage.SPRITES_SIZE.x);
+		setTranslateY(position.y * ViewPackage.SPRITES_SIZE.y);
 	}
 
 	/**

@@ -17,7 +17,7 @@ import javafx.util.Duration;
 public class LivingEntity extends Entity {
 	private static final double HEALTH_RECTANGLES_HEIGHT = 1;
 	private static final double HEALTH_RECTANGLES_WIDTH_RATIO = 0.8;
-	private static final double HEALTH_RECTANGLES_WIDTH = HEALTH_RECTANGLES_WIDTH_RATIO * ViewPackage.spritesSize.x;
+	private static final double HEALTH_RECTANGLES_WIDTH = HEALTH_RECTANGLES_WIDTH_RATIO * ViewPackage.SPRITES_SIZE.x;
 	private static final Color MAX_HEALTH_RECTANGLE_COLOR = Color.MAROON;
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
@@ -47,13 +47,13 @@ public class LivingEntity extends Entity {
 
 		getChildren().add(this.imageView);
 
-		maxHealthRectangle.setTranslateX((ViewPackage.spritesSize.x - HEALTH_RECTANGLES_WIDTH) / 2);
-		maxHealthRectangle.setTranslateY(ViewPackage.spritesSize.y);
-		actualHealthRectangle.setTranslateX((ViewPackage.spritesSize.x - HEALTH_RECTANGLES_WIDTH) / 2);
-		actualHealthRectangle.setTranslateY(ViewPackage.spritesSize.y);
+		this.maxHealthRectangle.setTranslateX((ViewPackage.SPRITES_SIZE.x - HEALTH_RECTANGLES_WIDTH) / 2);
+		this.maxHealthRectangle.setTranslateY(ViewPackage.SPRITES_SIZE.y);
+		this.actualHealthRectangle.setTranslateX((ViewPackage.SPRITES_SIZE.x - HEALTH_RECTANGLES_WIDTH) / 2);
+		this.actualHealthRectangle.setTranslateY(ViewPackage.SPRITES_SIZE.y);
 
-		getChildren().add(maxHealthRectangle);
-		getChildren().add(actualHealthRectangle);
+		getChildren().add(this.maxHealthRectangle);
+		getChildren().add(this.actualHealthRectangle);
 	}
 
 	/**
@@ -82,12 +82,12 @@ public class LivingEntity extends Entity {
 	}
 
 	private void updateHealth() {
-		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, healthProportion * this.maxHealthRectangle.getWidth(), ANIMATION_DURATION);
+		RectangleSizeTransition transition = new RectangleSizeTransition(this.actualHealthRectangle, this.healthProportion * this.maxHealthRectangle.getWidth(), ANIMATION_DURATION);
 		transition.play();
 	}
 
 	public double getHealthProportion() {
-		return healthProportion;
+		return this.healthProportion;
 	}
 
 	public void setHealthProportion(double healthProportion) {
@@ -96,8 +96,8 @@ public class LivingEntity extends Entity {
 	}
 
 	public void setHealthBarVisible(boolean visibility){
-		actualHealthRectangle.setVisible(visibility);
-		maxHealthRectangle.setVisible(visibility);
+		this.actualHealthRectangle.setVisible(visibility);
+		this.maxHealthRectangle.setVisible(visibility);
 	}
 
 	/**

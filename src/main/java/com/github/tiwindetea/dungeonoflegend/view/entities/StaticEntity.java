@@ -77,7 +77,7 @@ public class StaticEntity extends Entity {
 			@Override
 			public void handle(ActionEvent event) {
 				StaticEntity.this.actualSpriteNumber = (StaticEntity.this.actualSpriteNumber + 1) % StaticEntity.this.spritesNumber;
-				StaticEntity.this.imageView.setViewport(new Rectangle2D((StaticEntity.this.staticEntityType.getSpritesPosition().x + StaticEntity.this.actualSpriteNumber) * ViewPackage.spritesSize.x, StaticEntity.this.staticEntityType.getSpritesPosition().y * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y));
+				StaticEntity.this.imageView.setViewport(new Rectangle2D((StaticEntity.this.staticEntityType.getSpritesPosition().x + StaticEntity.this.actualSpriteNumber) * ViewPackage.SPRITES_SIZE.x, StaticEntity.this.staticEntityType.getSpritesPosition().y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 			}
 		};
 		final Timeline timeline = new Timeline(new KeyFrame(Duration.millis(this.staticEntityType.getAnimationSpeed()), eventExecutor));

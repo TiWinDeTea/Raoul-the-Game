@@ -33,8 +33,8 @@ public class TileMap extends Parent {
 
 	private static final int CANVAS_MAX_WIDTH = 2048;
 	private static final int CANVAS_MAX_HEIGHT = 2048;
-	private static final int RCANVAS_MAX_WIDTH = (int) (Math.floor(CANVAS_MAX_WIDTH / ViewPackage.spritesSize.x) * ViewPackage.spritesSize.x);
-	private static final int RCANVAS_MAX_HEIGHT = (int) (Math.floor(CANVAS_MAX_HEIGHT / ViewPackage.spritesSize.y) * ViewPackage.spritesSize.y);
+	private static final int RCANVAS_MAX_WIDTH = (int) (Math.floor(CANVAS_MAX_WIDTH / ViewPackage.SPRITES_SIZE.x) * ViewPackage.SPRITES_SIZE.x);
+	private static final int RCANVAS_MAX_HEIGHT = (int) (Math.floor(CANVAS_MAX_HEIGHT / ViewPackage.SPRITES_SIZE.y) * ViewPackage.SPRITES_SIZE.y);
 
 	private static final Tile EMPTY_TILE = Tile.UNKNOWN;
 
@@ -89,8 +89,8 @@ public class TileMap extends Parent {
 
 			// right mouse button
 			if(event.getButton() == MouseButton.SECONDARY) {
-				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));
-				if(((int) Math.floor(TileMap.this.rightMouseAnchorX / ViewPackage.spritesSize.x) == tilePosition.x) && ((int) Math.floor(event.getY() / ViewPackage.spritesSize.y) == tilePosition.y)) {
+				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.SPRITES_SIZE.x), (int) Math.floor(event.getY() / ViewPackage.SPRITES_SIZE.y));
+				if(((int) Math.floor(TileMap.this.rightMouseAnchorX / ViewPackage.SPRITES_SIZE.x) == tilePosition.x) && ((int) Math.floor(event.getY() / ViewPackage.SPRITES_SIZE.y) == tilePosition.y)) {
 					fireTileClickEvent(new TileClickEvent(tilePosition));
 				}
 			}
@@ -267,7 +267,7 @@ public class TileMap extends Parent {
 			public void handle(DragEvent event) {
 				boolean success = false;
 				Dragboard db = event.getDragboard();
-				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.spritesSize.x), (int) Math.floor(event.getY() / ViewPackage.spritesSize.y));
+				Vector2i tilePosition = new Vector2i((int) Math.floor(event.getX() / ViewPackage.SPRITES_SIZE.x), (int) Math.floor(event.getY() / ViewPackage.SPRITES_SIZE.y));
 				if (db.hasString()) {
 					try {
 						fireTileDragEvent(new TileDragEvent(tilePosition, Long.parseLong(db.getString())));
@@ -298,8 +298,8 @@ public class TileMap extends Parent {
 		int mapWidth = map.length;
 		int mapHeight = map[0].length;
 
-		int horizontalCanevasNumbers = (int) (Math.floor((mapWidth * ViewPackage.spritesSize.x) / RCANVAS_MAX_WIDTH)) + 1;
-		int verticalCanevasNumbers = (int) (Math.floor((mapHeight * ViewPackage.spritesSize.y) / RCANVAS_MAX_HEIGHT)) + 1;
+		int horizontalCanevasNumbers = (int) (Math.floor((mapWidth * ViewPackage.SPRITES_SIZE.x) / RCANVAS_MAX_WIDTH)) + 1;
+		int verticalCanevasNumbers = (int) (Math.floor((mapHeight * ViewPackage.SPRITES_SIZE.y) / RCANVAS_MAX_HEIGHT)) + 1;
 		this.canvases = new Canvas[horizontalCanevasNumbers][verticalCanevasNumbers];
 
 		for(int i = 0; i < horizontalCanevasNumbers - 1; i++) {
@@ -309,23 +309,23 @@ public class TileMap extends Parent {
 				this.canvases[i][j].setTranslateY(j * RCANVAS_MAX_HEIGHT);
 			}
 			int canevasesY = verticalCanevasNumbers - 1;
-			this.canvases[i][canevasesY] = new Canvas(RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.spritesSize.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
+			this.canvases[i][canevasesY] = new Canvas(RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
 			this.canvases[i][canevasesY].setTranslateX(i * RCANVAS_MAX_WIDTH);
 			this.canvases[i][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 		}
 		for(int i = 0; i < verticalCanevasNumbers - 1; i++) {
 			int canevasesX = horizontalCanevasNumbers - 1;
-			this.canvases[canevasesX][i] = new Canvas(mapWidth * ViewPackage.spritesSize.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
+			this.canvases[canevasesX][i] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
 			this.canvases[canevasesX][i].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
 			this.canvases[canevasesX][i].setTranslateY(i * RCANVAS_MAX_HEIGHT);
 		}
 		int canevasesX = this.canvases.length - 1;
 		int canevasesY = this.canvases[0].length - 1;
-		this.canvases[canevasesX][canevasesY] = new Canvas(mapWidth * ViewPackage.spritesSize.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.spritesSize.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
+		this.canvases[canevasesX][canevasesY] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
 		this.canvases[canevasesX][canevasesY].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
 		this.canvases[canevasesX][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 
-		Image image = ViewPackage.objectsImage;
+		Image image = ViewPackage.OBJECTS_IMAGE;
 		for(int i = 0; i < map.length; i++) {
 			for(int j = 0; j < map[i].length; j++) {
 				drawImage(image, map[i][j].getSpritePosition(i + j).x, map[i][j].getSpritePosition(i + j).y, i, j);
@@ -348,16 +348,16 @@ public class TileMap extends Parent {
 
 	private void drawRealTile(Vector2i tilePosition) {
 		Tile tile = this.realTileMap[tilePosition.x][tilePosition.y];
-		drawImage(ViewPackage.objectsImage, tile.getSpritePosition(tilePosition.x + tilePosition.y).x, tile.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+		drawImage(ViewPackage.OBJECTS_IMAGE, tile.getSpritePosition(tilePosition.x + tilePosition.y).x, tile.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
 	}
 
 	private void drawEmptyTile(Vector2i tilePosition) {
-		drawImage(ViewPackage.objectsImage, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).x, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+		drawImage(ViewPackage.OBJECTS_IMAGE, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).x, EMPTY_TILE.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
 	}
 
 	private void drawFoggedTile(Vector2i tilePosition) {
 		drawRealTile(tilePosition);
-		drawImage(ViewPackage.objectsImage, ViewPackage.fogSpritePosition.x, ViewPackage.fogSpritePosition.y, tilePosition.x, tilePosition.y);
+		drawImage(ViewPackage.OBJECTS_IMAGE, ViewPackage.FOG_SPRITE_POSITION.x, ViewPackage.FOG_SPRITE_POSITION.y, tilePosition.x, tilePosition.y);
 	}
 
 	/**
@@ -431,7 +431,7 @@ public class TileMap extends Parent {
 	public void setTile(Tile tileType, Vector2i tilePosition) {
 		if(tilePosition.x < this.realTileMap.length && tilePosition.y < this.realTileMap[0].length) {
 			this.realTileMap[tilePosition.x][tilePosition.y] = tileType;
-			drawImage(ViewPackage.objectsImage, tileType.getSpritePosition(tilePosition.x + tilePosition.y).x, tileType.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
+			drawImage(ViewPackage.OBJECTS_IMAGE, tileType.getSpritePosition(tilePosition.x + tilePosition.y).x, tileType.getSpritePosition(tilePosition.x + tilePosition.y).y, tilePosition.x, tilePosition.y);
 		}
 	}
 
@@ -456,7 +456,7 @@ public class TileMap extends Parent {
 		for(int i = 0; i < this.realTileMap.length; i++) {
 			for(int j = 0; j < this.realTileMap[i].length; j++) {
 				this.realTileMap[i][j] = tileType;
-				addOnTile(ViewPackage.objectsImage, this.realTileMap[i][j].getSpritePosition(i + j), new Vector2i(i, j));
+				addOnTile(ViewPackage.OBJECTS_IMAGE, this.realTileMap[i][j].getSpritePosition(i + j), new Vector2i(i, j));
 			}
 		}
 	}
@@ -639,9 +639,9 @@ public class TileMap extends Parent {
 	}
 
 	private void drawImage(Image img, double sx, double sy, double dx, double dy) {
-		int canvasesX = (int) Math.floor((dx * ViewPackage.spritesSize.x) / RCANVAS_MAX_WIDTH);
-		int canvasesY = (int) Math.floor((dy * ViewPackage.spritesSize.y) / RCANVAS_MAX_HEIGHT);
-		this.canvases[canvasesX][canvasesY].getGraphicsContext2D().drawImage(img, sx * ViewPackage.spritesSize.x, sy * ViewPackage.spritesSize.y, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y, dx * ViewPackage.spritesSize.x - canvasesX * RCANVAS_MAX_WIDTH, dy * ViewPackage.spritesSize.y - canvasesY * RCANVAS_MAX_HEIGHT, ViewPackage.spritesSize.x, ViewPackage.spritesSize.y);
+		int canvasesX = (int) Math.floor((dx * ViewPackage.SPRITES_SIZE.x) / RCANVAS_MAX_WIDTH);
+		int canvasesY = (int) Math.floor((dy * ViewPackage.SPRITES_SIZE.y) / RCANVAS_MAX_HEIGHT);
+		this.canvases[canvasesX][canvasesY].getGraphicsContext2D().drawImage(img, sx * ViewPackage.SPRITES_SIZE.x, sy * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y, dx * ViewPackage.SPRITES_SIZE.x - canvasesX * RCANVAS_MAX_WIDTH, dy * ViewPackage.SPRITES_SIZE.y - canvasesY * RCANVAS_MAX_HEIGHT, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y);
 	}
 
 	private double clamp(double value, double min, double max) {
@@ -689,8 +689,8 @@ public class TileMap extends Parent {
 
 		Pane parent = (Pane) (getParent());
 
-		double Xdiff = (parent.getWidth() / 2) - (ViewPackage.spritesSize.x / 2) - (tilePosition.x * ViewPackage.spritesSize.x) - getTranslateX();
-		double Ydiff = (parent.getHeight() / 2) - (ViewPackage.spritesSize.y / 2) - (tilePosition.y * ViewPackage.spritesSize.y) - getTranslateY();
+		double Xdiff = (parent.getWidth() / 2) - (ViewPackage.SPRITES_SIZE.x / 2) - (tilePosition.x * ViewPackage.SPRITES_SIZE.x) - getTranslateX();
+		double Ydiff = (parent.getHeight() / 2) - (ViewPackage.SPRITES_SIZE.y / 2) - (tilePosition.y * ViewPackage.SPRITES_SIZE.y) - getTranslateY();
 
 		this.scale.set(1);
 

@@ -42,7 +42,7 @@ public class PlayerInventory extends Parent {
 
 
 	private final Rectangle mainRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
-	private final ImageView backgroundImage = new ImageView(ViewPackage.InventoryImage);
+	private final ImageView backgroundImage = new ImageView(ViewPackage.INVENTORY_IMAGE);
 
 	private final ImageView playerPicture;
 
