@@ -155,7 +155,7 @@ public class MainMenu extends Application {
 		this.resumeImageView.setVisible(false);
 		this.greenLogoImageView.setVisible(true);
 		this.orangeLogoImageView.setVisible(false);
-		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(this.BACK_GROUND_COLOR_1, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(BACK_GROUND_COLOR_1, CornerRadii.EMPTY, Insets.EMPTY)));
 	}
 
 	private void setMultiplayerLayout() {
@@ -165,7 +165,7 @@ public class MainMenu extends Application {
 		this.resumeImageView.setVisible(false);
 		this.greenLogoImageView.setVisible(false);
 		this.orangeLogoImageView.setVisible(true);
-		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(this.BACK_GROUND_COLOR_2, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(BACK_GROUND_COLOR_2, CornerRadii.EMPTY, Insets.EMPTY)));
 	}
 
 	private void setLoadLayout() {
@@ -175,7 +175,7 @@ public class MainMenu extends Application {
 		this.resumeImageView.setVisible(false);
 		this.greenLogoImageView.setVisible(true);
 		this.orangeLogoImageView.setVisible(false);
-		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(this.BACK_GROUND_COLOR_1, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(BACK_GROUND_COLOR_1, CornerRadii.EMPTY, Insets.EMPTY)));
 	}
 
 	private void setResumeLayout() {
@@ -185,7 +185,7 @@ public class MainMenu extends Application {
 		this.resumeImageView.setVisible(true);
 		this.greenLogoImageView.setVisible(false);
 		this.orangeLogoImageView.setVisible(true);
-		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(this.BACK_GROUND_COLOR_2, CornerRadii.EMPTY, Insets.EMPTY)));
+		this.menuAnchorPane.setBackground(new Background(new BackgroundFill(BACK_GROUND_COLOR_2, CornerRadii.EMPTY, Insets.EMPTY)));
 	}
 
 	private void updateButtons() {
