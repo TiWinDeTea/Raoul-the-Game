@@ -144,6 +144,7 @@ public class MainMenu extends Application {
 	}
 
 	private void startGame() {
+		this.game.resume();
 		this.primaryStage.setScene(this.GUI.getScene());
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(this.game);
