@@ -32,7 +32,8 @@ public class LivingEntity extends Entity {
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 
 	private static final Font TEXT_FONT = Font.font("Arial", FontWeight.NORMAL, 14);
-	private static final Color TEXT_COLOR = Color.RED;
+	private static final Color POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
+	private static final Color NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
 	private static final Duration TRANSITION_DURATION = new Duration(1500);
 	private static final double TRANSITION_INITIAL_Y_POSITION = -12;
 	private static final double TRANSITION_FINAL_Y_POSITION = -60;
@@ -129,11 +130,17 @@ public class LivingEntity extends Entity {
 		return false;
 	}
 
-	public void displayDamages(int damages) {
-		Label label = new Label(Integer.toString(damages));
+	public void displayLifeModification(int value) {
+		Label label = new Label();
 		label.setFont(TEXT_FONT);
-		label.setTextFill(TEXT_COLOR);
-		label.impl_processCSS(true);
+		if(value > 0) {
+			label.setText("+" + Integer.toString(value));
+			label.setTextFill(POSITIVE_MODIFICATION_TEXT_COLOR);
+		}
+		else {
+			label.setText(Integer.toString(value));
+			label.setTextFill(NEGATIVE_MODIFICATION_TEXT_COLOR);
+		}
 		label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
 
 		getChildren().add(label);
