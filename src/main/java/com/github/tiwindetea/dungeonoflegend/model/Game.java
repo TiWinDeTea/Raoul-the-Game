@@ -19,6 +19,7 @@ import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
@@ -83,6 +84,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	private Queue<RequestEvent> requestedEvent = new LinkedList<>();
 
 	private volatile boolean isRunning = false;
+	private volatile boolean isPaused = false;
 	private int level;
 	private Map world;
 	private List<javafx.util.Pair<Vector2i, Pair<StorableObject>>> objectsOnGround = new LinkedList<>();
@@ -251,9 +253,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Player player : this.players) {
 			firePlayerCreationEvent(new PlayerCreationEvent(
 					player.getNumber(),
-					player.getId(),
-					new Vector2i(0, 0),
-					Direction.DOWN,
+					player.getGType(),
 					(int) player.getMaxHitPoints(),
 					(int) player.getMaxMana(),
 					player.getMaxXp(),
@@ -520,6 +520,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 	}
 
+	private void firePlayerDeletionEvent(PlayerDeletionEvent event) {
+		for (GameListener listener : getGameListeners()) {
+			listener.deletePlayer(event);
+		}
+	}
+
 
 	private void firePlayerStatEvent(PlayerStatEvent event) {
 		for (GameListener listener : getGameListeners()) {
@@ -580,7 +586,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	private void generateLevel() {
 
-		this.clearLevel();
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
@@ -732,6 +737,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		if (this.players.size() == 0 && this.playersOnNextLevel.size() > 0) {
 			++this.level;
 			this.save();
+			this.clearLevel();
 			this.generateLevel(); // Hot dog !
 			return;
 		}
@@ -991,23 +997,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 			while (file.hasNext()) {
 				str = file.nextLine();
 				int nextNumber = Player.parsePlayerNumber(str);
-				while (nextNumber > playerCount) {
-					System.out.println("Creating ghost " + playerCount);
-					firePlayerCreationEvent(new PlayerCreationEvent(
-							playerCount,
-							Pair.getNewId(),
-							new Vector2i(0, 0),
-							Direction.LEFT,
-							1,
-							1,
-							1,
-							""
-					));
-					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, 0));
-					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, 0));
-					firePlayerStatEvent(new PlayerStatEvent(playerCount, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, 0));
-					++playerCount;
-				}
 				++playerCount;
 				this.players.add(Player.parsePlayer(str));
 				this.players.get(this.players.size() - 1).setFloor(this.level);
@@ -1165,38 +1154,40 @@ public class Game implements RequestListener, Runnable, Stopable {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			do {
-				event = this.requestedEvent.poll();
-				while (event != null) {
-					try { // debug
-						switch (event.getSubType()) {
-							case MOVE_REQUEST_EVENT:
-								treatRequestEvent((MoveRequestEvent) event);
-								break;
-							case INTERACTION_REQUEST_EVENT:
-								treatRequestEvent((InteractionRequestEvent) event);
-								break;
-							case USAGE_REQUEST_EVENT:
-								treatRequestEvent((UsageRequestEvent) event);
-								break;
-							case DROP_REQUEST_EVENT:
-								treatRequestEvent((DropRequestEvent) event);
-								break;
-							case CENTER_VIEW_REQUEST_EVENT:
-								treatRequestEvent((CenterViewRequestEvent) event);
-								break;
+			if (!this.isPaused) {
+				do {
+					event = this.requestedEvent.poll();
+					while (event != null) {
+						try { // debug
+							switch (event.getSubType()) {
+								case MOVE_REQUEST_EVENT:
+									treatRequestEvent((MoveRequestEvent) event);
+									break;
+								case INTERACTION_REQUEST_EVENT:
+									treatRequestEvent((InteractionRequestEvent) event);
+									break;
+								case USAGE_REQUEST_EVENT:
+									treatRequestEvent((UsageRequestEvent) event);
+									break;
+								case DROP_REQUEST_EVENT:
+									treatRequestEvent((DropRequestEvent) event);
+									break;
+								case CENTER_VIEW_REQUEST_EVENT:
+									treatRequestEvent((CenterViewRequestEvent) event);
+									break;
+							}
+						} catch (Exception e) {
+							// debug
+							e.printStackTrace();
+						} finally {
+							event = this.requestedEvent.poll();
 						}
-					} catch (Exception e) {
-						// debug
-						e.printStackTrace();
-					} finally {
-						event = this.requestedEvent.poll();
 					}
-				}
-				if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
-					this.nextTick(); // modifies the here-above boolean
-				}
-			} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+					if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
+						this.nextTick(); // modifies the here-above boolean
+					}
+				} while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+			}
 		} while (this.isRunning);
 
 		boolean[][] bool = new boolean[(this.world.getSize().x / 2) * 2 + 1][(this.world.getSize().y / 2) * 2 + 1];
@@ -1381,27 +1372,24 @@ public class Game implements RequestListener, Runnable, Stopable {
 		for (Player player : this.players) {
 			player.doNothing();
 		}
+		this.isPaused = true;
 	}
 
 	public void resume() {
-
+		this.requestedEvent.clear();
+		this.isPaused = false;
 	}
 
 	private void clearAll() {
 		this.clearLevel();
-		for (Player player : this.players) {
-			player.deleteEquipedObjects();
-			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
-			playerInventory.addAll(player.getInventory());
-			playerInventory.forEach(player::removeFromInventory);
-			//todo : clear hud // inventory
+		for (int i = this.players.size() - 1; i >= 0; i--) {
+			this.deletePlayer(this.players.get(i));
 		}
-		for (Player player : this.playersOnNextLevel) {
-			player.deleteEquipedObjects();
-			List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
-			playerInventory.addAll(player.getInventory());
-			playerInventory.forEach(player::removeFromInventory);
+		this.players.clear();
+		for (int i = this.playersOnNextLevel.size() - 1; i >= 0; i--) {
+			this.deletePlayer(this.playersOnNextLevel.get(i));
 		}
+		this.playersOnNextLevel.clear();
 	}
 
 	private void clearLevel() {
@@ -1435,5 +1423,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 			fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(pair.getValue().getId()));
 		}
 		this.objectsOnGround.clear();
+	}
+
+	private void deletePlayer(Player player) {
+		player.deleteEquipedObjects();
+		List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
+		playerInventory.addAll(player.getInventory());
+		playerInventory.forEach(player::removeFromInventory);
+		firePlayerDeletionEvent(new PlayerDeletionEvent(player.getNumber()));
 	}
 }

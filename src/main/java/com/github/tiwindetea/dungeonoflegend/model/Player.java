@@ -625,9 +625,7 @@ public class Player extends LivingThing {
 
 		firePlayerCreationEvent(new PlayerCreationEvent(
 				p.number,
-				p.id,
-				new Vector2i(0, 0),
-				Direction.DOWN,
+				p.getGType(),
 				(int) p.maxHitPoints,
 				(int) p.maxMana,
 				p.requiredXp,

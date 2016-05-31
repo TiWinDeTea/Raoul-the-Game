@@ -6,13 +6,27 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.dungeonoflegend.model;
+package com.github.tiwindetea.oggplayer;
 
 /**
- * MainPackage (constants)
- * @author Lucas LAZARE
+ * Created by organic-code on 5/30/16.
  */
-public class MainPackage {
-    public static final String name = "com.github.tiwindetea.dungeonoflegend";
-    public static final String path = name.replace('.', '/');
+public class ObservableThread extends Thread {
+    private TerminatedThreadHandler listener = null;
+
+    public ObservableThread(Runnable target) {
+        super(target);
+    }
+
+    public void setListener(TerminatedThreadHandler listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void run() {
+        super.run();
+        if (this.listener != null) {
+            this.listener.handle();
+        }
+    }
 }

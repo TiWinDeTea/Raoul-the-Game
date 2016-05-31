@@ -3,6 +3,8 @@ package com.github.tiwindetea.dungeonoflegend;
 import com.github.tiwindetea.dungeonoflegend.model.Game;
 import com.github.tiwindetea.dungeonoflegend.view.GUI;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
@@ -66,7 +68,7 @@ public class MainMenu extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-
+		Sound.player.play(Sounds.MAIN_THEME);
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.getIcons().add(ViewPackage.ICON_IMAGE);
@@ -131,6 +133,12 @@ public class MainMenu extends Application {
 
 		initButtons();
 		updateButtons();
+		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent event) {
+				MainMenu.this.game.stop();
+			}
+		});
 		primaryStage.setScene(this.menuScene);
 		primaryStage.show();
 	}
@@ -140,12 +148,6 @@ public class MainMenu extends Application {
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(this.game);
 		executor.shutdown();
-		this.primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-			@Override
-			public void handle(WindowEvent event) {
-				MainMenu.this.game.stop();
-			}
-		});
 	}
 
 	private void setSoloLayout() {
