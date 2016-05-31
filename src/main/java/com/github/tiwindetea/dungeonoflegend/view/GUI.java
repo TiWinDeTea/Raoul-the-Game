@@ -19,6 +19,7 @@ import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.PlayerInventoryEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
@@ -43,7 +44,6 @@ import com.github.tiwindetea.dungeonoflegend.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
-import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -255,20 +255,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		public void createPlayer(PlayerCreationEvent e) {
 			if(GUI.this.actualPlayersNumber < GUI.this.maxPlayersNumber) {
-				LivingEntityType livingEntityType;
-				if(e.playerNumber == 1) {
-					livingEntityType = LivingEntityType.PLAYER2;
-				} else {
-					livingEntityType = LivingEntityType.PLAYER1;
-				}
-				LivingEntity livingEntity = new LivingEntity(livingEntityType, e.position, e.direction, e.description);
-				GUI.this.livingEntities.put(e.entityId, livingEntity);
-				GUI.this.cTileMap.addEntity(livingEntity);
 				++GUI.this.actualPlayersNumber;
 
-				ImageView imageView1 = new ImageView(livingEntityType.getImage());
-				ImageView imageView2 = new ImageView(livingEntityType.getImage());
-				Vector2i spritePosition = livingEntityType.getSpritePosition(e.direction);
+				ImageView imageView1 = new ImageView(e.playerType.getImage());
+				ImageView imageView2 = new ImageView(e.playerType.getImage());
+				Vector2i spritePosition = e.playerType.getSpritePosition(Direction.DOWN);
 				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana,0,e.maxXP);
@@ -281,7 +272,20 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				playerInventory.addPlayerInventoryListener(GUI.this);
 			}
 			else {
-				System.out.println("GUI::createPlayer : too much players " + GUI.this.actualPlayersNumber);
+				System.out.println("GUI::createPlayer : too much players - " + GUI.this.actualPlayersNumber);
+			}
+		}
+
+		public void deletePlayer(PlayerDeletionEvent e) {
+			if(GUI.this.actualPlayersNumber > 0) {
+				--GUI.this.actualPlayersNumber;
+				GUI.this.blTilePane.getChildren().remove(GUI.this.playersHUD.get(e.playerNumber));
+				GUI.this.playersHUD.remove(e.playerNumber);
+				GUI.this.rIventoryPane.getChildren().remove(GUI.this.playersInventories.get(e.playerNumber));
+				GUI.this.playersInventories.remove(e.playerNumber);
+			}
+			else {
+				System.out.println("GUI::deletePlayer : invalid player number - " + e.playerNumber);
 			}
 		}
 
@@ -487,6 +491,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					case PLAYER_NEXT_TICK_EVENT:
 						this.playerNextTick((PlayerNextTickEvent) e);
+						break;
+					case PLAYER_DELETION_EVENT:
+						this.deletePlayer((PlayerDeletionEvent) e);
 						break;
 					}
 					break;
@@ -827,6 +834,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void tileDragged(TileDragEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void deletePlayer(PlayerDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 }

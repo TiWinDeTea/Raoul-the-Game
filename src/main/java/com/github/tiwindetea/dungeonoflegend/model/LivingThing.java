@@ -12,7 +12,7 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
-import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.PlayerStatListener;
+import com.github.tiwindetea.dungeonoflegend.listeners.game.players.PlayerStatListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * LivingThing.
+ *
  * @author Lucas LAZARE
  */
 public abstract class LivingThing implements Descriptable {
@@ -43,7 +44,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @param listener Listener to add
 	 */
 	public static void addGameListener(GameListener listener) {
-		if (!listeners.contains(listener))
+		if(!listeners.contains(listener))
 			listeners.add(listener);
 	}
 
@@ -52,20 +53,20 @@ public abstract class LivingThing implements Descriptable {
 	}
 
 	protected void fireStatEvent(PlayerStatEvent event) {
-		for (PlayerStatListener listener : getPlayersListeners()) {
+		for(PlayerStatListener listener : getPlayersListeners()) {
 			listener.changePlayerStat(event);
 		}
 	}
 
 	protected void fireHealthUpdate(LivingEntityHealthUpdateEvent event) {
 
-		for (GameListener listener : getPlayersListeners()) {
+		for(GameListener listener : getPlayersListeners()) {
 			listener.updateLivingEntityHealth(event);
 		}
 	}
 
 	protected void fireMoveEvent(LivingEntityMoveEvent event) {
-		for (GameListener listener : getPlayersListeners()) {
+		for(GameListener listener : getPlayersListeners()) {
 			listener.moveLivingEntity(event);
 		}
 	}
@@ -161,7 +162,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @param damages damages taken by this
 	 */
 	public void damage(double damages) {
-		if (damages > 0) {
+		if(damages > 0) {
 			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
 			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
 		}
@@ -177,9 +178,9 @@ public abstract class LivingThing implements Descriptable {
 	/**
 	 * Make this to live.
 	 *
-	 * @param mobs Mobs around this
+	 * @param mobs    Mobs around this
 	 * @param players Players around this
-	 * @param los LOS of this
+	 * @param los     LOS of this
 	 */
 	public abstract void live(List<Mob> mobs, Collection<Player> players, boolean[][] los);
 
@@ -196,7 +197,7 @@ public abstract class LivingThing implements Descriptable {
 	 * @return the requested attack
 	 */
 	public Vector2i getRequestedAttack() {
-		if (this.requestedAttack == null) {
+		if(this.requestedAttack == null) {
 			return null;
 		}
 		return this.requestedAttack.copy();

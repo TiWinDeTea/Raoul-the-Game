@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players;
+package com.github.tiwindetea.dungeonoflegend.listeners.game.players;
 
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 

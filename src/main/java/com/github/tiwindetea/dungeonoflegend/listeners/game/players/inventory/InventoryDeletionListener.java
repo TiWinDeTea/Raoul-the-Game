@@ -1,4 +1,4 @@
-package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.players.inventory;
+package com.github.tiwindetea.dungeonoflegend.listeners.game.players.inventory;
 
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 
