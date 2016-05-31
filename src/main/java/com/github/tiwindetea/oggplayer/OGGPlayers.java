@@ -230,6 +230,12 @@ public class OGGPlayers<K> {
         return this.players.put(key, new JOrbisPlayer(file));
     }
 
+    public JOrbisPlayer put(K key, String file, boolean isLooping) {
+        JOrbisPlayer ret = new JOrbisPlayer(file);
+        ret.setLooping(isLooping);
+        return this.players.put(key, ret);
+    }
+
     /**
      * Associates a JOrbisPlayer targetting the file with the specified
      * key in the map. If the map previously contained a mapping for the
@@ -377,6 +383,22 @@ public class OGGPlayers<K> {
         } else {
             throw new NoSuchElementException();
         }
+    }
+
+    public void close(K key) {
+
+    }
+
+    public void closeAll(K... keys) {
+
+    }
+
+    public void closeAll(Collection<K> keys) {
+
+    }
+
+    public void closeAny() {
+
     }
 
     /**

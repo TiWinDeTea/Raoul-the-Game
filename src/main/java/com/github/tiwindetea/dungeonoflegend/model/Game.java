@@ -35,6 +35,8 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.request.RequestListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -586,6 +588,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	private void generateLevel() {
 
+		Sound.player.play(Sounds.NEXT_FLOOR_SOUND);
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
 
 		/* Generate the level and bulbs to turn off */
@@ -732,7 +735,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		} else {
 			this.currentPlayer = this.players.get(this.playerTurn);
 		}
-		fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+		if (!this.players.isEmpty()) {
+			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+		}
 
 		if (this.players.size() == 0 && this.playersOnNextLevel.size() > 0) {
 			++this.level;
@@ -888,6 +893,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 			));
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 			this.players.remove(player);
+			this.deletePlayer(player);
 		}
 		if (this.players.isEmpty() && this.playersOnNextLevel.isEmpty()) {
 			this.isRunning = false;
@@ -940,6 +946,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				if (this.bulbsOn.get(j).object.equals(player.getPosition())) {
 					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(j).getId()));
 					this.bulbsOn.remove(j);
+					Sound.player.play(Sounds.BULB_SOUND);
 					player.heal(2 * player.getMaxHitPoints() / 3);
 					player.xp(this.bulbXp + this.bulbXpGainPerLevel * this.level);
 					++this.globalScore;
@@ -993,11 +1000,8 @@ public class Game implements RequestListener, Runnable, Stopable {
 			str = file.nextLine();
 			this.globalScore = Integer.parseInt(str.substring(str.indexOf('=') + 1));
 			this.players.clear();
-			int playerCount = 0;
 			while (file.hasNext()) {
 				str = file.nextLine();
-				int nextNumber = Player.parsePlayerNumber(str);
-				++playerCount;
 				this.players.add(Player.parsePlayer(str));
 				this.players.get(this.players.size() - 1).setFloor(this.level);
 			}
@@ -1394,7 +1398,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void clearLevel() {
 		/* Next block deletes all entities on the GUI */
-		this.pause();
 		for (Player player : this.players) {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 		}

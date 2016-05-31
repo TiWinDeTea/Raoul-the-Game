@@ -68,7 +68,6 @@ public class MainMenu extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Sound.player.play(Sounds.MAIN_THEME);
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Dungeon Of Legends");
 		primaryStage.getIcons().add(ViewPackage.ICON_IMAGE);
@@ -291,6 +290,7 @@ public class MainMenu extends Application {
 	}
 
 	public static void main(String[] args) {
+		Sound.player.play(Sounds.MAIN_MENU_START_SOUND);
 		launch(args);
 	}
 }

@@ -13,6 +13,8 @@ import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntity
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.players.PlayerStatListener;
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -163,8 +165,12 @@ public abstract class LivingThing implements Descriptable {
 	 */
 	public void damage(double damages) {
 		if(damages > 0) {
-			this.hitPoints = Math.min(this.hitPoints + this.defensePower - damages, this.hitPoints - 1);
-			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints)));
+			double diff = this.getDefensePower() - damages;
+			if (diff >= 0) {
+				diff = -1;
+			}
+			this.hitPoints += diff;
+			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints), (int) Math.round(diff)));
 		}
 	}
 
@@ -216,7 +222,9 @@ public abstract class LivingThing implements Descriptable {
 	 *
 	 * @param target target of the attack
 	 */
-	public abstract void attack(LivingThing target);
+	public void attack(LivingThing target) {
+		Sound.player.play(Sounds.ATTACK_SOUND);
+	}
 
 	/**
 	 * {@inheritDoc}

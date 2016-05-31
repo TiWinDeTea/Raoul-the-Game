@@ -11,7 +11,7 @@ public class Main {
     public static void main(String[] args) {
         Sounds[] sounds = Sounds.values();
         for (Sounds sound : sounds) {
-            Sound.player.put(sound, sound.toString());
+            Sound.player.put(sound, sound.toString(), sound.isLooping());
         }
         MainMenu.main(args);
         Sound.player.stopAndClear();

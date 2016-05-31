@@ -509,13 +509,13 @@ public class JOrbisPlayer implements Runnable {
 
     public void play_sound() {
         if (this.player == null) {
-            this.isRunning = false;
+            this.isRunning = true;
             this.player = new ObservableThread(this);
             if (this.isLooping) {
                 this.player.setListener(new TerminatedThreadHandler() {
                     @Override
                     public void handle() {
-                        if (!JOrbisPlayer.this.isRunning) {
+                        if (JOrbisPlayer.this.isRunning) {
                             JOrbisPlayer.this.player = new ObservableThread(JOrbisPlayer.this);
                             JOrbisPlayer.this.player.setListener(this);
                             JOrbisPlayer.this.player.start();
@@ -536,8 +536,7 @@ public class JOrbisPlayer implements Runnable {
 
     public void stop_sound() {
         this.player = null;
-        this.isRunning = true;
-        this.close();
+        this.isRunning = false;
     }
 
     InputStream selectSource(String item) {

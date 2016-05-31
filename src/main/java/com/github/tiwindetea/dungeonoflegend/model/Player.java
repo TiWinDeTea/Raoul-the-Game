@@ -15,11 +15,14 @@ import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryA
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.BOOTS;
@@ -200,9 +203,13 @@ public class Player extends LivingThing {
 	 */
 	@Override
 	public void setPosition(Vector2i position) {
+		int dist = Math.abs(position.x - this.position.x) + Math.abs(position.y - this.position.y);
 		super.setPosition(position);
 		if (!this.requestedPath.empty() && this.position.equals(this.requestedPath.peek())) {
 			this.requestedPath.pop();
+		}
+		if (dist == 1 && new Random().nextInt(5) == 0) {
+			Sound.player.play(Sounds.WALK_SOUND);
 		}
 	}
 
@@ -326,12 +333,14 @@ public class Player extends LivingThing {
 		if (target.getType() == LivingThingType.MOB) {
 			double damages = this.attackPower;
 			for (Pair<Armor> armorPair : this.armors) {
-				if (armorPair != null && armorPair.object != null)
+				if (armorPair != null && armorPair.object != null) {
 					damages += armorPair.object.getAttackPowerModifier();
+				}
 			}
 			if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
 				damages += this.weapon.object.getAttackPowerModifier();
 			}
+			super.attack(target);
 			target.damage(damages);
 		}
 	}
@@ -383,6 +392,7 @@ public class Player extends LivingThing {
 	 */
 	public boolean addToInventory(Pair<StorableObject> storable) {
 		if (this.inventory.size() < this.maxStorageCapacity) {
+			Sound.player.play(Sounds.LOOT_SOUND);
 			this.inventory.add(storable);
 			fireInventoryAdditionEvent(new InventoryAdditionEvent(
 					this.number,
@@ -409,6 +419,19 @@ public class Player extends LivingThing {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public double getDefensePower() {
+		double def = 0;
+		for (Pair<Armor> armor : this.armors) {
+			if (armor != null && armor.object != null) {
+				def += armor.object.getDefensePowerModifier();
+			}
+		}
+		return def + this.defensePower;
+	}
 	/**
 	 * Method to call when the drop request was solved successfully
 	 *
@@ -521,7 +544,7 @@ public class Player extends LivingThing {
 		this.hitPoints = Math.min(this.maxHitPoints, hp + this.hitPoints);
 		this.fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
 				PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
-		super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints));
+		super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints, (int) Math.round(hp)));
 	}
 
 	/**
@@ -797,6 +820,7 @@ public class Player extends LivingThing {
 	public void xp(int earnedXp) {
 		this.xp += earnedXp;
 		if (this.xp >= this.requiredXp) {
+			Sound.player.play(Sounds.LEVEL_UP_SOUND);
 			int levelUpping = this.xp / this.requiredXp;
 			this.xp %= this.requiredXp;
 			this.requiredXp += this.requiredXpPerLevel * levelUpping;
@@ -812,7 +836,7 @@ public class Player extends LivingThing {
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, (int) this.maxMana));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
 			fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.MAX, this.requiredXp));
-			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints));
+			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints, 0));
 		}
 		fireStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, this.xp));
 	}
@@ -857,11 +881,6 @@ public class Player extends LivingThing {
 		this.requestedInteraction = null;
 		this.requestedPath.clear();
 		this.objectToDrop = null;
-	}
-
-	public static int parsePlayerNumber(String str) {
-		int nbr = str.indexOf("nbr=", 17) + 4;
-		return Integer.parseInt(str.substring(nbr, str.indexOf(',', nbr)));
 	}
 
 	public void deleteEquipedObjects() {

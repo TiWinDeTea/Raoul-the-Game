@@ -8,6 +8,9 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -107,8 +110,10 @@ public class Map {
     public void triggerTile(Vector2i position) {
         if (this.map[position.x][position.y] == Tile.CLOSED_DOOR) {
             this.map[position.x][position.y] = Tile.OPENED_DOOR;
+            Sound.player.play(Sounds.DOOR_SOUND);
         } else if (this.map[position.x][position.y] == Tile.OPENED_DOOR) {
             this.map[position.x][position.y] = Tile.CLOSED_DOOR;
+            Sound.player.play(Sounds.DOOR_SOUND);
         }
     }
 
