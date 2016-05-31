@@ -420,6 +420,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e) {
 			if(GUI.this.livingEntities.containsKey(e.entityId)) {
 				GUI.this.livingEntities.get(e.entityId).setHealthProportion(e.newHealthProportion);
+				GUI.this.livingEntities.get(e.entityId).displayHealthModification(e.healthDiff);
 			}
 			else {
 				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.entityId);

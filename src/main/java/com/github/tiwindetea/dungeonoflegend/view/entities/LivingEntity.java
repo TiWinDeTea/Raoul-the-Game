@@ -130,7 +130,7 @@ public class LivingEntity extends Entity {
 		return false;
 	}
 
-	public void displayLifeModification(int value) {
+	public void displayHealthModification(int value) {
 		Label label = new Label();
 		label.setFont(TEXT_FONT);
 		if(value > 0) {

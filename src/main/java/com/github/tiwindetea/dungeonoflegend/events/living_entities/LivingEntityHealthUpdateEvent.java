@@ -5,10 +5,12 @@ package com.github.tiwindetea.dungeonoflegend.events.living_entities;
  */
 public class LivingEntityHealthUpdateEvent extends LivingEntityEvent {
 	public double newHealthProportion;
+	public int healthDiff;
 
-	public LivingEntityHealthUpdateEvent(long entityId, double newHealthProportion) {
+	public LivingEntityHealthUpdateEvent(long entityId, double newHealthProportion, int healthDiff) {
 		super(entityId);
 		this.newHealthProportion = newHealthProportion;
+		this.healthDiff = healthDiff;
 	}
 
 	@Override
