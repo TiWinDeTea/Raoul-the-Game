@@ -131,51 +131,53 @@ public class LivingEntity extends Entity {
 	}
 
 	public void displayHealthModification(int value) {
-		Label label = new Label();
-		label.setFont(TEXT_FONT);
-		if(value > 0) {
-			label.setText("+" + Integer.toString(value));
-			label.setTextFill(POSITIVE_MODIFICATION_TEXT_COLOR);
-		}
-		else {
-			label.setText(Integer.toString(value));
-			label.setTextFill(NEGATIVE_MODIFICATION_TEXT_COLOR);
-		}
-		label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
-
-		getChildren().add(label);
-
-		FadeTransition fadeTransition = new FadeTransition();
-		fadeTransition.setNode(label);
-		fadeTransition.setDuration(TRANSITION_DURATION);
-		fadeTransition.setFromValue(1.0);
-		fadeTransition.setToValue(0.0);
-		fadeTransition.setCycleCount(1);
-		fadeTransition.setAutoReverse(false);
-
-		TranslateTransition translateTransition = new TranslateTransition();
-		translateTransition.setNode(label);
-		translateTransition.setDuration(TRANSITION_DURATION);
-		translateTransition.setFromY(TRANSITION_INITIAL_Y_POSITION);
-		translateTransition.setToY(TRANSITION_FINAL_Y_POSITION);
-		translateTransition.setCycleCount(1);
-		translateTransition.setAutoReverse(false);
-
-		fadeTransition.play();
-		translateTransition.play();
-
-		ExecutorService executorService = Executors.newSingleThreadExecutor();
-		executorService.submit(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch(InterruptedException e) {
-					e.printStackTrace();
-				}
-				getChildren().remove(label);
+		if(value != 0) {
+			Label label = new Label();
+			label.setFont(TEXT_FONT);
+			if(value > 0) {
+				label.setText("+" + Integer.toString(value));
+				label.setTextFill(POSITIVE_MODIFICATION_TEXT_COLOR);
 			}
-		});
-		executorService.shutdown();
+			else {
+				label.setText(Integer.toString(value));
+				label.setTextFill(NEGATIVE_MODIFICATION_TEXT_COLOR);
+			}
+			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+
+			getChildren().add(label);
+
+			FadeTransition fadeTransition = new FadeTransition();
+			fadeTransition.setNode(label);
+			fadeTransition.setDuration(TRANSITION_DURATION);
+			fadeTransition.setFromValue(1.0);
+			fadeTransition.setToValue(0.0);
+			fadeTransition.setCycleCount(1);
+			fadeTransition.setAutoReverse(false);
+
+			TranslateTransition translateTransition = new TranslateTransition();
+			translateTransition.setNode(label);
+			translateTransition.setDuration(TRANSITION_DURATION);
+			translateTransition.setFromY(TRANSITION_INITIAL_Y_POSITION);
+			translateTransition.setToY(TRANSITION_FINAL_Y_POSITION);
+			translateTransition.setCycleCount(1);
+			translateTransition.setAutoReverse(false);
+
+			fadeTransition.play();
+			translateTransition.play();
+
+			ExecutorService executorService = Executors.newSingleThreadExecutor();
+			executorService.submit(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(2000);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					getChildren().remove(label);
+				}
+			});
+			executorService.shutdown();
+		}
 	}
 }
