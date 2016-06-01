@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.events.Event;
+import com.github.tiwindetea.dungeonoflegend.events.LevelUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
@@ -440,6 +441,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			GUI.this.rScoreDisplayer.setScore(e.newScore);
 		}
 
+		public void updateLevel(LevelUpdateEvent e) {
+			GUI.this.rScoreDisplayer.setLevel(e.newLevel);
+		}
+
 		@Override
 		public void handle(ActionEvent event) {
 			Event gameEvent = GUI.this.eventQueue.poll();
@@ -560,6 +565,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					updateScore((ScoreUpdateEvent) gameEvent);
 					break;
 				}
+				case LEVEL_UPDATE_EVENT:
+					updateLevel((LevelUpdateEvent) gameEvent);
+					break;
 				}
 				gameEvent = GUI.this.eventQueue.poll();
 			}
@@ -840,6 +848,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void deletePlayer(PlayerDeletionEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void updateLevel(LevelUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 }
