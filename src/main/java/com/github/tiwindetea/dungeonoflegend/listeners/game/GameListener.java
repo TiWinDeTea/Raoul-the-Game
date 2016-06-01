@@ -7,5 +7,5 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.players.PlayerListen
 /**
  * Created by maxime on 5/6/16.
  */
-public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, PlayerListener {
+public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener {
 }
