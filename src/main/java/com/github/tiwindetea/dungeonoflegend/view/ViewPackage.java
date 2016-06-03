@@ -38,6 +38,8 @@ public class ViewPackage {
 	public static final Vector2i FOG_SPRITE_POSITION = new Vector2i(Integer.parseInt(TILES_RESOURCE_BUNDLE.getString("fog.sprite.position.x")),
 	  Integer.parseInt(TILES_RESOURCE_BUNDLE.getString("fog.sprite.position.y")));
 
+	public static final String MAIN_FONT_PATH = "/" + PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("font.mainfont.file");
+
 	/**
 	 * Gets main font.
 	 *
@@ -45,6 +47,6 @@ public class ViewPackage {
 	 * @return the main font
 	 */
 	public static Font getMainFont(int fontSize) {
-		return Font.loadFont(GUI.class.getResource("/com/github/tiwindetea/dungeonoflegend/fonts/slkscr.ttf").toExternalForm(), fontSize);
+		return Font.loadFont(GUI.class.getResource(MAIN_FONT_PATH).toExternalForm(), fontSize);
 	}
 }
