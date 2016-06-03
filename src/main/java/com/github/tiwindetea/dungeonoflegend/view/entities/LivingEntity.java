@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 import java.util.concurrent.ExecutorService;
@@ -31,7 +30,7 @@ public class LivingEntity extends Entity {
 	private static final Color ACTUAL_HEALTH_RECTANGLE_COLOR = Color.RED;
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 
-	private static final Font TEXT_FONT = Font.font("Arial", FontWeight.NORMAL, 14);
+	private static final Font TEXT_FONT = ViewPackage.getMainFont(14);
 	private static final Color POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
 	private static final Color NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
 	private static final Duration TRANSITION_DURATION = new Duration(1500);

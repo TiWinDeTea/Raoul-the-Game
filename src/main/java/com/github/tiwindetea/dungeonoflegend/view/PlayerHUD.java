@@ -10,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.util.Duration;
 
 /**
@@ -39,13 +38,17 @@ public class PlayerHUD extends Parent {
 
 	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
 
-	private static final Font HEALTH_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
+	private static final Font HEALTH_LABEL_FONT = ViewPackage.getMainFont(15);
 	private static final Color HEALTH_LABEL_TEXT_COLOR = Color.WHITE;
 	private static final int HEALTH_LABEL_TRANSLATE_Y = 37;
-	private static final Font MANA_LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 10);
+	private static final Font MANA_LABEL_FONT = ViewPackage.getMainFont(10);
 	private static final Color MANA_LABEL_TEXT_COLOR = Color.WHITE;
 	private static final int MANA_LABEL_TRANSLATE_Y = 57;
 	private static final int LABELS_OFFSET = 5;
+
+	private static final Font LEVEL_LABEL_FONT = ViewPackage.getMainFont(20);
+	private static final Color LEVEL_LABEL_TEXT_COLOR = Color.WHITE;
+	private static final int LEVEL_LABEL_TRANSLATE_Y = 5;
 
 	private final ImageView playerPicture;
 	private final Rectangle maxHealthRectangle = new Rectangle();
@@ -59,8 +62,10 @@ public class PlayerHUD extends Parent {
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
+	private final Label levelLabel = new Label();
 	private final SimpleStringProperty healthString = new SimpleStringProperty();
 	private final SimpleStringProperty manaString = new SimpleStringProperty();
+	private final SimpleStringProperty levelString = new SimpleStringProperty();
 
 	private final ImageView backgroundImage = new ImageView(ViewPackage.HUD_IMAGE);
 
@@ -70,6 +75,7 @@ public class PlayerHUD extends Parent {
 	private int actualMana;
 	private int maxXP;
 	private int actualXP;
+	private int actualLevel;
 
 	/**
 	 * Instantiates a new PlayerHUD.
@@ -181,6 +187,14 @@ public class PlayerHUD extends Parent {
 		this.manaLabel.setTranslateX(this.maxHealthRectangle.getTranslateX() + LABELS_OFFSET);
 		this.manaLabel.setTranslateY(MANA_LABEL_TRANSLATE_Y);
 
+		this.getChildren().add(this.levelLabel);
+		this.levelLabel.setFont(LEVEL_LABEL_FONT);
+		this.levelLabel.setTextFill(LEVEL_LABEL_TEXT_COLOR);
+		this.levelLabel.textProperty().bind(this.levelString);
+		this.levelString.set(Integer.toString(this.actualLevel));
+		this.levelLabel.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
+		this.levelLabel.setTranslateY(LEVEL_LABEL_TRANSLATE_Y);
+
 		getChildren().add(this.maskRectangle);
 		this.maskRectangle.setFill(MASK_COLOR);
 		this.maskRectangle.setVisible(false);
@@ -282,6 +296,16 @@ public class PlayerHUD extends Parent {
 	}
 
 	/**
+	 * Sets actual level.
+	 *
+	 * @param actualLevel the actual level
+	 */
+	public void setActualLevel(int actualLevel) {
+		this.actualLevel = actualLevel;
+		this.levelString.set(Integer.toString(this.actualLevel));
+	}
+
+	/**
 	 * Gets max health.
 	 *
 	 * @return the max health
@@ -333,5 +357,14 @@ public class PlayerHUD extends Parent {
 	 */
 	public int getActualXP() {
 		return this.actualXP;
+	}
+
+	/**
+	 * Gets actual level.
+	 *
+	 * @return the actual level
+	 */
+	public int getActualLevel() {
+		return this.actualLevel;
 	}
 }

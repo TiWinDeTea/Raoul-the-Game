@@ -16,7 +16,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 /**
  * The type ScoreDisplayer.
@@ -27,7 +26,7 @@ public class ScoreDisplayer extends Parent {
 	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(300, 60);
 	private static final int PADDING = 10;
 	private static final int SPACING = 50;
-	private static final Font LABEL_FONT = Font.font("Serif", FontWeight.NORMAL, 15);
+	private static final Font LABEL_FONT = ViewPackage.getMainFont(20);
 	private static final Color LABEL_TEXT_COLOR = Color.WHITE;
 
 	private final Rectangle mainRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, Color.rgb(0x2E, 0x26, 0x25));

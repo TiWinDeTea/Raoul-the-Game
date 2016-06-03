@@ -9,7 +9,6 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 /**
  * The type InformationsDisplayer
@@ -18,7 +17,7 @@ import javafx.scene.text.FontWeight;
  */
 public class InformationsDisplayer extends Parent {
 	private static final int WIDTH = 300;
-	private static final Font TEXT_FONT = Font.font("Arial", FontWeight.NORMAL, 20);
+	private static final Font TEXT_FONT = ViewPackage.getMainFont(20);
 	private static final Color TEXT_COLOR = Color.WHITE;
 
 	private static final StackPane MAIN_PANE = new StackPane();
