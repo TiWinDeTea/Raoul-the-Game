@@ -92,6 +92,7 @@ public class PlayerHUD extends Parent {
 	 * @param maxMana       the max mana
 	 * @param actualXP      the actual xp
 	 * @param maxXP         the max xp
+	 * @param actualLevel   the actual level
 	 */
 	public PlayerHUD(ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel) {
 		this.playerPicture = playerPicture;
