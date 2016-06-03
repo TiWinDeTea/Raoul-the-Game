@@ -87,6 +87,8 @@ public class MainMenu extends Application {
 		});
 
 		this.menuAnchorPane.getChildren().addAll(this.soloImageView, this.multiplayerImageView, this.loadImageView, this.resumeImageView, this.greenLogoImageView, this.orangeLogoImageView);
+		this.menuAnchorPane.setMinWidth(BUTTONS_VBOX_MIN_WIDTH + PICTURES_ESTIMATED_MAX_WIDTH);
+		this.menuAnchorPane.setMinHeight(PICTURES_HEIGHT + LOGOS_HEIGHT);
 
 		this.soloImageView.setPreserveRatio(true);
 		this.soloImageView.setFitHeight(PICTURES_HEIGHT);
