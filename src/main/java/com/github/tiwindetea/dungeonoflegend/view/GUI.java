@@ -330,6 +330,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					}
 					break;
+				case LEVEL:
+					GUI.this.playersHUD.get(e.playerNumber).setActualLevel(value);
+					break;
 				}
 			}
 			else {
