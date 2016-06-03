@@ -3,12 +3,14 @@ package com.github.tiwindetea.dungeonoflegend.view.entities;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.InformationsDisplayer;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
+import javafx.animation.TranslateTransition;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -33,7 +35,9 @@ public abstract class Entity extends Parent {
 	 * @param description the description
 	 */
 	public Entity(Vector2i position, String description) {
-		setPosition(position);
+		this.position = new Vector2i(position);
+		setTranslateX(this.position.x * ViewPackage.SPRITES_SIZE.x);
+		setTranslateY(this.position.y * ViewPackage.SPRITES_SIZE.y);
 		this.description = description;
 
 		getChildren().add(this.backgroundRectangle);
@@ -63,9 +67,18 @@ public abstract class Entity extends Parent {
 	 * @param position the position
 	 */
 	public void setPosition(Vector2i position) {
+		TranslateTransition translateTransition = new TranslateTransition();
+		translateTransition.setNode(this);
+		translateTransition.setDuration(new Duration(120));
+		translateTransition.setFromX(this.position.x * ViewPackage.SPRITES_SIZE.x);
+		translateTransition.setFromY(this.position.y * ViewPackage.SPRITES_SIZE.y);
+		translateTransition.setToX(position.x * ViewPackage.SPRITES_SIZE.x);
+		translateTransition.setToY(position.y * ViewPackage.SPRITES_SIZE.y);
+		translateTransition.setCycleCount(1);
+		translateTransition.setAutoReverse(false);
+		translateTransition.play();
+
 		this.position = new Vector2i(position);
-		setTranslateX(position.x * ViewPackage.SPRITES_SIZE.x);
-		setTranslateY(position.y * ViewPackage.SPRITES_SIZE.y);
 	}
 
 	/**
