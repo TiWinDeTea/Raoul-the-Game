@@ -333,6 +333,15 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				case LEVEL:
 					GUI.this.playersHUD.get(e.playerNumber).setActualLevel(value);
 					break;
+				case DAMAGES:
+					GUI.this.playersHUD.get(e.playerNumber).setActualDamages(value);
+					break;
+				case ARMOR:
+					GUI.this.playersHUD.get(e.playerNumber).setActualArmor(value);
+					break;
+				case RANGE:
+					GUI.this.playersHUD.get(e.playerNumber).setActualRange(value);
+					break;
 				}
 			}
 			else {

@@ -8,7 +8,10 @@ public class PlayerStatEvent extends PlayerEvent {
 		HEALTH,
 		MANA,
 		XP,
-		LEVEL
+		LEVEL,
+		DAMAGES,
+		ARMOR,
+		RANGE
 	}
 	public enum ValueType {
 		ACTUAL,

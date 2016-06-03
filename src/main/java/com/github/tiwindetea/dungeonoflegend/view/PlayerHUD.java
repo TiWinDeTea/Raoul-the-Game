@@ -69,6 +69,8 @@ public class PlayerHUD extends Parent {
 
 	private final ImageView backgroundImage = new ImageView(ViewPackage.HUD_IMAGE);
 
+	private String description;
+
 	private int maxHealth;
 	private int actualHealth;
 	private int maxMana;
@@ -76,6 +78,9 @@ public class PlayerHUD extends Parent {
 	private int maxXP;
 	private int actualXP;
 	private int actualLevel;
+	private int actualDamages;
+	private int actualArmor;
+	private int actualRange;
 
 	/**
 	 * Instantiates a new PlayerHUD.
@@ -117,8 +122,7 @@ public class PlayerHUD extends Parent {
 
 			@Override
 			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText("TODO");
-				//TODO: display real informations
+				InformationsDisplayer.setText(PlayerHUD.this.description);
 			}
 		});
 		this.setOnMouseExited(new EventHandler<MouseEvent>() {
@@ -226,6 +230,18 @@ public class PlayerHUD extends Parent {
 		transition.play();
 	}
 
+	private void updateDescription() {
+		this.description =
+		  "Level: " + this.actualLevel +
+			"\nXP to next level: " + (this.maxXP - this.actualXP) +
+			"\nHealth: " + this.actualHealth + " / " + this.maxHealth +
+			"\nMana: " + this.actualMana + " / " + this.maxMana +
+			"\n" +
+			"\nDamages: " + this.actualDamages +
+			"\nArmor: " + this.actualArmor +
+			"\nRange:" + this.actualRange;
+	}
+
 	/**
 	 * Sets masked (with a transparent black rectangle over).
 	 *
@@ -243,6 +259,7 @@ public class PlayerHUD extends Parent {
 	public void setMaxHealth(int maxHealth) {
 		this.maxHealth = maxHealth;
 		this.updateHealth();
+		updateDescription();
 	}
 
 	/**
@@ -253,6 +270,7 @@ public class PlayerHUD extends Parent {
 	public void setActualHealth(int actualHealth) {
 		this.actualHealth = actualHealth;
 		this.updateHealth();
+		updateDescription();
 	}
 
 	/**
@@ -263,6 +281,7 @@ public class PlayerHUD extends Parent {
 	public void setMaxMana(int maxMana) {
 		this.maxMana = maxMana;
 		this.updateMana();
+		updateDescription();
 	}
 
 	/**
@@ -273,6 +292,7 @@ public class PlayerHUD extends Parent {
 	public void setActualMana(int actualMana) {
 		this.actualMana = actualMana;
 		this.updateMana();
+		updateDescription();
 	}
 
 	/**
@@ -283,6 +303,7 @@ public class PlayerHUD extends Parent {
 	public void setMaxXP(int maxXP) {
 		this.maxXP = maxXP;
 		this.updateXP();
+		updateDescription();
 	}
 
 	/**
@@ -293,6 +314,7 @@ public class PlayerHUD extends Parent {
 	public void setActualXP(int actualXP) {
 		this.actualXP = actualXP;
 		this.updateXP();
+		updateDescription();
 	}
 
 	/**
@@ -303,6 +325,37 @@ public class PlayerHUD extends Parent {
 	public void setActualLevel(int actualLevel) {
 		this.actualLevel = actualLevel;
 		this.levelString.set(Integer.toString(this.actualLevel));
+		updateDescription();
+	}
+
+	/**
+	 * Sets actual damages.
+	 *
+	 * @param actualDamages the actual damages
+	 */
+	public void setActualDamages(int actualDamages) {
+		this.actualDamages = actualDamages;
+		updateDescription();
+	}
+
+	/**
+	 * Sets actual armor.
+	 *
+	 * @param actualArmor the actual armor
+	 */
+	public void setActualArmor(int actualArmor) {
+		this.actualArmor = actualArmor;
+		updateDescription();
+	}
+
+	/**
+	 * Sets actual range.
+	 *
+	 * @param actualRange the actual range
+	 */
+	public void setActualRange(int actualRange) {
+		this.actualRange = actualRange;
+		updateDescription();
 	}
 
 	/**
@@ -366,5 +419,32 @@ public class PlayerHUD extends Parent {
 	 */
 	public int getActualLevel() {
 		return this.actualLevel;
+	}
+
+	/**
+	 * Gets actual damages.
+	 *
+	 * @return the actual damages
+	 */
+	public int getActualDamages() {
+		return this.actualDamages;
+	}
+
+	/**
+	 * Gets actual armor.
+	 *
+	 * @return the actual armor
+	 */
+	public int getActualArmor() {
+		return this.actualArmor;
+	}
+
+	/**
+	 * Gets actual range.
+	 *
+	 * @return the actual range
+	 */
+	public int getActualRange() {
+		return this.actualRange;
 	}
 }
