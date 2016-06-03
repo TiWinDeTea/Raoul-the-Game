@@ -51,7 +51,7 @@ public class ScoreDisplayer extends Parent {
 		this.stackPane.prefHeightProperty().bind(this.mainRectangle.heightProperty());
 
 		this.stackPane.getChildren().addAll(this.hBox);
-		this.hBox.maxWidthProperty().bind(this.scoreLabel.widthProperty().add(this.levelLabel.widthProperty()).add(2 * ViewPackage.SPRITES_SIZE.x));
+		this.hBox.maxWidthProperty().bind(this.scoreLabel.widthProperty().add(this.levelLabel.widthProperty()).add(2 * ViewPackage.SPRITES_SIZE.x + 4 * PADDING));
 		this.hBox.setMaxHeight(ViewPackage.SPRITES_SIZE.y);
 		this.hBox.setAlignment(Pos.CENTER);
 		this.hBox.setSpacing(PADDING);
@@ -91,7 +91,7 @@ public class ScoreDisplayer extends Parent {
 	 * Increase level.
 	 */
 	public void increaseLevel() {
-		++this.score;
+		++this.level;
 		updateLevel();
 	}
 
