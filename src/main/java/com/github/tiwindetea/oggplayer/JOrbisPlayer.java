@@ -94,12 +94,8 @@ public class JOrbisPlayer implements Runnable {
 
     int bufferLengthInBytes;
 
-    public JOrbisPlayer(String file) {
-        this.file = selectSource(file);
-    }
-
     public JOrbisPlayer(URL file) {
-        this.file = selectSource(file.toString());
+        this.file = selectSource(file);
     }
 
     public void setLooping(boolean isLooping) {
@@ -141,6 +137,7 @@ public class JOrbisPlayer implements Runnable {
     }
 
     private void init_audio(int channels, int rate) {
+
         try {
             AudioFormat audioFormat = new AudioFormat((float) rate, 16, channels, true, // PCM_Signed
                     false // littleEndian
@@ -148,6 +145,7 @@ public class JOrbisPlayer implements Runnable {
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat,
                     AudioSystem.NOT_SPECIFIED);
             if (!AudioSystem.isLineSupported(info)) {
+                System.err.println("Sound not supported by system");
                 return;
             }
 
@@ -539,7 +537,8 @@ public class JOrbisPlayer implements Runnable {
         this.isRunning = false;
     }
 
-    InputStream selectSource(String item) {
+    InputStream selectSource(URL url) {
+        String item = url.toString();
         if (item.endsWith(".pls")) {
             item = fetch_pls(item);
         } else if (item.endsWith(".m3u")) {
@@ -553,7 +552,6 @@ public class JOrbisPlayer implements Runnable {
         InputStream is = null;
         URLConnection urlc = null;
         try {
-            URL url = new URL(item);
             urlc = url.openConnection();
             is = urlc.getInputStream();
             this.current_source = url.getProtocol() + "://" + url.getHost() + ":" + url.getPort()

@@ -2,7 +2,7 @@ package com.github.tiwindetea.oggplayer;
 
 import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
 
-import java.io.File;
+import java.net.URL;
 
 import static com.github.tiwindetea.oggplayer.Sound.SOUNDS_BUNDLE;
 
@@ -20,11 +20,12 @@ public enum Sounds {
     NEXT_FLOOR_SOUND(SOUNDS_BUNDLE.getString("next-floor-sound")),
     WALK_SOUND(SOUNDS_BUNDLE.getString("walk-sound"));
 
-    private final String path;
+    private final URL path;
     private final boolean isLooping;
+    private final ClassLoader loader = this.getClass().getClassLoader();
 
     Sounds(String accessPath, boolean looping) {
-        this.path = new File("src/main/resources/" + MainPackage.path + "/" + accessPath).toURI().toString();
+        this.path = this.loader.getResource(MainPackage.path + "/" + accessPath);
         this.isLooping = looping;
     }
 
@@ -36,7 +37,7 @@ public enum Sounds {
         return this.isLooping;
     }
 
-    public String toString() {
+    public URL toURL() {
         return this.path;
     }
 }

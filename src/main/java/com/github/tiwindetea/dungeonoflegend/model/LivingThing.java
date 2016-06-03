@@ -10,9 +10,7 @@ package com.github.tiwindetea.dungeonoflegend.model;
 
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.GameListener;
-import com.github.tiwindetea.dungeonoflegend.listeners.game.players.PlayerStatListener;
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
 
@@ -52,12 +50,6 @@ public abstract class LivingThing implements Descriptable {
 
 	protected static GameListener[] getPlayersListeners() {
 		return LivingThing.listeners.toArray(new GameListener[LivingThing.listeners.size()]);
-	}
-
-	protected void fireStatEvent(PlayerStatEvent event) {
-		for(PlayerStatListener listener : getPlayersListeners()) {
-			listener.changePlayerStat(event);
-		}
 	}
 
 	protected void fireHealthUpdate(LivingEntityHealthUpdateEvent event) {

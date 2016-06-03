@@ -1,5 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.events;
 
+import static com.github.tiwindetea.dungeonoflegend.events.EventType.LEVEL_UPDATE_EVENT;
+
 /**
  * Created by maxime on 6/1/16.
  */
@@ -12,6 +14,6 @@ public class LevelUpdateEvent extends Event {
 
 	@Override
 	public EventType getType() {
-		return null;
+		return LEVEL_UPDATE_EVENT;
 	}
 }

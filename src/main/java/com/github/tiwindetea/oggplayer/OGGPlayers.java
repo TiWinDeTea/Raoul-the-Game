@@ -226,30 +226,14 @@ public class OGGPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public JOrbisPlayer put(K key, String file) {
+    public JOrbisPlayer put(K key, URL file) {
         return this.players.put(key, new JOrbisPlayer(file));
     }
 
-    public JOrbisPlayer put(K key, String file, boolean isLooping) {
+    public JOrbisPlayer put(K key, URL file, boolean isLooping) {
         JOrbisPlayer ret = new JOrbisPlayer(file);
         ret.setLooping(isLooping);
         return this.players.put(key, ret);
-    }
-
-    /**
-     * Associates a JOrbisPlayer targetting the file with the specified
-     * key in the map. If the map previously contained a mapping for the
-     * key, the old value is replaced and returned.
-     *
-     * @param key  key with which the specified value is to be associated
-     * @param file URL to the target file
-     * @return the previous value associated with <tt>key</tt>, or
-     * <tt>null</tt> if there was no mapping for <tt>key</tt>.
-     * (A <tt>null</tt> return can also indicate that the map
-     * previously associated <tt>null</tt> with <tt>key</tt>.)
-     */
-    public JOrbisPlayer put(K key, URL file) {
-        return this.players.put(key, new JOrbisPlayer(file));
     }
 
     /**
@@ -266,23 +250,6 @@ public class OGGPlayers<K> {
      */
     public JOrbisPlayer put(K key, JOrbisPlayer player) {
         return this.players.put(key, player);
-    }
-
-    /**
-     * Adds the file to the map and plays it.
-     *
-     * @param key  key with which the specified value is to be associated
-     * @param file URL to the target file
-     * @return the previous value associated with <tt>key</tt>, or
-     * <tt>null</tt> if there was no mapping for <tt>key</tt>.
-     * (A <tt>null</tt> return can also indicate that the map
-     * previously associated <tt>null</tt> with <tt>key</tt>.)
-     *
-     * @see OGGPlayers#put(Object, String)
-     * @see OGGPlayers#play(Object)
-     */
-    public JOrbisPlayer putAndPlay(K key, String file) {
-        return this.putAndPlay(key, new JOrbisPlayer(file));
     }
 
     /**

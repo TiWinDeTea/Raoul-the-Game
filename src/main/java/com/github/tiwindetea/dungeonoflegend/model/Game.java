@@ -9,6 +9,7 @@
 
 package com.github.tiwindetea.dungeonoflegend.model;
 
+import com.github.tiwindetea.dungeonoflegend.events.LevelUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
@@ -21,7 +22,6 @@ import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
-import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
@@ -252,16 +252,6 @@ public class Game implements RequestListener, Runnable, Stopable {
 			}
 		}
 		fireMapCreationEvent(new MapCreationEvent(tiles));
-		for (Player player : this.players) {
-			firePlayerCreationEvent(new PlayerCreationEvent(
-					player.getNumber(),
-					player.getGType(),
-					(int) player.getMaxHitPoints(),
-					(int) player.getMaxMana(),
-					player.getMaxXp(),
-					player.getDescription()
-			));
-		}
 
 		for (Player player : players) {
 			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
@@ -528,10 +518,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		}
 	}
 
-
-	private void firePlayerStatEvent(PlayerStatEvent event) {
+	private void fireLevelUpdateEvent(LevelUpdateEvent event) {
 		for (GameListener listener : getGameListeners()) {
-			listener.changePlayerStat(event);
+			listener.updateLevel(event);
 		}
 	}
 
@@ -590,6 +579,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 		Sound.player.play(Sounds.NEXT_FLOOR_SOUND);
 		System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
+		fireLevelUpdateEvent(new LevelUpdateEvent(this.level));
 
 		/* Generate the level and bulbs to turn off */
 		List<Map.Room> rooms = this.world.generateLevel(this.level);
@@ -770,6 +760,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 					fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
 				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
 					player.setFloor(this.level + 1);
+					player.setPosition(new Vector2i(0, 0));
 					player.hasFallen = true;
 					player.damage(player.getMaxHitPoints() / 5);
 					fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
@@ -1268,13 +1259,10 @@ public class Game implements RequestListener, Runnable, Stopable {
 						this.currentPlayer.setRequestedAttack(e.tilePosition);
 						if (p.squaredDistance(e.tilePosition) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
 							Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
-							for (Mob mob : this.mobs) {
-								shadow.add(mob);
-							}
-							for (Player player : this.players) {
-								shadow.add(player);
-							}
+							shadow.addAll(this.mobs);
+							shadow.addAll(this.players);
 							this.currentPlayer.setRequestedPath(shortestPathApprox(p, e.tilePosition, false, shadow));
+							this.currentPlayer.setSawDuck(false);
 						}
 					}
 				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
