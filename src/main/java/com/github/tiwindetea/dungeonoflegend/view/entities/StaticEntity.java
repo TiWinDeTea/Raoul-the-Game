@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view.entities;
 
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
+import com.github.tiwindetea.dungeonoflegend.view.PlayerInventory;
 import com.github.tiwindetea.dungeonoflegend.view.ViewPackage;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -9,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
@@ -20,11 +22,13 @@ import javafx.util.Duration;
  * @author Maxime PINARD.
  */
 public class StaticEntity extends Entity {
+	public static final DataFormat place = new DataFormat("place in the inventory");
 	private StaticEntityType staticEntityType;
 	private boolean animated;
 	private Animation animation;
 	private int actualSpriteNumber;
 	private int spritesNumber;
+	private PlayerInventory.Place where;
 
 	/**
 	 * Instantiates a new StaticEntity.
@@ -62,6 +66,7 @@ public class StaticEntity extends Entity {
 			public void handle(MouseEvent event) {
 				Dragboard db = StaticEntity.this.startDragAndDrop(TransferMode.COPY);
 				ClipboardContent content = new ClipboardContent();
+				content.put(place, StaticEntity.this.where);
 				content.putString(Long.toString(id));
 				db.setContent(content);
 				event.consume();
@@ -99,5 +104,9 @@ public class StaticEntity extends Entity {
 	@Override
 	public boolean isVisibleOnFog() {
 		return true;
+	}
+
+	public void setWhere(PlayerInventory.Place where) {
+		this.where = where;
 	}
 }

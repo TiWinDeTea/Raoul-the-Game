@@ -27,6 +27,7 @@ import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestE
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
@@ -255,11 +256,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		fireMapCreationEvent(new MapCreationEvent(tiles));
 
 		for (Player player : players) {
-			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 0, 0, 0, 0)));
-			player.addToInventory(new Pair<>(new Pot(3, 0, 15, 0, 0, 0, 0)));
-			player.addToInventory(new Pair<>(new Pot(3, 15, 15, 1, 1, 1, 1)));
+			player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
-			player.addToInventory(new Pair<>(new Weapon(5, 5, 0)));
+			player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -562,6 +561,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 */
 	@Override
 	public void requestCenterView(CenterViewRequestEvent e) {
+		this.requestedEvent.add(e);
+	}
+
+	@Override
+	public void requestEquipping(EquipRequestEvent e) {
 		this.requestedEvent.add(e);
 	}
 
@@ -1177,6 +1181,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 								case CENTER_VIEW_REQUEST_EVENT:
 									treatRequestEvent((CenterViewRequestEvent) event);
 									break;
+								case EQUIP_REQUEST_EVENT:
+									treatRequestEvent((EquipRequestEvent) event);
+									break;
 							}
 						} catch (Exception e) {
 							// debug
@@ -1343,6 +1350,28 @@ public class Game implements RequestListener, Runnable, Stopable {
 		} else {
 			this.requestInteraction(new InteractionRequestEvent(pos));
 		}
+	}
+
+	private void treatRequestEvent(EquipRequestEvent e) {
+		List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
+		this.objectToUse = null;
+		for (Pair<StorableObject> pair : inventory) {
+			if (pair.getId() == e.objectId) {
+				if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
+				} else {
+					if (pair != null) {
+						this.currentPlayer.removeFromInventory(pair);
+						if (pair.object.getType() == StorableObjectType.ARMOR) {
+							this.currentPlayer.equipWithArmor(new Pair<>(pair.getId(), (Armor) pair.object));
+						} else if (pair.object.getType() == StorableObjectType.WEAPON) {
+							this.currentPlayer.equipWithWeapon(new Pair<>(pair.getId(), (Weapon) pair.object));
+						}
+					}
+				}
+				return;
+			}
+		}
+		this.currentPlayer.unequip(e.objectId);
 	}
 
 	public boolean isRunning() {

@@ -1,6 +1,7 @@
 package com.github.tiwindetea.dungeonoflegend.view;
 
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectDragEvent;
 import com.github.tiwindetea.dungeonoflegend.listeners.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
@@ -8,8 +9,11 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -30,6 +34,13 @@ import java.util.Map;
  * @author Maxime PINARD
  */
 public class PlayerInventory extends Parent {
+
+	public enum Place {
+		EQUIPPED_ITEMS,
+		UNEQUIPPED_ITEMS,
+		NOWHERE
+	}
+
 	private final List<PlayerInventoryListener> listeners = new ArrayList<>();
 
 	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(300, 400);
@@ -84,6 +95,49 @@ public class PlayerInventory extends Parent {
 		}
 	};
 
+	private EventHandler<DragEvent> onDragOverEquipementPanelEventHandler = new EventHandler<DragEvent>() {
+		@Override
+		public void handle(DragEvent event) {
+			Dragboard db = event.getDragboard();
+			if (db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.EQUIPPED_ITEMS) {
+				event.acceptTransferModes(TransferMode.COPY);
+			}
+			event.consume();
+		}
+	};
+
+	private EventHandler<DragEvent> onDragDroppedEquipementPanelEventHandler = new EventHandler<DragEvent>() {
+		@Override
+		public void handle(DragEvent event) {
+			boolean success = false;
+			Dragboard db = event.getDragboard();
+			if (db.hasString() && db.hasContent(StaticEntity.place)) {
+				try {
+					fireObjectDragEvent(new ObjectDragEvent(Long.parseLong(db.getString())));
+					success = true;
+				} catch (Exception e) {
+					System.out.println("Cannot parse " + db.getString() + " to a long");
+				}
+			}
+			event.setDropCompleted(success);
+			event.consume();
+		}
+	};
+
+	private EventHandler<DragEvent> onDragOverInventoryPanelEventHandler = new EventHandler<DragEvent>() {
+		@Override
+		public void handle(DragEvent event) {
+			Dragboard db = event.getDragboard();
+			if (db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.UNEQUIPPED_ITEMS) {
+				event.acceptTransferModes(TransferMode.COPY);
+			}
+			event.consume();
+		}
+	};
+
+	private EventHandler<DragEvent> onDragDroppedInventoryPanelEventHandler = this.onDragDroppedEquipementPanelEventHandler;
+
+
 	/**
 	 * Instantiates a new PlayerInventory.
 	 *
@@ -111,6 +165,12 @@ public class PlayerInventory extends Parent {
 		this.inventoryItemsTilePane.setPrefWidth(Double.MAX_VALUE);
 		this.inventoryItemsTilePane.setPadding(new Insets(SPACE));
 		this.inventoryItemsTilePane.maxWidthProperty().bind(this.mainVBox.widthProperty());
+
+		this.topHBox.setOnDragDropped(this.onDragDroppedEquipementPanelEventHandler);
+		this.topHBox.setOnDragOver(this.onDragOverEquipementPanelEventHandler);
+
+		this.inventoryItemsTilePane.setOnDragDropped(this.onDragDroppedInventoryPanelEventHandler);
+		this.inventoryItemsTilePane.setOnDragOver(this.onDragOverInventoryPanelEventHandler);
 	}
 
 	/**
@@ -137,6 +197,12 @@ public class PlayerInventory extends Parent {
 		}
 	}
 
+	private void fireObjectDragEvent(ObjectDragEvent event) {
+		for (PlayerInventoryListener listener : getPlayerInventoryListener()) {
+			listener.objectDragged(event);
+		}
+	}
+
 	/**
 	 * Add a inventory item (a StaticEntity to the inventory).
 	 *
@@ -147,6 +213,7 @@ public class PlayerInventory extends Parent {
 		this.inventoryItems.put(entityId, staticEntity);
 		this.inventoryItemsTilePane.getChildren().add(staticEntity);
 		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
+		staticEntity.setWhere(Place.UNEQUIPPED_ITEMS);
 	}
 
 	/**
@@ -155,7 +222,9 @@ public class PlayerInventory extends Parent {
 	 * @param entityId the entity id
 	 */
 	public void removeInventoryItem(Long entityId) {
-		this.inventoryItemsTilePane.getChildren().remove(this.inventoryItems.get(entityId));
+		StaticEntity a = this.inventoryItems.get(entityId);
+		a.setWhere(Place.NOWHERE);
+		this.inventoryItemsTilePane.getChildren().remove(a);
 		this.inventoryItems.remove(entityId);
 	}
 
@@ -168,6 +237,7 @@ public class PlayerInventory extends Parent {
 	public void addEquipedItem(Long entityId, StaticEntity staticEntity) {
 		this.equipedItems.put(entityId, staticEntity);
 		this.equipedItemsHBox.getChildren().add(staticEntity);
+		staticEntity.setWhere(Place.EQUIPPED_ITEMS);
 		staticEntity.setOnMouseReleased(this.onMouseReleaseEventHandler);
 	}
 
@@ -177,7 +247,9 @@ public class PlayerInventory extends Parent {
 	 * @param entityId the entity id
 	 */
 	public void removeEquipedItem(Long entityId) {
-		this.equipedItemsHBox.getChildren().remove(this.equipedItems.get(entityId));
+		StaticEntity a = this.equipedItems.get(entityId);
+		a.setWhere(Place.NOWHERE);
+		this.equipedItemsHBox.getChildren().remove(a);
 		this.equipedItems.remove(entityId);
 	}
 

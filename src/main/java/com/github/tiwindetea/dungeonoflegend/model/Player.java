@@ -190,13 +190,27 @@ public class Player extends LivingThing {
 	 * @param objectToDropId the id of the object to drop
 	 */
 	public void setObjectToDrop(long objectToDropId, Vector2i dropPos) {
+		this.objectToDrop = null;
 		int i = this.inventory.indexOf(new Pair<>(objectToDropId));
 		if (i >= 0) {
 			this.objectToDrop = this.inventory.get(i);
 			this.dropPos = dropPos;
 		} else {
-			this.objectToDrop = null;
-			this.requestedPath.clear();
+			if (this.weapon != null && this.weapon.getId() == objectToDropId) {
+				this.objectToDrop = new Pair<>(this.weapon);
+				this.dropPos = dropPos;
+			} else {
+				for (Pair<Armor> armor : this.armors) {
+					if (armor != null && armor.getId() == objectToDropId) {
+						this.objectToDrop = new Pair<>(armor);
+					}
+				}
+				if (this.objectToDrop == null) {
+					this.requestedPath.clear();
+				} else {
+					this.dropPos = dropPos;
+				}
+			}
 		}
 	}
 
@@ -465,12 +479,50 @@ public class Player extends LivingThing {
 	 * @return the dropped intem
 	 */
 	public Pair<StorableObject> dropRequestAccepted() {
-		if (this.objectToDrop != null && this.inventory.remove(this.objectToDrop)) {
-			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
-			Pair<StorableObject> tmp = this.objectToDrop;
-			this.inventory.remove(this.objectToDrop);
-			this.objectToDrop = null;
-			return tmp;
+		if (this.objectToDrop != null) {
+			if (this.objectToDrop != null && this.inventory.remove(this.objectToDrop)) {
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
+				Pair<StorableObject> tmp = this.objectToDrop;
+				this.inventory.remove(this.objectToDrop);
+				this.objectToDrop = null;
+				return tmp;
+			} else if (this.weapon != null && this.weapon.getId() == this.objectToDrop.getId()) {
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
+				Pair<StorableObject> tmp = this.objectToDrop;
+				this.weapon = null;
+				this.objectToDrop = null;
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.RANGE,
+						PlayerStatEvent.ValueType.ACTUAL,
+						this.getAttackRange()
+				));
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.DAMAGES,
+						PlayerStatEvent.ValueType.ACTUAL,
+						(int) this.getAttackPower()
+				));
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.POWER_GRADE,
+						PlayerStatEvent.ValueType.ACTUAL,
+						(int) this.getPowerGrade())
+				);
+				return tmp;
+			} else {
+				for (int i = 0; i < this.armors.size(); i++) {
+					if (this.armors.get(i) != null && this.armors.get(i).getId() == this.objectToDrop.getId()) {
+						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.objectToDrop.getId()));
+						Pair<StorableObject> tmp = this.objectToDrop;
+						this.armors.set(i, null);
+						firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
+						firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade()));
+						this.objectToDrop = null;
+						return tmp;
+					}
+				}
+			}
 		}
 		return null;
 	}
@@ -518,6 +570,7 @@ public class Player extends LivingThing {
 				));
 				this.armors.set(i, armor);
 				firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
+				firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade()));
 				return removedArmor;
 			}
 		}
@@ -927,6 +980,24 @@ public class Player extends LivingThing {
 				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
 				addToInventory(new Pair<>(this.weapon.getId(), this.weapon.object));
 				this.weapon = null;
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.RANGE,
+						PlayerStatEvent.ValueType.ACTUAL,
+						this.getAttackRange()
+				));
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.DAMAGES,
+						PlayerStatEvent.ValueType.ACTUAL,
+						(int) this.getAttackPower()
+				));
+				firePlayerStatEvent(new PlayerStatEvent(
+						this.number,
+						PlayerStatEvent.StatType.POWER_GRADE,
+						PlayerStatEvent.ValueType.ACTUAL,
+						(int) this.getPowerGrade())
+				);
 			} else {
 				for (int i = 0; i < this.armors.size(); i++) {
 					if (this.armors.get(i) != null && this.armors.get(i).getId() == id) {
@@ -946,6 +1017,13 @@ public class Player extends LivingThing {
 								PlayerStatEvent.ValueType.ACTUAL,
 								(int) this.getPowerGrade())
 						);
+
+						firePlayerStatEvent(new PlayerStatEvent(
+								this.number,
+								PlayerStatEvent.StatType.DAMAGES,
+								PlayerStatEvent.ValueType.ACTUAL,
+								(int) this.getAttackPower()
+						));
 					}
 				}
 			}

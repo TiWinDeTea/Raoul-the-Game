@@ -18,6 +18,7 @@ import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapEvent;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
+import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectDragEvent;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.PlayerInventoryEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
@@ -30,6 +31,7 @@ import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEv
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
@@ -421,6 +423,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
 		}
 
+		public void objectDragged(ObjectDragEvent e) {
+			fireEquipEvent(new EquipRequestEvent(e.objectId));
+		}
+
 		public void addFog(FogAdditionEvent e) {
 			GUI.this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
 		}
@@ -525,6 +531,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					case OJECT_CLICK_EVENT:
 						this.objectClicked((ObjectClickEvent) e);
 						break;
+						case OBJECT_DRAG_EVENT:
+							this.objectDragged((ObjectDragEvent) e);
+							break;
 					}
 					break;
 				}
@@ -723,6 +732,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 	}
 
+	private void fireEquipEvent(EquipRequestEvent event) {
+		for (RequestListener listener : getRequestListener()) {
+			listener.requestEquipping(event);
+		}
+	}
+
 	private void fireMoveRequestEvent(MoveRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
 			listener.requestMove(event);
@@ -868,6 +883,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void updateLevel(LevelUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void objectDragged(ObjectDragEvent e) {
 		this.eventQueue.add(e);
 	}
 }
