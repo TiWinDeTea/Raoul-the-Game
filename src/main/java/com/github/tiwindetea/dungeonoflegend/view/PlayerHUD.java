@@ -245,7 +245,7 @@ public class PlayerHUD extends Parent {
 			"\n" +
 			"\nDamages: " + this.actualDamages +
 			"\nArmor: " + this.actualArmor +
-		    "\nRange:" + this.actualRange +
+		    "\nRange: " + this.actualRange +
 		    "\n" +
 		    "\nPower grade: " + this.actualPowerGrade;
 	}
