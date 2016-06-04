@@ -70,7 +70,7 @@ public class PlayerHUD extends Parent {
 	private final ImageView backgroundImage = new ImageView(ViewPackage.HUD_IMAGE);
 
 	private String description;
-
+	private String playerName;
 	private int maxHealth;
 	private int actualHealth;
 	private int maxMana;
@@ -95,7 +95,7 @@ public class PlayerHUD extends Parent {
 	 * @param maxXP         the max xp
 	 * @param actualLevel   the actual level
 	 */
-	public PlayerHUD(ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel) {
+	public PlayerHUD(ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel, String playerName) {
 		this.playerPicture = playerPicture;
 		this.actualHealth = actualHealth;
 		this.maxHealth = maxHealth;
@@ -104,6 +104,7 @@ public class PlayerHUD extends Parent {
 		this.actualXP = actualXP;
 		this.maxXP = maxXP;
 		this.actualLevel = actualLevel;
+		this.playerName = playerName;
 		this.init();
 	}
 
@@ -235,7 +236,9 @@ public class PlayerHUD extends Parent {
 
 	private void updateDescription() {
 		this.description =
-		  "Level: " + this.actualLevel +
+		  this.playerName +
+			"\n" +
+			"\nLevel: " + this.actualLevel +
 			"\nXP to next level: " + (this.maxXP - this.actualXP) +
 			"\nHealth: " + this.actualHealth + " / " + this.maxHealth +
 			"\nMana: " + this.actualMana + " / " + this.maxMana +
