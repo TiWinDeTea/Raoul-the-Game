@@ -156,14 +156,18 @@ public abstract class LivingThing implements Descriptable {
 	 * @param damages damages taken by this
 	 */
 	public void damage(double damages) {
+		double diff;
 		if(damages > 0) {
-			double diff = this.getDefensePower() - damages;
+			diff = this.getDefensePower() - damages;
 			if (diff >= 0) {
 				diff = -1;
 			}
 			this.hitPoints += diff;
-			fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, (double) (this.hitPoints) / (double) (this.maxHitPoints), (int) Math.round(diff)));
+		} else {
+			diff = Math.min(this.maxHitPoints - this.hitPoints, -damages);
+			this.hitPoints += diff;
 		}
+		fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints, (int) Math.round(diff)));
 	}
 
 	/**

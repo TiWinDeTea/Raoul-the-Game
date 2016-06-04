@@ -86,6 +86,12 @@ public enum LivingEntityType {
 		public String toString() {
 			return resourceBundle.getString("satanic-duck.string");
 		}
+	},
+	PEACEFUL_ECTOPLASMA {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("peaceful-ectoplasma.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".LivingEntity";
@@ -208,6 +214,8 @@ public enum LivingEntityType {
 			return LITTLE_SATANIC_DUCK;
 		} else if (SATANIC_DUCK.toString().equals(str)) {
 			return SATANIC_DUCK;
+		} else if (PEACEFUL_ECTOPLASMA.toString().equals(str)) {
+			return PEACEFUL_ECTOPLASMA;
 		} else {
 			return null;
 		}

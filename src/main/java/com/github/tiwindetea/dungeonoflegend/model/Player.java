@@ -448,12 +448,9 @@ public class Player extends LivingThing {
 		double def = 0;
 		for (Pair<Armor> armor : this.armors) {
 			if (armor != null && armor.object != null) {
-				System.out.println(armor.object.getDefensePowerModifier());
 				def += armor.object.getDefensePowerModifier();
 			}
 		}
-		System.out.println(this.defensePower);
-		System.out.println("\n");
 		return def + this.defensePower;
 	}
 	/**

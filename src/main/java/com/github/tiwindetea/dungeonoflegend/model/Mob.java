@@ -312,9 +312,14 @@ public class Mob extends LivingThing {
 	@Override
 	public String getDescription() {
 		if (!this.nameAsked) {
-			this.name += " (Lv" + this.level + ".)\n"
-					+ "Power grade: " + (int) (5 * (this.attackPower / 11 + this.hitPoints / 10 + this.defensePower));
+			if (this.attackPower > 0) {
+				this.name += " (Lv" + this.level + ".)\n"
+						+ "Power grade: " + (int) (5 * (this.attackPower / 11 + this.hitPoints / 10 + this.defensePower));
+			} else {
+				this.name += "\nPeace and harmony on your people";
+			}
 		}
+		this.nameAsked = true;
 		return this.name;
 	}
 }
