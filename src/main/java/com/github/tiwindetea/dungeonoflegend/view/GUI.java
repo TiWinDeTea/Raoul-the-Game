@@ -342,6 +342,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				case RANGE:
 					GUI.this.playersHUD.get(e.playerNumber).setActualRange(value);
 					break;
+				case POWER_GRADE:
+					GUI.this.playersHUD.get(e.playerNumber).setActualPowerGrade(value);
+					break;
 				}
 			}
 			else {

@@ -81,6 +81,7 @@ public class PlayerHUD extends Parent {
 	private int actualDamages;
 	private int actualArmor;
 	private int actualRange;
+	private int actualPowerGrade;
 
 	/**
 	 * Instantiates a new PlayerHUD.
@@ -241,7 +242,9 @@ public class PlayerHUD extends Parent {
 			"\n" +
 			"\nDamages: " + this.actualDamages +
 			"\nArmor: " + this.actualArmor +
-			"\nRange:" + this.actualRange;
+		    "\nRange:" + this.actualRange +
+		    "\n" +
+		    "\nPower grade: " + this.actualPowerGrade;
 	}
 
 	/**
@@ -361,6 +364,16 @@ public class PlayerHUD extends Parent {
 	}
 
 	/**
+	 * Sets actual power grade.
+	 *
+	 * @param actualPowerGrade the actual power grade
+	 */
+	public void setActualPowerGrade(int actualPowerGrade) {
+		this.actualPowerGrade = actualPowerGrade;
+		updateDescription();
+	}
+
+	/**
 	 * Gets max health.
 	 *
 	 * @return the max health
@@ -448,5 +461,14 @@ public class PlayerHUD extends Parent {
 	 */
 	public int getActualRange() {
 		return this.actualRange;
+	}
+
+	/**
+	 * Gets actual power grade.
+	 *
+	 * @return the actual power grade
+	 */
+	public int getActualPowerGrade() {
+		return this.actualPowerGrade;
 	}
 }

@@ -11,7 +11,8 @@ public class PlayerStatEvent extends PlayerEvent {
 		LEVEL,
 		DAMAGES,
 		ARMOR,
-		RANGE
+		RANGE,
+		POWER_GRADE
 	}
 	public enum ValueType {
 		ACTUAL,
