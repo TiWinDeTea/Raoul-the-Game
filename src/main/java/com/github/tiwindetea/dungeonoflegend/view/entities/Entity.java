@@ -20,6 +20,7 @@ import java.util.List;
  * @author Maxime PINARD.
  */
 public abstract class Entity extends Parent {
+	private static final Duration ANIMATION_DURATION = new Duration(100);
 	protected static final Vector2i spriteSize = ViewPackage.SPRITES_SIZE;
 	private final Rectangle backgroundRectangle = new Rectangle(spriteSize.x, spriteSize.y);
 	protected final ImageView imageView = new ImageView();
@@ -69,7 +70,7 @@ public abstract class Entity extends Parent {
 	public void setPosition(Vector2i position) {
 		TranslateTransition translateTransition = new TranslateTransition();
 		translateTransition.setNode(this);
-		translateTransition.setDuration(new Duration(120));
+		translateTransition.setDuration(ANIMATION_DURATION);
 		translateTransition.setFromX(this.position.x * ViewPackage.SPRITES_SIZE.x);
 		translateTransition.setFromY(this.position.y * ViewPackage.SPRITES_SIZE.y);
 		translateTransition.setToX(position.x * ViewPackage.SPRITES_SIZE.x);
