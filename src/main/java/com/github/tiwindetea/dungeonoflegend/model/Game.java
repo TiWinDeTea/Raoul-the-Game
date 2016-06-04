@@ -201,6 +201,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 	 * @param numberOfPlayers the number of players
 	 */
 	public void initNew(int numberOfPlayers) {
+		this.clearAll();
 		ArrayList<Player> players = new ArrayList<>();
 		ResourceBundle playersBundle = ResourceBundle.getBundle(MainPackage.name + ".Players");
 
@@ -885,6 +886,12 @@ public class Game implements RequestListener, Runnable, Stopable {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 			this.players.remove(player);
 			this.deletePlayer(player);
+			for (int number = player.getNumber(); number < this.players.size(); number++) {
+				this.players.get(number).setNumber(this.players.get(number).getNumber() - 1);
+			}
+			for (Player player1 : this.playersOnNextLevel) {
+				player1.setNumber(player1.getNumber() - 1);
+			}
 		}
 		if (this.players.isEmpty() && this.playersOnNextLevel.isEmpty()) {
 			this.isRunning = false;

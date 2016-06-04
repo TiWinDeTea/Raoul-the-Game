@@ -65,6 +65,9 @@ public abstract class LivingThing implements Descriptable {
 		}
 	}
 
+	protected double getPowerGrade() {
+		return 5 * (this.getAttackPower() / 11 + this.getHitPoints() / 10 + this.getDefensePower());
+	}
 
 	/**
 	 * Instantiates a new Living thing.

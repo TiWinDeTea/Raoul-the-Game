@@ -314,7 +314,7 @@ public class Mob extends LivingThing {
 		if (!this.nameAsked) {
 			if (this.attackPower > 0) {
 				this.name += " (Lv" + this.level + ".)\n"
-						+ "Power grade: " + (int) (5 * (this.attackPower / 11 + this.hitPoints / 10 + this.defensePower));
+						+ "Power grade: " + (int) this.getPowerGrade();
 			} else {
 				this.name += "\nPeace and harmony on your people";
 			}

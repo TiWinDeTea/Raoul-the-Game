@@ -132,6 +132,7 @@ public class Player extends LivingThing {
 		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.DAMAGES, PlayerStatEvent.ValueType.ACTUAL, (int) this.getAttackPower()));
 		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.LEVEL, PlayerStatEvent.ValueType.ACTUAL, this.level));
 		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.RANGE, PlayerStatEvent.ValueType.ACTUAL, this.getAttackRange()));
+		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade()));
 	}
 
 	private Player() {
@@ -375,6 +376,11 @@ public class Player extends LivingThing {
 		return this.number;
 	}
 
+	/* FIXME: remove that */
+	public void setNumber(int number) {
+		this.number = number;
+	}
+
 	/**
 	 * Sets the requested interaction.
 	 *
@@ -551,6 +557,12 @@ public class Player extends LivingThing {
 				PlayerStatEvent.ValueType.ACTUAL,
 				(int) this.getAttackPower()
 		));
+		firePlayerStatEvent(new PlayerStatEvent(
+				this.number,
+				PlayerStatEvent.StatType.POWER_GRADE,
+				PlayerStatEvent.ValueType.ACTUAL,
+				(int) this.getPowerGrade())
+		);
 		return removedWeapon;
 	}
 
@@ -600,6 +612,12 @@ public class Player extends LivingThing {
 		this.hitPoints = Math.max(hp + this.hitPoints, 1);
 		this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH,
 				PlayerStatEvent.ValueType.MAX, (int) this.maxHitPoints));
+		firePlayerStatEvent(new PlayerStatEvent(
+				this.number,
+				PlayerStatEvent.StatType.POWER_GRADE,
+				PlayerStatEvent.ValueType.ACTUAL,
+				(int) this.getPowerGrade())
+		);
 	}
 
 	/**
@@ -693,6 +711,8 @@ public class Player extends LivingThing {
 		firePlayerStatEvent(new PlayerStatEvent(p.number, PlayerStatEvent.StatType.LEVEL, PlayerStatEvent.ValueType.ACTUAL, p.level));
 		firePlayerStatEvent(new PlayerStatEvent(p.number, PlayerStatEvent.StatType.RANGE, PlayerStatEvent.ValueType.ACTUAL, p.getAttackRange()));
 		firePlayerStatEvent(new PlayerStatEvent(p.number, PlayerStatEvent.StatType.XP, PlayerStatEvent.ValueType.ACTUAL, p.xp));
+		firePlayerStatEvent(new PlayerStatEvent(p.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) p.getPowerGrade())
+		);
 
 
 		/* parsing the equipement */
@@ -876,7 +896,8 @@ public class Player extends LivingThing {
 			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
 			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.DAMAGES, PlayerStatEvent.ValueType.ACTUAL, (int) this.getAttackPower()));
 			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.LEVEL, PlayerStatEvent.ValueType.ACTUAL, this.level));
-			fireLevelUpdateEvent(new LevelUpdateEvent(this.number));
+			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade())
+			);
 			super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints, 0));
 
 		}
@@ -912,7 +933,19 @@ public class Player extends LivingThing {
 						fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
 						addToInventory(new Pair<>(this.armors.get(i).getId(), this.armors.get(i).object));
 						this.armors.set(i, null);
-						firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
+						firePlayerStatEvent(new PlayerStatEvent(
+								this.number,
+								PlayerStatEvent.StatType.ARMOR,
+								PlayerStatEvent.ValueType.ACTUAL,
+								(int) this.getDefensePower()
+						));
+
+						firePlayerStatEvent(new PlayerStatEvent(
+								this.number,
+								PlayerStatEvent.StatType.POWER_GRADE,
+								PlayerStatEvent.ValueType.ACTUAL,
+								(int) this.getPowerGrade())
+						);
 					}
 				}
 			}
@@ -934,13 +967,37 @@ public class Player extends LivingThing {
 				this.armors.set(i, null);
 			}
 		}
-		firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
+		firePlayerStatEvent(new PlayerStatEvent(
+				this.number,
+				PlayerStatEvent.StatType.ARMOR,
+				PlayerStatEvent.ValueType.ACTUAL,
+				(int) this.getDefensePower()
+		));
+
 		if (this.weapon != null && this.weapon.object != null) {
 			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, this.weapon.getId()));
 			this.weapon = null;
-			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.RANGE, PlayerStatEvent.ValueType.ACTUAL, this.getAttackRange()));
-			firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.DAMAGES, PlayerStatEvent.ValueType.ACTUAL, (int) this.getAttackPower()));
+			firePlayerStatEvent(new PlayerStatEvent(
+					this.number, PlayerStatEvent.StatType.RANGE,
+					PlayerStatEvent.ValueType.ACTUAL,
+					this.getAttackRange()
+			));
 		}
+
+		firePlayerStatEvent(new PlayerStatEvent(
+				this.number,
+				PlayerStatEvent.StatType.DAMAGES,
+				PlayerStatEvent.ValueType.ACTUAL,
+				(int) this.getAttackPower()
+		));
+
+		firePlayerStatEvent(new PlayerStatEvent(
+				this.number,
+				PlayerStatEvent.StatType.POWER_GRADE,
+				PlayerStatEvent.ValueType.ACTUAL,
+				(int) this.getPowerGrade())
+		);
+
 	}
 
 	/**
