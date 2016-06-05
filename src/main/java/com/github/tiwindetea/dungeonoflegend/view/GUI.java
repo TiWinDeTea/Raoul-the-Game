@@ -640,7 +640,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
 		this.bPane.getChildren().add(this.bHBox);
 		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-//		this.bPane.prefWidthProperty().bind(this.anchorPane.widthProperty());
 		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
 		this.bPane.maxHeightProperty().bind(this.bHBox.heightProperty());
 
