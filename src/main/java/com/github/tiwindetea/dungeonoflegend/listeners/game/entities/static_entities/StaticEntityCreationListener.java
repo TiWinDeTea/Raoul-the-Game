@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.static_ent
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityCreationEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface StaticEntityCreationListener
+ * @author Maxime PINARD
  */
 public interface StaticEntityCreationListener {
+	/**
+	 * Handler associated to a StaticEntityCreationEvent
+	 * @param e Event to handle
+	 */
 	void createStaticEntity(StaticEntityCreationEvent e);
 }

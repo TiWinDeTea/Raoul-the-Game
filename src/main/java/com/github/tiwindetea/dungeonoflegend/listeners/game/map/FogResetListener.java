@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogResetEvent;
 
 /**
- * Created by maxime on 5/20/16.
+ * The inteface FogResetListener
+ * @author Maxime PINARD
  */
 public interface FogResetListener {
+	/**
+	 * Handler associated to a FogResetEvent
+	 * @param e Event to handle
+	 */
 	void resetFog(FogResetEvent e);
 }

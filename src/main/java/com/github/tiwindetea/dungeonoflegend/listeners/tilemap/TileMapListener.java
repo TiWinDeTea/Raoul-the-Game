@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.tilemap;
 
 /**
- * Created by maxime on 5/10/16.
+ * The interface TileMapListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface TileMapListener extends TileClickListener, TileDragListener {
 }

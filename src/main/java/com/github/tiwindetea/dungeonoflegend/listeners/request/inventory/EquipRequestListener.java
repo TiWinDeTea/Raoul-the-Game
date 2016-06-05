@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.request.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.EquipRequestEvent;
 
 /**
- * Created by organic-code on 6/4/16.
+ * The interface EquipRequestListener
+ * @author Lucas LAZARE
  */
 public interface EquipRequestListener {
-    void requestEquipping(EquipRequestEvent event);
+    /**
+     * Handler associated to an EquipRequestEvent
+     * @param e Event to handle
+     */
+    void requestEquipping(EquipRequestEvent e);
 }

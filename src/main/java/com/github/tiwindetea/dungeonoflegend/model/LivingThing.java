@@ -149,6 +149,10 @@ public abstract class LivingThing implements Descriptable {
 		this.position = position;
 	}
 
+	/**
+	 * Getter for the LivingEntity id
+	 * @return the id
+     */
 	public long getId() {
 		return this.id;
 	}

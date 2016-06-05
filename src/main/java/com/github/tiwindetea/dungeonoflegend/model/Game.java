@@ -65,7 +65,9 @@ import java.util.logging.Logger;
  * Game.
  * @author Lucas LAZARE
  */
-public class Game implements RequestListener, Runnable, Stopable {
+public class Game implements RequestListener, Runnable, Stoppable {
+
+	private class AlreadyRunningException extends RuntimeException{}
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 1;
@@ -448,7 +450,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void fireLivingEntityLOSModificationEvent(LivingEntityLOSModificationEvent event) {
 		for (GameListener listener : this.getGameListeners()) {
-			listener.modifieLivingEntityLOS(event);
+			listener.modifyLivingEntityLOS(event);
 		}
 	}
 
@@ -490,7 +492,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void fireTileModificationEvent(TileModificationEvent event) {
 		for (GameListener listener : getGameListeners()) {
-			listener.modifieTile(event);
+			listener.modifyTile(event);
 		}
 	}
 
@@ -1149,8 +1151,14 @@ public class Game implements RequestListener, Runnable, Stopable {
 		return i - 1;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run() {
+		if (isRunning){
+			throw new AlreadyRunningException();
+		}
 		this.isRunning = true;
 		// TODO : run slower and slower up to n
 		RequestEvent event;
@@ -1374,6 +1382,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.currentPlayer.unequip(e.getObjectId());
 	}
 
+	/**
+	 * @return true if an instance of the game is running, false otherwise
+     */
 	public boolean isRunning() {
 		return this.isRunning;
 	}
@@ -1395,6 +1406,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		return ans;
 	}
 
+	/**
+	 * Pauses the game (ignore any incoming events)
+	 */
 	public void pause() {
 		this.requestedEvent.clear();
 		for (Player player : this.players) {
@@ -1403,6 +1417,9 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.isPaused = true;
 	}
 
+	/**
+	 * Resumes the game
+	 */
 	public void resume() {
 		this.requestedEvent.clear();
 		this.isPaused = false;

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 import com.github.tiwindetea.dungeonoflegend.events.map.CenterOnTileEvent;
 
 /**
- * Created by maxime on 5/21/16.
+ * The interface CenterOnTileListener
+ * @author Maxime PINARD
  */
 public interface CenterOnTileListener {
+	/**
+	 * Handler associated to a CenterOnTileEvent
+	 * @param e Event to handle
+	 */
 	void centerOnTile(CenterOnTileEvent e);
 }

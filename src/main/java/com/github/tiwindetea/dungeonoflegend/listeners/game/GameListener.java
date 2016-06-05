@@ -13,7 +13,8 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.map.MapListener;
 import com.github.tiwindetea.dungeonoflegend.listeners.game.players.PlayerListener;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface GameListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener {
 }

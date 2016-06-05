@@ -144,6 +144,11 @@ public enum Tile {
 		}
 	}
 
+	/**
+	 * Returns true if the tile is a border of a room (wall, door, ...) [with current Map generator]
+	 * @param tile The concerned tile
+	 * @return     true if the tile is a border of a room
+     */
 	public static boolean isRoomBorder(Tile tile) {
 		switch (tile) {
 			case PILLAR:

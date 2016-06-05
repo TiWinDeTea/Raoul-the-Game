@@ -137,6 +137,9 @@ public class Scroll implements Consumable {
 				+ ",}";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDescription() {
 		if (this.name == null) {

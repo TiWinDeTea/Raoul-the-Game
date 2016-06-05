@@ -55,6 +55,10 @@ public class Node {
         this.heuristic = heuristic;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object o) {
         /* asserting o to be a Node */
         return this.equals((Node) o);

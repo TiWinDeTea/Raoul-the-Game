@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game;
 import com.github.tiwindetea.dungeonoflegend.events.LevelUpdateEvent;
 
 /**
- * Created by maxime on 6/1/16.
+ * The interface LevelUpdateListener
+ * @author Maxime PINARD
  */
 public interface LevelUpdateListener {
+	/**
+	 * Handler associated to a LevelUpdateListener
+	 * @param e Event to handle
+	 */
 	void updateLevel(LevelUpdateEvent e);
 }

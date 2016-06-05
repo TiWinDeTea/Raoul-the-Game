@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
 
 /**
- * Created by maxime on 5/31/16.
+ * The interface PlayerDeletionEvent
+ * @author Maxime PINARD
  */
 public interface PlayerDeletionListener {
+	/**
+	 * Handler associated to a PlayerDeletionEvent
+	 * @param e Event to handle
+	 */
 	void deletePlayer(PlayerDeletionEvent e);
 }

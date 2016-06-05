@@ -1,12 +1,12 @@
 package com.github.tiwindetea.dungeonoflegend.model;
 
 /**
- * Stopable
+ * Stoppable
  * @author Lucas LAZARE
  */
-public interface Stopable {
+public interface Stoppable {
     /**
-     * Asks the object to stop
+     * Asks the object to stop its thread
      */
     void stop();
 }

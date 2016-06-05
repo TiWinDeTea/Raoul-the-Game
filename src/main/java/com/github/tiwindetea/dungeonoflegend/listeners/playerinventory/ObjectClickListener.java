@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.playerinventory;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectClickEvent;
 
 /**
- * Created by maxime on 5/18/16.
+ * The interface ObjectClickListener
+ * @author Maxime PINARD
  */
 public interface ObjectClickListener {
+	/**
+	 * Handler associated to an ObjectClickEvent.
+	 * @param e Event to handle
+     */
 	void objectClicked(ObjectClickEvent e);
 }

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.request;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 
 /**
- * Created by maxime on 5/21/16.
+ * The interface CenterViewRequestListener
+ * @author Maxime PINARD
  */
 public interface CenterViewRequestListener {
+	/**
+	 * Handler associated to a CenterViewRequestEvent
+	 * @param e Event to handle
+	 */
 	void requestCenterView(CenterViewRequestEvent e);
 }

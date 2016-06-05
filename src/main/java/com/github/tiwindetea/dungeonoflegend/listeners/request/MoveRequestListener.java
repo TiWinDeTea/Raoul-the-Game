@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.request;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface MoveRequestListener
+ * @author Maxime PINARD
  */
 public interface MoveRequestListener {
+	/**
+	 * Handler associated to a MoveRequestEvent
+	 * @param e Event to handle
+	 */
 	void requestMove(MoveRequestEvent e);
 }

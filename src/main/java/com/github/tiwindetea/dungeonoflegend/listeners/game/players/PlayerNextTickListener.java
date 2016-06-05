@@ -11,8 +11,14 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 
 /**
- * Created by organic-code on 5/16/16.
+ * The interface PlayerNextTickListener
+ *
+ * @author Lucas LAZARE
  */
 public interface PlayerNextTickListener {
-	void playerNextTick(PlayerNextTickEvent event);
+	/**
+	 * Handler associated to a PlayerNextTickEvent
+	 * @param e Event to handle
+	 */
+	void playerNextTick(PlayerNextTickEvent e);
 }

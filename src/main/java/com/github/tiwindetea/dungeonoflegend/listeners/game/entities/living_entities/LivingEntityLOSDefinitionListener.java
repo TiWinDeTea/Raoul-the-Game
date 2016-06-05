@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSDefinitionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface LivingEntityLOSDefinitionListener
+ * @author Maxime PINARD
  */
 public interface LivingEntityLOSDefinitionListener {
+	/**
+	 * Handler associated to a LivingEntityLOSDefinitionEvent
+	 * @param e Event to handle
+	 */
 	void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e);
 }

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerStatEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface PlayerStatListener
+ * @author Maxime PINARD
  */
 public interface PlayerStatListener {
+	/**
+	 * Handler associated to a PlayerStatEvent
+	 * @param e Event to handle
+	 */
 	void changePlayerStat(PlayerStatEvent e);
 }

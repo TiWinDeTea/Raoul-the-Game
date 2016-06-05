@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.playerinventory;
 
 /**
- * Created by maxime on 5/18/16.
+ * The interface PlayerInventoryListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface PlayerInventoryListener extends ObjectClickListener, ObjectDragListener {
 }

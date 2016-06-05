@@ -11,8 +11,15 @@ package com.github.tiwindetea.dungeonoflegend.listeners.playerinventory;
 import com.github.tiwindetea.dungeonoflegend.events.playerinventory.ObjectDragEvent;
 
 /**
- * Created by organic-code on 6/4/16.
+ * The interface ObjectDragListener
+ *
+ * @author Lucas LAZARE
  */
+
 public interface ObjectDragListener {
+    /**
+     * Handler associated to an ObjectDragEvent.
+     * @param e Event to handle
+     */
     void objectDragged(ObjectDragEvent e);
 }

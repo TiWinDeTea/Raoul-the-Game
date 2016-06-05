@@ -159,6 +159,9 @@ public class Pot implements Consumable {
 		return ConsumableType.POT;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public StorableObjectType getType() {
 		return StorableObjectType.CONSUMABLE;
@@ -200,6 +203,9 @@ public class Pot implements Consumable {
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDescription() {
 		if (this.name == null) {

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 import com.github.tiwindetea.dungeonoflegend.events.map.FogAdditionEvent;
 
 /**
- * Created by maxime on 5/20/16.
+ * The interface FogAdditionListener
+ * @author Maxime PINARD
  */
 public interface FogAdditionListener {
+	/**
+	 * Handler associated to a FogAdditionEvent
+	 * @param e Event to handle
+	 */
 	void addFog(FogAdditionEvent e);
 }

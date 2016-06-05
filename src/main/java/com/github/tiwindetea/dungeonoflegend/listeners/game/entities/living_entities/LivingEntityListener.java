@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_entities;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface LivingEntityListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface LivingEntityListener extends LivingEntityCreationListener, LivingEntityDeletionListener, LivingEntityHealthUpdateListener, LivingEntityHealthVisibilityListener, LivingEntityLOSDefinitionListener, LivingEntityLOSModificationListener, LivingEntityMoveListener {
 }

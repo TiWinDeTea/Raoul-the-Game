@@ -108,6 +108,11 @@ public class Vector2i {
 		return this;
 	}
 
+	/**
+	 * Computes the squared distance between this and another Vector2i
+	 * @param that The other Vector2i
+	 * @return     The squared distance between this and that
+     */
 	public double squaredDistance(Vector2i that) {
 		return Math.pow(this.x - that.x, 2) + Math.pow(this.y - that.y, 2);
 	}

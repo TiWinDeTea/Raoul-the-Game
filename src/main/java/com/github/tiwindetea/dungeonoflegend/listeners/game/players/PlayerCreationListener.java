@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerCreationEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface PlayerCreationListener
+ * @author Maxime Pinard
  */
 public interface PlayerCreationListener {
+	/**
+	 * Handler associated to a PlayerCreationEvent
+	 * @param e Event to handle
+	 */
 	void createPlayer(PlayerCreationEvent e);
 }

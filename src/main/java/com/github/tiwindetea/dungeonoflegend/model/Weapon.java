@@ -192,6 +192,9 @@ public class Weapon implements StorableObject {
 				+ ",}";
 	}
 
+	/**
+	 * {@inheritDoc}
+     */
 	@Override
 	public String getDescription() {
 		return this.name;

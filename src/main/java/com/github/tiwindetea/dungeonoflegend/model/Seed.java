@@ -93,6 +93,10 @@ public class Seed {
         return "seed={alphaSeed=" + this.alphaSeed + ",betaSeed=" + this.betaSeed + ",}";
     }
 
+    /**
+     * Copies the seed
+     * @return A copy of this seed
+     */
     public Seed copy() {
         return new Seed(this.alphaSeed, this.betaSeed);
     }

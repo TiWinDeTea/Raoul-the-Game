@@ -11,8 +11,12 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 import com.github.tiwindetea.dungeonoflegend.events.map.MapCreationEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface MapCreationListener
  */
 public interface MapCreationListener {
+	/**
+	 * Handler associated to a MapCreationEvent
+	 * @param e Event to handle
+	 */
 	void createMap(MapCreationEvent e);
 }

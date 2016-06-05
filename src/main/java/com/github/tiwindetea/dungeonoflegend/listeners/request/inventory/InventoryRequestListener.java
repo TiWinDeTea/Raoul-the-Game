@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.request.inventory;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface InventoryRequestListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface InventoryRequestListener extends DropRequestListener, UsageRequestListener, EquipRequestListener {
 }

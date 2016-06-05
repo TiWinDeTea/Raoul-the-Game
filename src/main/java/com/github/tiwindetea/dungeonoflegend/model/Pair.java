@@ -20,6 +20,9 @@ public class Pair<T extends Object> {
     private long id;
     public T object;
 
+    /**
+     * Instanciates a new Pair without consuming an id
+     */
     public Pair() {
         this.id = Pair.ERROR_VAL;
         this.object = null;
@@ -77,6 +80,9 @@ public class Pair<T extends Object> {
         this.id = id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof Pair)

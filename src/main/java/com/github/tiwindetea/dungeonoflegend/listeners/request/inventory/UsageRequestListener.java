@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.request.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.UsageRequestEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface UsageRequestListener
+ * @author Maxime PINARD
  */
 public interface UsageRequestListener {
+	/**
+	 * Handler associated to an UsageRequestEvent
+	 * @param e Event to handle
+	 */
 	void requestUsage(UsageRequestEvent e);
 }

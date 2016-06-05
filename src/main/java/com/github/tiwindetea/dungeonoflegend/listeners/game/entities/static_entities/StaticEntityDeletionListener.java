@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.static_ent
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityDeletionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface StaticEntityDeletionListener
+ * @author Maxime PINARD
  */
 public interface StaticEntityDeletionListener {
+	/**
+	 * Handler associated to a StaticEntityDeletionEvent
+	 * @param e Event to handle
+	 */
 	void deleteStaticEntity(StaticEntityDeletionEvent e);
 }

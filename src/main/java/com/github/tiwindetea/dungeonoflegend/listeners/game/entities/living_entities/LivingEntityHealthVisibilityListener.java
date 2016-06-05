@@ -11,8 +11,14 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthVisibilityEvent;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The interface LivingEntityHealthVisibilityListener
+ *
+ * @author Maxime PINARD
  */
 public interface LivingEntityHealthVisibilityListener {
+	/**
+	 * Handler associated to a LivingEntityHealthVisibilityEvent
+	 * @param e Event to handle
+	 */
 	void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e);
 }

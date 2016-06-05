@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.static_entities;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface StaticEntityListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface StaticEntityListener extends StaticEntityCreationListener, StaticEntityDeletionListener, StaticEntityLOSDefinitionListener {
 }

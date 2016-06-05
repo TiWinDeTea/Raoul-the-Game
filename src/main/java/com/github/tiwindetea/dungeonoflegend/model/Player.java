@@ -386,7 +386,7 @@ public class Player extends LivingThing {
 		return this.number;
 	}
 
-	/* FIXME: remove that */
+	/* FIXME: remove that later on */
 	public void setNumber(int number) {
 		this.number = number;
 	}

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryAdditionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface InventoryAdditionListener
+ * @author Maxime PINARD
  */
 public interface InventoryAdditionListener {
+	/**
+	 * Handler associated to an InventoryAdditionEvent
+	 * @param e Event to handle
+	 */
 	void addInventory(InventoryAdditionEvent e);
 }

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityLOSModificationEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface LivingEntityLOSModificationListener
+ * @author Maxime PINARD
  */
 public interface LivingEntityLOSModificationListener {
-	void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e);
+	/**
+	 * Handler associated to a LivingEntityLOSModificationEvent
+	 * @param e Event to handle
+	 */
+	void modifyLivingEntityLOS(LivingEntityLOSModificationEvent e);
 }

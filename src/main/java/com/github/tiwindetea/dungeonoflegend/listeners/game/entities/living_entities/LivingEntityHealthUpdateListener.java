@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityHealthUpdateEvent;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The interface LivingEntityHealthUpdateListener
+ * @author Maxime PINARD
  */
 public interface LivingEntityHealthUpdateListener {
+	/**
+	 * Handler associated to a LivingEntityHealthUpdateEvent
+	 * @param e Event to handle
+	 */
 	void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e);
 }

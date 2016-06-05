@@ -109,6 +109,9 @@ public class InteractiveObject implements Descriptable {
         return this.position.equals(io.position);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getDescription() {
         if (this.isTrap) {

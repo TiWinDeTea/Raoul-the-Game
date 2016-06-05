@@ -166,6 +166,9 @@ public class Armor implements StorableObject {
 				+ ",}";
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String getDescription() {
 		if (this.name == null) {

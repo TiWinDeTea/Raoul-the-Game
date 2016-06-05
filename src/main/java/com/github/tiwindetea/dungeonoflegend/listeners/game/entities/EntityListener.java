@@ -12,7 +12,8 @@ import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_enti
 import com.github.tiwindetea.dungeonoflegend.listeners.game.entities.static_entities.StaticEntityListener;
 
 /**
- * Created by maxime on 5/2/16.
+ * The interface EntityListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface EntityListener extends LivingEntityListener, StaticEntityListener {
 }

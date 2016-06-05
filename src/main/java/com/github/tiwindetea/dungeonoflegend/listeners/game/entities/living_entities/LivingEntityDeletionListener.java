@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.living_ent
 import com.github.tiwindetea.dungeonoflegend.events.living_entities.LivingEntityDeletionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface LivingEntityDeletionEvent
+ * @author Maxime PINARD
  */
 public interface LivingEntityDeletionListener {
+	/**
+	 * Handler associated to a LivingEntityTypeDeletionEvent
+	 * @param e Event to handle
+	 */
 	void deleteLivingEntity(LivingEntityDeletionEvent e);
 }

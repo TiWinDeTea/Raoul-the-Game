@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.entities.static_ent
 import com.github.tiwindetea.dungeonoflegend.events.static_entities.StaticEntityLOSDefinitionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface StaticEntityLOSDefinitionListener
+ * @author Maxime PINARD
  */
 public interface StaticEntityLOSDefinitionListener {
+	/**
+	 * Handler associated to a StaticEntityLOSDefinitionEvent
+	 * @param e Event to handle
+	 */
 	void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e);
 }

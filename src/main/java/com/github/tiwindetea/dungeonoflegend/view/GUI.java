@@ -183,7 +183,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
 
 		public void addInventory(InventoryAdditionEvent e) {
-			if(e.isEquiped()) {
+			if(e.isEquiped()	) {
 				GUI.this.playersInventories.get(e.getPlayerNumber()).addEquipedItem(e.getObjectId(), new StaticEntity(e.getStaticEntityType(), e.getDescription(), e.getObjectId()));
 			}
 			else {
@@ -789,7 +789,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	}
 
 	@Override
-	public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
+	public void modifyLivingEntityLOS(LivingEntityLOSModificationEvent e) {
 		this.eventQueue.add(e);
 	}
 
@@ -834,7 +834,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	}
 
 	@Override
-	public void modifieTile(TileModificationEvent e) {
+	public void modifyTile(TileModificationEvent e) {
 		this.eventQueue.add(e);
 	}
 

@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.players.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface InventoryDeletionListener
+ * @author Maxime PINARD
  */
 public interface InventoryDeletionListener {
+	/**
+	 * Handler associated to an InventoryDeletionEvent
+	 * @param e Event to handle
+	 */
 	void deleteInventory(InventoryDeletionEvent e);
 }

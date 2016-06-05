@@ -11,8 +11,14 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game;
 import com.github.tiwindetea.dungeonoflegend.events.ScoreUpdateEvent;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The interface ScoreUpdateListener
+ *
+ * @author Maxime PINARD
  */
-public interface ScoreUpdateListener {
+public interface ScoreUpdateListener{
+		/**
+		 * Handler associated to a ScoreUpdateEvent
+		 * @param e Event to handle
+		 */
 	void updateScore(ScoreUpdateEvent e);
 }

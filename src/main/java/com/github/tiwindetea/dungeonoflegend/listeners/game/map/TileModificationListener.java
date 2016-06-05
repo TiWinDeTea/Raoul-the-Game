@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 import com.github.tiwindetea.dungeonoflegend.events.map.TileModificationEvent;
 
 /**
- * Created by maxime on 5/12/16.
+ * The interface TileModificationListener
+ * @author Maxime PINARD
  */
 public interface TileModificationListener {
-	void modifieTile(TileModificationEvent e);
+	/**
+	 * Handler associated to a TileModificationEvent
+	 * @param e Event to handle
+	 */
+	void modifyTile(TileModificationEvent e);
 }

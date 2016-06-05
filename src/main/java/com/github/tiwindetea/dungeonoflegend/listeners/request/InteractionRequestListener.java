@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.request;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface InteractionRequestListener
+ * @author Maxime PINARD
  */
 public interface InteractionRequestListener {
+	/**
+	 * Handler associated to an InteractionRequestEvent
+	 * @param e Event to handle
+	 */
 	void requestInteraction(InteractionRequestEvent e);
 }

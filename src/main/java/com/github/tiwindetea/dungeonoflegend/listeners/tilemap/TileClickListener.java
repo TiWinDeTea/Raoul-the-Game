@@ -11,8 +11,13 @@ package com.github.tiwindetea.dungeonoflegend.listeners.tilemap;
 import com.github.tiwindetea.dungeonoflegend.events.tilemap.TileClickEvent;
 
 /**
- * Created by maxime on 5/10/16.
+ * The interface TileClickListener
+ * @author Maxime PINARD
  */
 public interface TileClickListener {
+	/**
+	 * Handler associated to a TileClickEvent
+	 * @param e Event to handle
+	 */
 	void tileClicked(TileClickEvent e);
 }

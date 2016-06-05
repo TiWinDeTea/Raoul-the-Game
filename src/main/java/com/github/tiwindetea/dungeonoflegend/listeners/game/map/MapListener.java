@@ -9,7 +9,8 @@
 package com.github.tiwindetea.dungeonoflegend.listeners.game.map;
 
 /**
- * Created by maxime on 5/6/16.
+ * The interface MapListener, that regroups some other listeners
+ * @author Maxime PINARD
  */
 public interface MapListener extends CenterOnTileListener, FogAdditionListener, FogResetListener, MapCreationListener, TileModificationListener {
 }
