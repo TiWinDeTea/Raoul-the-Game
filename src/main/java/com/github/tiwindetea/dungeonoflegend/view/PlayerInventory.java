@@ -77,11 +77,6 @@ public class PlayerInventory extends Parent {
 
 		public void handle(MouseEvent event) {
 
-			// left mouse button
-			if(event.getButton() == MouseButton.PRIMARY) {
-				//TODO
-			}
-
 			// right mouse button
 			if(event.getButton() == MouseButton.SECONDARY) {
 				StaticEntity staticEntity = (StaticEntity) event.getSource();

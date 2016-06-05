@@ -346,12 +346,12 @@ public class TileMap extends Parent {
 		}
 		getChildren().addAll(this.entities);
 
-		//TODO:
 		this.visibleTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		this.foggedTiles = new boolean[this.realTileMap.length][this.realTileMap[0].length];
 		setAllTilesFogged(false);
 		setAllTilesVisibility(false);
 		updateEntitiesVisibility();
+		//TODO: optimisation
 	}
 
 	private void drawRealTile(Vector2i tilePosition) {
