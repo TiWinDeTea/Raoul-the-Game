@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum EventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum EventType {
     TILEMAP_EVENT,

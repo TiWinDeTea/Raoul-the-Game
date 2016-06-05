@@ -9,10 +9,16 @@
 package com.github.tiwindetea.dungeonoflegend.events.requests;
 
 /**
- * Created by maxime on 5/21/16.
+ * The type CenterViewRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class CenterViewRequestEvent extends RequestEvent {
 
+	/**
+	 * Instantiates a new CenterViewRequestEvent.
+	 */
 	public CenterViewRequestEvent() {
 	}
 

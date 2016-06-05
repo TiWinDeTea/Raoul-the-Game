@@ -12,7 +12,10 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type MapEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class MapEvent extends Event {
 
@@ -20,5 +23,10 @@ public abstract class MapEvent extends Event {
         return EventType.MAP_EVENT;
     }
 
+    /**
+     * Gets sub type.
+     *
+     * @return the sub type
+     */
     public abstract MapEventType getSubType();
 }

@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events.requests;
 import com.github.tiwindetea.dungeonoflegend.model.Direction;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type MoveRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class MoveRequestEvent extends RequestEvent {
-	public Direction moveDirection;
+	private Direction moveDirection;
 
+	/**
+	 * Instantiates a new MoveRequestEvent.
+	 *
+	 * @param moveDirection the move direction
+	 */
 	public MoveRequestEvent(Direction moveDirection) {
 		this.moveDirection = moveDirection;
 	}
@@ -23,5 +31,14 @@ public class MoveRequestEvent extends RequestEvent {
 	@Override
 	public RequestEventType getSubType() {
 		return RequestEventType.MOVE_REQUEST_EVENT;
+	}
+
+	/**
+	 * Gets move direction.
+	 *
+	 * @return the move direction
+	 */
+	public Direction getMoveDirection() {
+		return this.moveDirection;
 	}
 }

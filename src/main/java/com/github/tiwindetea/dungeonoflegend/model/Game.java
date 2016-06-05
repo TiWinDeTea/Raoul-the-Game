@@ -1222,11 +1222,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void treatRequestEvent(DropRequestEvent e) {
 		/* Take the shortest path possible to drop the item */
-		if (!Tile.isObstructed(this.world.getTile(e.dropPosition)) || this.world.getTile(e.dropPosition) == Tile.HOLE) {
-			Stack<Vector2i> path = this.shortestPathApprox(this.currentPlayer.getPosition(), e.dropPosition, false, null);
+		if(!Tile.isObstructed(this.world.getTile(e.getDropPosition())) || this.world.getTile(e.getDropPosition()) == Tile.HOLE) {
+			Stack<Vector2i> path = this.shortestPathApprox(this.currentPlayer.getPosition(), e.getDropPosition(), false, null);
 			if (path != null) {
 				this.currentPlayer.setRequestedPath(path);
-				this.currentPlayer.setObjectToDrop(e.objectId, e.dropPosition);
+				this.currentPlayer.setObjectToDrop(e.getObjectId(), e.getDropPosition());
 				this.nextTick();
 			}
 		}
@@ -1234,17 +1234,17 @@ public class Game implements RequestListener, Runnable, Stopable {
 
 	private void treatRequestEvent(InteractionRequestEvent e) {
 		logger.log(this.debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
-		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.tilePosition, false, null);
+		Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.getTilePosition(), false, null);
 		boolean success = true;
-		Tile tile = this.world.getTile(e.tilePosition);
-		int distance = Math.max(Math.abs(e.tilePosition.x - this.currentPlayer.getPosition().x),
-				Math.abs(e.tilePosition.y - this.currentPlayer.getPosition().y));
+		Tile tile = this.world.getTile(e.getTilePosition());
+		int distance = Math.max(Math.abs(e.getTilePosition().x - this.currentPlayer.getPosition().x),
+		  Math.abs(e.getTilePosition().y - this.currentPlayer.getPosition().y));
 
 		if ((tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR) && distance > 1) {
-			path = shortestPathApprox(this.currentPlayer.getPosition(), e.tilePosition, false, null);
+			path = shortestPathApprox(this.currentPlayer.getPosition(), e.getTilePosition(), false, null);
 			if (path != null) {
 				this.currentPlayer.setRequestedPath(path);
-				this.currentPlayer.setRequestedInteraction(e.tilePosition);
+				this.currentPlayer.setRequestedInteraction(e.getTilePosition());
 			} else {
 				success = false;
 			}
@@ -1252,11 +1252,11 @@ public class Game implements RequestListener, Runnable, Stopable {
 		/* Looking for a mob to attack*/
 			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
 			Vector2i p = this.currentPlayer.getPosition();
-			if (los[los.length / 2 - p.x + e.tilePosition.x][los[0].length / 2 - p.y + e.tilePosition.y]) {
+			if(los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
 				int i = -1;
 				int j = 0;
 				while (i == -1 && j < this.mobs.size()) {
-					if (this.mobs.get(j).getPosition().equals(e.tilePosition)) {
+					if(this.mobs.get(j).getPosition().equals(e.getTilePosition())) {
 						i = j;
 					}
 					++j;
@@ -1270,18 +1270,18 @@ public class Game implements RequestListener, Runnable, Stopable {
 						success = false;
 						path = null;
 					} else {
-						this.currentPlayer.setRequestedAttack(e.tilePosition);
-						if (p.squaredDistance(e.tilePosition) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
+						this.currentPlayer.setRequestedAttack(e.getTilePosition());
+						if(p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
 							Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
 							shadow.addAll(this.mobs);
 							shadow.addAll(this.players);
-							this.currentPlayer.setRequestedPath(shortestPathApprox(p, e.tilePosition, false, shadow));
+							this.currentPlayer.setRequestedPath(shortestPathApprox(p, e.getTilePosition(), false, shadow));
 							this.currentPlayer.setSawDuck(false);
 						}
 					}
 				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
 					/* interaction with doors */
-					this.currentPlayer.setRequestedInteraction(e.tilePosition);
+					this.currentPlayer.setRequestedInteraction(e.getTilePosition());
 				} else {
 					success = false; // no mob found, neither doors
 				}
@@ -1312,7 +1312,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		this.objectToUse = null;
 		Pair<StorableObject> obj = null;
 		for (Pair<StorableObject> pair : inventory) {
-			if (pair.getId() == e.objectId) {
+			if(pair.getId() == e.getObjectId()) {
 				if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
 					this.objectToUse = new Pair<>(pair.getId(), (Consumable) pair.object);
 				} else {
@@ -1335,13 +1335,13 @@ public class Game implements RequestListener, Runnable, Stopable {
 				this.currentPlayer.equipWithWeapon(new Pair<>(obj.getId(), (Weapon) obj.object));
 			}
 		} else {
-			this.currentPlayer.unequip(e.objectId);
+			this.currentPlayer.unequip(e.getObjectId());
 		}
 	}
 
 	private void treatRequestEvent(MoveRequestEvent e) {
 		logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
-		Vector2i pos = this.currentPlayer.getPosition().copy().add(e.moveDirection);
+		Vector2i pos = this.currentPlayer.getPosition().copy().add(e.getMoveDirection());
 		if (isAccessible(pos)) {
 			Stack<Vector2i> stack = new Stack<>();
 			stack.add(pos);
@@ -1356,7 +1356,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 		List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
 		this.objectToUse = null;
 		for (Pair<StorableObject> pair : inventory) {
-			if (pair.getId() == e.objectId) {
+			if(pair.getId() == e.getObjectId()) {
 				if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
 				} else {
 					if (pair != null) {
@@ -1371,7 +1371,7 @@ public class Game implements RequestListener, Runnable, Stopable {
 				return;
 			}
 		}
-		this.currentPlayer.unequip(e.objectId);
+		this.currentPlayer.unequip(e.getObjectId());
 	}
 
 	public boolean isRunning() {

@@ -12,11 +12,19 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/3/16.
+ * The type StaticEntityEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class StaticEntityEvent extends Event {
-	public long entityId;
+	private long entityId;
 
+	/**
+	 * Instantiates a new StaticEntityEvent.
+	 *
+	 * @param entityId the entity id
+	 */
 	public StaticEntityEvent(long entityId) {
 		this.entityId = entityId;
 	}
@@ -25,5 +33,19 @@ public abstract class StaticEntityEvent extends Event {
 		return EventType.STATIC_ENTITY_EVENT;
 	}
 
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
 	public abstract StaticEntityEventType getSubType();
+
+	/**
+	 * Gets entity id.
+	 *
+	 * @return the entity id
+	 */
+	public long getEntityId() {
+		return this.entityId;
+	}
 }

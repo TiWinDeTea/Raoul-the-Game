@@ -9,11 +9,20 @@
 package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityLOSDefinitionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityLOSDefinitionEvent extends LivingEntityEvent {
-	public boolean[][] newLOS;
+	private boolean[][] newLOS;
 
+	/**
+	 * Instantiates a new LivingEntityLOSDefinitionEvent.
+	 *
+	 * @param entityId the entity id
+	 * @param newLOS   the new los
+	 */
 	public LivingEntityLOSDefinitionEvent(long entityId, boolean[][] newLOS) {
 		super(entityId);
 		this.newLOS = newLOS;
@@ -23,4 +32,13 @@ public class LivingEntityLOSDefinitionEvent extends LivingEntityEvent {
     public LivingEntityEventType getSubType() {
         return LivingEntityEventType.LIVING_ENTITY_LOS_DEFINITION_EVENT;
     }
+
+	/**
+	 * Get new los.
+	 *
+	 * @return the new los
+	 */
+	public boolean[][] getNewLOS() {
+		return this.newLOS;
+	}
 }

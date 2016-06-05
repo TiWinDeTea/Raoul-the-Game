@@ -9,12 +9,22 @@
 package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The type LivingEntityHealthUpdateEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityHealthUpdateEvent extends LivingEntityEvent {
-	public double newHealthProportion;
-	public int healthDiff;
+	private double newHealthProportion;
+	private int healthDiff;
 
+	/**
+	 * Instantiates a new LivingEntityHealthUpdateEvent.
+	 *
+	 * @param entityId            the entity id
+	 * @param newHealthProportion the new health proportion
+	 * @param healthDiff          the health diff
+	 */
 	public LivingEntityHealthUpdateEvent(long entityId, double newHealthProportion, int healthDiff) {
 		super(entityId);
 		this.newHealthProportion = newHealthProportion;
@@ -24,5 +34,23 @@ public class LivingEntityHealthUpdateEvent extends LivingEntityEvent {
 	@Override
 	public LivingEntityEventType getSubType() {
 		return LivingEntityEventType.LIVING_ENTITY_HEALTH_UPDATE_EVENT;
+	}
+
+	/**
+	 * Gets new health proportion.
+	 *
+	 * @return the new health proportion
+	 */
+	public double getNewHealthProportion() {
+		return this.newHealthProportion;
+	}
+
+	/**
+	 * Gets health diff.
+	 *
+	 * @return the health diff
+	 */
+	public int getHealthDiff() {
+		return this.healthDiff;
 	}
 }

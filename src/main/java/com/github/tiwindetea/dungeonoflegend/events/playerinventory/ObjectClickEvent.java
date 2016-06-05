@@ -9,11 +9,19 @@
 package com.github.tiwindetea.dungeonoflegend.events.playerinventory;
 
 /**
- * Created by maxime on 5/18/16.
+ * The type ObjectClickEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class ObjectClickEvent extends PlayerInventoryEvent {
-	public Long objectId;
+	private Long objectId;
 
+	/**
+	 * Instantiates a new ObjectClickEvent.
+	 *
+	 * @param objectId the object id
+	 */
 	public ObjectClickEvent(Long objectId) {
 		this.objectId = objectId;
 	}
@@ -21,4 +29,13 @@ public class ObjectClickEvent extends PlayerInventoryEvent {
     public PlayerInventoryEventType getSubType() {
         return PlayerInventoryEventType.OJECT_CLICK_EVENT;
     }
+
+	/**
+	 * Gets object id.
+	 *
+	 * @return the object id
+	 */
+	public Long getObjectId() {
+		return this.objectId;
+	}
 }

@@ -9,10 +9,16 @@
 package com.github.tiwindetea.dungeonoflegend.events.map;
 
 /**
- * Created by maxime on 5/20/16.
+ * The type FogResetEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class FogResetEvent extends MapEvent {
 
+	/**
+	 * Instantiates a new FogResetEvent.
+	 */
 	public FogResetEvent() {
 	}
 

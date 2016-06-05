@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events.requests;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type InteractionRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class InteractionRequestEvent extends RequestEvent {
-	public Vector2i tilePosition;
+	private Vector2i tilePosition;
 
+	/**
+	 * Instantiates a new InteractionRequestEvent.
+	 *
+	 * @param tilePosition the tile position
+	 */
 	public InteractionRequestEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
@@ -23,5 +31,14 @@ public class InteractionRequestEvent extends RequestEvent {
 	@Override
 	public RequestEventType getSubType() {
 		return RequestEventType.INTERACTION_REQUEST_EVENT;
+	}
+
+	/**
+	 * Gets tile position.
+	 *
+	 * @return the tile position
+	 */
+	public Vector2i getTilePosition() {
+		return this.tilePosition;
 	}
 }

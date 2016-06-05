@@ -12,11 +12,19 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class LivingEntityEvent extends Event {
-	public long entityId;
+	private long entityId;
 
+	/**
+	 * Instantiates a new LivingEntityEvent.
+	 *
+	 * @param entityId the entity id
+	 */
 	public LivingEntityEvent(long entityId) {
 		this.entityId = entityId;
 	}
@@ -24,5 +32,19 @@ public abstract class LivingEntityEvent extends Event {
         return EventType.LIVING_ENTITY_EVENT;
     }
 
-    public abstract LivingEntityEventType getSubType();
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
+	public abstract LivingEntityEventType getSubType();
+
+	/**
+	 * Gets entity id.
+	 *
+	 * @return the entity id
+	 */
+	public long getEntityId() {
+		return this.entityId;
+	}
 }

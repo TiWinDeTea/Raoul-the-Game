@@ -13,11 +13,20 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import java.util.List;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityLOSModificationEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityLOSModificationEvent extends LivingEntityEvent {
-	public List<Vector2i> modifiedTilesPositions;
+	private List<Vector2i> modifiedTilesPositions;
 
+	/**
+	 * Instantiates a new LivingEntityLOSModificationEvent.
+	 *
+	 * @param entityId               the entity id
+	 * @param modifiedTilesPositions the modified tiles positions
+	 */
 	public LivingEntityLOSModificationEvent(long entityId, List<Vector2i> modifiedTilesPositions) {
 		super(entityId);
 		this.modifiedTilesPositions = modifiedTilesPositions;
@@ -27,4 +36,13 @@ public class LivingEntityLOSModificationEvent extends LivingEntityEvent {
     public LivingEntityEventType getSubType() {
         return LivingEntityEventType.LIVING_ENTITY_LOS_MODIFICATION_EVENT;
     }
+
+	/**
+	 * Gets modified tiles positions.
+	 *
+	 * @return the modified tiles positions
+	 */
+	public List<Vector2i> getModifiedTilesPositions() {
+		return this.modifiedTilesPositions;
+	}
 }

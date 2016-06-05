@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.map;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum MapEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum MapEventType {
     CENTER_ON_TILE_EVENT,

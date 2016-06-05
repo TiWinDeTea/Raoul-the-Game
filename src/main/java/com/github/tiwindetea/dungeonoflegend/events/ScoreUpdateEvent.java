@@ -9,11 +9,19 @@
 package com.github.tiwindetea.dungeonoflegend.events;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The type ScoreUpdateEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class ScoreUpdateEvent extends Event {
-	public int newScore;
+	private int newScore;
 
+	/**
+	 * Instantiates a new ScoreUpdateEvent.
+	 *
+	 * @param newScore the new score
+	 */
 	public ScoreUpdateEvent(int newScore) {
 		this.newScore = newScore;
 	}
@@ -21,5 +29,14 @@ public class ScoreUpdateEvent extends Event {
 	@Override
 	public EventType getType() {
 		return EventType.SCORE_UPDATE_EVENT;
+	}
+
+	/**
+	 * Gets new score.
+	 *
+	 * @return the new score
+	 */
+	public int getNewScore() {
+		return this.newScore;
 	}
 }

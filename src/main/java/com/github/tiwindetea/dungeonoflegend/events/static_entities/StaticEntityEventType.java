@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.static_entities;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum StaticEntityEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum StaticEntityEventType {
     STATIC_ENTITY_CREATION_EVENT,

@@ -9,11 +9,20 @@
 package com.github.tiwindetea.dungeonoflegend.events.static_entities;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type StaticEntityLOSDefinitionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class StaticEntityLOSDefinitionEvent extends StaticEntityEvent {
-	public boolean[][] newLOS;
+	private boolean[][] newLOS;
 
+	/**
+	 * Instantiates a new StaticEntityLOSDefinitionEvent.
+	 *
+	 * @param entityId the entity id
+	 * @param newLOS   the new los
+	 */
 	public StaticEntityLOSDefinitionEvent(long entityId, boolean[][] newLOS) {
 		super(entityId);
 		this.newLOS = newLOS;
@@ -23,4 +32,13 @@ public class StaticEntityLOSDefinitionEvent extends StaticEntityEvent {
     public StaticEntityEventType getSubType() {
         return StaticEntityEventType.STATIC_ENTITY_LOS_DEFINITION_EVENT;
     }
+
+	/**
+	 * Get new los.
+	 *
+	 * @return the new los
+	 */
+	public boolean[][] getNewLOS() {
+		return this.newLOS;
+	}
 }

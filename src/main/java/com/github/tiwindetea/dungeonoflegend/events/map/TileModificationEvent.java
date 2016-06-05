@@ -12,12 +12,21 @@ import com.github.tiwindetea.dungeonoflegend.model.Tile;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/12/16.
+ * The type TileModificationEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class TileModificationEvent extends MapEvent {
-	public Vector2i tilePosition;
-	public Tile tileType;
+	private Vector2i tilePosition;
+	private Tile tileType;
 
+	/**
+	 * Instantiates a new TileModificationEvent.
+	 *
+	 * @param tilePosition the tile position
+	 * @param tileType     the tile type
+	 */
 	public TileModificationEvent(Vector2i tilePosition, Tile tileType) {
 		this.tilePosition = tilePosition;
 		this.tileType = tileType;
@@ -27,4 +36,22 @@ public class TileModificationEvent extends MapEvent {
     public MapEventType getSubType() {
         return MapEventType.TILE_MODIFICATION_EVENT;
     }
+
+	/**
+	 * Gets tile position.
+	 *
+	 * @return the tile position
+	 */
+	public Vector2i getTilePosition() {
+		return this.tilePosition;
+	}
+
+	/**
+	 * Gets tile type.
+	 *
+	 * @return the tile type
+	 */
+	public Tile getTileType() {
+		return this.tileType;
+	}
 }

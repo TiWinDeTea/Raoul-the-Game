@@ -26,11 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.BOOTS;
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.BREAST_PLATE;
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.GLOVES;
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.HELMET;
-import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.PANTS;
+import static com.github.tiwindetea.dungeonoflegend.model.ArmorType.*;
 
 /**
  * Player

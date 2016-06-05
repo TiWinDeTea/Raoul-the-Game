@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum LivingEntityEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum LivingEntityEventType {
     LIVING_ENTITY_CREATION_EVENT,

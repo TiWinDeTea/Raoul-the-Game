@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.players;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum PlayerEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum PlayerEventType {
     INVENTORY_ADDITION_EVENT,

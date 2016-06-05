@@ -9,11 +9,20 @@
 package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 
 /**
- * Created by Maxime on 22/05/2016.
+ * The type LivingEntityHealthVisibilityEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityHealthVisibilityEvent extends LivingEntityEvent {
-	public boolean healthVisibility;
+	private boolean healthVisibility;
 
+	/**
+	 * Instantiates a new LivingEntityHealthVisibilityEvent.
+	 *
+	 * @param entityId         the entity id
+	 * @param healthVisibility the health visibility
+	 */
 	public LivingEntityHealthVisibilityEvent(long entityId, boolean healthVisibility) {
 		super(entityId);
 		this.healthVisibility = healthVisibility;
@@ -22,5 +31,14 @@ public class LivingEntityHealthVisibilityEvent extends LivingEntityEvent {
 	@Override
 	public LivingEntityEventType getSubType() {
 		return LivingEntityEventType.LIVING_ENTITY_HEALTH_VISIBILITY_EVENT;
+	}
+
+	/**
+	 * Is health visibility boolean.
+	 *
+	 * @return the boolean
+	 */
+	public boolean isHealthVisibility() {
+		return this.healthVisibility;
 	}
 }

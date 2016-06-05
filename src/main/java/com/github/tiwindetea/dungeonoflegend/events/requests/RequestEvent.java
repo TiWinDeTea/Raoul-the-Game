@@ -12,10 +12,25 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type RequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class RequestEvent extends Event {
-    public abstract RequestEventType getSubType();
+
+	/**
+	 * Instantiates a new RequestEvent.
+	 */
+	public RequestEvent() {
+	}
+
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
+	public abstract RequestEventType getSubType();
 
     public EventType getType() {
         return EventType.REQUEST_EVENT;

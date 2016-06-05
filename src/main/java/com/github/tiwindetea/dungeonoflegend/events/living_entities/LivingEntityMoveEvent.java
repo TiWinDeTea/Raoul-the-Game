@@ -11,11 +11,20 @@ package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityMoveEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityMoveEvent extends LivingEntityEvent {
-	public Vector2i newPosition;
+	private Vector2i newPosition;
 
+	/**
+	 * Instantiates a new LivingEntityMoveEvent.
+	 *
+	 * @param entityId    the entity id
+	 * @param newPosition the new position
+	 */
 	public LivingEntityMoveEvent(long entityId, Vector2i newPosition) {
 		super(entityId);
 		this.newPosition = newPosition;
@@ -25,4 +34,13 @@ public class LivingEntityMoveEvent extends LivingEntityEvent {
     public LivingEntityEventType getSubType() {
         return LivingEntityEventType.LIVING_ENTITY_MOVE_EVENT;
     }
+
+	/**
+	 * Gets new position.
+	 *
+	 * @return the new position
+	 */
+	public Vector2i getNewPosition() {
+		return this.newPosition;
+	}
 }

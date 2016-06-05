@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.requests;
 
 /**
- * Created by organic-code on 5/20/16.
+ * The enum RequestEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum RequestEventType {
     MOVE_REQUEST_EVENT,

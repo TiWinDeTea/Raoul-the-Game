@@ -9,9 +9,17 @@
 package com.github.tiwindetea.dungeonoflegend.events.static_entities;
 
 /**
- * Created by maxime on 5/3/16.
+ * The type StaticEntityDeletionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class StaticEntityDeletionEvent extends StaticEntityEvent {
+	/**
+	 * Instantiates a new StaticEntityDeletionEvent.
+	 *
+	 * @param entityId the entity id
+	 */
 	public StaticEntityDeletionEvent(long entityId) {
 		super(entityId);
 	}

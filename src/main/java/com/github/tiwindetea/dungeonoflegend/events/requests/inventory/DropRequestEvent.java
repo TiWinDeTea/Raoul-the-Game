@@ -12,11 +12,20 @@ import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEventType;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type DropRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class DropRequestEvent extends InventoryRequestEvent {
-	public Vector2i dropPosition;
+	private Vector2i dropPosition;
 
+	/**
+	 * Instantiates a new DropRequestEvent.
+	 *
+	 * @param objectId     the object id
+	 * @param dropPosition the drop position
+	 */
 	public DropRequestEvent(long objectId, Vector2i dropPosition) {
 		super(objectId);
 		this.dropPosition = dropPosition;
@@ -25,5 +34,14 @@ public class DropRequestEvent extends InventoryRequestEvent {
 	@Override
 	public RequestEventType getSubType() {
 		return RequestEventType.DROP_REQUEST_EVENT;
+	}
+
+	/**
+	 * Gets drop position.
+	 *
+	 * @return the drop position
+	 */
+	public Vector2i getDropPosition() {
+		return this.dropPosition;
 	}
 }

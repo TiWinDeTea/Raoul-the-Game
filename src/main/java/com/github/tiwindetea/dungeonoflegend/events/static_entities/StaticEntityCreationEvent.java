@@ -12,16 +12,27 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
 /**
- * Created by maxime on 5/3/16.
+ * The type StaticEntityCreationEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class StaticEntityCreationEvent extends StaticEntityEvent {
-	public StaticEntityType type;
-	public Vector2i position;
-	public String description;
+	private StaticEntityType staticEntityType;
+	private Vector2i position;
+	private String description;
 
-	public StaticEntityCreationEvent(long entityId, StaticEntityType type, Vector2i position, String description) {
+	/**
+	 * Instantiates a new StaticEntityCreationEvent.
+	 *
+	 * @param entityId         the entity id
+	 * @param staticEntityType the static entity type
+	 * @param position         the position
+	 * @param description      the description
+	 */
+	public StaticEntityCreationEvent(long entityId, StaticEntityType staticEntityType, Vector2i position, String description) {
 		super(entityId);
-		this.type = type;
+		this.staticEntityType = staticEntityType;
 		this.position = position;
 		this.description = description;
 	}
@@ -29,5 +40,32 @@ public class StaticEntityCreationEvent extends StaticEntityEvent {
 	@Override
 	public StaticEntityEventType getSubType() {
 		return StaticEntityEventType.STATIC_ENTITY_CREATION_EVENT;
+	}
+
+	/**
+	 * Gets static entity type.
+	 *
+	 * @return the static entity type
+	 */
+	public StaticEntityType getStaticEntityType() {
+		return this.staticEntityType;
+	}
+
+	/**
+	 * Gets position.
+	 *
+	 * @return the position
+	 */
+	public Vector2i getPosition() {
+		return this.position;
+	}
+
+	/**
+	 * Gets description.
+	 *
+	 * @return the description
+	 */
+	public String getDescription() {
+		return this.description;
 	}
 }

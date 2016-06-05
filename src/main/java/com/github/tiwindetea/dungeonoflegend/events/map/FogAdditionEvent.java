@@ -11,12 +11,21 @@ package com.github.tiwindetea.dungeonoflegend.events.map;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/20/16.
+ * The type FogAdditionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class FogAdditionEvent extends MapEvent {
-	public Vector2i fogCenterPosition;
-	public boolean[][] fog;
+	private Vector2i fogCenterPosition;
+	private boolean[][] fog;
 
+	/**
+	 * Instantiates a new FogAdditionEvent.
+	 *
+	 * @param fogCenterPosition the fog center position
+	 * @param fog               the fog
+	 */
 	public FogAdditionEvent(Vector2i fogCenterPosition, boolean[][] fog) {
 		this.fogCenterPosition = fogCenterPosition;
 		this.fog = fog;
@@ -26,4 +35,22 @@ public class FogAdditionEvent extends MapEvent {
     public MapEventType getSubType() {
         return MapEventType.FOG_ADDITION_EVENT;
     }
+
+	/**
+	 * Gets fog center position.
+	 *
+	 * @return the fog center position
+	 */
+	public Vector2i getFogCenterPosition() {
+		return this.fogCenterPosition;
+	}
+
+	/**
+	 * Get fog.
+	 *
+	 * @return the fog
+	 */
+	public boolean[][] getFog() {
+		return this.fog;
+	}
 }

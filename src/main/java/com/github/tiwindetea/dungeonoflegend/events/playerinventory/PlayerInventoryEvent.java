@@ -12,7 +12,10 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/18/16.
+ * The type PlayerInventoryEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class PlayerInventoryEvent extends Event {
 
@@ -20,5 +23,10 @@ public abstract class PlayerInventoryEvent extends Event {
         return EventType.PLAYER_INVENTORY_EVENT;
     }
 
+    /**
+     * Gets sub type.
+     *
+     * @return the sub type
+     */
     public abstract PlayerInventoryEventType getSubType();
 }

@@ -9,9 +9,17 @@
 package com.github.tiwindetea.dungeonoflegend.events.players;
 
 /**
- * Created by maxime on 5/31/16.
+ * The type PlayerDeletionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class PlayerDeletionEvent extends PlayerEvent {
+	/**
+	 * Instantiates a new PlayerDeletionEvent.
+	 *
+	 * @param playerNumber the player number
+	 */
 	public PlayerDeletionEvent(int playerNumber) {
 		super(playerNumber);
 	}

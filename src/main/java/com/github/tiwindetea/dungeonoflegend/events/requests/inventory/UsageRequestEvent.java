@@ -11,10 +11,18 @@ package com.github.tiwindetea.dungeonoflegend.events.requests.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEventType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type UsageRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class UsageRequestEvent extends InventoryRequestEvent {
 
+	/**
+	 * Instantiates a new UsageRequestEvent.
+	 *
+	 * @param objectId the object id
+	 */
 	public UsageRequestEvent(long objectId) {
 		super(objectId);
 	}

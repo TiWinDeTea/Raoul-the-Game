@@ -11,9 +11,18 @@ package com.github.tiwindetea.dungeonoflegend.events.players.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEventType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type InventoryDeletionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class InventoryDeletionEvent extends InventoryEvent {
+	/**
+	 * Instantiates a new InventoryDeletionEvent.
+	 *
+	 * @param playerNumber the player number
+	 * @param objectId     the object id
+	 */
 	public InventoryDeletionEvent(int playerNumber, long objectId) {
 		super(playerNumber, objectId);
 	}

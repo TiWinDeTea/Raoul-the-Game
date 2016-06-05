@@ -12,22 +12,61 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEventType;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntityType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type InventoryAdditionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class InventoryAdditionEvent extends InventoryEvent {
-	public boolean isEquiped;
-	public StaticEntityType type;
-	public String description;
+	private boolean isEquiped;
+	private StaticEntityType staticEntityType;
+	private String description;
 
-	public InventoryAdditionEvent(int playerNumber, long objectId, boolean isEquiped, StaticEntityType type, String description) {
+	/**
+	 * Instantiates a new InventoryAdditionEvent.
+	 *
+	 * @param playerNumber     the player number
+	 * @param objectId         the object id
+	 * @param isEquiped        the is equiped
+	 * @param staticEntityType the static entity type
+	 * @param description      the description
+	 */
+	public InventoryAdditionEvent(int playerNumber, long objectId, boolean isEquiped, StaticEntityType staticEntityType, String description) {
 		super(playerNumber, objectId);
 		this.isEquiped = isEquiped;
-		this.type = type;
+		this.staticEntityType = staticEntityType;
 		this.description = description;
 	}
 
 	@Override
 	public PlayerEventType getSubType() {
 		return PlayerEventType.INVENTORY_ADDITION_EVENT;
+	}
+
+	/**
+	 * Is equiped boolean.
+	 *
+	 * @return the boolean
+	 */
+	public boolean isEquiped() {
+		return this.isEquiped;
+	}
+
+	/**
+	 * Gets static entity type.
+	 *
+	 * @return the static entity type
+	 */
+	public StaticEntityType getStaticEntityType() {
+		return this.staticEntityType;
+	}
+
+	/**
+	 * Gets description.
+	 *
+	 * @return the description
+	 */
+	public String getDescription() {
+		return this.description;
 	}
 }

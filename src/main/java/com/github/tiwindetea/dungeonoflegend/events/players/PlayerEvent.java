@@ -12,11 +12,19 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/5/16.
+ * The type PlayerEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class PlayerEvent extends Event {
-	public int playerNumber;
+	private int playerNumber;
 
+	/**
+	 * Instantiates a new PlayerEvent.
+	 *
+	 * @param playerNumber the player number
+	 */
 	public PlayerEvent(int playerNumber) {
 		this.playerNumber = playerNumber;
 	}
@@ -25,5 +33,19 @@ public abstract class PlayerEvent extends Event {
         return EventType.PLAYER_EVENT;
     }
 
-    public abstract PlayerEventType getSubType();
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
+	public abstract PlayerEventType getSubType();
+
+	/**
+	 * Gets player number.
+	 *
+	 * @return the player number
+	 */
+	public int getPlayerNumber() {
+		return this.playerNumber;
+	}
 }

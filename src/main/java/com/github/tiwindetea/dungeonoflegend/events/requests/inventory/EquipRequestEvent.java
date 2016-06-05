@@ -11,10 +11,18 @@ package com.github.tiwindetea.dungeonoflegend.events.requests.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEventType;
 
 /**
- * Created by organic-code on 6/4/16.
+ * The type EquipRequestEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class EquipRequestEvent extends InventoryRequestEvent {
 
+    /**
+     * Instantiates a new EquipRequestEvent.
+     *
+     * @param objectId the object id
+     */
     public EquipRequestEvent(long objectId) {
         super(objectId);
     }

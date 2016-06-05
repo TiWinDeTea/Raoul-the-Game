@@ -9,11 +9,19 @@
 package com.github.tiwindetea.dungeonoflegend.events.playerinventory;
 
 /**
- * Created by organic-code on 6/4/16.
+ * The type ObjectDragEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class ObjectDragEvent extends PlayerInventoryEvent {
-    public Long objectId;
+    private Long objectId;
 
+    /**
+     * Instantiates a new ObjectDragEvent.
+     *
+     * @param objectId the object id
+     */
     public ObjectDragEvent(Long objectId) {
         this.objectId = objectId;
     }
@@ -21,5 +29,14 @@ public class ObjectDragEvent extends PlayerInventoryEvent {
     @Override
     public PlayerInventoryEventType getSubType() {
         return PlayerInventoryEventType.OBJECT_DRAG_EVENT;
+    }
+
+    /**
+     * Gets object id.
+     *
+     * @return the object id
+     */
+    public Long getObjectId() {
+        return this.objectId;
     }
 }

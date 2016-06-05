@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events.tilemap;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/10/16.
+ * The type TileClickEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class TileClickEvent extends TileMapEvent {
-	public Vector2i tilePosition;
+	private Vector2i tilePosition;
 
+	/**
+	 * Instantiates a new TileClickEvent.
+	 *
+	 * @param tilePosition the tile position
+	 */
 	public TileClickEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
@@ -24,4 +32,13 @@ public class TileClickEvent extends TileMapEvent {
     public TileMapEventType getSubType() {
         return TileMapEventType.TILE_CLICK_EVENT;
     }
+
+	/**
+	 * Gets tile position.
+	 *
+	 * @return the tile position
+	 */
+	public Vector2i getTilePosition() {
+		return this.tilePosition;
+	}
 }

@@ -9,7 +9,10 @@
 package com.github.tiwindetea.dungeonoflegend.events.tilemap;
 
 /**
- * Created by Lucas on 21/05/2016.
+ * The enum TileMapEventType.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public enum TileMapEventType {
     TILE_CLICK_EVENT,

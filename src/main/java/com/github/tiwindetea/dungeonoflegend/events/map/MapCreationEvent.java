@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events.map;
 import com.github.tiwindetea.dungeonoflegend.model.Tile;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type MapCreationEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class MapCreationEvent extends MapEvent {
-	public Tile[][] map;
+	private Tile[][] map;
 
+	/**
+	 * Instantiates a new MapCreationEvent.
+	 *
+	 * @param map the map
+	 */
 	public MapCreationEvent(Tile[][] map) {
 		this.map = map;
 	}
@@ -24,4 +32,13 @@ public class MapCreationEvent extends MapEvent {
     public MapEventType getSubType() {
         return MapEventType.MAP_CREATION_EVENT;
     }
+
+	/**
+	 * Get map.
+	 *
+	 * @return the map
+	 */
+	public Tile[][] getMap() {
+		return this.map;
+	}
 }

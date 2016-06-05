@@ -13,17 +13,29 @@ import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntityType;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityCreationEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityCreationEvent extends LivingEntityEvent {
-	public LivingEntityType type;
-	public Vector2i position;
-	public Direction direction;
-	public String description;
+	private LivingEntityType livingEntityType;
+	private Vector2i position;
+	private Direction direction;
+	private String description;
 
-	public LivingEntityCreationEvent(long entityId, LivingEntityType type, Vector2i position, Direction direction, String description) {
+	/**
+	 * Instantiates a new LivingEntityCreationEvent.
+	 *
+	 * @param entityId         the entity id
+	 * @param livingEntityType the livingEntityType
+	 * @param position         the position
+	 * @param direction        the direction
+	 * @param description      the description
+	 */
+	public LivingEntityCreationEvent(long entityId, LivingEntityType livingEntityType, Vector2i position, Direction direction, String description) {
 		super(entityId);
-		this.type = type;
+		this.livingEntityType = livingEntityType;
 		this.position = position;
 		this.direction = direction;
 		this.description = description;
@@ -32,4 +44,40 @@ public class LivingEntityCreationEvent extends LivingEntityEvent {
     public LivingEntityEventType getSubType() {
         return LivingEntityEventType.LIVING_ENTITY_CREATION_EVENT;
     }
+
+	/**
+	 * Gets living entity staticEntityType.
+	 *
+	 * @return the living entity staticEntityType
+	 */
+	public LivingEntityType getLivingEntityType() {
+		return this.livingEntityType;
+	}
+
+	/**
+	 * Gets position.
+	 *
+	 * @return the position
+	 */
+	public Vector2i getPosition() {
+		return this.position;
+	}
+
+	/**
+	 * Gets direction.
+	 *
+	 * @return the direction
+	 */
+	public Direction getDirection() {
+		return this.direction;
+	}
+
+	/**
+	 * Gets description.
+	 *
+	 * @return the description
+	 */
+	public String getDescription() {
+		return this.description;
+	}
 }

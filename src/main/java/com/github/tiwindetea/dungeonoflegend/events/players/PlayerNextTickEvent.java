@@ -9,10 +9,18 @@
 package com.github.tiwindetea.dungeonoflegend.events.players;
 
 /**
- * Created by organic-code on 5/16/16.
+ * The type PlayerNextTickEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class PlayerNextTickEvent extends PlayerEvent {
 
+    /**
+     * Instantiates a new PlayerNextTickEvent.
+     *
+     * @param playerNumber the player number
+     */
     public PlayerNextTickEvent(int playerNumber) {
         super(playerNumber);
     }

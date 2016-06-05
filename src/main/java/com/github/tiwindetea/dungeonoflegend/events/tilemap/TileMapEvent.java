@@ -12,11 +12,25 @@ import com.github.tiwindetea.dungeonoflegend.events.Event;
 import com.github.tiwindetea.dungeonoflegend.events.EventType;
 
 /**
- * Created by maxime on 5/10/16.
+ * The type TileMapEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class TileMapEvent extends Event {
 
-    public abstract TileMapEventType getSubType();
+	/**
+	 * Instantiates a new TileMapEvent.
+	 */
+	public TileMapEvent() {
+	}
+
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
+	public abstract TileMapEventType getSubType();
 
     public EventType getType() {
         return EventType.TILEMAP_EVENT;

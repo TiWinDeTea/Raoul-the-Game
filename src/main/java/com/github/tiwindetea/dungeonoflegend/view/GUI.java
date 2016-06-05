@@ -183,63 +183,63 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final EventHandler<ActionEvent> eventExecutor = new EventHandler<ActionEvent>() {
 
 		public void addInventory(InventoryAdditionEvent e) {
-			if(e.isEquiped) {
-				GUI.this.playersInventories.get(e.playerNumber).addEquipedItem(e.objectId, new StaticEntity(e.type, e.description, e.objectId));
+			if(e.isEquiped()) {
+				GUI.this.playersInventories.get(e.getPlayerNumber()).addEquipedItem(e.getObjectId(), new StaticEntity(e.getStaticEntityType(), e.getDescription(), e.getObjectId()));
 			}
 			else {
-				GUI.this.playersInventories.get(e.playerNumber).addInventoryItem(e.objectId, new StaticEntity(e.type, e.description, e.objectId));
+				GUI.this.playersInventories.get(e.getPlayerNumber()).addInventoryItem(e.getObjectId(), new StaticEntity(e.getStaticEntityType(), e.getDescription(), e.getObjectId()));
 			}
 		}
 
 		public void deleteInventory(InventoryDeletionEvent e) {
-			if(e.playerNumber < GUI.this.actualPlayersNumber) {
-				GUI.this.playersInventories.get(e.playerNumber).removeItem(e.objectId);
+			if(e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				GUI.this.playersInventories.get(e.getPlayerNumber()).removeItem(e.getObjectId());
 			}
 			else {
-				System.out.println("GUI::deleteInventory : invalid player number " + e.playerNumber);
+				System.out.println("GUI::deleteInventory : invalid player number " + e.getPlayerNumber());
 			}
 		}
 
 		public void createLivingEntity(LivingEntityCreationEvent e) {
-			LivingEntity livingEntity = new LivingEntity(e.type, e.position, e.direction, e.description);
-			GUI.this.livingEntities.put(e.entityId, livingEntity);
+			LivingEntity livingEntity = new LivingEntity(e.getLivingEntityType(), e.getPosition(), e.getDirection(), e.getDescription());
+			GUI.this.livingEntities.put(e.getEntityId(), livingEntity);
 			GUI.this.cTileMap.addEntity(livingEntity);
 		}
 
 		public void deleteLivingEntity(LivingEntityDeletionEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				GUI.this.cTileMap.removeEntity(GUI.this.livingEntities.get(e.entityId));
-				GUI.this.livingEntities.remove(e.entityId);
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.cTileMap.removeEntity(GUI.this.livingEntities.get(e.getEntityId()));
+				GUI.this.livingEntities.remove(e.getEntityId());
 			}
 			else {
-				System.out.println("GUI::deleteLivingEntity : invalid entity id " + e.entityId);
+				System.out.println("GUI::deleteLivingEntity : invalid entity id " + e.getEntityId());
 			}
 		}
 
 		public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				GUI.this.livingEntities.get(e.entityId).setLOS(e.newLOS);
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).setLOS(e.getNewLOS());
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
 			}
 			else {
-				System.out.println("GUI::defineLivingEntityLOS : invalid entity id " + e.entityId);
+				System.out.println("GUI::defineLivingEntityLOS : invalid entity id " + e.getEntityId());
 			}
 		}
 
 		public void modifieLivingEntityLOS(LivingEntityLOSModificationEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				GUI.this.livingEntities.get(e.entityId).modifieLOS(e.modifiedTilesPositions);
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).modifieLOS(e.getModifiedTilesPositions());
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
 			}
 			else {
-				System.out.println("GUI::modifieLivingEntityLOS : invalid entity id " + e.entityId);
+				System.out.println("GUI::modifieLivingEntityLOS : invalid entity id " + e.getEntityId());
 			}
 		}
 
 		public void moveLivingEntity(LivingEntityMoveEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				Vector2i oldPosition = GUI.this.livingEntities.get(e.entityId).getPosition();
-				Vector2i newPosition = e.newPosition;
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				Vector2i oldPosition = GUI.this.livingEntities.get(e.getEntityId()).getPosition();
+				Vector2i newPosition = e.getNewPosition();
 				Direction direction;
 				if(newPosition.y > oldPosition.y) {
 					direction = Direction.DOWN;
@@ -253,14 +253,14 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				else if(newPosition.x < oldPosition.x) {
 					direction = Direction.LEFT;
 				} else {
-					direction = GUI.this.livingEntities.get(e.entityId).getDirection();
+					direction = GUI.this.livingEntities.get(e.getEntityId()).getDirection();
 				}
-				GUI.this.livingEntities.get(e.entityId).setDirection(direction);
-				GUI.this.livingEntities.get(e.entityId).setPosition(e.newPosition);
+				GUI.this.livingEntities.get(e.getEntityId()).setDirection(direction);
+				GUI.this.livingEntities.get(e.getEntityId()).setPosition(e.getNewPosition());
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
 			}
 			else {
-				System.out.println("GUI::moveLivingEntity : invalid entity id " + e.entityId);
+				System.out.println("GUI::moveLivingEntity : invalid entity id " + e.getEntityId());
 			}
 		}
 
@@ -268,12 +268,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(GUI.this.actualPlayersNumber < GUI.this.maxPlayersNumber) {
 				++GUI.this.actualPlayersNumber;
 
-				ImageView imageView1 = new ImageView(e.playerType.getImage());
-				ImageView imageView2 = new ImageView(e.playerType.getImage());
-				Vector2i spritePosition = e.playerType.getSpritePosition(Direction.DOWN);
+				ImageView imageView1 = new ImageView(e.getPlayerType().getImage());
+				ImageView imageView2 = new ImageView(e.getPlayerType().getImage());
+				Vector2i spritePosition = e.getPlayerType().getSpritePosition(Direction.DOWN);
 				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
-				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.maxHealth, e.maxHealth, e.maxMana, e.maxMana, 0, e.maxXP, e.level, e.playerName);
+				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.getMaxHealth(), e.getMaxHealth(), e.getMaxMana(), e.getMaxMana(), 0, e.getMaxXP(), e.getLevel(), e.getPlayerName());
 				GUI.this.playersHUD.add(playerHUD);
 				GUI.this.blTilePane.getChildren().add(playerHUD);
 
@@ -290,13 +290,13 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void deletePlayer(PlayerDeletionEvent e) {
 			if(GUI.this.actualPlayersNumber > 0) {
 				--GUI.this.actualPlayersNumber;
-				GUI.this.blTilePane.getChildren().remove(GUI.this.playersHUD.get(e.playerNumber));
-				GUI.this.playersHUD.remove(e.playerNumber);
-				GUI.this.rIventoryPane.getChildren().remove(GUI.this.playersInventories.get(e.playerNumber));
-				GUI.this.playersInventories.remove(e.playerNumber);
+				GUI.this.blTilePane.getChildren().remove(GUI.this.playersHUD.get(e.getPlayerNumber()));
+				GUI.this.playersHUD.remove(e.getPlayerNumber());
+				GUI.this.rIventoryPane.getChildren().remove(GUI.this.playersInventories.get(e.getPlayerNumber()));
+				GUI.this.playersInventories.remove(e.getPlayerNumber());
 			}
 			else {
-				System.out.println("GUI::deletePlayer : invalid player number - " + e.playerNumber);
+				System.out.println("GUI::deletePlayer : invalid player number - " + e.getPlayerNumber());
 			}
 		}
 
@@ -304,61 +304,61 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(e == null) {
 				return;
 			}
-			if(e.playerNumber >= 0 && e.playerNumber < GUI.this.actualPlayersNumber) {
-				int value = e.value;
+			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				int value = e.getValue();
 				if(value < 0) {
 					value = 0;
 				}
-				switch(e.statType) {
+				switch(e.getStatType()) {
 				case HEALTH:
-					switch(e.valueType) {
+					switch(e.getValueType()) {
 					case ACTUAL:
-						GUI.this.playersHUD.get(e.playerNumber).setActualHealth(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setActualHealth(value);
 						break;
 					case MAX:
-						GUI.this.playersHUD.get(e.playerNumber).setMaxHealth(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setMaxHealth(value);
 						break;
 					}
 					break;
 				case MANA:
-					switch(e.valueType) {
+					switch(e.getValueType()) {
 					case ACTUAL:
-						GUI.this.playersHUD.get(e.playerNumber).setActualMana(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setActualMana(value);
 						break;
 					case MAX:
-						GUI.this.playersHUD.get(e.playerNumber).setMaxMana(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setMaxMana(value);
 						break;
 					}
 					break;
 				case XP:
-					switch(e.valueType) {
+					switch(e.getValueType()) {
 					case ACTUAL:
-						GUI.this.playersHUD.get(e.playerNumber).setActualXP(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setActualXP(value);
 						break;
 					case MAX:
-						GUI.this.playersHUD.get(e.playerNumber).setMaxXP(value);
+						GUI.this.playersHUD.get(e.getPlayerNumber()).setMaxXP(value);
 						break;
 					}
 					break;
 				case LEVEL:
-					GUI.this.playersHUD.get(e.playerNumber).setActualLevel(value);
+					GUI.this.playersHUD.get(e.getPlayerNumber()).setActualLevel(value);
 					break;
 				case DAMAGES:
-					GUI.this.playersHUD.get(e.playerNumber).setActualDamages(value);
+					GUI.this.playersHUD.get(e.getPlayerNumber()).setActualDamages(value);
 					break;
 				case ARMOR:
-					GUI.this.playersHUD.get(e.playerNumber).setActualArmor(value);
+					GUI.this.playersHUD.get(e.getPlayerNumber()).setActualArmor(value);
 					break;
 				case RANGE:
-					GUI.this.playersHUD.get(e.playerNumber).setActualRange(value);
+					GUI.this.playersHUD.get(e.getPlayerNumber()).setActualRange(value);
 					break;
 				case POWER_GRADE:
-					GUI.this.playersHUD.get(e.playerNumber).setActualPowerGrade(value);
+					GUI.this.playersHUD.get(e.getPlayerNumber()).setActualPowerGrade(value);
 					break;
 				}
 			}
 			else {
-				System.out.println("GUI::changePlayerStat : invalid player number " + e.playerNumber);
+				System.out.println("GUI::changePlayerStat : invalid player number " + e.getPlayerNumber());
 			}
 		}
 
@@ -366,8 +366,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(e == null) {
 				return;
 			}
-			StaticEntity staticEntity = new StaticEntity(e.type, e.position, e.description);
-			GUI.this.staticEntities.put(e.entityId, staticEntity);
+			StaticEntity staticEntity = new StaticEntity(e.getStaticEntityType(), e.getPosition(), e.getDescription());
+			GUI.this.staticEntities.put(e.getEntityId(), staticEntity);
 			GUI.this.cTileMap.addEntity(staticEntity);
 		}
 
@@ -375,12 +375,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(e == null) {
 				return;
 			}
-			if(GUI.this.staticEntities.containsKey(e.entityId)) {
-				GUI.this.cTileMap.removeEntity(GUI.this.staticEntities.get(e.entityId));
-				GUI.this.staticEntities.remove(e.entityId);
+			if(GUI.this.staticEntities.containsKey(e.getEntityId())) {
+				GUI.this.cTileMap.removeEntity(GUI.this.staticEntities.get(e.getEntityId()));
+				GUI.this.staticEntities.remove(e.getEntityId());
 			}
 			else {
-				System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.entityId);
+				System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.getEntityId());
 			}
 		}
 
@@ -388,12 +388,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(e == null) {
 				return;
 			}
-			if(GUI.this.staticEntities.containsKey(e.entityId)) {
-				GUI.this.staticEntities.get(e.entityId).setLOS(e.newLOS);
+			if(GUI.this.staticEntities.containsKey(e.getEntityId())) {
+				GUI.this.staticEntities.get(e.getEntityId()).setLOS(e.getNewLOS());
 				GUI.this.cTileMap.setVisibleTiles(computeVisibleTiles());
 			}
 			else {
-				System.out.println("GUI::defineStaticEntityLOS : invalid entity id " + e.entityId);
+				System.out.println("GUI::defineStaticEntityLOS : invalid entity id " + e.getEntityId());
 			}
 		}
 
@@ -401,19 +401,19 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			if(e == null) {
 				return;
 			}
-			GUI.this.cTileMap.setMap(e.map);
+			GUI.this.cTileMap.setMap(e.getMap());
 		}
 
 		public void tileClicked(TileClickEvent e) {
-			fireInteractionRequestEvent(new InteractionRequestEvent(e.tilePosition));
+			fireInteractionRequestEvent(new InteractionRequestEvent(e.getTilePosition()));
 		}
 
 		public void tileDragged(TileDragEvent e) {
-			fireDropRequestEvent(new DropRequestEvent(e.objectId, e.tilePosition));
+			fireDropRequestEvent(new DropRequestEvent(e.getObjectId(), e.getTilePosition()));
 		}
 
 		public void modifieTile(TileModificationEvent e) {
-			GUI.this.cTileMap.setTile(e.tileType, e.tilePosition);
+			GUI.this.cTileMap.setTile(e.getTileType(), e.getTilePosition());
 		}
 
 		public void playerNextTick(PlayerNextTickEvent event) {
@@ -423,20 +423,20 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			for(PlayerInventory playersInventory : GUI.this.playersInventories) {
 				playersInventory.setVisible(false);
 			}
-			GUI.this.playersHUD.get(event.playerNumber).setMasked(false);
-			GUI.this.playersInventories.get(event.playerNumber).setVisible(true);
+			GUI.this.playersHUD.get(event.getPlayerNumber()).setMasked(false);
+			GUI.this.playersInventories.get(event.getPlayerNumber()).setVisible(true);
 		}
 
 		public void objectClicked(ObjectClickEvent e) {
-			fireUsageRequestEvent(new UsageRequestEvent(e.objectId));
+			fireUsageRequestEvent(new UsageRequestEvent(e.getObjectId()));
 		}
 
 		public void objectDragged(ObjectDragEvent e) {
-			fireEquipEvent(new EquipRequestEvent(e.objectId));
+			fireEquipEvent(new EquipRequestEvent(e.getObjectId()));
 		}
 
 		public void addFog(FogAdditionEvent e) {
-			GUI.this.cTileMap.addFoggedTiles(e.fogCenterPosition, e.fog);
+			GUI.this.cTileMap.addFoggedTiles(e.getFogCenterPosition(), e.getFog());
 		}
 
 		public void resetFog(FogResetEvent e) {
@@ -444,34 +444,34 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void centerOnTile(CenterOnTileEvent e) {
-			GUI.this.cTileMap.centerViewOnTile(e.tilePosition);
+			GUI.this.cTileMap.centerViewOnTile(e.getTilePosition());
 		}
 
 		public void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				GUI.this.livingEntities.get(e.entityId).setHealthProportion(e.newHealthProportion);
-				GUI.this.livingEntities.get(e.entityId).displayHealthModification(e.healthDiff);
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).setHealthProportion(e.getNewHealthProportion());
+				GUI.this.livingEntities.get(e.getEntityId()).displayHealthModification(e.getHealthDiff());
 			}
 			else {
-				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.entityId);
+				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.getEntityId());
 			}
 		}
 
 		public void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e) {
-			if(GUI.this.livingEntities.containsKey(e.entityId)) {
-				GUI.this.livingEntities.get(e.entityId).setHealthBarVisible(e.healthVisibility);
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).setHealthBarVisible(e.isHealthVisibility());
 			}
 			else {
-				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.entityId);
+				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.getEntityId());
 			}
 		}
 
 		public void updateScore(ScoreUpdateEvent e) {
-			GUI.this.rScoreDisplayer.setScore(e.newScore);
+			GUI.this.rScoreDisplayer.setScore(e.getNewScore());
 		}
 
 		public void updateLevel(LevelUpdateEvent e) {
-			GUI.this.rScoreDisplayer.setLevel(e.newLevel);
+			GUI.this.rScoreDisplayer.setLevel(e.getNewLevel());
 		}
 
 		@Override

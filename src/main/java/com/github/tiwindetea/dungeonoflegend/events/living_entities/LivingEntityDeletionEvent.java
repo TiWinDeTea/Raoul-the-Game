@@ -9,9 +9,17 @@
 package com.github.tiwindetea.dungeonoflegend.events.living_entities;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type LivingEntityDeletionEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LivingEntityDeletionEvent extends LivingEntityEvent {
+	/**
+	 * Instantiates a new LivingEntityDeletionEvent.
+	 *
+	 * @param entityId the entity id
+	 */
 	public LivingEntityDeletionEvent(long entityId) {
 		super(entityId);
 	}

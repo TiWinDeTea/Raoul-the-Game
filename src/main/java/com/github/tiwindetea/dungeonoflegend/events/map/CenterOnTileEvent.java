@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events.map;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 
 /**
- * Created by maxime on 5/21/16.
+ * The type CenterOnTileEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class CenterOnTileEvent extends MapEvent {
-	public Vector2i tilePosition;
+	private Vector2i tilePosition;
 
+	/**
+	 * Instantiates a new CenterOnTileEvent.
+	 *
+	 * @param tilePosition the tile position
+	 */
 	public CenterOnTileEvent(Vector2i tilePosition) {
 		this.tilePosition = tilePosition;
 	}
@@ -24,4 +32,13 @@ public class CenterOnTileEvent extends MapEvent {
     public MapEventType getSubType() {
         return MapEventType.CENTER_ON_TILE_EVENT;
     }
+
+	/**
+	 * Gets tile position.
+	 *
+	 * @return the tile position
+	 */
+	public Vector2i getTilePosition() {
+		return this.tilePosition;
+	}
 }

@@ -11,13 +11,31 @@ package com.github.tiwindetea.dungeonoflegend.events.players.inventory;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerEvent;
 
 /**
- * Created by maxime on 5/6/16.
+ * The type InventoryEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public abstract class InventoryEvent extends PlayerEvent {
-	public long objectId;
+	private long objectId;
 
+	/**
+	 * Instantiates a new InventoryEvent.
+	 *
+	 * @param playerNumber the player number
+	 * @param objectId     the object id
+	 */
 	public InventoryEvent(int playerNumber, long objectId) {
 		super(playerNumber);
 		this.objectId = objectId;
+	}
+
+	/**
+	 * Gets object id.
+	 *
+	 * @return the object id
+	 */
+	public long getObjectId() {
+		return this.objectId;
 	}
 }

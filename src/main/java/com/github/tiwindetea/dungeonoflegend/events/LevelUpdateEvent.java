@@ -11,11 +11,19 @@ package com.github.tiwindetea.dungeonoflegend.events;
 import static com.github.tiwindetea.dungeonoflegend.events.EventType.LEVEL_UPDATE_EVENT;
 
 /**
- * Created by maxime on 6/1/16.
+ * The type LevelUpdateEvent.
+ *
+ * @author Maxime PINARD
+ * @author Lucas LAZARE
  */
 public class LevelUpdateEvent extends Event {
-	public int newLevel;
+	private int newLevel;
 
+	/**
+	 * Instantiates a new LevelUpdateEvent.
+	 *
+	 * @param newLevel the new level
+	 */
 	public LevelUpdateEvent(int newLevel) {
 		this.newLevel = newLevel;
 	}
@@ -23,5 +31,14 @@ public class LevelUpdateEvent extends Event {
 	@Override
 	public EventType getType() {
 		return LEVEL_UPDATE_EVENT;
+	}
+
+	/**
+	 * Gets new level.
+	 *
+	 * @return the new level
+	 */
+	public int getNewLevel() {
+		return this.newLevel;
 	}
 }
