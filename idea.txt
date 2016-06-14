@@ -2,4 +2,5 @@
 2. Refondre les sons (mp3 ?)
 3. Changer le tir pour qu'il soit plus restrictif (un seul rayon au lieu de 4
 4. Il y a des FIXME // TODO
-5. Factoriser les events de stats de joueurs
+5. Factoriser les events de stats de joueurs (players && livingentity, avec les armes
+6. Ligne portée d'attaque
