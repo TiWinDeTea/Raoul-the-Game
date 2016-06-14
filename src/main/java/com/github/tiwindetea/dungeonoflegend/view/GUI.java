@@ -37,6 +37,7 @@ import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryA
 import com.github.tiwindetea.dungeonoflegend.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.LockViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.EquipRequestEvent;
@@ -173,6 +174,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				case SPACE:
 					fireCenterViewRequestEvent(new CenterViewRequestEvent());
 					break;
+					case Y:
+						fireLockViewRequestEvent(new LockViewRequestEvent());
+						break;
 				default:
 					break;
 				}
@@ -725,6 +729,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	 */
 	public RequestListener[] getRequestListener() {
 		return this.listeners.toArray(new RequestListener[this.listeners.size()]);
+	}
+
+	private void fireLockViewRequestEvent(LockViewRequestEvent event) {
+		for (RequestListener listener : this.getRequestListener()) {
+			listener.requestLockView(event);
+		}
 	}
 
 	private void fireDropRequestEvent(DropRequestEvent event) {

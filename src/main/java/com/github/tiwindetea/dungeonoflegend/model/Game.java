@@ -24,6 +24,7 @@ import com.github.tiwindetea.dungeonoflegend.events.players.PlayerDeletionEvent;
 import com.github.tiwindetea.dungeonoflegend.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.InteractionRequestEvent;
+import com.github.tiwindetea.dungeonoflegend.events.requests.LockViewRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.RequestEvent;
 import com.github.tiwindetea.dungeonoflegend.events.requests.inventory.DropRequestEvent;
@@ -90,6 +91,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
 	private volatile boolean isRunning = false;
 	private volatile boolean isPaused = false;
+	private volatile boolean viewIsLocked = false;
 	private int level;
 	private Map world;
 	private List<javafx.util.Pair<Vector2i, Pair<StorableObject>>> objectsOnGround = new LinkedList<>();
@@ -566,9 +568,20 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		this.requestedEvent.add(e);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestEquipping(EquipRequestEvent e) {
 		this.requestedEvent.add(e);
+	}
+
+	/**
+	 * {@inhericDoc}
+	 */
+	@Override
+	public void requestLockView(LockViewRequestEvent e) {
+		this.viewIsLocked = !this.viewIsLocked;
 	}
 
 	/**
@@ -741,7 +754,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			this.save();
 			this.clearLevel();
 			this.generateLevel(); // Hot dog !
-			return;
+		}
+
+		if (this.viewIsLocked) {
+			fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
 		}
 	}
 
@@ -1156,7 +1172,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 */
 	@Override
 	public void run() {
-		if (isRunning){
+		if (this.isRunning){
 			throw new AlreadyRunningException();
 		}
 		this.isRunning = true;

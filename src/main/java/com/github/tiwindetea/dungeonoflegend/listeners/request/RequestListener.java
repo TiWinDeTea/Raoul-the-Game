@@ -14,5 +14,5 @@ import com.github.tiwindetea.dungeonoflegend.listeners.request.inventory.Invento
  * The interface RequestListener, that regroups some other listener
  * @author Maxime PINARD
  */
-public interface RequestListener extends CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener {
+public interface RequestListener extends CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener, LockViewRequestListener {
 }
