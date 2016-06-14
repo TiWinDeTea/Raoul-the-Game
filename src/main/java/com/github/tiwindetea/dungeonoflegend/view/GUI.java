@@ -57,6 +57,7 @@ import com.github.tiwindetea.dungeonoflegend.model.Direction;
 import com.github.tiwindetea.dungeonoflegend.model.Vector2i;
 import com.github.tiwindetea.dungeonoflegend.view.entities.LivingEntity;
 import com.github.tiwindetea.dungeonoflegend.view.entities.StaticEntity;
+import com.github.tiwindetea.oggplayer.Sound;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
@@ -174,9 +175,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				case SPACE:
 					fireCenterViewRequestEvent(new CenterViewRequestEvent());
 					break;
-					case Y:
-						fireLockViewRequestEvent(new LockViewRequestEvent());
-						break;
+				case M:
+					Sound.player.setStopped(!Sound.player.getStopped());
+					break;
+				case Y:
+					fireLockViewRequestEvent(new LockViewRequestEvent());
+					break;
 				default:
 					break;
 				}

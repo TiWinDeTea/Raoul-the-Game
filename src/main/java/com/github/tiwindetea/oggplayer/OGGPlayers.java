@@ -20,6 +20,7 @@ import java.util.NoSuchElementException;
 public class OGGPlayers<K> {
 
     private Map<K, JOrbisPlayer> players;
+    private boolean stopped = false;
 
 
     /**
@@ -284,7 +285,9 @@ public class OGGPlayers<K> {
      */
     public JOrbisPlayer putAndPlay(K key, JOrbisPlayer player) {
         JOrbisPlayer r = this.players.put(key, player);
-        player.play_sound();
+        if (!this.stopped) {
+            player.play_sound();
+        }
         return r;
     }
 
@@ -296,7 +299,9 @@ public class OGGPlayers<K> {
     public void play(K key) {
         JOrbisPlayer r = this.players.get(key);
         if (r != null) {
-            r.play_sound();
+            if (!this.stopped) {
+                r.play_sound();
+            }
         } else {
             throw new NoSuchElementException();
         }
@@ -326,7 +331,9 @@ public class OGGPlayers<K> {
         JOrbisPlayer p = this.players.get(key);
         if (p != null) {
             p.setLooping(loop);
-            p.play_sound();
+            if (!this.stopped) {
+                p.play_sound();
+            }
         } else {
             throw new NoSuchElementException();
         }
@@ -377,5 +384,16 @@ public class OGGPlayers<K> {
      */
     public void clear() {
         this.players.clear();
+    }
+
+    public void setStopped(boolean stopped) {
+        if (!this.stopped && stopped) {
+            this.stopAny();
+        }
+        this.stopped = stopped;
+    }
+
+    public boolean getStopped() {
+        return this.stopped;
     }
 }
