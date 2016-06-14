@@ -2,5 +2,11 @@
 2. Refondre les sons (mp3 ?)
 3. Changer le tir pour qu'il soit plus restrictif (un seul rayon au lieu de 4
 4. Il y a des FIXME // TODO
-5. Factoriser les events de stats de joueurs (players && livingentity, avec les armes
-6. Ligne portée d'attaque
+5. Factoriser les events de stats de joueurs (players && livingentity, avec les armes)
+6. Ligne indiquant la portée d'attaque
+7. Ajouter un tutoriel // aide
+8. Ajouter un scenario (façon star wars, avec un bouton "don't remind me")
+9. Transition de la caméra (caméra locké)
+10. Centrer la caméra tout en étant zoomé
+11. Il y a une fuite de CPU quelque part...
+12. Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me")
