@@ -185,14 +185,18 @@ public class Map {
      *
      * @param position    the position
      * @param visionRange the vision range
+     * @param tries       the number of rays casted for each block
      * @return the LOS
      */
-    public boolean[][] getLOS(Vector2i position, int visionRange) {
+    public boolean[][] getLOS(Vector2i position, int visionRange, int tries) {
         if (visionRange < 0) {
-            throw new IllegalArgumentException("visionRange should not be negative (value : " + visionRange);
+            throw new IllegalArgumentException("visionRange should not be negative (value : " + visionRange + ")");
         }
         if (position.x < 0 || position.y < 0 || position.x > this.map.length || position.y > this.map[0].length) {
             throw new IllegalArgumentException("Watcher outside of the map !");
+        }
+        if (tries > 4 || tries < 0) {
+            throw new IllegalArgumentException("restriction should be between 0 and 4 (value : " + tries + ")");
         }
 
         boolean[][] LOS = new boolean[2 * visionRange + 1][2 * visionRange + 1];
@@ -207,7 +211,7 @@ public class Map {
         for (int i = Math.max(position.x - visionRange, 0); i < i_end; ++i) {
             for (int j = Math.max(position.y - visionRange, 0); j < j_end; ++j) {
                 if (Math.pow(i - position.x, 2) + Math.pow(j - position.y, 2) <= squaredVisionRange) {
-                    LOS[i - xlos_shift][j - ylos_shift] = this.isVisibleFrom(new Vector2i(i, j), position);
+                    LOS[i - xlos_shift][j - ylos_shift] = this.isVisibleFrom(new Vector2i(i, j), position, tries);
                 }
             }
         }
@@ -223,14 +227,16 @@ public class Map {
         return new Vector2i(this.map.length, this.map[0].length);
     }
 
-    private boolean isVisibleFrom(Vector2i tilePosition, Vector2i watcherPosition) {
+    private boolean isVisibleFrom(Vector2i tilePosition, Vector2i watcherPosition, int tries) {
         float distance = (float) Math.sqrt(Math.pow(tilePosition.x - watcherPosition.x, 2)
                 + Math.pow(tilePosition.y - watcherPosition.y, 2));
 
 
         if (distance != 0) {
+
             boolean visible = false;
-            for (int j = 0; j < 4 && !visible; j++) {
+
+            for (int j = 0; j < tries && !visible; j++) {
                 visible = true;
                 float xShifting = (tilePosition.x + j / 2 - watcherPosition.x) / distance;
                 float yShifting = (tilePosition.y + j % 2 - watcherPosition.y) / distance;
@@ -251,7 +257,7 @@ public class Map {
                         visible = false;
                     --i;
                 }
-            }
+                }
             return visible;
         }
         return true;

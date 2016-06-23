@@ -614,7 +614,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb, "A Lit bulb"));
 			fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(
 					p.getId(),
-					this.world.getLOS(bulb, BULB_LOS)
+					this.world.getLOS(bulb, BULB_LOS, 4)
 			));
 		}
 
@@ -697,7 +697,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
 					player.getId(),
-					this.world.getLOS(player.getPosition(), player.getLos())
+					this.world.getLOS(player.getPosition(), player.getLos(), 4)
 			));
 		}
 		fireCenterOnTileEvent(new CenterOnTileEvent(this.players.get(0).getPosition()));
@@ -780,7 +780,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
 				if (distance <= 1 && isAccessible(pos)) {
 					player.setPosition(pos);
-					fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos())));
+					fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos(), 4)));
 				} else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
 					player.setFloor(this.level + 1);
 					player.setPosition(new Vector2i(0, 0));
@@ -798,7 +798,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			} else if ((pos = player.getRequestedAttack()) != null) {
 			/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
 				if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
-					boolean[][] los = this.world.getLOS(playerPos, player.getLos());
+					boolean[][] los = this.world.getLOS(playerPos, player.getLos(), 4);
 					if (los[los.length / 2 - playerPos.x + pos.x][los[0].length / 2 - playerPos.y + pos.y]) {
 						int j = this.mobs.indexOf(new Mob(pos));
 						if (j >= 0) {
@@ -845,7 +845,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		/* Letting the mobs to play */
 		for (Mob mob : this.mobs) {
 			if (mob.isAlive()) {
-				mob.live(this.mobs, this.players, this.world.getLOS(mob.getPosition(), mob.getChaseRange()));
+				mob.live(this.mobs, this.players, this.world.getLOS(mob.getPosition(), mob.getChaseRange(), 4));
 				if ((pos = mob.getRequestedMove()) != null) {
 					int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
 					if (distance <= 1 && isAccessible(pos)) {
@@ -1063,7 +1063,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	private void recomputePlayersLoses() {
 		for (Player player : this.players) {
 			Vector2i pos = player.getPosition();
-			boolean[][] playerLOS = this.world.getLOS(pos, player.getLos());
+			boolean[][] playerLOS = this.world.getLOS(pos, player.getLos(), 4);
 			player.live(this.mobs, this.players, playerLOS);
 			fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
 					player.getId(),
@@ -1071,7 +1071,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			));
 			fireFogAdditionEvent(new FogAdditionEvent(
 					pos,
-					this.world.getLOS(pos, player.getExploreLOS())
+					this.world.getLOS(pos, player.getExploreLOS(), 4)
 			));
 		}
 	}
@@ -1274,7 +1274,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 		} else if (distance <= this.currentPlayer.getLos()) {
 		/* Looking for a mob to attack*/
-			boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos());
+			boolean[][] los;
+			if (this.objectToUse != null) {
+				los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos(), 4);
+			} else {
+				los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getAttackRange(), 1);
+			}
 			Vector2i p = this.currentPlayer.getPosition();
 			if(los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
 				int i = -1;
