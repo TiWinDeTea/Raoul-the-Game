@@ -1,6 +1,6 @@
 package com.github.tiwindetea.oggplayer;
 
-import com.github.tiwindetea.dungeonoflegend.model.MainPackage;
+import com.github.tiwindetea.raoulthegame.model.MainPackage;
 
 import java.net.URL;
 

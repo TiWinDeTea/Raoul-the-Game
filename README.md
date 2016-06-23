@@ -1,4 +1,4 @@
-# DungeonOfLegends
+# Raoul, The Game
 School Project - Java Rogue Like
 
 ## About
