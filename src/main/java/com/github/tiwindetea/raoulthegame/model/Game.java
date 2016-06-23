@@ -1281,7 +1281,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getAttackRange(), 1);
 			}
 			Vector2i p = this.currentPlayer.getPosition();
-			if(los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
+			if (distance <= los.length / 2 && los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
 				int i = -1;
 				int j = 0;
 				while (i == -1 && j < this.mobs.size()) {
@@ -1315,7 +1315,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					success = false; // no mob found, neither doors
 				}
 			} else {
-				success = false; // tile not in the los
+				success = false; // tile not in the los or out of range for damages
 			}
 		} else {
 			success = false; // tile too far away
