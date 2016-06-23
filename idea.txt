@@ -9,5 +9,5 @@
 9.  Il y a une fuite de CPU quelque part...
 10. Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me")
 11. Indicateur de gain d'xp ? (comme les dégats mais genre en violet) // Mana ?
-12. Auto equip quand tu passes sur genre une armure et que tu n'en as pas d'équipé ou qu'elle est meilleure que la tienne (choix dans un menu) ?
+12. Auto equip -> choix dans un menu ?
 13. Permettre de saisir une seed

@@ -199,4 +199,13 @@ public class Weapon implements StorableObject {
 	public String getDescription() {
 		return this.name;
 	}
+
+	/**
+	 * Computes the powergrade of this object
+	 *
+	 * @return the powergrade
+	 */
+	public int powerGrade() {
+		return (int) (5 * (this.attackPowerModifier / 11) + this.range / 3);
+	}
 }

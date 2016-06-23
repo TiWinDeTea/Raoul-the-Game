@@ -39,7 +39,6 @@ import static com.github.tiwindetea.raoulthegame.model.ArmorType.PANTS;
  */
 public class Player extends LivingThing {
 	private List<Pair<StorableObject>> inventory;
-	private static ArmorType[] equipedArmor = {HELMET, BREAST_PLATE, GLOVES, PANTS, BOOTS}; // Order of the armors in the player's amors' array
 	private int maxStorageCapacity;
 	private double maxMana;
 	private double mana;
@@ -94,7 +93,7 @@ public class Player extends LivingThing {
 		this.inventory = new ArrayList<>();
 		this.armors = new ArrayList<>(5);
 		for (int i = 0; i < 5; i++) {
-			this.armors.add(new Pair<>());
+			this.armors.add(null);
 		}
 		this.weapon = null;
 		this.name = name;
@@ -376,6 +375,28 @@ public class Player extends LivingThing {
 			if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
 				damages += this.weapon.object.getAttackPowerModifier();
 			}
+			if (Game.AUTO_EQUIP
+					&& this.weapon != null
+					&& this.weapon.object != null
+					&& this.weapon.object.getManaCost() > this.mana) {
+				int maxPowerGrade = 0;
+				Pair<Weapon> selectedWeapon = null;
+				for (Pair<StorableObject> pair : this.inventory) {
+					if (pair.object != null
+							&& pair.object.getType() == StorableObjectType.WEAPON) {
+						Pair<Weapon> tmp = new Pair<>(pair, false);
+						if (tmp.object.getManaCost() < this.mana
+								&& tmp.object.powerGrade() > maxPowerGrade) {
+							maxPowerGrade = tmp.object.powerGrade();
+							selectedWeapon = tmp;
+						}
+					}
+				}
+				if (selectedWeapon != null) {
+					this.removeFromInventory(new Pair<>(selectedWeapon));
+					this.equipWithWeapon(selectedWeapon);
+				}
+			}
 			super.attack(target);
 			target.damage(damages);
 		}
@@ -540,26 +561,22 @@ public class Player extends LivingThing {
 	 */
 	public Pair<Armor> equipWithArmor(Pair<Armor> armor) {
 		Pair<Armor> removedArmor = null;
-		for (int i = 0; i < equipedArmor.length; i++) {
-			if (equipedArmor[i] == armor.object.getArmorType()) {
-				if (this.armors.get(i) != null && this.armors.get(i).object != null) {
-					removedArmor = this.armors.get(i);
-					fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
-					addToInventory(new Pair<>(removedArmor));
-				}
-				fireInventoryAdditionEvent(new InventoryAdditionEvent(
-						this.number,
-						armor.getId(),
-						true,
-						armor.object.getGType(),
-						armor.object.getDescription()
-				));
-				this.armors.set(i, armor);
-				this.updateArmorStats();
-				return removedArmor;
-			}
+		int i = armor.object.getArmorType().ordinal();
+		if (this.armors.get(i) != null && this.armors.get(i).object != null) {
+			removedArmor = this.armors.get(i);
+			fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
+			addToInventory(new Pair<>(removedArmor));
 		}
-		return null;
+		fireInventoryAdditionEvent(new InventoryAdditionEvent(
+				this.number,
+				armor.getId(),
+				true,
+				armor.object.getGType(),
+				armor.object.getDescription()
+		));
+		this.armors.set(i, armor);
+		this.updateArmorStats();
+		return removedArmor;
 	}
 
 
@@ -946,7 +963,7 @@ public class Player extends LivingThing {
 	 * @param id the id of the equipement
 	 */
 	public void unequip(long id) {
-		if (this.inventory.size() < this.maxStorageCapacity - 1) {
+		if (this.inventory.size() < this.maxStorageCapacity) {
 			if (this.weapon != null && this.weapon.getId() == id) {
 				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, id));
 				addToInventory(new Pair<>(this.weapon.getId(), this.weapon.object));
@@ -1070,5 +1087,97 @@ public class Player extends LivingThing {
 				PlayerStatEvent.ValueType.ACTUAL,
 				(int) this.getPowerGrade())
 		);
+	}
+
+	public boolean simpleAutoEquipWeapon(Pair<Weapon> weapon) {
+		if (this.weapon == null) {
+			this.equipWithWeapon(weapon);
+			return true;
+		}
+		return false;
+	}
+
+	public Pair<Weapon> autoEquipWeapon(Pair<Weapon> weapon, boolean canDrop) {
+		if (this.weapon == null) {
+			this.equipWithWeapon(weapon);
+			return null;
+		} else if (weapon.object.getManaCost() < this.mana && weapon.object.powerGrade() > this.weapon.object.powerGrade()) {
+			if (this.inventory.size() < this.maxStorageCapacity) {
+				this.equipWithWeapon(weapon);
+				return null;
+			} else if (canDrop) {
+				Pair<Weapon> removedWeapon = this.weapon;
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedWeapon.getId()));
+				fireInventoryAdditionEvent(new InventoryAdditionEvent(
+						this.number,
+						weapon.getId(),
+						true,
+						weapon.object.getGType(),
+						weapon.object.getDescription()
+				));
+				this.updateAttackStats();
+				return removedWeapon;
+			} else {
+				return new Pair<>();
+			}
+		}
+		return new Pair<>();
+	}
+
+	public boolean simpleAutoEquipArmor(Pair<Armor> armor) {
+		int i = armor.object.getArmorType().ordinal();
+
+		if (this.armors.get(i) == null || this.armors.get(i).object == null) {
+			fireInventoryAdditionEvent(new InventoryAdditionEvent(
+					this.number,
+					armor.getId(),
+					true,
+					armor.object.getGType(),
+					armor.object.getDescription()
+			));
+			this.armors.set(i, armor);
+			this.updateArmorStats();
+			return true;
+		}
+		return false;
+	}
+
+	public Pair<Armor> autoEquipArmor(Pair<Armor> armor, boolean canDrop) {
+		if (this.simpleAutoEquipArmor(armor)) {
+			return null;
+		}
+
+		int i = armor.object.getArmorType().ordinal();
+		Pair<Armor> removedArmor = this.armors.get(i);
+
+		if (armor.object.powerGrade() > removedArmor.object.powerGrade()) {
+			if (this.inventory.size() < this.maxStorageCapacity) {
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
+				addToInventory(new Pair<>(removedArmor));
+				fireInventoryAdditionEvent(new InventoryAdditionEvent(
+						this.number,
+						armor.getId(),
+						true,
+						armor.object.getGType(),
+						armor.object.getDescription()
+				));
+				this.armors.set(i, armor);
+				this.updateArmorStats();
+				return null;
+			} else if (canDrop) {
+				fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
+				fireInventoryAdditionEvent(new InventoryAdditionEvent(
+						this.number,
+						armor.getId(),
+						true,
+						armor.object.getGType(),
+						armor.object.getDescription()
+				));
+				this.armors.set(i, armor);
+				this.updateArmorStats();
+				return removedArmor;
+			}
+		}
+		return new Pair<>();
 	}
 }

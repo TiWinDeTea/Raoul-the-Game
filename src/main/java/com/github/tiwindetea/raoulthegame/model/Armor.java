@@ -183,4 +183,13 @@ public class Armor implements StorableObject {
 		}
 		return this.name;
 	}
+
+	/**
+	 * Computes the powergrade of this object
+	 *
+	 * @return the powergrade
+	 */
+	public int powerGrade() {
+		return (int) (5 * (this.attackPowerModifier / 11 + this.defensePowerModifier));
+	}
 }

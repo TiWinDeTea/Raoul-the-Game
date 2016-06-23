@@ -21,7 +21,9 @@ public class Pair<T extends Object> {
     public T object;
 
     /**
-     * Instanciates a new Pair without consuming an id
+     * Instanciates a new Pair without consuming an id (the id is set to Pair.ERROR_VAL)
+     *
+     * @see Pair#ERROR_VAL
      */
     public Pair() {
         this.id = Pair.ERROR_VAL;
@@ -69,6 +71,18 @@ public class Pair<T extends Object> {
     public Pair(Pair<? extends T> pair) {
         this.id = pair.id;
         this.object = pair.object;
+    }
+
+    /**
+     * Copy-caster constructor
+     *
+     * @param pair   pair to copy
+     * @param unused Variable used to avoid type collision with the Pair(Pair<? extends T> pair) constructor
+     * @see Pair#Pair(Pair)
+     */
+    public Pair(Pair<? super T> pair, boolean unused) {
+        this.id = pair.id;
+        this.object = (T) pair.object;
     }
 
     /**

@@ -9,6 +9,8 @@
 
 package com.github.tiwindetea.raoulthegame.model;
 
+import com.github.tiwindetea.oggplayer.Sound;
+import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityCreationEvent;
@@ -37,8 +39,6 @@ import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.listeners.request.RequestListener;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -49,9 +49,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -61,6 +61,7 @@ import java.util.Scanner;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Game.
@@ -69,6 +70,10 @@ import java.util.logging.Logger;
 public class Game implements RequestListener, Runnable, Stoppable {
 
 	private class AlreadyRunningException extends RuntimeException{}
+
+	public static final boolean SIMPLE_AUTO_EQUIP = true;
+	public static final boolean AUTO_EQUIP = true;
+	public static final boolean AUTO_EQUIP_CAN_DROP = true;
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 1;
@@ -79,8 +84,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 4;
-	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 5;
-	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 10;
+	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 50;
+	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 100;
 	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 100;
 	private static final int REFRESH_TIME_MS = 100;
@@ -263,6 +268,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 			player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
+			player.addToInventory(new Pair<>(new Weapon(15, 1, 5)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -920,12 +926,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		}
 
 		/* Letting consumable do their effects */
-		ArrayList<Consumable> consumableToDelete = new ArrayList<>();
-		for (Consumable consumable : this.triggeredObjects) {
-			if (consumable.nextTick()) { // if its effect is finished
-				consumableToDelete.add(consumable);
-			}
-		}
+		ArrayList<Consumable> consumableToDelete = this.triggeredObjects.stream()
+				/* if its effect is finished */
+				.filter(consumable -> consumable.nextTick())
+				.collect(Collectors.toCollection(ArrayList::new));
 
 		for (Consumable consumable : consumableToDelete) {
 			this.triggeredObjects.remove(consumable);
@@ -937,15 +941,86 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			pos = player.getPosition();
 
 			/* Loots */
-			Iterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.iterator();
+			ListIterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.listIterator();
 			while (iter.hasNext()) {
 				javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();//TODO
 				Pair<StorableObject> objDroppedByPlayer = objectsJustDropped.get(new Integer(player.getNumber()));
 				if (objPair.getKey().equals(pos)
-						&& (objDroppedByPlayer == null || objDroppedByPlayer.getId() != objPair.getValue().getId())
-						&& player.addToInventory(objPair.getValue())) {
-					fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
-					iter.remove();
+						&& (objDroppedByPlayer == null || objDroppedByPlayer.getId() != objPair.getValue().getId())) {
+
+					Pair<StorableObject> obj = null;
+
+
+					if (objPair.getValue().object.getType() == StorableObjectType.ARMOR) {
+						if (AUTO_EQUIP) {
+							Pair<Armor> arm = player.autoEquipArmor(new Pair<>(objPair.getValue(), false), AUTO_EQUIP_CAN_DROP);
+							//noinspection Duplicates
+							if (arm == null) {
+								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+								iter.remove();
+							} else {
+								if (arm.getId() != Pair.ERROR_VAL) {
+									fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+									fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+											arm.getId(),
+											arm.object.getGType(),
+											objPair.getKey(),
+											arm.object.getDescription()
+									));
+									iter.set(new javafx.util.Pair<>(objPair.getKey(), new Pair<>(arm)));
+								} else {
+									obj = objPair.getValue();
+								}
+							}
+						} else if (SIMPLE_AUTO_EQUIP) {
+							if (player.simpleAutoEquipArmor(new Pair<>(objPair.getValue(), false))) {
+								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+								iter.remove();
+							} else {
+								obj = objPair.getValue();
+							}
+						} else {
+							obj = objPair.getValue();
+						}
+					} else if (objPair.getValue().object.getType() == StorableObjectType.WEAPON) {
+						if (AUTO_EQUIP) {
+							Pair<Weapon> weap = player.autoEquipWeapon(new Pair<>(objPair.getValue(), false), AUTO_EQUIP_CAN_DROP);
+							//noinspection Duplicates
+							if (weap == null) {
+								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+								iter.remove();
+							} else {
+								if (weap.getId() != Pair.ERROR_VAL) {
+									fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+									fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+											weap.getId(),
+											weap.object.getGType(),
+											objPair.getKey(),
+											weap.object.getDescription()
+									));
+									iter.set(new javafx.util.Pair<>(objPair.getKey(), new Pair<>(weap)));
+								} else {
+									obj = objPair.getValue();
+								}
+							}
+						} else if (SIMPLE_AUTO_EQUIP) {
+							if (player.simpleAutoEquipWeapon(new Pair<>(objPair.getValue(), false))) {
+								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+								iter.remove();
+							} else {
+								obj = objPair.getValue();
+							}
+						} else {
+							obj = objPair.getValue();
+						}
+					} else {
+						obj = objPair.getValue();
+					}
+
+					if (obj != null && obj.object != null && player.addToInventory(obj)) {
+						fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+						iter.remove();
+					}
 				}
 			}
 
@@ -975,14 +1050,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 
 			/* chests and traps */
-			ArrayList<Pair<InteractiveObject>> objectsToDelete = new ArrayList<>();
-			for (Pair<InteractiveObject> interactiveObject : this.interactiveObjects) {
-				if (interactiveObject.object.getPosition().equals(player.getPosition())) {
-					if (interactiveObject.object.trigger(player)) {
-						objectsToDelete.add(interactiveObject);
-					}
-				}
-			}
+			ArrayList<Pair<InteractiveObject>> objectsToDelete = this.interactiveObjects.stream()
+					.filter(interactiveObject -> interactiveObject.object.getPosition().equals(player.getPosition()))
+					.filter(interactiveObject -> interactiveObject.object.trigger(player))
+					.collect(Collectors.toCollection(ArrayList::new));
 
 			for (Pair<InteractiveObject> interactiveObject : objectsToDelete) {
 				fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
