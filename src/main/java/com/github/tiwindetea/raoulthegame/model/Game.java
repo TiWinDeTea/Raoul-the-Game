@@ -268,7 +268,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 			player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
-			player.addToInventory(new Pair<>(new Weapon(15, 1, 5)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -693,7 +692,14 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			));
 			if (player.hasFallen) {
 				do {
-					player.setPosition(this.selectRandomGroundPosition(rooms, random));
+					player.setPosition(this.selectRandomGroundPosition(
+							rooms,
+							new Random(
+									this.world.getAlphaSeed() * player.getPosition().x
+											+ this.world.getBetaSeed() * player.getPosition().y
+											+ this.level
+							)
+					));
 				} while (Tile.isObstructed(this.world.getTile(player.getPosition())));
 				player.hasFallen = false;
 			} else {

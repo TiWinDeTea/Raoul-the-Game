@@ -3,11 +3,14 @@
 3.  Il y a des FIXME // TODO
 4.  Ligne indiquant la portée d'attaque
 5.  Ajouter un tutoriel // aide
-6.  Ajouter un scenario (façon star wars, avec un bouton "don't remind me")
+6.  Ajouter le scenario (façon star wars, avec un bouton "don't remind me")
 7.  Transition de la caméra (caméra locké)
 8.  Centrer la caméra tout en étant zoomé
 9.  Il y a une fuite de CPU quelque part...
-10. Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me")
+10. Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me", le "niveau" d'auto-équip, une checkbox 'inverser les clicks')
 11. Indicateur de gain d'xp ? (comme les dégats mais genre en violet) // Mana ?
-12. Auto equip -> choix dans un menu ?
-13. Permettre de saisir une seed
+12. Permettre de saisir une seed
+13. Ajouter des animations d'attaque // de drop d'objet
+14. Attaques spéciales ? (eg: link's awakening tourbilol)
+15. Classes // races ? (~~)
+16. Supprimer la sauvegarde en cas de mort ?
