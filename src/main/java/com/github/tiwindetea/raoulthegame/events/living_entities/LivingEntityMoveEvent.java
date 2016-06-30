@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.events.living_entities;
 
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 
 /**
  * The type LivingEntityMoveEvent.

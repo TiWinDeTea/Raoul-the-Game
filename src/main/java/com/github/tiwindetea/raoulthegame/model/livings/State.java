@@ -6,15 +6,17 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
+package com.github.tiwindetea.raoulthegame.model.livings;
 
 /**
- * Direction
+ * State
+ *
  * @author Lucas LAZARE
  */
-public enum Direction {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT
+public enum State {
+    PATROLING,
+    STANDING,
+    SLEEPING,
+    WANDERING,
+    CHASING
 }

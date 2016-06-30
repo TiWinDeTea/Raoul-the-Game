@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.events.requests;
 
-import com.github.tiwindetea.raoulthegame.model.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
 
 /**
  * The type MoveRequestEvent.

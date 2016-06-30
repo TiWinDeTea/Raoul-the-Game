@@ -9,8 +9,8 @@
 package com.github.tiwindetea.raoulthegame.view;
 
 import com.github.tiwindetea.raoulthegame.model.Pair;
-import com.github.tiwindetea.raoulthegame.model.Tile;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Tile;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 import javafx.geometry.Insets;

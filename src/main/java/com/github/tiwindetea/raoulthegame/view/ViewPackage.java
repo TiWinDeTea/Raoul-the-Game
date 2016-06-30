@@ -9,7 +9,7 @@
 package com.github.tiwindetea.raoulthegame.view;
 
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 

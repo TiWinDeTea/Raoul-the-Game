@@ -8,8 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.events.map;
 
-import com.github.tiwindetea.raoulthegame.model.Tile;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Tile;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 
 /**
  * The type TileModificationEvent.

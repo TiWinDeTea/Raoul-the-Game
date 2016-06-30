@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.view.entities;
 
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.InformationsDisplayer;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.animation.TranslateTransition;

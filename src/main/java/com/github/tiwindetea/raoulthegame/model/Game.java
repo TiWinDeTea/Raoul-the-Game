@@ -37,6 +37,23 @@ import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityDel
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityLOSDefinitionEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.listeners.request.RequestListener;
+import com.github.tiwindetea.raoulthegame.model.items.Armor;
+import com.github.tiwindetea.raoulthegame.model.items.ArmorType;
+import com.github.tiwindetea.raoulthegame.model.items.Consumable;
+import com.github.tiwindetea.raoulthegame.model.items.ConsumableType;
+import com.github.tiwindetea.raoulthegame.model.items.InteractiveObject;
+import com.github.tiwindetea.raoulthegame.model.items.Pot;
+import com.github.tiwindetea.raoulthegame.model.items.Scroll;
+import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
+import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
+import com.github.tiwindetea.raoulthegame.model.items.Weapon;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Mob;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Map;
+import com.github.tiwindetea.raoulthegame.model.space.Tile;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 
@@ -84,8 +101,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	private static final int MAX_TRAPS_QTT_PER_LEVEL = 12;
 	private static final int MIN_CHEST_QTT_PER_LEVEL = 2;
 	private static final int MAX_CHEST_QTT_PER_LEVEL = 4;
-	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 50;
-	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 100;
+	private static final int MIN_MOBS_LOOTS_PER_LEVEL = 5;
+	private static final int MAX_MOBS_LOOTS_PER_LEVEL = 10;
 	private static final int BULB_LOS = 2;
 	private static final int MINIMUN_TURN_TIME_MS = 100;
 	private static final int REFRESH_TIME_MS = 100;

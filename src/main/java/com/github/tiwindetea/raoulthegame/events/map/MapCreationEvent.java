@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.events.map;
 
-import com.github.tiwindetea.raoulthegame.model.Tile;
+import com.github.tiwindetea.raoulthegame.model.space.Tile;
 
 /**
  * The type MapCreationEvent.

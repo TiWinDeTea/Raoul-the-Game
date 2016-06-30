@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.EventHandler;
 import javafx.scene.Parent;

@@ -6,30 +6,14 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
-
-import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
+package com.github.tiwindetea.raoulthegame.model.livings;
 
 /**
- * StorableObject
+ * LivingThingType
  *
  * @author Lucas LAZARE
  */
-public interface StorableObject extends Descriptable {
-
-    /**
-     * Gets the Storable Object type.
-     *
-     * @return The storable object type
-     *
-     * @see StorableObjectType
-     */
-    StorableObjectType getType();
-
-    /**
-     * Gets graphical type.
-     *
-     * @return the graphical type
-     */
-    StaticEntityType getGType();
+public enum LivingThingType {
+    PLAYER,
+    MOB
 }

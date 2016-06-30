@@ -8,9 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.view.entities;
 
-import com.github.tiwindetea.raoulthegame.model.Direction;
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.scene.image.Image;
 

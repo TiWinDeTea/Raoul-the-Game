@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
+import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.raoulthegame.events.Event;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
@@ -53,11 +54,10 @@ import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.listeners.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.raoulthegame.listeners.request.RequestListener;
 import com.github.tiwindetea.raoulthegame.listeners.tilemap.TileMapListener;
-import com.github.tiwindetea.raoulthegame.model.Direction;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntity;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
-import com.github.tiwindetea.oggplayer.Sound;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;

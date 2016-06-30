@@ -6,7 +6,9 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
+package com.github.tiwindetea.raoulthegame.model.items;
+
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 
 /**
  * Consumable
@@ -15,25 +17,26 @@ package com.github.tiwindetea.raoulthegame.model;
  */
 public interface Consumable extends StorableObject {
 
-	/**
-	 * Triggers a consumable.
-	 *
-	 * @param livingThing the target of the consumable
-	 */
-	void trigger(LivingThing livingThing);
+    /**
+     * Triggers a consumable.
+     *
+     * @param livingThing the target of the consumable
+     */
+    void trigger(LivingThing livingThing);
 
-	/**
-	 * method to call after each game tick
-	 *
-	 * @return true if the object finished its effects, false otherwise
-	 */
-	boolean nextTick();
+    /**
+     * method to call after each game tick
+     *
+     * @return true if the object finished its effects, false otherwise
+     */
+    boolean nextTick();
 
-	/**
-	 * Gets the consumable type.
-	 *
-	 * @return the consumable type
-	 * @see ConsumableType
-	 */
-	ConsumableType getConsumableType();
+    /**
+     * Gets the consumable type.
+     *
+     * @return the consumable type
+     *
+     * @see ConsumableType
+     */
+    ConsumableType getConsumableType();
 }

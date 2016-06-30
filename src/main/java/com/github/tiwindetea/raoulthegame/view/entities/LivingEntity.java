@@ -8,8 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.view.entities;
 
-import com.github.tiwindetea.raoulthegame.model.Direction;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.RectangleSizeTransition;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import com.sun.javafx.tk.Toolkit;

@@ -6,7 +6,7 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
+package com.github.tiwindetea.raoulthegame.model.space;
 
 import java.util.Comparator;
 import java.util.Iterator;

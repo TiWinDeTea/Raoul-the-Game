@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.events.static_entities;
 
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 
 /**

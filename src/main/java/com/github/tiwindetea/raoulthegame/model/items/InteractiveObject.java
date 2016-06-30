@@ -6,14 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
+package com.github.tiwindetea.raoulthegame.model.items;
+
+import com.github.tiwindetea.raoulthegame.model.Descriptable;
+import com.github.tiwindetea.raoulthegame.model.Pair;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 
 /**
  * Created by maxime on 4/24/16.
  */
 public class InteractiveObject implements Descriptable {
 
-	private boolean isTrap;
+    private boolean isTrap;
     private double manaModifier;
     private double hpModifier;
     private StorableObject loot;

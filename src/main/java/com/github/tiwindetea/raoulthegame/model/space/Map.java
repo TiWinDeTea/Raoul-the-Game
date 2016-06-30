@@ -6,10 +6,13 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.model;
+package com.github.tiwindetea.raoulthegame.model.space;
 
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
+import com.github.tiwindetea.raoulthegame.model.Seed;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Mob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +34,7 @@ import java.util.stream.Collectors;
  * @author Lucas LAZARE
  */
 public class Map {
-    
+
     /*
      * Tuning parameters for the map generation
      */
@@ -257,7 +260,7 @@ public class Map {
                         visible = false;
                     --i;
                 }
-                }
+            }
             return visible;
         }
         return true;

@@ -11,7 +11,7 @@ package com.github.tiwindetea.raoulthegame.view;
 import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectClickEvent;
 import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectDragEvent;
 import com.github.tiwindetea.raoulthegame.listeners.playerinventory.PlayerInventoryListener;
-import com.github.tiwindetea.raoulthegame.model.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
