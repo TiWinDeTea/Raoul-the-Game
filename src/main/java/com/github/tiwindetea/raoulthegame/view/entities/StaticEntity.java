@@ -17,6 +17,7 @@ import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.CacheHint;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
@@ -37,6 +38,7 @@ public class StaticEntity extends Entity {
 	private int actualSpriteNumber;
 	private int spritesNumber;
 	private PlayerInventory.Place where;
+	public Timeline timeLine;
 
 	/**
 	 * Instantiates a new StaticEntity.
@@ -54,6 +56,8 @@ public class StaticEntity extends Entity {
 		this.imageView.setTranslateY(0);
 
 		if(staticEntityType.getSpritesNumber() > 1) {
+			setCache(true);
+			setCacheHint(CacheHint.SPEED);
 			this.animate();
 		}
 
@@ -98,6 +102,7 @@ public class StaticEntity extends Entity {
 		this.actualSpriteNumber = 0;
 		timeline.setCycleCount(Timeline.INDEFINITE);
 		timeline.play();
+		this.timeLine = timeline;
 	}
 
 	/**
@@ -116,5 +121,16 @@ public class StaticEntity extends Entity {
 
 	public void setWhere(PlayerInventory.Place where) {
 		this.where = where;
+	}
+
+	/**
+	 * Stops the animation
+	 */
+	public void stopAnimation() {
+		if (this.isAnimated()) {
+			this.timeLine.stop();
+			this.timeLine = null;
+			this.animated = false;
+		}
 	}
 }

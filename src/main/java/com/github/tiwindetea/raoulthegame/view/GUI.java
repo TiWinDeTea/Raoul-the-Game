@@ -384,8 +384,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				return;
 			}
 			if(GUI.this.staticEntities.containsKey(e.getEntityId())) {
-				GUI.this.cTileMap.removeEntity(GUI.this.staticEntities.get(e.getEntityId()));
-				GUI.this.staticEntities.remove(e.getEntityId());
+				StaticEntity entity = GUI.this.staticEntities.remove(e.getEntityId());
+				GUI.this.cTileMap.removeEntity(entity);
+				if (entity != null) {
+					entity.stopAnimation();
+				}
 			}
 			else {
 				System.out.println("GUI::deleteStaticEntity : invalid entity id " + e.getEntityId());
