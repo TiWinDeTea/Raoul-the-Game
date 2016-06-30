@@ -13,6 +13,7 @@ import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +31,8 @@ public class Mob extends LivingThing {
 
     private final int ON_DAMAGE_CHASE_RANGE_BONUS = 100;
 
+    public static int NUMBER_OF_PLAYERS;
+
     // Mobs know the map perfectly.
     private static Map map;
     private State state = State.SLEEPING;
@@ -40,6 +43,7 @@ public class Mob extends LivingThing {
     private boolean nameAsked = false;
     private int xpGain;
     private boolean wasHit;
+    private double[] aggro = new double[NUMBER_OF_PLAYERS];
 
     /**
      * Sets the map.
@@ -79,6 +83,9 @@ public class Mob extends LivingThing {
         this.chaseRange = chaseRange;
         this.position = position;
         this.hitPoints = maxHitPoints;
+        for (int i = 0; i < this.aggro.length; i++) {
+            this.aggro[i] = 0;
+        }
     }
 
     private Tile map(Vector2i pos) {
@@ -166,9 +173,10 @@ public class Mob extends LivingThing {
             this.chaseRange += this.ON_DAMAGE_CHASE_RANGE_BONUS;
         }
         int distance = Integer.MAX_VALUE;
-        Collection<LivingThing> shadow = new ArrayList<>();
+        Collection<LivingThing> shadow = new ArrayList<>(mobs.size() + players.size());
         Player chasedPlayer = null;
         shadow.addAll(mobs);
+        shadow.addAll(players);
 
         for (Player player : players) {
             Vector2i pos = player.getPosition();
@@ -176,16 +184,16 @@ public class Mob extends LivingThing {
             int distanceToPlayer = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
             if (distanceToPlayer < los.length / 2) {
                 if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
-                    int dist = this.distanceTo(pos, shadow);
-                    if (distance >= dist) {
+                    System.out.println(player.getName() + ": " + this.aggro[player.getNumber()]);
+                    if (chasedPlayer == null || this.aggro[player.getNumber()] > this.aggro[chasedPlayer.getNumber()]) {
                         chasedPlayer = player;
-                        distance = dist;
+                        distance = this.distanceTo(pos, shadow);
                     }
                 }
             }
         }
         if (distance <= 1) {
-            this.requestedAttack = chasedPlayer.getPosition();
+            this.requestedAttack = chasedPlayer;
             this.requestedPath = null;
             this.requestedPathStack.clear();
         } else if (distance <= this.chaseRange) {
@@ -267,7 +275,7 @@ public class Mob extends LivingThing {
      */
     @Override
     public void attack(LivingThing target) {
-        target.damage(this.attackPower);
+        target.damage(this.attackPower, this);
     }
 
     /**
@@ -308,10 +316,14 @@ public class Mob extends LivingThing {
      * {@inheritDoc}
      */
     @Override
-    public void damage(double damages) {
-        super.damage(damages);
+    public void damage(double damages, @Nullable LivingThing source) {
+        super.damage(damages, source);
         this.state = State.CHASING;
         this.wasHit = true;
+        if (source != null && source.getType() == LivingThingType.PLAYER) {
+            Player tmp = (Player) source;
+            this.aggro[tmp.getNumber()] += tmp.getAggro() + damages;
+        }
     }
 
     /**

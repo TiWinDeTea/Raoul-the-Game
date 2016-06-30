@@ -69,7 +69,7 @@ public class InteractiveObject implements Descriptable {
      */
     public boolean trigger(LivingThing livingThing) {
         if (this.isTrap) {
-            livingThing.damage(this.hpModifier);
+            livingThing.damage(this.hpModifier, null);
             if (livingThing.getType() == LivingThingType.PLAYER)
                 ((Player) livingThing).useMana(this.manaModifier);
             return true;

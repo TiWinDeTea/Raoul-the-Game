@@ -62,6 +62,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -91,6 +92,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	public static final boolean SIMPLE_AUTO_EQUIP = true;
 	public static final boolean AUTO_EQUIP = true;
 	public static final boolean AUTO_EQUIP_CAN_DROP = true;
+	public static final boolean PERMA_DEATH = true;
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 1;
@@ -248,10 +250,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					Double.parseDouble(playersBundle.getString(pString + "baseMana")),
 					Double.parseDouble(playersBundle.getString(pString + "baseAttack")),
 					Double.parseDouble(playersBundle.getString(pString + "baseDef")),
+					Double.parseDouble(playersBundle.getString(pString + "baseAggro")),
 					Double.parseDouble(playersBundle.getString(pString + "healthPerLevel")),
 					Double.parseDouble(playersBundle.getString(pString + "manaPerLevel")),
 					Double.parseDouble(playersBundle.getString(pString + "attackPerLevel")),
-					Double.parseDouble(playersBundle.getString(pString + "defensePerLevel"))
+					Double.parseDouble(playersBundle.getString(pString + "defensePerLevel")),
+					Double.parseDouble(playersBundle.getString(pString + "aggroPerLevel"))
 			));
 		}
 		this.initNew(players, new Seed(), 1);
@@ -265,6 +269,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 * @param level   the level
 	 */
 	public void initNew(Collection<Player> players, Seed seed, int level) {
+		Mob.NUMBER_OF_PLAYERS = players.size();
+
 		this.playerTurn = 0;
 		this.level = level;
 		this.seed = seed;
@@ -796,6 +802,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	private void nextTurn() {
 		logger.log(this.debugLevel, "Starting players lives");
 		Vector2i pos;
+		LivingThing target;
 		HashMap<Integer, Pair<StorableObject>> objectsJustDropped = new HashMap<>();
 
 		/* Letting the players to play */
@@ -814,7 +821,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					player.setFloor(this.level + 1);
 					player.setPosition(new Vector2i(0, 0));
 					player.hasFallen = true;
-					player.damage(player.getMaxHitPoints() / 5);
+					player.damage(player.getMaxHitPoints() / 5, null);
 					fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
 					this.playersOnNextLevel.add(player);
 					this.players.remove(i);
@@ -824,8 +831,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 							+ playerPos + " to " + pos + ")");
 					player.moveRequestDenied();
 				}
-			} else if ((pos = player.getRequestedAttack()) != null) {
-			/* See if the player can attack as he wants to (ignoring the los) [TODO ?] */
+			} else if ((target = player.getRequestedAttack()) != null) {
+				pos = target.getPosition();
 				if (playerPos.squaredDistance(pos) <= Math.pow(player.getAttackRange(), 2)) {
 					boolean[][] los = this.world.getLOS(playerPos, player.getLos(), 4);
 					if (los[los.length / 2 - playerPos.x + pos.x][los[0].length / 2 - playerPos.y + pos.y]) {
@@ -880,20 +887,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					if (distance <= 1 && isAccessible(pos)) {
 						mob.setPosition(pos);
 					}
-				} else if ((pos = mob.getRequestedAttack()) != null) {
+				} else if ((target = mob.getRequestedAttack()) != null) {
+					pos = target.getPosition();
 					int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
 					if (distance <= 1) {
-						int j = this.players.indexOf(new Mob(pos));
-						if (j < 0) {
-							j = this.mobs.indexOf(new Mob(pos));
-							if (j >= 0) {
-								mob.attack(this.mobs.get(j));
-							}
-						} else {
-							if (j >= 0) {
-								mob.attack(this.players.get(j));
-							}
-						}
+						mob.attack(target);
 					}
 				}
 			} else {
@@ -1317,6 +1315,14 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 		} while (this.isRunning);
 
+		if (PERMA_DEATH && this.players.size() == 0) {
+			try {
+				Files.deleteIfExists(new File(this.gameName).toPath());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		boolean[][] bool = new boolean[(this.world.getSize().x / 2) * 2 + 1][(this.world.getSize().y / 2) * 2 + 1];
 		for (int i = 0; i < bool.length; i++) {
 			for (int j = 0; j < bool[i].length; j++) {
@@ -1386,6 +1392,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				}
 				if (i >= 0) {
 					if (this.objectToUse != null) {
+						if (this.objectToUse.object.getConsumableType() == ConsumableType.SCROLL) {
+							((Scroll) this.objectToUse.object).setSource(this.currentPlayer);
+						}
 						this.objectToUse.object.trigger(this.mobs.get(i));
 						this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
 						this.triggeredObjects.add(this.objectToUse.object);
@@ -1393,7 +1402,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 						success = false;
 						path = null;
 					} else {
-						this.currentPlayer.setRequestedAttack(e.getTilePosition());
+						this.currentPlayer.setRequestedAttack(this.mobs.get(i));
 						if(p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
 							Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
 							shadow.addAll(this.mobs);

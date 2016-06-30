@@ -17,6 +17,7 @@ import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,7 @@ public abstract class LivingThing implements Descriptable {
     protected double attackPower;
     protected double defensePower;
     protected Vector2i position;
-    protected Vector2i requestedAttack;
+    protected LivingThing requestedAttack;
     protected String name;
     protected long id;
     protected static final ArrayList<GameListener> listeners = new ArrayList<>();
@@ -166,8 +167,9 @@ public abstract class LivingThing implements Descriptable {
      * Damages this.
      *
      * @param damages damages taken by this
+     * @param source  LivingThing that is the source of the damages
      */
-    public void damage(double damages) {
+    public void damage(double damages, @Nullable LivingThing source) {
         double diff;
         if (damages > 0) {
             diff = this.getDefensePower() - damages;
@@ -210,11 +212,8 @@ public abstract class LivingThing implements Descriptable {
      *
      * @return the requested attack
      */
-    public Vector2i getRequestedAttack() {
-        if (this.requestedAttack == null) {
-            return null;
-        }
-        return this.requestedAttack.copy();
+    public LivingThing getRequestedAttack() {
+        return this.requestedAttack;
     }
 
     /**

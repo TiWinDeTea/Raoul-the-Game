@@ -58,9 +58,9 @@ public class SampleSpell extends Spell {
         LivingThing owner = this.getOwner();
         if (owner != null) {
             for (LivingThing target : targets) {
-                target.damage(this.damages);
+                target.damage(this.damages, owner);
             }
-            owner.damage(-this.heal);
+            owner.damage(-this.heal, owner);
             this.cooldown = MAXCOOLDOWN;
         }
         return false;

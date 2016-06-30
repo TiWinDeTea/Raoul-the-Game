@@ -24,6 +24,7 @@ public class Scroll implements Consumable {
     private double healthModifierPerTick;
     private double healthModifierModifierPerTick;
     private LivingThing target;
+    private LivingThing source;
     private StaticEntityType gtype;
     private String name;
 
@@ -48,6 +49,15 @@ public class Scroll implements Consumable {
 
     private Scroll() {
 
+    }
+
+    /**
+     * Sets the source damages landed by the scroll
+     *
+     * @param source
+     */
+    public void setSource(LivingThing source) {
+        this.source = source;
     }
 
     /**
@@ -84,7 +94,7 @@ public class Scroll implements Consumable {
      */
     public void trigger(LivingThing livingThing) {
         this.target = livingThing;
-        livingThing.damage(this.healthModifierPerTick);
+        livingThing.damage(this.healthModifierPerTick, this.source);
         --this.turns;
     }
 
@@ -97,7 +107,7 @@ public class Scroll implements Consumable {
         if (this.turns > 0) {
             --this.turns;
             this.healthModifierModifierPerTick += this.healthModifierModifierPerTick;
-            this.target.damage(this.healthModifierPerTick);
+            this.target.damage(this.healthModifierPerTick, this.source);
             return this.turns < 0;
         }
         return true;
@@ -156,7 +166,7 @@ public class Scroll implements Consumable {
                 this.name += "\nDamage modifier: " + (int) this.healthModifierModifierPerTick;
             }
             if (this.turns != 0) {
-                this.name += "\nEffect duration: " + (int) this.turns;
+                this.name += "\nEffect duration: " + this.turns;
             }
         }
         return this.name;
