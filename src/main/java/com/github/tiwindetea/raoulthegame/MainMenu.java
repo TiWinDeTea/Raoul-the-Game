@@ -11,6 +11,7 @@ package com.github.tiwindetea.raoulthegame;
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.model.Game;
+import com.github.tiwindetea.raoulthegame.model.Seed;
 import com.github.tiwindetea.raoulthegame.view.GUI;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.application.Application;
@@ -21,6 +22,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -50,6 +52,7 @@ public class MainMenu extends Application {
 	private final VBox buttonsVBox = new VBox();
 	private final AnchorPane menuAnchorPane = new AnchorPane();
 	private final Scene menuScene = new Scene(this.menuAnchorPane);
+	private final TextField seedTF = new TextField("Enter your seed here");
 	private final Button soloButton = new Button("Solo");
 	private final Button multiplayerButton = new Button("2 Players");
 	private final Button loadButton = new Button("Load game");
@@ -76,6 +79,9 @@ public class MainMenu extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		this.seedTF.minWidthProperty().bind(MainMenu.this.menuAnchorPane.widthProperty().divide(2.5));
+		this.seedTF.maxWidthProperty().bind(MainMenu.this.menuAnchorPane.widthProperty().divide(2.5));
+
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Raoul, the Game");
 		primaryStage.getIcons().add(ViewPackage.ICON_IMAGE);
@@ -90,6 +96,7 @@ public class MainMenu extends Application {
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 					MainMenu.this.game.pause();
+					MainMenu.this.seedTF.setText("Enter your seed here");
 				}
 			}
 		});
@@ -205,6 +212,22 @@ public class MainMenu extends Application {
 		this.loadButton.setDisable(!new File(SAVE_FILE_NAME).isFile());
 	}
 
+	private void hideButtons() {
+		this.soloButton.setVisible(false);
+		this.multiplayerButton.setVisible(false);
+		this.loadButton.setVisible(false);
+		this.resumeButton.setVisible(false);
+		this.exitButton.setVisible(false);
+	}
+
+	private void showButtons() {
+		this.soloButton.setVisible(true);
+		this.multiplayerButton.setVisible(true);
+		this.loadButton.setVisible(true);
+		this.resumeButton.setVisible(true);
+		this.exitButton.setVisible(true);
+	}
+
 	private void initButtons() {
 
 		this.soloButton.defaultButtonProperty().bind(this.soloButton.focusedProperty());
@@ -213,8 +236,22 @@ public class MainMenu extends Application {
 		this.soloButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				MainMenu.this.game.initNew(1);
-				MainMenu.this.startGame();
+				MainMenu.this.buttonsVBox.getChildren().add(MainMenu.this.seedTF);
+				MainMenu.this.buttonsVBox.setAlignment(Pos.BASELINE_CENTER);
+				MainMenu.this.hideButtons();
+				MainMenu.this.seedTF.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						if (MainMenu.this.seedTF.getText().equals("Enter your seed here")) {
+							MainMenu.this.game.initNew(1);
+						} else {
+							MainMenu.this.game.initNew(1, new Seed(MainMenu.this.seedTF.getText()));
+						}
+						MainMenu.this.startGame();
+						MainMenu.this.showButtons();
+						MainMenu.this.buttonsVBox.getChildren().remove(MainMenu.this.seedTF);
+					}
+				});
 			}
 		});
 		this.soloButton.setOnMouseEntered(new EventHandler<MouseEvent>() {

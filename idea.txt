@@ -6,8 +6,6 @@
 . Transition de la caméra (caméra locké)
 . Centrer la caméra tout en étant zoomé
 . Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me", le "niveau" d'auto-équip, une checkbox 'inverser les clicks', choix permadeath)
-. Indicateur de gain d'xp ? (comme les dégats mais genre en violet) Mana ?
-. Permettre de saisir une seed
 . Ajouter des animations d'attaque // de drop d'objet
 . Barre de difficulté
 

@@ -92,7 +92,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	public static final boolean SIMPLE_AUTO_EQUIP = true;
 	public static final boolean AUTO_EQUIP = true;
 	public static final boolean AUTO_EQUIP_CAN_DROP = true;
-	public static final boolean PERMA_DEATH = true;
+	public static final boolean PERMA_DEATH = false;
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 1;
@@ -215,6 +215,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		this.loadBulb();
 	}
 
+	public void initNew(int numberOfPlayers) {
+		this.initNew(numberOfPlayers, new Seed());
+	}
+
 	/**
 	 * Initialises a game.
 	 *
@@ -229,7 +233,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 *
 	 * @param numberOfPlayers the number of players
 	 */
-	public void initNew(int numberOfPlayers) {
+	public void initNew(int numberOfPlayers, Seed seed) {
 		this.clearAll();
 		ArrayList<Player> players = new ArrayList<>();
 		ResourceBundle playersBundle = ResourceBundle.getBundle(MainPackage.name + ".Players");
@@ -258,7 +262,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					Double.parseDouble(playersBundle.getString(pString + "aggroPerLevel"))
 			));
 		}
-		this.initNew(players, new Seed(), 1);
+		this.initNew(players, seed, 1);
 	}
 
 	/**

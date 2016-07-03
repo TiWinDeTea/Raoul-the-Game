@@ -18,12 +18,14 @@ import java.util.Random;
 public class Seed {
     private long alphaSeed;
     private long betaSeed;
+    private final String seed;
 
     /**
      * Instantiates a new Seed with random subseeds.
      */
     public Seed() {
-        Random random = new Random();
+        this.seed = Long.toString(new Random().nextLong());
+        Random random = new Random(this.seed.hashCode());
         this.alphaSeed = random.nextLong();
         this.betaSeed = random.nextLong();
     }
@@ -31,12 +33,13 @@ public class Seed {
     /**
      * Instantiates a new Seed with given subseeds.
      *
-     * @param alphaSeed alpha seed
-     * @param betaSeed  beta seed
+     * @param seed the base seed
      */
-    public Seed(long alphaSeed, long betaSeed) {
-        this.alphaSeed = alphaSeed;
-        this.betaSeed = betaSeed;
+    public Seed(String seed) {
+        this.seed = seed;
+        Random random = new Random(this.seed.hashCode());
+        this.alphaSeed = random.nextLong();
+        this.betaSeed = random.nextLong();
     }
 
     /**
@@ -77,12 +80,8 @@ public class Seed {
         if (!str.substring(0, 5).equals("seed=")) {
             throw new IllegalArgumentException("Invoking Seed.parseSeed with input string: \"" + str + "\"");
         }
-        int alphaSeedIdx = str.indexOf("alphaSeed=") + 10;
-        int betaSeedIdx = str.indexOf("betaSeed=", alphaSeedIdx) + 9;
-        return new Seed(
-                Long.parseLong(str.substring(alphaSeedIdx, str.indexOf(',', alphaSeedIdx))),
-                Long.parseLong(str.substring(betaSeedIdx, str.indexOf(',', betaSeedIdx)))
-        );
+        int seedIdx = str.indexOf("{") + 1;
+        return new Seed(str.substring(seedIdx, str.indexOf(',', seedIdx)));
     }
 
     /**
@@ -90,7 +89,7 @@ public class Seed {
      */
     @Override
     public String toString() {
-        return "seed={alphaSeed=" + this.alphaSeed + ",betaSeed=" + this.betaSeed + ",}";
+        return "seed={" + this.seed + ",}";
     }
 
     /**
@@ -98,6 +97,6 @@ public class Seed {
      * @return A copy of this seed
      */
     public Seed copy() {
-        return new Seed(this.alphaSeed, this.betaSeed);
+        return new Seed(this.seed);
     }
 }
