@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.model;
 
+import java.math.BigInteger;
 import java.util.Random;
 
 /**
@@ -24,7 +25,7 @@ public class Seed {
      * Instantiates a new Seed with random subseeds.
      */
     public Seed() {
-        this.seed = Long.toString(new Random().nextLong());
+        this.seed = new BigInteger(256, new Random()).toString(Character.MAX_RADIX);
         Random random = new Random(this.seed.hashCode());
         this.alphaSeed = random.nextLong();
         this.betaSeed = random.nextLong();
