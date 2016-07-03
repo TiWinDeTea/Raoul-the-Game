@@ -20,7 +20,9 @@ public class Main {
         for (Sounds sound : sounds) {
             Sound.player.put(sound, sound.toURL(), sound.isLooping());
         }
+        Settings.loadSettings();
         MainMenu.main(args);
+        Settings.saveSettings();
         Sound.player.stopAndClear();
     }
 }

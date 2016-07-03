@@ -46,8 +46,8 @@ import java.util.concurrent.Executors;
 public class MainMenu extends Application {
 
 	private final GUI GUI = new GUI();
-	private static final String SAVE_FILE_NAME = "Save";
-	private final Game game = new Game(SAVE_FILE_NAME);
+	private final Game game = new Game(Settings.SAVE_PATH);
+	private boolean wait = false;
 
 	private final VBox buttonsVBox = new VBox();
 	private final AnchorPane menuAnchorPane = new AnchorPane();
@@ -79,8 +79,6 @@ public class MainMenu extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		this.seedTF.minWidthProperty().bind(MainMenu.this.menuAnchorPane.widthProperty().divide(2.5));
-		this.seedTF.maxWidthProperty().bind(MainMenu.this.menuAnchorPane.widthProperty().divide(2.5));
 
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Raoul, the Game");
@@ -96,8 +94,20 @@ public class MainMenu extends Application {
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 					MainMenu.this.game.pause();
-					MainMenu.this.seedTF.setText("Enter your seed here");
 				}
+			}
+		});
+
+
+		this.seedTF.minWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
+		this.seedTF.maxWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
+		this.menuScene.setOnKeyPressed(event -> {
+			if (event.getCode() == KeyCode.ESCAPE && !this.soloButton.isVisible()) {
+				this.buttonsVBox.getChildren().remove(this.seedTF);
+				this.buttonsVBox.setAlignment(Pos.CENTER);
+				this.showButtons();
+				this.wait = true;
+				this.seedTF.setText("Enter your seed here");
 			}
 		});
 
@@ -209,7 +219,7 @@ public class MainMenu extends Application {
 
 	private void updateButtons() {
 		this.resumeButton.setDisable(!this.game.isRunning());
-		this.loadButton.setDisable(!new File(SAVE_FILE_NAME).isFile());
+		this.loadButton.setDisable(!new File(Settings.SAVE_PATH).isFile());
 	}
 
 	private void hideButtons() {
@@ -250,6 +260,7 @@ public class MainMenu extends Application {
 						MainMenu.this.startGame();
 						MainMenu.this.showButtons();
 						MainMenu.this.buttonsVBox.getChildren().remove(MainMenu.this.seedTF);
+						MainMenu.this.seedTF.setText("Enter your seed here");
 					}
 				});
 			}
@@ -323,8 +334,12 @@ public class MainMenu extends Application {
 		this.exitButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				MainMenu.this.primaryStage.close();
-				MainMenu.this.game.stop();
+				if (MainMenu.this.wait) {
+					MainMenu.this.wait = false;
+				} else {
+					MainMenu.this.primaryStage.close();
+					MainMenu.this.game.stop();
+				}
 			}
 		});
 		this.exitButton.setOnMouseEntered(new EventHandler<MouseEvent>() {

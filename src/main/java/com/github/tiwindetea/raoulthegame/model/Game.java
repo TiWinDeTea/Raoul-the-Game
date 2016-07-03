@@ -11,6 +11,7 @@ package com.github.tiwindetea.raoulthegame.model;
 
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
+import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityCreationEvent;
@@ -88,11 +89,6 @@ import java.util.stream.Collectors;
 public class Game implements RequestListener, Runnable, Stoppable {
 
 	private class AlreadyRunningException extends RuntimeException{}
-
-	public static final boolean SIMPLE_AUTO_EQUIP = true;
-	public static final boolean AUTO_EQUIP = true;
-	public static final boolean AUTO_EQUIP_CAN_DROP = true;
-	public static final boolean PERMA_DEATH = false;
 
 	/* Tunning parameters for the entities generation */
 	private static final int MIN_MOB_PER_LEVEL = 1;
@@ -215,23 +211,20 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		this.loadBulb();
 	}
 
+	/**
+	 * Initiliases a game. equivalent to Game.initNew(numberOfPlayers, new Seed())
+	 *
+	 * @param numberOfPlayers the number of players
+	 */
 	public void initNew(int numberOfPlayers) {
 		this.initNew(numberOfPlayers, new Seed());
-	}
-
-	/**
-	 * Initialises a game.
-	 *
-	 * @param players the players
-	 */
-	public void initNew(Collection<Player> players) {
-		this.initNew(players, new Seed(), 1);
 	}
 
 	/**
 	 * Initiliases a game.
 	 *
 	 * @param numberOfPlayers the number of players
+	 * @param seed            the seed that should be used for this game
 	 */
 	public void initNew(int numberOfPlayers, Seed seed) {
 		this.clearAll();
@@ -295,7 +288,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 			player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
-			player.addToInventory(new Pair<>(new Weapon(5, 5, 5)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -978,8 +970,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
 
 					if (objPair.getValue().object.getType() == StorableObjectType.ARMOR) {
-						if (AUTO_EQUIP) {
-							Pair<Armor> arm = player.autoEquipArmor(new Pair<>(objPair.getValue(), false), AUTO_EQUIP_CAN_DROP);
+						if (Settings.autoEquip) {
+							Pair<Armor> arm = player.autoEquipArmor(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
 							//noinspection Duplicates
 							if (arm == null) {
 								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
@@ -998,7 +990,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 									obj = objPair.getValue();
 								}
 							}
-						} else if (SIMPLE_AUTO_EQUIP) {
+						} else if (Settings.simpleAutoEquip) {
 							if (player.simpleAutoEquipArmor(new Pair<>(objPair.getValue(), false))) {
 								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
 								iter.remove();
@@ -1009,8 +1001,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 							obj = objPair.getValue();
 						}
 					} else if (objPair.getValue().object.getType() == StorableObjectType.WEAPON) {
-						if (AUTO_EQUIP) {
-							Pair<Weapon> weap = player.autoEquipWeapon(new Pair<>(objPair.getValue(), false), AUTO_EQUIP_CAN_DROP);
+						if (Settings.autoEquip) {
+							Pair<Weapon> weap = player.autoEquipWeapon(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
 							//noinspection Duplicates
 							if (weap == null) {
 								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
@@ -1029,7 +1021,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 									obj = objPair.getValue();
 								}
 							}
-						} else if (SIMPLE_AUTO_EQUIP) {
+						} else if (Settings.simpleAutoEquip) {
 							if (player.simpleAutoEquipWeapon(new Pair<>(objPair.getValue(), false))) {
 								fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
 								iter.remove();
@@ -1100,7 +1092,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 */
 	public void loadSave() {
 		try {
-
 			Scanner file = new Scanner(new FileInputStream(this.gameName));
 			clearAll();
 			Tile[][] tiles = new Tile[1][1];
@@ -1124,6 +1115,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 			file.close();
 			this.currentPlayer = this.players.get(0);
+			Mob.NUMBER_OF_PLAYERS = this.players.size();
 			fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
 			fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
 			this.generateLevel();
@@ -1180,9 +1172,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				this.mobsName[selectedMob],
 				mobLevel,
 				mobLevel * this.mobsXpGainPerLevel[selectedMob] + this.mobsBaseXpGain[selectedMob],
-				mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob],
-				mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob],
-				mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob],
+				(mobLevel * this.mobsHPPerLevel[selectedMob] + this.mobsBaseHP[selectedMob]) * (Settings.difficulty + 0.5),
+				(mobLevel * this.mobsAttackPerLevel[selectedMob] + this.mobsBaseAttack[selectedMob]) * (Settings.difficulty + 0.5),
+				(mobLevel * this.mobsDefPerLevel[selectedMob] + this.mobsBaseDef[selectedMob]) * (Settings.difficulty + 0.5),
 				this.mobsChaseRange[selectedMob],
 				mobPos.copy());
 		this.mobs.add(mob);
@@ -1320,7 +1312,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 		} while (this.isRunning);
 
-		if (PERMA_DEATH && this.players.size() == 0) {
+		if (Settings.permaDeath && this.players.size() == 0) {
 			try {
 				Files.deleteIfExists(new File(this.gameName).toPath());
 			} catch (IOException e) {
@@ -1414,8 +1406,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
 					Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
 					shadow.addAll(this.mobs);
 					shadow.addAll(this.players);
-					path = new Stack<>();
-					path.add(shortestPathApprox(p, e.getTilePosition(), false, shadow).peek());
+					Stack<Vector2i> tmp = shortestPathApprox(p, e.getTilePosition(), false, shadow);
+					if (tmp != null) {
+						path = new Stack<>();
+						path.add(tmp.peek());
+					}
 				}
 			}
 		} else {

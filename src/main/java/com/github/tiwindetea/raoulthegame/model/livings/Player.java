@@ -10,6 +10,7 @@ package com.github.tiwindetea.raoulthegame.model.livings;
 
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
+import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
@@ -19,7 +20,6 @@ import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
-import com.github.tiwindetea.raoulthegame.model.Game;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.items.Armor;
 import com.github.tiwindetea.raoulthegame.model.items.ArmorType;
@@ -399,28 +399,6 @@ public class Player extends LivingThing {
             if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
                 damages += this.weapon.object.getAttackPowerModifier();
             }
-            if (Game.AUTO_EQUIP
-                    && this.weapon != null
-                    && this.weapon.object != null
-                    && this.weapon.object.getManaCost() > this.mana) {
-                int maxPowerGrade = 0;
-                Pair<Weapon> selectedWeapon = null;
-                for (Pair<StorableObject> pair : this.inventory) {
-                    if (pair.object != null
-                            && pair.object.getType() == StorableObjectType.WEAPON) {
-                        Pair<Weapon> tmp = new Pair<>(pair, false);
-                        if (tmp.object.getManaCost() < this.mana
-                                && tmp.object.powerGrade() > maxPowerGrade) {
-                            maxPowerGrade = tmp.object.powerGrade();
-                            selectedWeapon = tmp;
-                        }
-                    }
-                }
-                if (selectedWeapon != null) {
-                    this.removeFromInventory(new Pair<>(selectedWeapon));
-                    this.equipWithWeapon(selectedWeapon);
-                }
-            }
             super.attack(target);
             target.damage(damages, this);
         }
@@ -565,14 +543,36 @@ public class Player extends LivingThing {
      * @return true if the mana was consumed, false otherwise (ie : not enough mana)
      */
     public boolean useMana(double consumption) {
-        super.fireManaUpdateEvent(new LivingEntityManaUpdateEvent(this.id, -(int) consumption));
         if (this.mana >= consumption) {
+            super.fireManaUpdateEvent(new LivingEntityManaUpdateEvent(this.id, -(int) consumption));
             this.mana -= consumption;
             firePlayerStatEvent(new PlayerStatEvent(this.number,
                     PlayerStatEvent.StatType.MANA,
                     PlayerStatEvent.ValueType.ACTUAL,
                     (int) this.mana
             ));
+            if (Settings.autoEquip
+                    && this.weapon != null
+                    && this.weapon.object != null
+                    && this.weapon.object.getManaCost() > this.mana) {
+                int maxPowerGrade = 0;
+                Pair<Weapon> selectedWeapon = null;
+                for (Pair<StorableObject> pair : this.inventory) {
+                    if (pair.object != null
+                            && pair.object.getType() == StorableObjectType.WEAPON) {
+                        Pair<Weapon> tmp = new Pair<>(pair, false);
+                        if (tmp.object.getManaCost() < this.mana
+                                && tmp.object.powerGrade() > maxPowerGrade) {
+                            maxPowerGrade = tmp.object.powerGrade();
+                            selectedWeapon = tmp;
+                        }
+                    }
+                }
+                if (selectedWeapon != null) {
+                    this.removeFromInventory(new Pair<>(selectedWeapon));
+                    this.equipWithWeapon(selectedWeapon);
+                }
+            }
             return true;
         }
         return false;
