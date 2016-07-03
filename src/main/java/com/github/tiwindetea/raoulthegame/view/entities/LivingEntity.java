@@ -39,6 +39,7 @@ public class LivingEntity extends Entity {
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 
 	private static final Font TEXT_FONT = ViewPackage.getMainFont(14);
+	private static final Font SMALL_TEXT_FONT = ViewPackage.getMainFont(8);
 	private static final Color HEALTH_POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
 	private static final Color HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
 	private static final Color MANA_POSITIVE_MODIFICATION_TEXT_COLOR = Color.ROYALBLUE;
@@ -56,12 +57,20 @@ public class LivingEntity extends Entity {
 	private LivingEntityType livingEntityType;
 	private Direction direction;
 
-	private int centerLabelNumber = 0;
+	private int centerHealthLabelNumber = 0;
+	private int centerManaLabelNumber = 0;
+	private int centerXpLabelNumber = 0;
 
 	private enum LabelPosistion {
 		LEFT,
 		CENTER,
 		RIGHT
+	}
+
+	private enum LabelType {
+		MANA,
+		HEALTH,
+		XP
 	}
 
 	/**
@@ -161,14 +170,14 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			displaLabel(label, LabelPosistion.CENTER);
+			displaLabel(label, LabelType.HEALTH, LabelPosistion.CENTER);
 		}
 	}
 
 	public void displayManaModification(int value) {
 		if(value != 0) {
 			Label label = new Label();
-			label.setFont(TEXT_FONT);
+			label.setFont(SMALL_TEXT_FONT);
 			if(value > 0) {
 				label.setText("+" + Integer.toString(value));
 				label.setTextFill(MANA_POSITIVE_MODIFICATION_TEXT_COLOR);
@@ -177,14 +186,14 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(MANA_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			displaLabel(label, LabelPosistion.LEFT);
+			displaLabel(label, LabelType.MANA, LabelPosistion.LEFT);
 		}
 	}
 
 	public void displayXpModification(int value) {
 		if(value != 0) {
 			Label label = new Label();
-			label.setFont(TEXT_FONT);
+			label.setFont(SMALL_TEXT_FONT);
 			if(value > 0) {
 				label.setText("+" + Integer.toString(value));
 				label.setTextFill(XP_POSITIVE_MODIFICATION_TEXT_COLOR);
@@ -193,11 +202,11 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(XP_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			displaLabel(label, LabelPosistion.RIGHT);
+			displaLabel(label, LabelType.XP, LabelPosistion.RIGHT);
 		}
 	}
 
-	private void displaLabel(Label label, LabelPosistion labelPosistion) {
+	private void displaLabel(Label label, LabelType labelType, LabelPosistion labelPosistion) {
 		getChildren().add(label);
 
 		FadeTransition fadeTransition = new FadeTransition();
@@ -219,9 +228,11 @@ public class LivingEntity extends Entity {
 		ExecutorService executorService = Executors.newSingleThreadExecutor();
 		Runnable runnable;
 
-		if(labelPosistion == LabelPosistion.CENTER || this.centerLabelNumber < 1) {
+		switch(labelType) {
+		default:
+		case HEALTH: {
 			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
-			++this.centerLabelNumber;
+			++this.centerHealthLabelNumber;
 			runnable = new Runnable() {
 				@Override
 				public void run() {
@@ -230,29 +241,78 @@ public class LivingEntity extends Entity {
 					} catch(InterruptedException e) {
 						e.printStackTrace();
 					}
-					--LivingEntity.this.centerLabelNumber;
+					--LivingEntity.this.centerHealthLabelNumber;
 					getChildren().remove(label);
 				}
 			};
+			break;
 		}
-		else {
-			if(labelPosistion == LabelPosistion.LEFT) {
+		case MANA: {
+			if(this.centerHealthLabelNumber < 1 && this.centerXpLabelNumber < 1) {
+				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+				++this.centerManaLabelNumber;
+				runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(2000);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+						--LivingEntity.this.centerManaLabelNumber;
+						getChildren().remove(label);
+					}
+				};
+			}
+			else {
 				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2 - 20);
+				runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(2000);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+						getChildren().remove(label);
+					}
+				};
+			}
+			break;
+		}
+		case XP: {
+			if(this.centerHealthLabelNumber < 1 && this.centerManaLabelNumber < 1) {
+				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+				++this.centerXpLabelNumber;
+				runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(2000);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+						--LivingEntity.this.centerXpLabelNumber;
+						getChildren().remove(label);
+					}
+				};
 			}
 			else {
 				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2 + 20);
-			}
-			runnable = new Runnable() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(2000);
-					} catch(InterruptedException e) {
-						e.printStackTrace();
+				runnable = new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(2000);
+						} catch(InterruptedException e) {
+							e.printStackTrace();
+						}
+						getChildren().remove(label);
 					}
-					getChildren().remove(label);
-				}
-			};
+				};
+			}
+			break;
+		}
 		}
 
 		fadeTransition.play();
