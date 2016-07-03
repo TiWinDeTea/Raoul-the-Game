@@ -56,6 +56,14 @@ public class LivingEntity extends Entity {
 	private LivingEntityType livingEntityType;
 	private Direction direction;
 
+	private int centerLabelNumber = 0;
+
+	private enum LabelPosistion {
+		LEFT,
+		CENTER,
+		RIGHT
+	}
+
 	/**
 	 * Instantiates a new LivingEntity.
 	 *
@@ -153,9 +161,7 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
-
-			displaLabel(label);
+			displaLabel(label, LabelPosistion.CENTER);
 		}
 	}
 
@@ -171,9 +177,7 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(MANA_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
-
-			displaLabel(label);
+			displaLabel(label, LabelPosistion.LEFT);
 		}
 	}
 
@@ -189,13 +193,11 @@ public class LivingEntity extends Entity {
 				label.setText(Integer.toString(value));
 				label.setTextFill(XP_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
-			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
-
-			displaLabel(label);
+			displaLabel(label, LabelPosistion.RIGHT);
 		}
 	}
 
-	private void displaLabel(Label label) {
+	private void displaLabel(Label label, LabelPosistion labelPosistion) {
 		getChildren().add(label);
 
 		FadeTransition fadeTransition = new FadeTransition();
@@ -214,21 +216,49 @@ public class LivingEntity extends Entity {
 		translateTransition.setCycleCount(1);
 		translateTransition.setAutoReverse(false);
 
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		Runnable runnable;
+
+		if(labelPosistion == LabelPosistion.CENTER || this.centerLabelNumber < 1) {
+			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+			++this.centerLabelNumber;
+			runnable = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(2000);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					--LivingEntity.this.centerLabelNumber;
+					getChildren().remove(label);
+				}
+			};
+		}
+		else {
+			if(labelPosistion == LabelPosistion.LEFT) {
+				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2 - 20);
+			}
+			else {
+				label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2 + 20);
+			}
+			runnable = new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(2000);
+					} catch(InterruptedException e) {
+						e.printStackTrace();
+					}
+					getChildren().remove(label);
+				}
+			};
+		}
+
 		fadeTransition.play();
 		translateTransition.play();
 
-		ExecutorService executorService = Executors.newSingleThreadExecutor();
-		executorService.submit(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2000);
-				} catch(InterruptedException e) {
-					e.printStackTrace();
-				}
-				getChildren().remove(label);
-			}
-		});
+		executorService.submit(runnable);
 		executorService.shutdown();
 	}
 }
