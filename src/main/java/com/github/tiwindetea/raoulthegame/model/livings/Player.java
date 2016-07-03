@@ -767,7 +767,7 @@ public class Player extends LivingThing {
         p.attackPowerPerLevel = Double.parseDouble(str.substring(appl, str.indexOf(',', appl)));
         p.defensePowerPerLevel = Double.parseDouble(str.substring(adpl, str.indexOf(',', adpl)));
         p.aggro = Double.parseDouble(str.substring(agg, str.indexOf(',', agg)));
-        p.aggroPerLevel = Double.parseDouble(str.substring(str.indexOf(',', aggpl)));
+        p.aggroPerLevel = Double.parseDouble(str.substring(aggpl, str.indexOf(',', aggpl)));
 
         firePlayerCreationEvent(new PlayerCreationEvent(
                 p.number,
