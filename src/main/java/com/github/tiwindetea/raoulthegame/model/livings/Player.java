@@ -12,6 +12,8 @@ import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
@@ -563,6 +565,7 @@ public class Player extends LivingThing {
      * @return true if the mana was consumed, false otherwise (ie : not enough mana)
      */
     public boolean useMana(double consumption) {
+        super.fireManaUpdateEvent(new LivingEntityManaUpdateEvent(this.id, -(int) consumption));
         if (this.mana >= consumption) {
             this.mana -= consumption;
             firePlayerStatEvent(new PlayerStatEvent(this.number,
@@ -632,8 +635,10 @@ public class Player extends LivingThing {
      * @param mana the mana
      */
     public void addMana(double mana) {
-        if (mana < 0)
+        if (mana < 0) {
             throw new IllegalArgumentException("mana must be positive");
+        }
+        super.fireManaUpdateEvent(new LivingEntityManaUpdateEvent(this.id, (int) mana));
         this.mana = Math.min(this.maxMana, mana + this.mana);
         this.firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA,
                 PlayerStatEvent.ValueType.ACTUAL, (int) this.mana));
@@ -945,6 +950,7 @@ public class Player extends LivingThing {
      */
     public void xp(int earnedXp) {
         this.xp += earnedXp;
+        super.fireXpUpdateEvent(new LivingEntityXpUpdateEvent(this.id, earnedXp));
         if (this.xp >= this.requiredXp) {
             Sound.player.play(Sounds.LEVEL_UP_SOUND);
             int levelUpping = this.xp / this.requiredXp;
@@ -1010,6 +1016,9 @@ public class Player extends LivingThing {
         }
     }
 
+    /**
+     * Cancels every asked action
+     */
     public void doNothing() {
         this.requestedAttack = null;
         this.requestedInteraction = null;
@@ -1017,6 +1026,9 @@ public class Player extends LivingThing {
         this.objectToDrop = null;
     }
 
+    /**
+     * Deletes an equipped object
+     */
     public void deleteEquipedObjects() {
         for (int i = 0; i < this.armors.size(); i++) {
             Pair<Armor> pair = this.armors.get(i);
@@ -1117,6 +1129,12 @@ public class Player extends LivingThing {
         );
     }
 
+    /**
+     * Auto equips a weapon, simple version
+     *
+     * @param weapon the weapon to try to equip
+     * @return true if the weapon changed
+     */
     public boolean simpleAutoEquipWeapon(Pair<Weapon> weapon) {
         if (this.weapon == null) {
             this.equipWithWeapon(weapon);
@@ -1125,6 +1143,13 @@ public class Player extends LivingThing {
         return false;
     }
 
+    /**
+     * Auto equips a weapon, complete version
+     *
+     * @param weapon  the weapon to try to equip
+     * @param canDrop True if this function should be able to drop an object of the inventory
+     * @return The previously equipped weapon (if there was one)
+     */
     public Pair<Weapon> autoEquipWeapon(Pair<Weapon> weapon, boolean canDrop) {
         if (this.weapon == null) {
             this.equipWithWeapon(weapon);
@@ -1152,6 +1177,12 @@ public class Player extends LivingThing {
         return new Pair<>();
     }
 
+    /**
+     * Auto equips an armor, simple version
+     *
+     * @param armor the armor to try to equip
+     * @return true if the armor changed
+     */
     public boolean simpleAutoEquipArmor(Pair<Armor> armor) {
         int i = armor.object.getArmorType().ordinal();
 
@@ -1170,6 +1201,13 @@ public class Player extends LivingThing {
         return false;
     }
 
+    /**
+     * Auto equips an armor, complete version
+     *
+     * @param armor   the armor to try to equip
+     * @param canDrop True if this function should be able to drop an object of the inventory
+     * @return The previously equipped armor (if there was one)
+     */
     public Pair<Armor> autoEquipArmor(Pair<Armor> armor, boolean canDrop) {
         if (this.simpleAutoEquipArmor(armor)) {
             return null;

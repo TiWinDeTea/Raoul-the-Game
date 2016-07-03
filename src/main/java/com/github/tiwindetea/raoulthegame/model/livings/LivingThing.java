@@ -11,7 +11,9 @@ package com.github.tiwindetea.raoulthegame.model.livings;
 import com.github.tiwindetea.oggplayer.Sound;
 import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
@@ -67,6 +69,18 @@ public abstract class LivingThing implements Descriptable {
     protected void fireMoveEvent(LivingEntityMoveEvent event) {
         for (GameListener listener : getPlayersListeners()) {
             listener.moveLivingEntity(event);
+        }
+    }
+
+    protected void fireXpUpdateEvent(LivingEntityXpUpdateEvent event) {
+        for (GameListener listener : getPlayersListeners()) {
+            listener.updateLivingEntityXp(event);
+        }
+    }
+
+    protected void fireManaUpdateEvent(LivingEntityManaUpdateEvent event) {
+        for (GameListener listener : getPlayersListeners()) {
+            listener.updateLivingEntityMana(event);
         }
     }
 
