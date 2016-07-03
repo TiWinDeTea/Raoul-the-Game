@@ -1383,14 +1383,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 			Vector2i p = this.currentPlayer.getPosition();
 			if (distance <= los.length / 2 && los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
-				int i = -1;
-				int j = 0;
-				while (i == -1 && j < this.mobs.size()) {
-					if(this.mobs.get(j).getPosition().equals(e.getTilePosition())) {
-						i = j;
-					}
-					++j;
-				}
+				int i = this.findMob(e.getTilePosition());
 				if (i >= 0) {
 					if (this.objectToUse != null) {
 						if (this.objectToUse.object.getConsumableType() == ConsumableType.SCROLL) {
@@ -1413,7 +1406,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				}
 			} else {
 				success = false; // tile not in the los or out of range for damages
-				if (p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
+				if (p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2) && this.findMob(e.getTilePosition()) > -1) {
 					Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
 					shadow.addAll(this.mobs);
 					shadow.addAll(this.players);
@@ -1600,5 +1593,17 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		playerInventory.addAll(player.getInventory());
 		playerInventory.forEach(player::removeFromInventory);
 		firePlayerDeletionEvent(new PlayerDeletionEvent(player.getNumber()));
+	}
+
+	private int findMob(Vector2i position) {
+		int i = -1;
+		int j = 0;
+		while (i == -1 && j < this.mobs.size()) {
+			if (this.mobs.get(j).getPosition().equals(position)) {
+				i = j;
+			}
+			++j;
+		}
+		return i;
 	}
 }

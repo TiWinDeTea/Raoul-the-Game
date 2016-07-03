@@ -41,10 +41,10 @@ public class LivingEntity extends Entity {
 	private static final Font TEXT_FONT = ViewPackage.getMainFont(14);
 	private static final Color HEALTH_POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
 	private static final Color HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
-	private static final Color MANA_POSITIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
-	private static final Color MANA_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
-	private static final Color XP_POSITIVE_MODIFICATION_TEXT_COLOR = Color.PURPLE;
-	private static final Color XP_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.PURPLE;
+	private static final Color MANA_POSITIVE_MODIFICATION_TEXT_COLOR = Color.ROYALBLUE;
+	private static final Color MANA_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.ROYALBLUE;
+	private static final Color XP_POSITIVE_MODIFICATION_TEXT_COLOR = Color.WHITE;
+	private static final Color XP_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.WHITE;
 	private static final Duration TRANSITION_DURATION = new Duration(1500);
 	private static final double TRANSITION_INITIAL_Y_POSITION = -12;
 	private static final double TRANSITION_FINAL_Y_POSITION = -60;
