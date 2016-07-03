@@ -621,6 +621,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					case LIVING_ENTITY_HEALTH_VISIBILITY_EVENT:
 						this.setLivingEntityHealthVisibility((LivingEntityHealthVisibilityEvent) e);
 						break;
+					case LIVING_ENTITY_MANA_UPDATE_EVENT:
+						this.updateLivingEntityMana((LivingEntityManaUpdateEvent) e);
+						break;
+					case LIVING_ENTITY_XP_UPDATE_EVENT:
+						this.updateLivingEntityXp((LivingEntityXpUpdateEvent) e);
+						break;
 					}
 					break;
 				}

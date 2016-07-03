@@ -43,7 +43,8 @@ public class LivingEntity extends Entity {
 	private static final Color HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
 	private static final Color MANA_POSITIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
 	private static final Color MANA_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
-	private static final Color XP_MODIFICATION_TEXT_COLOR = Color.PURPLE;
+	private static final Color XP_POSITIVE_MODIFICATION_TEXT_COLOR = Color.PURPLE;
+	private static final Color XP_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.PURPLE;
 	private static final Duration TRANSITION_DURATION = new Duration(1500);
 	private static final double TRANSITION_INITIAL_Y_POSITION = -12;
 	private static final double TRANSITION_FINAL_Y_POSITION = -60;
@@ -180,8 +181,14 @@ public class LivingEntity extends Entity {
 		if(value != 0) {
 			Label label = new Label();
 			label.setFont(TEXT_FONT);
-			label.setText(Integer.toString(value));
-			label.setTextFill(XP_MODIFICATION_TEXT_COLOR);
+			if(value > 0) {
+				label.setText("+" + Integer.toString(value));
+				label.setTextFill(XP_POSITIVE_MODIFICATION_TEXT_COLOR);
+			}
+			else {
+				label.setText(Integer.toString(value));
+				label.setTextFill(XP_NEGATIVE_MODIFICATION_TEXT_COLOR);
+			}
 			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
 
 			displaLabel(label);
