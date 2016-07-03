@@ -1404,13 +1404,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 						path = null;
 					} else {
 						this.currentPlayer.setRequestedAttack(this.mobs.get(i));
-						if(p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
-							Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
-							shadow.addAll(this.mobs);
-							shadow.addAll(this.players);
-							this.currentPlayer.setRequestedPath(shortestPathApprox(p, e.getTilePosition(), false, shadow));
-							this.currentPlayer.setSawDuck(false);
-						}
 					}
 				} else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
 					/* interaction with doors */
@@ -1420,6 +1413,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				}
 			} else {
 				success = false; // tile not in the los or out of range for damages
+				if (p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2)) {
+					Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
+					shadow.addAll(this.mobs);
+					shadow.addAll(this.players);
+					path = new Stack<>();
+					path.add(shortestPathApprox(p, e.getTilePosition(), false, shadow).peek());
+				}
 			}
 		} else {
 			success = false; // tile too far away
