@@ -8,9 +8,18 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entities;
 
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
+
 /**
- * The interface LivingEntityListener, that regroups some other listeners
+ * The interface LivingEntityManaUpdateListener
+ *
  * @author Maxime PINARD
  */
-public interface LivingEntityListener extends LivingEntityCreationListener, LivingEntityDeletionListener, LivingEntityHealthUpdateListener, LivingEntityHealthVisibilityListener, LivingEntityLOSDefinitionListener, LivingEntityLOSModificationListener, LivingEntityManaUpdateListener, LivingEntityMoveListener, LivingEntityXpUpdateListener {
+public interface LivingEntityManaUpdateListener {
+	/**
+	 * Handler associated to a LivingEntityManaUpdateListener
+	 *
+	 * @param e Event to handle
+	 */
+	void updateLivingEntityMana(LivingEntityManaUpdateEvent e);
 }

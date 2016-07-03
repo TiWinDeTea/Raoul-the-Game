@@ -39,8 +39,11 @@ public class LivingEntity extends Entity {
 	private static final Duration ANIMATION_DURATION = Duration.millis(500);
 
 	private static final Font TEXT_FONT = ViewPackage.getMainFont(14);
-	private static final Color POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
-	private static final Color NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
+	private static final Color HEALTH_POSITIVE_MODIFICATION_TEXT_COLOR = Color.LIME;
+	private static final Color HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.RED;
+	private static final Color MANA_POSITIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
+	private static final Color MANA_NEGATIVE_MODIFICATION_TEXT_COLOR = Color.CYAN;
+	private static final Color XP_MODIFICATION_TEXT_COLOR = Color.PURPLE;
 	private static final Duration TRANSITION_DURATION = new Duration(1500);
 	private static final double TRANSITION_INITIAL_Y_POSITION = -12;
 	private static final double TRANSITION_FINAL_Y_POSITION = -60;
@@ -143,48 +146,82 @@ public class LivingEntity extends Entity {
 			label.setFont(TEXT_FONT);
 			if(value > 0) {
 				label.setText("+" + Integer.toString(value));
-				label.setTextFill(POSITIVE_MODIFICATION_TEXT_COLOR);
+				label.setTextFill(HEALTH_POSITIVE_MODIFICATION_TEXT_COLOR);
 			}
 			else {
 				label.setText(Integer.toString(value));
-				label.setTextFill(NEGATIVE_MODIFICATION_TEXT_COLOR);
+				label.setTextFill(HEALTH_NEGATIVE_MODIFICATION_TEXT_COLOR);
 			}
 			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
 
-			getChildren().add(label);
-
-			FadeTransition fadeTransition = new FadeTransition();
-			fadeTransition.setNode(label);
-			fadeTransition.setDuration(TRANSITION_DURATION);
-			fadeTransition.setFromValue(1.0);
-			fadeTransition.setToValue(0.0);
-			fadeTransition.setCycleCount(1);
-			fadeTransition.setAutoReverse(false);
-
-			TranslateTransition translateTransition = new TranslateTransition();
-			translateTransition.setNode(label);
-			translateTransition.setDuration(TRANSITION_DURATION);
-			translateTransition.setFromY(TRANSITION_INITIAL_Y_POSITION);
-			translateTransition.setToY(TRANSITION_FINAL_Y_POSITION);
-			translateTransition.setCycleCount(1);
-			translateTransition.setAutoReverse(false);
-
-			fadeTransition.play();
-			translateTransition.play();
-
-			ExecutorService executorService = Executors.newSingleThreadExecutor();
-			executorService.submit(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(2000);
-					} catch(InterruptedException e) {
-						e.printStackTrace();
-					}
-					getChildren().remove(label);
-				}
-			});
-			executorService.shutdown();
+			displaLabel(label);
 		}
+	}
+
+	public void displayManaModification(int value) {
+		if(value != 0) {
+			Label label = new Label();
+			label.setFont(TEXT_FONT);
+			if(value > 0) {
+				label.setText("+" + Integer.toString(value));
+				label.setTextFill(MANA_POSITIVE_MODIFICATION_TEXT_COLOR);
+			}
+			else {
+				label.setText(Integer.toString(value));
+				label.setTextFill(MANA_NEGATIVE_MODIFICATION_TEXT_COLOR);
+			}
+			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+
+			displaLabel(label);
+		}
+	}
+
+	public void displayXpModification(int value) {
+		if(value != 0) {
+			Label label = new Label();
+			label.setFont(TEXT_FONT);
+			label.setText(Integer.toString(value));
+			label.setTextFill(XP_MODIFICATION_TEXT_COLOR);
+			label.setTranslateX((ViewPackage.SPRITES_SIZE.x - Toolkit.getToolkit().getFontLoader().computeStringWidth(label.getText(), label.getFont())) / 2);
+
+			displaLabel(label);
+		}
+	}
+
+	private void displaLabel(Label label) {
+		getChildren().add(label);
+
+		FadeTransition fadeTransition = new FadeTransition();
+		fadeTransition.setNode(label);
+		fadeTransition.setDuration(TRANSITION_DURATION);
+		fadeTransition.setFromValue(1.0);
+		fadeTransition.setToValue(0.0);
+		fadeTransition.setCycleCount(1);
+		fadeTransition.setAutoReverse(false);
+
+		TranslateTransition translateTransition = new TranslateTransition();
+		translateTransition.setNode(label);
+		translateTransition.setDuration(TRANSITION_DURATION);
+		translateTransition.setFromY(TRANSITION_INITIAL_Y_POSITION);
+		translateTransition.setToY(TRANSITION_FINAL_Y_POSITION);
+		translateTransition.setCycleCount(1);
+		translateTransition.setAutoReverse(false);
+
+		fadeTransition.play();
+		translateTransition.play();
+
+		ExecutorService executorService = Executors.newSingleThreadExecutor();
+		executorService.submit(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(2000);
+				} catch(InterruptedException e) {
+					e.printStackTrace();
+				}
+				getChildren().remove(label);
+			}
+		});
+		executorService.shutdown();
 	}
 }

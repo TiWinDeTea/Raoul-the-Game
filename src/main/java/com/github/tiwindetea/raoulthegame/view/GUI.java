@@ -19,7 +19,9 @@ import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHea
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthVisibilityEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
 import com.github.tiwindetea.raoulthegame.events.map.FogResetEvent;
@@ -473,7 +475,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				GUI.this.livingEntities.get(e.getEntityId()).setHealthBarVisible(e.isHealthVisibility());
 			}
 			else {
-				System.out.println("GUI::updateLivingEntityHealth : invalid entity id " + e.getEntityId());
+				System.out.println("GUI::setLivingEntityHealthVisibility : invalid entity id " + e.getEntityId());
 			}
 		}
 
@@ -483,6 +485,24 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		public void updateLevel(LevelUpdateEvent e) {
 			GUI.this.rScoreDisplayer.setLevel(e.getNewLevel());
+		}
+
+		public void updateLivingEntityMana(LivingEntityManaUpdateEvent e) {
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).displayManaModification(e.getManaDiff());
+			}
+			else {
+				System.out.println("GUI::updateLivingEntityMana : invalid entity id " + e.getEntityId());
+			}
+		}
+
+		public void updateLivingEntityXp(LivingEntityXpUpdateEvent e) {
+			if(GUI.this.livingEntities.containsKey(e.getEntityId())) {
+				GUI.this.livingEntities.get(e.getEntityId()).displayXpModification(e.getXpDiff());
+			}
+			else {
+				System.out.println("GUI::updateLivingEntityXp : invalid entity id " + e.getEntityId());
+			}
 		}
 
 		@Override
@@ -596,10 +616,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						this.moveLivingEntity((LivingEntityMoveEvent) e);
 						break;
 					case LIVING_ENTITY_HEALTH_UPDATE_EVENT:
-						updateLivingEntityHealth((LivingEntityHealthUpdateEvent) e);
+						this.updateLivingEntityHealth((LivingEntityHealthUpdateEvent) e);
 						break;
 					case LIVING_ENTITY_HEALTH_VISIBILITY_EVENT:
-						setLivingEntityHealthVisibility((LivingEntityHealthVisibilityEvent) e);
+						this.setLivingEntityHealthVisibility((LivingEntityHealthVisibilityEvent) e);
 						break;
 					}
 					break;
@@ -912,6 +932,16 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void objectDragged(ObjectDragEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void updateLivingEntityMana(LivingEntityManaUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void updateLivingEntityXp(LivingEntityXpUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 }

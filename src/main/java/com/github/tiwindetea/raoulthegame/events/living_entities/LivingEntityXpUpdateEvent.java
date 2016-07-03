@@ -9,19 +9,36 @@
 package com.github.tiwindetea.raoulthegame.events.living_entities;
 
 /**
- * The enum LivingEntityEventType.
+ * The type LivingEntityManaUpdateEvent.
  *
  * @author Maxime PINARD
  * @author Lucas LAZARE
  */
-public enum LivingEntityEventType {
-    LIVING_ENTITY_CREATION_EVENT,
-    LIVING_ENTITY_DELETION_EVENT,
-    LIVING_ENTITY_LOS_DEFINITION_EVENT,
-    LIVING_ENTITY_LOS_MODIFICATION_EVENT,
-    LIVING_ENTITY_MOVE_EVENT,
-    LIVING_ENTITY_HEALTH_UPDATE_EVENT,
-    LIVING_ENTITY_HEALTH_VISIBILITY_EVENT,
-    LIVING_ENTITY_MANA_UPDATE_EVENT,
-    LIVING_ENTITY_XP_UPDATE_EVENT
+public class LivingEntityXpUpdateEvent extends LivingEntityEvent {
+	private int xpDiff;
+
+	/**
+	 * Instantiates a new LivingEntityXpUpdateEvent.
+	 *
+	 * @param entityId the entity id
+	 * @param xpDiff   the xp diff
+	 */
+	public LivingEntityXpUpdateEvent(long entityId, int xpDiff) {
+		super(entityId);
+		this.xpDiff = xpDiff;
+	}
+
+	@Override
+	public LivingEntityEventType getSubType() {
+		return LivingEntityEventType.LIVING_ENTITY_XP_UPDATE_EVENT;
+	}
+
+	/**
+	 * Gets xp diff.
+	 *
+	 * @return the xp diff
+	 */
+	public int getXpDiff() {
+		return this.xpDiff;
+	}
 }
