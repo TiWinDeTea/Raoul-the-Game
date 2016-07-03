@@ -48,7 +48,7 @@ public class Pair<T extends Object> {
      *
      * @return an unique ID
      */
-    public static long getNewId() {
+    public static long getUniqueId() {
         return currID++;
     }
 

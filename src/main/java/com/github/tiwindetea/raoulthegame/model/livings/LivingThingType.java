@@ -15,5 +15,6 @@ package com.github.tiwindetea.raoulthegame.model.livings;
  */
 public enum LivingThingType {
     PLAYER,
-    MOB
+    MOB,
+    PET
 }

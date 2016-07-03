@@ -6,8 +6,14 @@
 . Transition de la caméra (caméra locké)
 . Centrer la caméra tout en étant zoomé
 . Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me", le "niveau" d'auto-équip, une checkbox 'inverser les clicks', choix permadeath)
-. Indicateur de gain d'xp ? (comme les dégats mais genre en violet) // Mana ?
+. Indicateur de gain d'xp ? (comme les dégats mais genre en violet) Mana ?
 . Permettre de saisir une seed
 . Ajouter des animations d'attaque // de drop d'objet
-. Attaques spéciales ? (eg: link's awakening tourbilol)
-. Classes // races ? (~~)
+. Barre de difficulté
+
+
+. Sorts:
+    . Maximum de x sorts
+    . Passifs (hp bonus, regen, regain de pv quand en dessous de x, bonus de def, vol de pv)
+    . Actifs (soin, invocation, wololo, dégâts, aggro, contrôle, invulnérabilité pendant n tours, dégâts mirroirs, te tp à la sortie // endroi au pif, vision ++)
+    . Menu de choix quand on change

@@ -78,7 +78,7 @@ public abstract class LivingThing implements Descriptable {
      * Instantiates a new Living thing.
      */
     public LivingThing() {
-        this.id = Pair.getNewId();
+        this.id = Pair.getUniqueId();
     }
 
     /**
@@ -173,7 +173,7 @@ public abstract class LivingThing implements Descriptable {
         double diff;
         if (damages > 0) {
             diff = this.getDefensePower() - damages;
-            if (diff >= 0) {
+            if (diff >= -1) {
                 diff = -1;
             }
             this.hitPoints += diff;

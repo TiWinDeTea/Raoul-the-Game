@@ -291,6 +291,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
 			player.addToInventory(new Pair<>(new Scroll(10, 1, 1)));
 			player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
+			player.addToInventory(new Pair<>(new Weapon(5, 5, 5)));
 		}
 		this.currentPlayer = this.players.get(0);
 		fireNextTickEvent(new PlayerNextTickEvent(0));
@@ -964,7 +965,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			/* Loots */
 			ListIterator<javafx.util.Pair<Vector2i, Pair<StorableObject>>> iter = this.objectsOnGround.listIterator();
 			while (iter.hasNext()) {
-				javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();//TODO
+				javafx.util.Pair<Vector2i, Pair<StorableObject>> objPair = iter.next();
 				Pair<StorableObject> objDroppedByPlayer = objectsJustDropped.get(new Integer(player.getNumber()));
 				if (objPair.getKey().equals(pos)
 						&& (objDroppedByPlayer == null || objDroppedByPlayer.getId() != objPair.getValue().getId())) {
@@ -1268,7 +1269,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			throw new AlreadyRunningException();
 		}
 		this.isRunning = true;
-		// TODO : run slower and slower up to n
+
 		RequestEvent event;
 		do {
 			try {

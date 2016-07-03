@@ -184,7 +184,6 @@ public class Mob extends LivingThing {
             int distanceToPlayer = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
             if (distanceToPlayer < los.length / 2) {
                 if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
-                    System.out.println(player.getName() + ": " + this.aggro[player.getNumber()]);
                     if (chasedPlayer == null || this.aggro[player.getNumber()] > this.aggro[chasedPlayer.getNumber()]) {
                         chasedPlayer = player;
                         distance = this.distanceTo(pos, shadow);

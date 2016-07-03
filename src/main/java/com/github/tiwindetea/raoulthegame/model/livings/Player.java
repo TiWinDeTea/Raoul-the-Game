@@ -433,7 +433,6 @@ public class Player extends LivingThing {
         return this.number;
     }
 
-    /* FIXME: remove that later on */
     public void setNumber(int number) {
         this.number = number;
     }
@@ -952,11 +951,11 @@ public class Player extends LivingThing {
             this.xp %= this.requiredXp;
             this.requiredXp += this.requiredXpPerLevel * levelUpping;
             this.level += levelUpping;
-            this.maxHitPoints += this.hitPointsPerLevel * levelUpping;
-            this.maxMana += this.manaPerLevel * levelUpping;
-            this.attackPower += this.attackPowerPerLevel * levelUpping;
-            this.defensePower += this.defensePowerPerLevel * levelUpping;
-            this.aggro += this.aggroPerLevel * levelUpping;
+            this.maxHitPoints = Math.round(this.hitPointsPerLevel * levelUpping + this.maxHitPoints);
+            this.maxMana = Math.round(this.manaPerLevel * levelUpping + this.maxMana);
+            this.attackPower = Math.round(this.attackPowerPerLevel * levelUpping + this.attackPower);
+            this.defensePower = Math.round(this.defensePowerPerLevel * levelUpping + this.defensePower);
+            this.aggro = Math.round(this.aggroPerLevel * levelUpping + this.aggro);
             this.hitPoints = this.maxHitPoints;
             this.mana = this.maxMana;
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, (int) this.maxHitPoints));
@@ -967,8 +966,7 @@ public class Player extends LivingThing {
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.ARMOR, PlayerStatEvent.ValueType.ACTUAL, (int) this.getDefensePower()));
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.DAMAGES, PlayerStatEvent.ValueType.ACTUAL, (int) this.getAttackPower()));
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.LEVEL, PlayerStatEvent.ValueType.ACTUAL, this.level));
-            firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade())
-            );
+            firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.POWER_GRADE, PlayerStatEvent.ValueType.ACTUAL, (int) this.getPowerGrade()));
             super.fireHealthUpdate(new LivingEntityHealthUpdateEvent(this.id, this.hitPoints / this.maxHitPoints, 0));
 
         }

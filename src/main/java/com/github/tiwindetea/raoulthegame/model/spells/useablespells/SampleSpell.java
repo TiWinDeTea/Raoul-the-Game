@@ -1,7 +1,18 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
 
 import java.util.Collection;
 
@@ -21,12 +32,9 @@ public class SampleSpell extends Spell {
      * Instantiates a new Spell.
      *
      * @param owner        the spell's owner
-     * @param targetNumber the maximum number of target this spell can be used on. If set to 0, all LivingThing within range are passed as targets when the spell is casted
-     * @param range        the range of this spell
-     * @param description  the description of this spell
      */
-    public SampleSpell(LivingThing owner, int targetNumber, int range, String description) {
-        super(owner, targetNumber, range, description);
+    public SampleSpell(Player owner) {
+        super(owner, 2, owner.getLos(), 2, "A wololo spell");
     }
 
     @Override
@@ -35,7 +43,22 @@ public class SampleSpell extends Spell {
     }
 
     @Override
-    public void update() {
+    public boolean isPassive() {
+        return false;
+    }
+
+    @Override
+    public void ownerDamaged(@Nullable LivingThing source) {
+
+    }
+
+    @Override
+    public void ownerAttacking(@NotNull LivingThing target) {
+
+    }
+
+    @Override
+    public void update(Collection<LivingThing> targets) {
         if (this.cooldown > 0) {
             --this.cooldown;
         }
@@ -50,7 +73,6 @@ public class SampleSpell extends Spell {
     public void nextSpellLevel() {
         this.cooldown = 0;
         this.heal++;
-        this.updateStats(this.targetNumber, this.range, "A random spell level " + this.level);
     }
 
     @Override
