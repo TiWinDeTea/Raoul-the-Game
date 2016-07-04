@@ -23,12 +23,12 @@ import java.util.List;
  */
 public abstract class Spell implements Descriptable {
 
-    private WeakReference<LivingThing> owner = null;
+    private final WeakReference<LivingThing> owner;
     protected int targetNumber;
     protected int range;
-    protected int secondaryRange = 0; // for aoe spells
+    protected int secondaryRange; // for aoe spells
     protected final long id = Pair.getUniqueId();
-    private String description;
+    protected String description;
 
     protected static final List<SpellListener> listeners = new LinkedList<>();
 
@@ -122,25 +122,11 @@ public abstract class Spell implements Descriptable {
     public abstract double ownerAttacking(@NotNull LivingThing target);
 
     /**
-     * Update the spell's stats.
-     *
-     * @param targetNumber the maximum number of target this spell can be used on. If set to 0, all LivingThing within range are passed as targets when the spell is casted
-     * @param range        the new range of this spell
-     * @param description  the new description of this spell
-     */
-    protected void updateStats(int targetNumber, int range, int secondaryRange, String description) {
-        this.targetNumber = targetNumber;
-        this.range = range;
-        this.secondaryRange = secondaryRange;
-        this.description = description;
-    }
-
-    /**
      * Handler. Updates the spell. This function should be called once and only once each turn.
      *
      * @param targets the new potential targets of this spell (nullable if the spell isn't an AOE spell)
      */
-    public abstract void update(@Nullable Collection<LivingThing> targets);
+    public abstract void update(Collection<LivingThing> targets);
 
     /**
      * Handler. This function should be called each time the spell's owner gained a level.
@@ -155,10 +141,11 @@ public abstract class Spell implements Descriptable {
     /**
      * Method called whenever the spell is casted on a LivingThing // a group of LivingThing(s)
      *
-     * @param targets the potential targets of this spell (from 0 to targetNumber if the spell isn't an aoe spell)
+     * @param targets        the potential targets of this spell (from 0 to targetNumber if the spell isn't an aoe spell)
+     * @param sourcePosition position where the spell was cast. nullable if the spell isn't an aoe spell
      * @return true if the spell was successfully casted, false otherwise
      */
-    public abstract boolean cast(Collection<LivingThing> targets);
+    public abstract boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition);
 
     /**
      * {@inheritDoc}
