@@ -14,6 +14,7 @@ import com.github.tiwindetea.raoulthegame.listeners.tilemap.TileMapListener;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.Entity;
+import javafx.animation.TranslateTransition;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
@@ -27,6 +28,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +62,8 @@ public class TileMap extends Parent {
 	private double rightMouseAnchorX;
 	private double rightMouseAnchorY;
 
-	private Canvas[][] canvases;
+	private Canvas[][] mapCanvases;
+	private Canvas[][] VisibilityCanvases;
 
 	private final List<Entity> entities = new ArrayList<>();
 
@@ -227,7 +230,7 @@ public class TileMap extends Parent {
 	 * @return the width
 	 */
 	public double getWidth() {
-		return (this.canvases.length - 1) * RCANVAS_MAX_WIDTH + this.canvases[this.canvases.length - 1][0].getWidth();
+		return (this.mapCanvases.length - 1) * RCANVAS_MAX_WIDTH + this.mapCanvases[this.mapCanvases.length - 1][0].getWidth();
 	}
 
 	/**
@@ -236,7 +239,7 @@ public class TileMap extends Parent {
 	 * @return the height
 	 */
 	public double getHeight() {
-		return (this.canvases[0].length - 1) * RCANVAS_MAX_HEIGHT + this.canvases[0][this.canvases[0].length - 1].getHeight();
+		return (this.mapCanvases[0].length - 1) * RCANVAS_MAX_HEIGHT + this.mapCanvases[0][this.mapCanvases[0].length - 1].getHeight();
 	}
 
 	/**
@@ -308,30 +311,30 @@ public class TileMap extends Parent {
 
 		int horizontalCanevasNumbers = (int) (Math.floor((mapWidth * ViewPackage.SPRITES_SIZE.x) / RCANVAS_MAX_WIDTH)) + 1;
 		int verticalCanevasNumbers = (int) (Math.floor((mapHeight * ViewPackage.SPRITES_SIZE.y) / RCANVAS_MAX_HEIGHT)) + 1;
-		this.canvases = new Canvas[horizontalCanevasNumbers][verticalCanevasNumbers];
+		this.mapCanvases = new Canvas[horizontalCanevasNumbers][verticalCanevasNumbers];
 
 		for(int i = 0; i < horizontalCanevasNumbers - 1; i++) {
 			for(int j = 0; j < verticalCanevasNumbers - 1; j++) {
-				this.canvases[i][j] = new Canvas(RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
-				this.canvases[i][j].setTranslateX(i * RCANVAS_MAX_WIDTH);
-				this.canvases[i][j].setTranslateY(j * RCANVAS_MAX_HEIGHT);
+				this.mapCanvases[i][j] = new Canvas(RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
+				this.mapCanvases[i][j].setTranslateX(i * RCANVAS_MAX_WIDTH);
+				this.mapCanvases[i][j].setTranslateY(j * RCANVAS_MAX_HEIGHT);
 			}
 			int canevasesY = verticalCanevasNumbers - 1;
-			this.canvases[i][canevasesY] = new Canvas(RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
-			this.canvases[i][canevasesY].setTranslateX(i * RCANVAS_MAX_WIDTH);
-			this.canvases[i][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
+			this.mapCanvases[i][canevasesY] = new Canvas(RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
+			this.mapCanvases[i][canevasesY].setTranslateX(i * RCANVAS_MAX_WIDTH);
+			this.mapCanvases[i][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 		}
 		for(int i = 0; i < verticalCanevasNumbers - 1; i++) {
 			int canevasesX = horizontalCanevasNumbers - 1;
-			this.canvases[canevasesX][i] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
-			this.canvases[canevasesX][i].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
-			this.canvases[canevasesX][i].setTranslateY(i * RCANVAS_MAX_HEIGHT);
+			this.mapCanvases[canevasesX][i] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, RCANVAS_MAX_HEIGHT);
+			this.mapCanvases[canevasesX][i].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
+			this.mapCanvases[canevasesX][i].setTranslateY(i * RCANVAS_MAX_HEIGHT);
 		}
-		int canevasesX = this.canvases.length - 1;
-		int canevasesY = this.canvases[0].length - 1;
-		this.canvases[canevasesX][canevasesY] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
-		this.canvases[canevasesX][canevasesY].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
-		this.canvases[canevasesX][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
+		int canevasesX = this.mapCanvases.length - 1;
+		int canevasesY = this.mapCanvases[0].length - 1;
+		this.mapCanvases[canevasesX][canevasesY] = new Canvas(mapWidth * ViewPackage.SPRITES_SIZE.x - (horizontalCanevasNumbers - 1) * RCANVAS_MAX_WIDTH, mapHeight * ViewPackage.SPRITES_SIZE.y - (verticalCanevasNumbers - 1) * RCANVAS_MAX_HEIGHT);
+		this.mapCanvases[canevasesX][canevasesY].setTranslateX(canevasesX * RCANVAS_MAX_WIDTH);
+		this.mapCanvases[canevasesX][canevasesY].setTranslateY(canevasesY * RCANVAS_MAX_HEIGHT);
 
 		Image image = ViewPackage.OBJECTS_IMAGE;
 		for(int i = 0; i < map.length; i++) {
@@ -341,7 +344,7 @@ public class TileMap extends Parent {
 		}
 
 		getChildren().clear();
-		for(Canvas[] canvas : this.canvases) {
+		for(Canvas[] canvas : this.mapCanvases) {
 			getChildren().addAll(canvas);
 		}
 		getChildren().addAll(this.entities);
@@ -649,7 +652,7 @@ public class TileMap extends Parent {
 	private void drawImage(Image img, double sx, double sy, double dx, double dy) {
 		int canvasesX = (int) Math.floor((dx * ViewPackage.SPRITES_SIZE.x) / RCANVAS_MAX_WIDTH);
 		int canvasesY = (int) Math.floor((dy * ViewPackage.SPRITES_SIZE.y) / RCANVAS_MAX_HEIGHT);
-		this.canvases[canvasesX][canvasesY].getGraphicsContext2D().drawImage(img, sx * ViewPackage.SPRITES_SIZE.x, sy * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y, dx * ViewPackage.SPRITES_SIZE.x - canvasesX * RCANVAS_MAX_WIDTH, dy * ViewPackage.SPRITES_SIZE.y - canvasesY * RCANVAS_MAX_HEIGHT, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y);
+		this.mapCanvases[canvasesX][canvasesY].getGraphicsContext2D().drawImage(img, sx * ViewPackage.SPRITES_SIZE.x, sy * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y, dx * ViewPackage.SPRITES_SIZE.x - canvasesX * RCANVAS_MAX_WIDTH, dy * ViewPackage.SPRITES_SIZE.y - canvasesY * RCANVAS_MAX_HEIGHT, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y);
 	}
 
 	private double clamp(double value, double min, double max) {
@@ -702,7 +705,18 @@ public class TileMap extends Parent {
 
 		this.scale.set(1);
 
-		setTranslateX(getTranslateX() + Xdiff);
-		setTranslateY(getTranslateY() + Ydiff);
+		TranslateTransition translateTransition = new TranslateTransition();
+		translateTransition.setNode(this);
+		translateTransition.setDuration(new Duration(100));
+		translateTransition.setFromX(getTranslateX());
+		translateTransition.setFromY(getTranslateY());
+		translateTransition.setToX(getTranslateX() + Xdiff);
+		translateTransition.setToY(getTranslateY() + Ydiff);
+		translateTransition.setCycleCount(1);
+		translateTransition.setAutoReverse(false);
+		translateTransition.play();
+
+		//setTranslateX(getTranslateX() + Xdiff);
+		//setTranslateY(getTranslateY() + Ydiff);
 	}
 }
