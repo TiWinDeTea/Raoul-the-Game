@@ -23,11 +23,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
@@ -50,13 +48,11 @@ public class MainMenu extends Application {
 	private final GUI GUI = new GUI();
 	private final Game game = new Game(Settings.SAVE_PATH);
 	private boolean wait = false;
-	private boolean textFieldCleared = false;
-	private final String SEED_TEXT = "Enter your seed here, or leave empty for a random seed";
 
 	private final VBox buttonsVBox = new VBox();
 	private final AnchorPane menuAnchorPane = new AnchorPane();
 	private final Scene menuScene = new Scene(this.menuAnchorPane);
-	private final TextField seedTextField = new TextField(this.SEED_TEXT);
+	private final TextField seedTF = new TextField("Enter your seed here");
 	private final Button soloButton = new Button("Solo");
 	private final Button multiplayerButton = new Button("2 Players");
 	private final Button loadButton = new Button("Load game");
@@ -102,43 +98,16 @@ public class MainMenu extends Application {
 			}
 		});
 
-		this.seedTextField.minWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
-		this.seedTextField.maxWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
-		this.seedTextField.setFocusTraversable(false);
-		this.seedTextField.setTooltip(new Tooltip(this.SEED_TEXT));
-		this.seedTextField.setOnMouseClicked(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				if (!MainMenu.this.textFieldCleared && event.getButton() == MouseButton.PRIMARY) {
-					MainMenu.this.textFieldCleared = true;
-					MainMenu.this.seedTextField.clear();
-				}
-			}
-		});
-		MainMenu.this.seedTextField.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				MainMenu.this.textFieldCleared = false;
-				if (MainMenu.this.seedTextField.getText().equals(MainMenu.this.SEED_TEXT)
-						|| MainMenu.this.seedTextField.getText().length() == 0) {
-					MainMenu.this.game.initNew(1);
-				} else {
-					MainMenu.this.game.initNew(1, new Seed(MainMenu.this.seedTextField.getText()));
-				}
-				MainMenu.this.startGame();
-				MainMenu.this.showButtons();
-				MainMenu.this.buttonsVBox.getChildren().remove(MainMenu.this.seedTextField);
-				MainMenu.this.seedTextField.setText("Enter your seed here");
-			}
-		});
 
+		this.seedTF.minWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
+		this.seedTF.maxWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
 		this.menuScene.setOnKeyPressed(event -> {
 			if (event.getCode() == KeyCode.ESCAPE && !this.soloButton.isVisible()) {
-				this.buttonsVBox.getChildren().remove(this.seedTextField);
+				this.buttonsVBox.getChildren().remove(this.seedTF);
 				this.buttonsVBox.setAlignment(Pos.CENTER);
 				this.showButtons();
 				this.wait = true;
-				this.seedTextField.setText("Enter your seed here");
+				this.seedTF.setText("Enter your seed here");
 			}
 		});
 
@@ -277,9 +246,23 @@ public class MainMenu extends Application {
 		this.soloButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				MainMenu.this.buttonsVBox.getChildren().add(MainMenu.this.seedTextField);
+				MainMenu.this.buttonsVBox.getChildren().add(MainMenu.this.seedTF);
 				MainMenu.this.buttonsVBox.setAlignment(Pos.BASELINE_CENTER);
 				MainMenu.this.hideButtons();
+				MainMenu.this.seedTF.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent event) {
+						if (MainMenu.this.seedTF.getText().equals("Enter your seed here")) {
+							MainMenu.this.game.initNew(1);
+						} else {
+							MainMenu.this.game.initNew(1, new Seed(MainMenu.this.seedTF.getText()));
+						}
+						MainMenu.this.startGame();
+						MainMenu.this.showButtons();
+						MainMenu.this.buttonsVBox.getChildren().remove(MainMenu.this.seedTF);
+						MainMenu.this.seedTF.setText("Enter your seed here");
+					}
+				});
 			}
 		});
 		this.soloButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
