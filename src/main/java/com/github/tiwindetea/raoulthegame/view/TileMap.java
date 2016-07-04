@@ -63,7 +63,6 @@ public class TileMap extends Parent {
 	private double rightMouseAnchorY;
 
 	private Canvas[][] mapCanvases;
-	private Canvas[][] VisibilityCanvases;
 
 	private final List<Entity> entities = new ArrayList<>();
 
