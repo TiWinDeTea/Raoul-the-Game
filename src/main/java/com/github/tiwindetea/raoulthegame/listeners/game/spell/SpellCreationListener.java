@@ -6,23 +6,20 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events;
+package com.github.tiwindetea.raoulthegame.listeners.game.spell;
+
+import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
 
 /**
- * The enum EventType.
+ * The interface SpellCreationListener
  *
- * @author Maxime PINARD
  * @author Lucas LAZARE
  */
-public enum EventType {
-    TILEMAP_EVENT,
-    STATIC_ENTITY_EVENT,
-    REQUEST_EVENT,
-    PLAYER_EVENT,
-    PLAYER_INVENTORY_EVENT,
-    MAP_EVENT,
-	LIVING_ENTITY_EVENT,
-	SCORE_UPDATE_EVENT,
-    LEVEL_UPDATE_EVENT,
-    SPELL_EVENT
+public interface SpellCreationListener {
+    /**
+     * Handler associated to a SpellCreationEvent
+     *
+     * @param e Event to handle
+     */
+    void createSpell(SpellCreationEvent e);
 }

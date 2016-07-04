@@ -1,12 +1,19 @@
 package com.github.tiwindetea.raoulthegame.model.spells;
 
+import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.listeners.game.spell.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
+import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * The Spell class.
@@ -20,7 +27,15 @@ public abstract class Spell implements Descriptable {
     protected int targetNumber;
     protected int range;
     protected int secondaryRange = 0; // for aoe spells
+    protected final long id = Pair.getUniqueId();
     private String description;
+
+    protected static final List<SpellListener> listeners = new LinkedList<>();
+
+    public static void addSpellListener(SpellListener listener) {
+        if (!listeners.contains(listener))
+            listeners.add(listener);
+    }
 
     /**
      * Instantiates a new Spell.
@@ -31,12 +46,15 @@ public abstract class Spell implements Descriptable {
      * @param secondaryRange the aoe range of this spell
      * @param description    the description of this spell
      */
-    public Spell(LivingThing owner, int targetNumber, int range, int secondaryRange, String description) {
+    public Spell(LivingThing owner, int targetNumber, int range, int secondaryRange, String description, SpellType spellType) {
         this.owner = new WeakReference<>(owner);
         this.targetNumber = targetNumber;
         this.range = range;
         this.secondaryRange = secondaryRange;
         this.description = description;
+        for (SpellListener listener : listeners) {
+            listener.createSpell(new SpellCreationEvent(this.id, spellType));
+        }
     }
 
     /**
@@ -44,6 +62,9 @@ public abstract class Spell implements Descriptable {
      */
     public abstract boolean isAOE();
 
+    /**
+     * @return true if this spell is a passive spell
+     */
     public abstract boolean isPassive();
 
     /**
@@ -77,18 +98,28 @@ public abstract class Spell implements Descriptable {
     }
 
     /**
+     * Gets the coordinate where the spell was casted.
+     *
+     * @return the spell's coordinates or null if irrelevant for this spell
+     */
+    public abstract Vector2i getSpellSource();
+
+    /**
      * Handler. This function should be called each time the spell's owner is attacked
      *
-     * @param source the source of the damages
+     * @param source  the source of the damages
+     * @param damages the amount of received damages
+     * @return the damage modifier of this spell
      */
-    public abstract void ownerDamaged(@Nullable LivingThing source);
+    public abstract double ownerDamaged(@Nullable LivingThing source, double damages);
 
     /**
      * Handler. This function should be called time the spell's owner is attacking
      *
      * @param target the damages' target
+     * @return the damage modifier of this spell
      */
-    public abstract void ownerAttacking(@NotNull LivingThing target);
+    public abstract double ownerAttacking(@NotNull LivingThing target);
 
     /**
      * Update the spell's stats.
@@ -107,9 +138,9 @@ public abstract class Spell implements Descriptable {
     /**
      * Handler. Updates the spell. This function should be called once and only once each turn.
      *
-     * @param targets the new potential targets of this spell (empty if the spell isn't an AOE spell)
+     * @param targets the new potential targets of this spell (nullable if the spell isn't an AOE spell)
      */
-    public abstract void update(Collection<LivingThing> targets);
+    public abstract void update(@Nullable Collection<LivingThing> targets);
 
     /**
      * Handler. This function should be called each time the spell's owner gained a level.

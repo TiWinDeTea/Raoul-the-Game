@@ -26,6 +26,11 @@ import java.util.Scanner;
 public final class Settings {
 
     /**
+     * Maximum number of spells per LivingThing
+     */
+    public static final int SPELLS_MAX_QT = 3;
+
+    /**
      * Path to the config file
      */
     public static final String CONFIG_PATH = ResourceBundle.getBundle(MainPackage.name + ".OutputFiles").getString("settings-file");

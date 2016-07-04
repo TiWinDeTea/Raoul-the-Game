@@ -6,23 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events;
+package com.github.tiwindetea.raoulthegame.events.spells;
 
 /**
- * The enum EventType.
+ * The type SpellDeletionEvent.
  *
- * @author Maxime PINARD
  * @author Lucas LAZARE
  */
-public enum EventType {
-    TILEMAP_EVENT,
-    STATIC_ENTITY_EVENT,
-    REQUEST_EVENT,
-    PLAYER_EVENT,
-    PLAYER_INVENTORY_EVENT,
-    MAP_EVENT,
-	LIVING_ENTITY_EVENT,
-	SCORE_UPDATE_EVENT,
-    LEVEL_UPDATE_EVENT,
-    SPELL_EVENT
+public class SpellDeletionEvent extends SpellEvent {
+
+    public SpellDeletionEvent(long id) {
+        super(id);
+    }
+
+    @Override
+    public SpellEventType getSubType() {
+        return null;
+    }
 }

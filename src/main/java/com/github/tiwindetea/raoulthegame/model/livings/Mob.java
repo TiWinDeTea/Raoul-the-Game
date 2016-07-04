@@ -273,14 +273,6 @@ public class Mob extends LivingThing {
      * {@inheritDoc}
      */
     @Override
-    public void attack(LivingThing target) {
-        target.damage(this.attackPower, this);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public LivingThingType getType() {
         return LivingThingType.MOB;
     }

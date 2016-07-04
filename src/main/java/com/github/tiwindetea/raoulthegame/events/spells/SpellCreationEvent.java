@@ -6,23 +6,30 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events;
+package com.github.tiwindetea.raoulthegame.events.spells;
+
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 
 /**
- * The enum EventType.
+ * The type SpellCreationEvent.
  *
- * @author Maxime PINARD
  * @author Lucas LAZARE
  */
-public enum EventType {
-    TILEMAP_EVENT,
-    STATIC_ENTITY_EVENT,
-    REQUEST_EVENT,
-    PLAYER_EVENT,
-    PLAYER_INVENTORY_EVENT,
-    MAP_EVENT,
-	LIVING_ENTITY_EVENT,
-	SCORE_UPDATE_EVENT,
-    LEVEL_UPDATE_EVENT,
-    SPELL_EVENT
+public class SpellCreationEvent extends SpellEvent {
+
+    private SpellType spellType;
+
+    public SpellCreationEvent(long id, SpellType spellType) {
+        super(id);
+        this.spellType = spellType;
+    }
+
+    @Override
+    public SpellEventType getSubType() {
+        return SpellEventType.SPELL_CREATION_EVENT;
+    }
+
+    public SpellType getSpellType() {
+        return this.spellType;
+    }
 }

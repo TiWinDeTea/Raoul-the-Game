@@ -112,10 +112,14 @@ public class Vector2i {
      * Computes the squared distance between this and another Vector2i
      *
      * @param that The other Vector2i
-     * @return The squared distance between this and that
+     * @return The squared distance between this and that, or {@link Double#POSITIVE_INFINITY} if that is null
      */
     public double squaredDistance(Vector2i that) {
-        return Math.pow(this.x - that.x, 2) + Math.pow(this.y - that.y, 2);
+        if (that != null) {
+            return Math.pow(this.x - that.x, 2) + Math.pow(this.y - that.y, 2);
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     /**

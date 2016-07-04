@@ -8,8 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.model.livings;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
+import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
@@ -19,6 +18,8 @@ import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public abstract class LivingThing implements Descriptable {
     protected String name;
     protected long id;
     protected static final ArrayList<GameListener> listeners = new ArrayList<>();
+    protected List<Spell> spells = new ArrayList<>(Settings.SPELLS_MAX_QT);
 
 
     /**
@@ -102,6 +104,15 @@ public abstract class LivingThing implements Descriptable {
      */
     public void updateSight(Tile[][] sight) {
         this.sight = sight;
+    }
+
+    /**
+     * Get spells
+     *
+     * @return the spells
+     */
+    public List<Spell> getSpells() {
+        return this.spells;
     }
 
     /**
@@ -186,6 +197,9 @@ public abstract class LivingThing implements Descriptable {
     public void damage(double damages, @Nullable LivingThing source) {
         double diff;
         if (damages > 0) {
+            for (Spell spell : this.spells) {
+                damages += spell.ownerDamaged(source, damages);
+            }
             diff = this.getDefensePower() - damages;
             if (diff >= -1) {
                 diff = -1;
@@ -244,8 +258,12 @@ public abstract class LivingThing implements Descriptable {
      *
      * @param target target of the attack
      */
-    public void attack(LivingThing target) {
-        Sound.player.play(Sounds.ATTACK_SOUND);
+    public void attack(@NotNull LivingThing target) {
+        double damages = this.getAttackPower();
+        for (Spell spell : this.spells) {
+            damages += spell.ownerAttacking(target);
+        }
+        target.damage(damages, this);
     }
 
     /**

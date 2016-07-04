@@ -30,6 +30,7 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
@@ -388,19 +389,10 @@ public class Player extends LivingThing {
      * {@inheritDoc}
      */
     @Override
-    public void attack(LivingThing target) {
+    public void attack(@NotNull LivingThing target) {
         if (target.getType() == LivingThingType.MOB) {
-            double damages = this.attackPower;
-            for (Pair<Armor> armorPair : this.armors) {
-                if (armorPair != null && armorPair.object != null) {
-                    damages += armorPair.object.getAttackPowerModifier();
-                }
-            }
-            if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
-                damages += this.weapon.object.getAttackPowerModifier();
-            }
+            Sound.player.play(Sounds.ATTACK_SOUND);
             super.attack(target);
-            target.damage(damages, this);
         }
     }
 
@@ -1075,11 +1067,16 @@ public class Player extends LivingThing {
      */
     @Override
     public double getAttackPower() {
-        if (this.weapon == null || this.weapon.object == null) {
-            return this.attackPower;
-        } else {
-            return this.attackPower + this.weapon.object.getAttackPowerModifier();
+        double damages = this.attackPower;
+        for (Pair<Armor> armorPair : this.armors) {
+            if (armorPair != null && armorPair.object != null) {
+                damages += armorPair.object.getAttackPowerModifier();
+            }
         }
+        if (this.weapon != null && this.weapon.object != null && useMana(this.weapon.object.getManaCost())) {
+            damages += this.weapon.object.getAttackPowerModifier();
+        }
+        return damages;
     }
 
     public void setSawDuck(boolean sawDuck) {

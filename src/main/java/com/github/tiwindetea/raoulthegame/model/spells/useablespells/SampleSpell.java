@@ -10,6 +10,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
@@ -34,7 +35,7 @@ public class SampleSpell extends Spell {
      * @param owner        the spell's owner
      */
     public SampleSpell(Player owner) {
-        super(owner, 2, owner.getLos(), 2, "A wololo spell");
+        super(owner, 2, owner.getLos(), 2, "A wololo spell", null);
     }
 
     @Override
@@ -48,13 +49,18 @@ public class SampleSpell extends Spell {
     }
 
     @Override
-    public void ownerDamaged(@Nullable LivingThing source) {
-
+    public Vector2i getSpellSource() {
+        return null;
     }
 
     @Override
-    public void ownerAttacking(@NotNull LivingThing target) {
+    public double ownerDamaged(@Nullable LivingThing source, double damages) {
+        return 0;
+    }
 
+    @Override
+    public double ownerAttacking(@NotNull LivingThing target) {
+        return 0;
     }
 
     @Override

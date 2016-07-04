@@ -797,12 +797,23 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 * Step into the next turn (all entities live)
 	 */
 	private void nextTurn() {
-		logger.log(this.debugLevel, "Starting players lives");
+		HashMap<Integer, Pair<StorableObject>> objectsJustDropped = new HashMap<>();
+		ArrayList<Mob> mobsToDelete = new ArrayList<>(3);
+
+		this.nextTurnPlayers(objectsJustDropped);
+		this.nextTurnMobs(mobsToDelete);
+		this.updateLivingsSpells();
+		this.killDeads(mobsToDelete);
+		this.updateConsumables();
+		this.computeWorldInteractions(objectsJustDropped);
+
+		this.recomputePlayersLoses();
+	}
+
+	private void nextTurnPlayers(HashMap<Integer, Pair<StorableObject>> objectsJustDropped) {
 		Vector2i pos;
 		LivingThing target;
-		HashMap<Integer, Pair<StorableObject>> objectsJustDropped = new HashMap<>();
 
-		/* Letting the players to play */
 		for (int i = 0; i < this.players.size(); i++) {
 			Player player = this.players.get(i);
 			Vector2i playerPos = player.getPosition();
@@ -873,8 +884,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				logger.log(this.debugLevel, msg);
 			}
 		}
+	}
 
-		ArrayList<Mob> mobToDelete = new ArrayList<>(3);
+	private void nextTurnMobs(ArrayList<Mob> mobToDelete) {
+		Vector2i pos;
+		LivingThing target;
+
 		/* Letting the mobs to play */
 		for (Mob mob : this.mobs) {
 			if (mob.isAlive()) {
@@ -898,7 +913,36 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				}
 			}
 		}
+	}
 
+	private void updateLivingsSpells() {
+		ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size() + this.players.size());
+		livings.addAll(this.players);
+		livings.addAll(this.mobs);
+
+		for (LivingThing living : livings) {
+			living.getSpells().stream()
+					.filter(spell -> !spell.isPassive())
+					.forEach(spell -> {
+						if (spell.isAOE()) {
+							Vector2i pos = spell.getSpellSource();
+							int range = spell.getRange();
+							if (pos != null) {
+								LinkedList<LivingThing> targets = livings.stream()
+										.filter(thing -> pos.squaredDistance(thing.getPosition()) < range)
+										.collect(Collectors.toCollection(LinkedList::new));
+								spell.update(targets);
+							} else {
+								spell.update(null);
+							}
+						} else {
+							spell.update(null);
+						}
+					});
+		}
+	}
+
+	private void killDeads(ArrayList<Mob> mobToDelete) {
 		Random random = new Random();
 		for (Mob mob : mobToDelete) {
 			fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
@@ -916,7 +960,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			this.mobs.remove(mob);
 		}
 
-		/* Scanning for dead players */
 		ArrayList<Player> playerToDelete = new ArrayList<>();
 		for (Player player : this.players) {
 			if (!player.isAlive()) {
@@ -942,8 +985,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		if (this.players.isEmpty() && this.playersOnNextLevel.isEmpty()) {
 			this.isRunning = false;
 		}
+	}
 
-		/* Letting consumable do their effects */
+	private void updateConsumables() {
 		ArrayList<Consumable> consumableToDelete = this.triggeredObjects.stream()
 				/* if its effect is finished */
 				.filter(consumable -> consumable.nextTick())
@@ -952,7 +996,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		for (Consumable consumable : consumableToDelete) {
 			this.triggeredObjects.remove(consumable);
 		}
+	}
 
+	private void computeWorldInteractions(HashMap<Integer, Pair<StorableObject>> objectsJustDropped) {
+		Vector2i pos;
 		/* Scanning for loots&chests to give to players, for traps, next level & light bulb */
 		for (int i = 0; i < this.players.size(); ++i) {
 			Player player = this.players.get(i);
@@ -1078,7 +1125,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 				this.interactiveObjects.remove(interactiveObject);
 			}
 		}
-		this.recomputePlayersLoses();
 	}
 
 	//-------------------------------------//
