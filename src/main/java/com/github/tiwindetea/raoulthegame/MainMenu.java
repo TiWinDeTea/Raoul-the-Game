@@ -80,6 +80,17 @@ public class MainMenu extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
+		// Loading sounds (cannot create some MediaPlayer if `launch(args)` hasn't been called)
+		try {
+			for (Sounds sound : Sounds.values()) {
+				Sound.player.put(sound, sound.toURL(), sound.isLooping());
+			}
+			Sound.player.play(Sounds.MAIN_MENU_START_SOUND);
+		} catch (Exception e){
+			System.out.println("javafx.scene.media.MediaPlayer seems to be unsupported for your system.");
+			System.out.println("Sounds will be disabled");
+			Sound.player.setStopped(true);
+		}
 		this.primaryStage = primaryStage;
 		primaryStage.setTitle("Raoul, the Game");
 		primaryStage.getIcons().add(ViewPackage.ICON_IMAGE);
@@ -352,7 +363,6 @@ public class MainMenu extends Application {
 	}
 
 	public static void main(String[] args) {
-		Sound.player.play(Sounds.MAIN_MENU_START_SOUND);
 		launch(args);
 	}
 }

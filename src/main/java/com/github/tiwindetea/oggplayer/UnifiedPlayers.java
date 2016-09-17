@@ -8,6 +8,10 @@
 
 package com.github.tiwindetea.oggplayer;
 
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
+
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,33 +21,33 @@ import java.util.NoSuchElementException;
 /**
  * Created by organic-code on 5/30/16.
  */
-public class OGGPlayers<K> {
+public class UnifiedPlayers<K> {
 
-    private Map<K, JOrbisPlayer> players;
+    private Map<K, MediaPlayer> players;
     private boolean stopped = false;
 
 
     /**
-     * Constructs an empty <tt>OGGPlayers</tt> with an hashmap of the default initial
+     * Constructs an empty <tt>UnifiedPlayers</tt> with an hashmap of the default initial
      * capacity (5) and the default load factor (2).
      */
-    public OGGPlayers() {
+    public UnifiedPlayers() {
         this(5, 2);
     }
 
     /**
-     * Constructs an empty <tt>OGGPlayers</tt> with an hashmap of the specified initial
+     * Constructs an empty <tt>UnifiedPlayers</tt> with an hashmap of the specified initial
      * capacity and the default load factor (2).
      *
      * @param initialCapacity the initial capacity.
      * @throws IllegalArgumentException if the initial capacity is negative.
      */
-    public OGGPlayers(int initialCapacity) {
+    public UnifiedPlayers(int initialCapacity) {
         this(initialCapacity, 2);
     }
 
     /**
-     * Constructs an empty <tt>OGGPlayers</tt> with an hashmap of the specified initial
+     * Constructs an empty <tt>UnifiedPlayers</tt> with an hashmap of the specified initial
      * capacity and load factor.
      *
      * @param initialCapacity the initial capacity
@@ -51,7 +55,7 @@ public class OGGPlayers<K> {
      * @throws IllegalArgumentException if the initial capacity is negative
      *                                  or the load factor is nonpositive
      */
-    public OGGPlayers(int initialCapacity, float loadFactor) {
+    public UnifiedPlayers(int initialCapacity, float loadFactor) {
         this.players = new HashMap<>(initialCapacity, loadFactor);
     }
 
@@ -64,7 +68,7 @@ public class OGGPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public JOrbisPlayer remove(K key) {
+    public MediaPlayer remove(K key) {
         return this.players.remove(key);
     }
 
@@ -76,7 +80,7 @@ public class OGGPlayers<K> {
      * @param player player expected to be associated with the specified key
      * @return {@code true} if the value was removed
      */
-    public boolean remove(K key, JOrbisPlayer player) {
+    public boolean remove(K key, MediaPlayer player) {
         return this.players.remove(key, player);
     }
 
@@ -109,10 +113,10 @@ public class OGGPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public JOrbisPlayer stopAndRemove(K key) {
-        JOrbisPlayer p = this.players.get(key);
+    public MediaPlayer stopAndRemove(K key) {
+        MediaPlayer p = this.players.get(key);
         if (p != null) {
-            p.stop_sound();
+            p.stop();
             return this.players.remove(key);
         } else {
             return null;
@@ -127,9 +131,9 @@ public class OGGPlayers<K> {
      *                                value or this value is <tt>null</tt>
      */
     public void stop(K key) {
-        JOrbisPlayer p = this.players.get(key);
+        MediaPlayer p = this.players.get(key);
         if (p != null) {
-            p.stop_sound();
+            p.stop();
         } else {
             throw new NoSuchElementException();
         }
@@ -143,10 +147,10 @@ public class OGGPlayers<K> {
      * @param player player expected to be associated with the specified key
      * @return {@code true} if the value was removed
      */
-    public boolean stopAndRemove(K key, JOrbisPlayer player) {
-        JOrbisPlayer local = this.players.get(key);
+    public boolean stopAndRemove(K key, MediaPlayer player) {
+        MediaPlayer local = this.players.get(key);
         if (local != null && local.equals(player)) {
-            local.stop_sound();
+            local.stop();
             return this.players.remove(key, player);
         } else {
             return false;
@@ -178,7 +182,16 @@ public class OGGPlayers<K> {
      * The map will be empty after this call returns.
      */
     public void stopAndClear() {
-        this.players.forEach((k, player) -> player.stop_sound());
+        this.players.forEach((k, player) -> {
+            try {
+                if (player != null) {
+                    player.stop();
+                }
+                // javafx sucks
+            } catch (NullPointerException e){
+
+            }
+        });
         this.players.clear();
     }
 
@@ -212,11 +225,11 @@ public class OGGPlayers<K> {
      * Stops any players of the map
      */
     public void stopAny() {
-        this.players.forEach((k, player) -> player.stop_sound());
+        this.players.forEach((k, player) -> player.stop());
     }
 
     /**
-     * Associates a JOrbisPlayer targetting the file with the specified
+     * Associates a MediaPlayer targetting the file with the specified
      * key in the map. If the map previously contained a mapping for the
      * key, the old value is replaced and returned.
      *
@@ -227,29 +240,31 @@ public class OGGPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public JOrbisPlayer put(K key, URL file) {
-        return this.players.put(key, new JOrbisPlayer(file));
+    public MediaPlayer put(K key, URL file) {
+        return this.players.put(key, new MediaPlayer(new Media(file.toString())));
     }
 
-    public JOrbisPlayer put(K key, URL file, boolean isLooping) {
-        JOrbisPlayer ret = new JOrbisPlayer(file);
-        ret.setLooping(isLooping);
+    public MediaPlayer put(K key, URL file, boolean isLooping) {
+        MediaPlayer ret = new MediaPlayer(new Media(file.toString()));
+        if (isLooping) {
+            ret.setOnEndOfMedia(() -> ret.seek(Duration.ZERO));
+        }
         return this.players.put(key, ret);
     }
 
     /**
-     * Associates a JOrbisPlayer with the specified key in the map.
+     * Associates a MediaPlayer with the specified key in the map.
      * If the map previously contained a mapping for the key, the old
      * value is replaced and returned.
      *
      * @param key    key with which the specified value is to be associated
-     * @param player JOrbisPlayer to be associated with the specied key.
+     * @param player MediaPlayer to be associated with the specied key.
      * @return the previous value associated with <tt>key</tt>, or
      * <tt>null</tt> if there was no mapping for <tt>key</tt>.
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public JOrbisPlayer put(K key, JOrbisPlayer player) {
+    public MediaPlayer put(K key, MediaPlayer player) {
         return this.players.put(key, player);
     }
 
@@ -263,30 +278,30 @@ public class OGGPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      *
-     * @see OGGPlayers#put(Object, URL)
-     * @see OGGPlayers#play(Object)
+     * @see UnifiedPlayers#put(Object, URL)
+     * @see UnifiedPlayers#play(Object)
      */
-    public JOrbisPlayer putAndPlay(K key, URL file) {
-        return this.putAndPlay(key, new JOrbisPlayer(file));
+    public MediaPlayer putAndPlay(K key, URL file) {
+        return this.putAndPlay(key, new MediaPlayer(new Media(file.toString())));
     }
 
     /**
      * Adds the player to the map and plays it.
      *
      * @param key    key with which the specified value is to be associated
-     * @param player JOrbisPlayer to be associated with the specied key.
+     * @param player MediaPlayer to be associated with the specied key.
      * @return the previous value associated with <tt>key</tt>, or
      * <tt>null</tt> if there was no mapping for <tt>key</tt>.
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      *
-     * @see OGGPlayers#put(Object, JOrbisPlayer)
-     * @see OGGPlayers#play(Object)
+     * @see UnifiedPlayers#put(Object, MediaPlayer)
+     * @see UnifiedPlayers#play(Object)
      */
-    public JOrbisPlayer putAndPlay(K key, JOrbisPlayer player) {
-        JOrbisPlayer r = this.players.put(key, player);
+    public MediaPlayer putAndPlay(K key, MediaPlayer player) {
+        MediaPlayer r = this.players.put(key, player);
         if (!this.stopped) {
-            player.play_sound();
+            player.play();
         }
         return r;
     }
@@ -297,13 +312,14 @@ public class OGGPlayers<K> {
      * @param key key with which the player is associated
      */
     public void play(K key) {
-        JOrbisPlayer r = this.players.get(key);
-        if (r != null) {
-            if (!this.stopped) {
-                r.play_sound();
+        if (!this.stopped) {
+            MediaPlayer r = this.players.get(key);
+            if (r != null) {
+                r.seek(Duration.ZERO);
+                r.play();
+            } else {
+                throw new NoSuchElementException();
             }
-        } else {
-            throw new NoSuchElementException();
         }
     }
 
@@ -319,20 +335,28 @@ public class OGGPlayers<K> {
      * @apiNote <tt>false</tt> by default
      */
     public void setLoop(K key, boolean loop) {
-        JOrbisPlayer p = this.players.get(key);
+        MediaPlayer p = this.players.get(key);
         if (p != null) {
-            p.setLooping(loop);
+            if (loop){
+                p.setOnEndOfMedia(() -> p.seek(Duration.ZERO));
+            } else {
+                p.setOnEndOfMedia(() -> {});
+            }
         } else {
             throw new NoSuchElementException();
         }
     }
 
     public void setLoopAndPlay(Object key, boolean loop) {
-        JOrbisPlayer p = this.players.get(key);
+        MediaPlayer p = this.players.get(key);
         if (p != null) {
-            p.setLooping(loop);
+            if (loop){
+                p.setOnEndOfMedia(() -> p.seek(Duration.ZERO));
+            } else {
+                p.setOnEndOfMedia(() -> {});
+            }
             if (!this.stopped) {
-                p.play_sound();
+                p.play();
             }
         } else {
             throw new NoSuchElementException();
@@ -351,28 +375,12 @@ public class OGGPlayers<K> {
      *                                value or this value is null
      */
     public boolean isPlaying(K key) {
-        JOrbisPlayer p = this.players.get(key);
+        MediaPlayer p = this.players.get(key);
         if (p != null) {
-            return p.isRunning();
+            return p.getStatus().equals(MediaPlayer.Status.PLAYING);
         } else {
             throw new NoSuchElementException();
         }
-    }
-
-    public void close(K key) {
-
-    }
-
-    public void closeAll(K... keys) {
-
-    }
-
-    public void closeAll(Collection<K> keys) {
-
-    }
-
-    public void closeAny() {
-
     }
 
     /**
@@ -391,6 +399,24 @@ public class OGGPlayers<K> {
             this.stopAny();
         }
         this.stopped = stopped;
+    }
+
+    public void pause (K key) {
+        MediaPlayer p = this.players.get(key);
+        if (p != null) {
+            p.pause();
+        } else {
+            throw new NoSuchElementException();
+        }
+    }
+
+    public void resume (K key){
+        MediaPlayer p = this.players.get(key);
+        if (p != null) {
+            p.play();
+        } else {
+            throw new NoSuchElementException();
+        }
     }
 
     public boolean getStopped() {

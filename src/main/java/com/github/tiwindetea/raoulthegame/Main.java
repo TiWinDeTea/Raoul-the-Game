@@ -16,10 +16,6 @@ import com.github.tiwindetea.oggplayer.Sounds;
  */
 public class Main {
     public static void main(String[] args) {
-        Sounds[] sounds = Sounds.values();
-        for (Sounds sound : sounds) {
-            Sound.player.put(sound, sound.toURL(), sound.isLooping());
-        }
         Settings.loadSettings();
         MainMenu.main(args);
         Settings.saveSettings();

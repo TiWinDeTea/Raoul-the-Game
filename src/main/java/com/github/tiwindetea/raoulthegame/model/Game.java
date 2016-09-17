@@ -108,6 +108,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
 
 	private Queue<RequestEvent> requestedEvent = new LinkedList<>();
+	private Sounds currentMusic = Sounds.MAIN_MUSIC;
 
 	private volatile boolean isRunning = false;
 	private volatile boolean isPaused = false;
@@ -1167,7 +1168,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			this.generateLevel();
 		} catch (FileNotFoundException e) {
 			System.out.println("Failed to open the save file");
-			e.printStackTrace();
+			throw new RuntimeException(e);
+		} catch (NumberFormatException e) {
+			System.out.println("Corrupted save");
+			throw e;
 		}
 	}
 
@@ -1312,6 +1316,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		}
 		this.isRunning = true;
 
+		currentMusic = Sounds.MAIN_MUSIC;
+		Sound.player.play(currentMusic);
 		RequestEvent event;
 		do {
 			try {
@@ -1358,6 +1364,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			}
 		} while (this.isRunning);
 
+		Sound.player.stop(currentMusic);
+
 		if (Settings.permaDeath && this.players.size() == 0) {
 			try {
 				Files.deleteIfExists(new File(this.gameName).toPath());
@@ -1381,6 +1389,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 		));
 		fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, bool));
 		fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
+		currentMusic = Sounds.DEATH_MUSIC;
+		Sound.player.play(currentMusic);
 	}
 
 	private void treatRequestEvent(CenterViewRequestEvent e) {
@@ -1573,6 +1583,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	 * Pauses the game (ignore any incoming events)
 	 */
 	public void pause() {
+		Sound.player.pause(currentMusic);
 		this.requestedEvent.clear();
 		for (Player player : this.players) {
 			player.doNothing();
@@ -1586,6 +1597,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 	public void resume() {
 		this.requestedEvent.clear();
 		this.isPaused = false;
+		Sound.player.resume(currentMusic);
 	}
 
 	private void clearAll() {
