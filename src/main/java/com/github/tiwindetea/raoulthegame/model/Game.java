@@ -9,8 +9,6 @@
 
 package com.github.tiwindetea.raoulthegame.model;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
@@ -57,6 +55,8 @@ import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
+import com.github.tiwindetea.soundplayer.Sound;
+import com.github.tiwindetea.soundplayer.Sounds;
 
 import java.io.File;
 import java.io.FileInputStream;

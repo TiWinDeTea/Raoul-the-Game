@@ -6,7 +6,7 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.oggplayer;
+package com.github.tiwindetea.soundplayer;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -131,11 +131,13 @@ public class UnifiedPlayers<K> {
      *                                value or this value is <tt>null</tt>
      */
     public void stop(K key) {
-        MediaPlayer p = this.players.get(key);
-        if (p != null) {
-            p.stop();
-        } else {
-            throw new NoSuchElementException();
+        if (!this.stopped) {
+            MediaPlayer p = this.players.get(key);
+            if (p != null) {
+                p.stop();
+            } else {
+                throw new NoSuchElementException();
+            }
         }
     }
 
@@ -188,7 +190,7 @@ public class UnifiedPlayers<K> {
                     player.stop();
                 }
                 // javafx sucks
-            } catch (NullPointerException e){
+            } catch (NullPointerException e) {
 
             }
         });
@@ -337,10 +339,11 @@ public class UnifiedPlayers<K> {
     public void setLoop(K key, boolean loop) {
         MediaPlayer p = this.players.get(key);
         if (p != null) {
-            if (loop){
+            if (loop) {
                 p.setOnEndOfMedia(() -> p.seek(Duration.ZERO));
             } else {
-                p.setOnEndOfMedia(() -> {});
+                p.setOnEndOfMedia(() -> {
+                });
             }
         } else {
             throw new NoSuchElementException();
@@ -350,10 +353,11 @@ public class UnifiedPlayers<K> {
     public void setLoopAndPlay(Object key, boolean loop) {
         MediaPlayer p = this.players.get(key);
         if (p != null) {
-            if (loop){
+            if (loop) {
                 p.setOnEndOfMedia(() -> p.seek(Duration.ZERO));
             } else {
-                p.setOnEndOfMedia(() -> {});
+                p.setOnEndOfMedia(() -> {
+                });
             }
             if (!this.stopped) {
                 p.play();
@@ -401,21 +405,25 @@ public class UnifiedPlayers<K> {
         this.stopped = stopped;
     }
 
-    public void pause (K key) {
-        MediaPlayer p = this.players.get(key);
-        if (p != null) {
-            p.pause();
-        } else {
-            throw new NoSuchElementException();
+    public void pause(K key) {
+        if (!this.stopped) {
+            MediaPlayer p = this.players.get(key);
+            if (p != null) {
+                p.pause();
+            } else {
+                throw new NoSuchElementException();
+            }
         }
     }
 
-    public void resume (K key){
-        MediaPlayer p = this.players.get(key);
-        if (p != null) {
-            p.play();
-        } else {
-            throw new NoSuchElementException();
+    public void resume(K key) {
+        if (!this.stopped) {
+            MediaPlayer p = this.players.get(key);
+            if (p != null) {
+                p.play();
+            } else {
+                throw new NoSuchElementException();
+            }
         }
     }
 

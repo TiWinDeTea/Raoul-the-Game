@@ -8,12 +8,12 @@
 
 package com.github.tiwindetea.raoulthegame;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.model.Game;
 import com.github.tiwindetea.raoulthegame.model.Seed;
 import com.github.tiwindetea.raoulthegame.view.GUI;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
+import com.github.tiwindetea.soundplayer.Sound;
+import com.github.tiwindetea.soundplayer.Sounds;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;

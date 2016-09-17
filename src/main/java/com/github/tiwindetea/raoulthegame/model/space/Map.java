@@ -8,11 +8,11 @@
 
 package com.github.tiwindetea.raoulthegame.model.space;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.model.Seed;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Mob;
+import com.github.tiwindetea.soundplayer.Sound;
+import com.github.tiwindetea.soundplayer.Sounds;
 
 import java.util.ArrayList;
 import java.util.Arrays;

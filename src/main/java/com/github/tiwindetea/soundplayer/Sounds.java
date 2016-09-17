@@ -1,10 +1,10 @@
-package com.github.tiwindetea.oggplayer;
+package com.github.tiwindetea.soundplayer;
 
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
 
 import java.net.URL;
 
-import static com.github.tiwindetea.oggplayer.Sound.SOUNDS_BUNDLE;
+import static com.github.tiwindetea.soundplayer.Sound.SOUNDS_BUNDLE;
 
 /**
  * Created by organic-code on 5/31/16.

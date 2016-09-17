@@ -8,8 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
+import com.github.tiwindetea.soundplayer.Sound;
 
 /**
  * Created by organic-code on 5/31/16.

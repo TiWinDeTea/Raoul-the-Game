@@ -8,8 +8,6 @@
 
 package com.github.tiwindetea.raoulthegame.model.livings;
 
-import com.github.tiwindetea.oggplayer.Sound;
-import com.github.tiwindetea.oggplayer.Sounds;
 import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
@@ -30,6 +28,8 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
+import com.github.tiwindetea.soundplayer.Sound;
+import com.github.tiwindetea.soundplayer.Sounds;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 

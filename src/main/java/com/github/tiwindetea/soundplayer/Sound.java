@@ -1,4 +1,4 @@
-package com.github.tiwindetea.oggplayer;
+package com.github.tiwindetea.soundplayer;
 
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
 
