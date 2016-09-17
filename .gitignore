@@ -15,7 +15,7 @@ hs_err_pid*
 .idea/*
 .gitignore
 pom.xml
-DungeonOfLegends.iml
+Raoul-the-Game.iml
 
 #SublimeText
 *.sublime-workspace
