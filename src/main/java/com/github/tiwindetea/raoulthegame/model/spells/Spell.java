@@ -57,6 +57,10 @@ public abstract class Spell implements Descriptable {
         }
     }
 
+    public Spell(LivingThing owner){
+        this.owner = new WeakReference<>(owner);
+    }
+
     /**
      * @return true if this spell is an aoe spell, false otherwise
      */

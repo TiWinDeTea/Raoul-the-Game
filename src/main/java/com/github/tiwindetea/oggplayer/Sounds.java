@@ -10,7 +10,6 @@ import static com.github.tiwindetea.oggplayer.Sound.SOUNDS_BUNDLE;
  * Created by organic-code on 5/31/16.
  */
 public enum Sounds {
-    MAIN_THEME(SOUNDS_BUNDLE.getString("main-theme")),
     ATTACK_SOUND(SOUNDS_BUNDLE.getString("attack-sound")),
     BULB_SOUND(SOUNDS_BUNDLE.getString("bulb-sound")),
     DOOR_SOUND(SOUNDS_BUNDLE.getString("door-sound")),
@@ -18,7 +17,12 @@ public enum Sounds {
     MAIN_MENU_START_SOUND(SOUNDS_BUNDLE.getString("main-menu-start-sound")),
     LOOT_SOUND(SOUNDS_BUNDLE.getString("loot-sound")),
     NEXT_FLOOR_SOUND(SOUNDS_BUNDLE.getString("next-floor-sound")),
-    WALK_SOUND(SOUNDS_BUNDLE.getString("walk-sound"));
+    WALK_SOUND(SOUNDS_BUNDLE.getString("walk-sound")),
+
+    DEATH_MUSIC(SOUNDS_BUNDLE.getString("death-music"), true),
+    MAIN_MUSIC(SOUNDS_BUNDLE.getString("main-music"), true),
+    CREDITS_MUSIC(SOUNDS_BUNDLE.getString("credits-music"), true);
+
 
     private final URL path;
     private final boolean isLooping;

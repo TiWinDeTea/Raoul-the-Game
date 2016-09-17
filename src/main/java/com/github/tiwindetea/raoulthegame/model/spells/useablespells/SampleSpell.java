@@ -82,7 +82,7 @@ public class SampleSpell extends Spell {
     }
 
     @Override
-    public boolean cast(Collection<LivingThing> targets) {
+    public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
         LivingThing owner = this.getOwner();
         if (owner != null) {
             for (LivingThing target : targets) {
