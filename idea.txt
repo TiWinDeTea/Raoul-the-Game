@@ -1,9 +1,5 @@
-. Refondre les sons (mp3 ?)
 . Il y a des FIXME // TODO
 . Ligne indiquant la portée d'attaque
-. Ajouter un tutoriel // aide
-. Ajouter le scenario (façon star wars, avec un bouton "don't remind me")
-. Transition de la caméra (caméra locké)
 . Centrer la caméra tout en étant zoomé
 . Ajouter un menu d'options ? (avec ce fameux bouton "don't remind me", le "niveau" d'auto-équip, une checkbox 'inverser les clicks', choix permadeath)
 . Ajouter des animations d'attaque // de drop d'objet
