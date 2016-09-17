@@ -14,15 +14,15 @@ hs_err_pid*
 # IDE
 .idea/*
 .gitignore
+*.iml
 pom.xml
-Raoul-the-Game.iml
 
 #SublimeText
 *.sublime-workspace
 *.sublime-project
 
 # Other
-DungeonOfLegends_pgs
 target/*
 out/*
 raoulTheGame*
+*.rtg
