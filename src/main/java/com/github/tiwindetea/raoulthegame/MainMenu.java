@@ -47,6 +47,7 @@ public class MainMenu extends Application {
 
 	private final GUI GUI = new GUI();
 	private final Game game = new Game(Settings.SAVE_PATH);
+	private final Tutorial tutorial = new Tutorial();
 	private boolean wait = false;
 
 	private final VBox buttonsVBox = new VBox();
@@ -55,6 +56,7 @@ public class MainMenu extends Application {
 	private final TextField seedTF = new TextField("Enter your seed here");
 	private final Button soloButton = new Button("Solo");
 	private final Button multiplayerButton = new Button("2 Players");
+	private final Button tutoButton = new Button("tutorial");
 	private final Button loadButton = new Button("Load game");
 	private final Button resumeButton = new Button("Resume game");
 	private final Button exitButton = new Button("exit");
@@ -105,6 +107,17 @@ public class MainMenu extends Application {
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 					MainMenu.this.game.pause();
+				}
+			}
+		});
+
+		this.tutorial.getScene().addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.ESCAPE) {
+					updateButtons();
+					primaryStage.setScene(MainMenu.this.menuScene);
+					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 				}
 			}
 		});
@@ -166,7 +179,7 @@ public class MainMenu extends Application {
 		this.buttonsVBox.setPadding(new Insets(20));
 		this.buttonsVBox.setSpacing(10);
 		this.buttonsVBox.prefWidthProperty().bind(Bindings.max(this.menuAnchorPane.widthProperty().subtract(PICTURES_ESTIMATED_MAX_WIDTH), BUTTONS_VBOX_MIN_WIDTH));
-		this.buttonsVBox.getChildren().addAll(this.soloButton, this.multiplayerButton, this.resumeButton, this.loadButton, this.exitButton);
+		this.buttonsVBox.getChildren().addAll(this.soloButton, this.multiplayerButton, this.tutoButton, this.resumeButton, this.loadButton, this.exitButton);
 
 		initButtons();
 		updateButtons();
@@ -236,6 +249,7 @@ public class MainMenu extends Application {
 	private void hideButtons() {
 		this.soloButton.setVisible(false);
 		this.multiplayerButton.setVisible(false);
+		this.tutoButton.setVisible(false);
 		this.loadButton.setVisible(false);
 		this.resumeButton.setVisible(false);
 		this.exitButton.setVisible(false);
@@ -244,6 +258,7 @@ public class MainMenu extends Application {
 	private void showButtons() {
 		this.soloButton.setVisible(true);
 		this.multiplayerButton.setVisible(true);
+		this.tutoButton.setVisible(true);
 		this.loadButton.setVisible(true);
 		this.resumeButton.setVisible(true);
 		this.exitButton.setVisible(true);
@@ -299,6 +314,24 @@ public class MainMenu extends Application {
 			public void handle(MouseEvent event) {
 				setMultiplayerLayout();
 				MainMenu.this.multiplayerButton.requestFocus();
+			}
+		});
+
+		this.tutoButton.defaultButtonProperty().bind(this.tutoButton.focusedProperty());
+		this.tutoButton.setPrefWidth(BUTTONS_WIDTH);
+		this.tutoButton.getStylesheets().add(this.buttonsStyle);
+		this.tutoButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				MainMenu.this.primaryStage.setScene(MainMenu.this.tutorial.getScene());
+				MainMenu.this.tutorial.reset();
+			}
+		});
+		this.tutoButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				setLoadLayout();
+				MainMenu.this.tutoButton.requestFocus();
 			}
 		});
 
