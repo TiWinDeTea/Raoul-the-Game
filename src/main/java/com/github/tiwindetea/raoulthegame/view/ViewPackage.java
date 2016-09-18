@@ -38,6 +38,7 @@ public class ViewPackage {
 	public static final Image ORANGE_LOGO_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("menu.logo.orange.file"));
 	public static final Image TUTORIAL_1_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("tuto.instructions.file"));
 	public static final Image TUTORIAL_2_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("tuto.illustration.file"));
+	public static final Image CREDITS_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("credits.file"));
 
 	public static final Vector2i SPRITES_SIZE = new Vector2i(Integer.parseInt(VIEW_PACKAGE_BUNDLE.getString("sprites.size.x")), Integer.parseInt(VIEW_PACKAGE_BUNDLE.getString("sprites.size.y")));
 

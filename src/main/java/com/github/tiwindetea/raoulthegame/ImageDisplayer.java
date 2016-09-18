@@ -8,12 +8,12 @@
 
 package com.github.tiwindetea.raoulthegame;
 
-import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -27,37 +27,36 @@ import java.util.List;
 /**
  * Created by maxime on 9/17/16.
  */
-public class Tutorial {
+public class ImageDisplayer {
 
 	private static final Color BACKGROUND_COLOR = Color.DARKGRAY;
 	private final StackPane tutoStackPane = new StackPane();
 	private final Scene scene = new Scene(this.tutoStackPane);
 	private final List<ImageViewWrapper> imageViewWrapperList = new ArrayList<>();
-	private final ImageViewWrapper tuto1 = new ImageViewWrapper(ViewPackage.TUTORIAL_1_IMAGE);
-	private final ImageViewWrapper tuto2 = new ImageViewWrapper(ViewPackage.TUTORIAL_2_IMAGE);
 
 	private int imageIndex = 0;
 
-	public Tutorial() {
+	public ImageDisplayer(Image... images) {
 
 		this.tutoStackPane.setBackground(new Background(new BackgroundFill(BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
 
-		this.imageViewWrapperList.add(this.tuto1);
-		this.tuto1.setPreserveRatio(true);
-		this.imageViewWrapperList.add(this.tuto2);
-		this.tuto2.setPreserveRatio(true);
+		for(Image image : images) {
+			ImageViewWrapper imageViewWrapper = new ImageViewWrapper(image);
+			this.imageViewWrapperList.add(imageViewWrapper);
+			imageViewWrapper.setPreserveRatio(true);
+		}
 
 		this.tutoStackPane.widthProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				for(ImageViewWrapper imageViewWrapper : Tutorial.this.imageViewWrapperList) {
-					if(Tutorial.this.tutoStackPane.getWidth() / Tutorial.this.tutoStackPane.getHeight() < imageViewWrapper.getInitial_width() / imageViewWrapper.getInitial_height()) {
-						imageViewWrapper.setFitWidth(Tutorial.this.tutoStackPane.getWidth());
-						imageViewWrapper.setFitHeight(imageViewWrapper.getInitial_width() * Tutorial.this.tutoStackPane.getHeight() / Tutorial.this.tutoStackPane.getWidth());
+				for(ImageViewWrapper imageViewWrapper : ImageDisplayer.this.imageViewWrapperList) {
+					if(ImageDisplayer.this.tutoStackPane.getWidth() / ImageDisplayer.this.tutoStackPane.getHeight() < imageViewWrapper.getInitial_width() / imageViewWrapper.getInitial_height()) {
+						imageViewWrapper.setFitWidth(ImageDisplayer.this.tutoStackPane.getWidth());
+						//imageViewWrapper.setFitHeight(imageViewWrapper.getInitial_width() * ImageDisplayer.this.tutoStackPane.getHeight() / ImageDisplayer.this.tutoStackPane.getWidth());
 					}
 					else {
-						imageViewWrapper.setFitHeight(Tutorial.this.tutoStackPane.getHeight());
-						imageViewWrapper.setFitWidth(imageViewWrapper.getInitial_height() * Tutorial.this.tutoStackPane.getWidth() / Tutorial.this.tutoStackPane.getHeight());
+						imageViewWrapper.setFitHeight(ImageDisplayer.this.tutoStackPane.getHeight());
+						//imageViewWrapper.setFitWidth(imageViewWrapper.getInitial_height() * ImageDisplayer.this.tutoStackPane.getWidth() / ImageDisplayer.this.tutoStackPane.getHeight());
 					}
 				}
 			}
@@ -70,15 +69,15 @@ public class Tutorial {
 			public void handle(KeyEvent event) {
 				switch(event.getCode()) {
 				case LEFT:
-					if(Tutorial.this.imageIndex > 0) {
-						Tutorial.this.tutoStackPane.getChildren().clear();
-						Tutorial.this.tutoStackPane.getChildren().add(Tutorial.this.imageViewWrapperList.get(--Tutorial.this.imageIndex).getImageView());
+					if(ImageDisplayer.this.imageIndex > 0) {
+						ImageDisplayer.this.tutoStackPane.getChildren().clear();
+						ImageDisplayer.this.tutoStackPane.getChildren().add(ImageDisplayer.this.imageViewWrapperList.get(--ImageDisplayer.this.imageIndex).getImageView());
 					}
 					break;
 				case RIGHT:
-					if(Tutorial.this.imageIndex < Tutorial.this.imageViewWrapperList.size() - 1) {
-						Tutorial.this.tutoStackPane.getChildren().clear();
-						Tutorial.this.tutoStackPane.getChildren().add(Tutorial.this.imageViewWrapperList.get(++Tutorial.this.imageIndex).getImageView());
+					if(ImageDisplayer.this.imageIndex < ImageDisplayer.this.imageViewWrapperList.size() - 1) {
+						ImageDisplayer.this.tutoStackPane.getChildren().clear();
+						ImageDisplayer.this.tutoStackPane.getChildren().add(ImageDisplayer.this.imageViewWrapperList.get(++ImageDisplayer.this.imageIndex).getImageView());
 					}
 					break;
 				}
@@ -92,7 +91,7 @@ public class Tutorial {
 
 	public void reset() {
 		this.imageIndex = 0;
-		Tutorial.this.tutoStackPane.getChildren().clear();
+		ImageDisplayer.this.tutoStackPane.getChildren().clear();
 		this.tutoStackPane.getChildren().add(this.imageViewWrapperList.get(this.imageIndex).getImageView());
 	}
 }

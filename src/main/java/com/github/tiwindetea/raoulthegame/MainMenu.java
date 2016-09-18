@@ -47,7 +47,8 @@ public class MainMenu extends Application {
 
 	private final GUI GUI = new GUI();
 	private final Game game = new Game(Settings.SAVE_PATH);
-	private final Tutorial tutorial = new Tutorial();
+	private final ImageDisplayer tutorial = new ImageDisplayer(ViewPackage.TUTORIAL_1_IMAGE, ViewPackage.TUTORIAL_2_IMAGE);
+	private final ImageDisplayer credits = new ImageDisplayer(ViewPackage.CREDITS_IMAGE);
 	private boolean wait = false;
 
 	private final VBox buttonsVBox = new VBox();
@@ -56,9 +57,10 @@ public class MainMenu extends Application {
 	private final TextField seedTF = new TextField("Enter your seed here");
 	private final Button soloButton = new Button("Solo");
 	private final Button multiplayerButton = new Button("2 Players");
-	private final Button tutoButton = new Button("tutorial");
+	private final Button tutoButton = new Button("Tutorial");
 	private final Button loadButton = new Button("Load game");
 	private final Button resumeButton = new Button("Resume game");
+	private final Button creditsButton = new Button("Credits");
 	private final Button exitButton = new Button("exit");
 	private final String buttonsStyle = ViewPackage.BUTTONS_STYLE_FILE_PATH;
 	private Stage primaryStage;
@@ -84,11 +86,11 @@ public class MainMenu extends Application {
 
 		// Loading sounds (cannot create some MediaPlayer if `launch(args)` hasn't been called)
 		try {
-			for (Sounds sound : Sounds.values()) {
+			for(Sounds sound : Sounds.values()) {
 				Sound.player.put(sound, sound.toURL(), sound.isLooping());
 			}
 			Sound.player.play(Sounds.MAIN_MENU_START_SOUND);
-		} catch (Exception e){
+		} catch(Exception e) {
 			System.out.println("javafx.scene.media.MediaPlayer seems to be unsupported for your system.");
 			System.out.println("Sounds will be disabled");
 			Sound.player.setStopped(true);
@@ -122,11 +124,22 @@ public class MainMenu extends Application {
 			}
 		});
 
+		this.credits.getScene().addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
+			@Override
+			public void handle(KeyEvent event) {
+				if(event.getCode() == KeyCode.ESCAPE) {
+					updateButtons();
+					primaryStage.setScene(MainMenu.this.menuScene);
+					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
+				}
+			}
+		});
+
 
 		this.seedTF.minWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
 		this.seedTF.maxWidthProperty().bind(this.menuAnchorPane.widthProperty().divide(2.5));
 		this.menuScene.setOnKeyPressed(event -> {
-			if (event.getCode() == KeyCode.ESCAPE && !this.soloButton.isVisible()) {
+			if(event.getCode() == KeyCode.ESCAPE && !this.soloButton.isVisible()) {
 				this.buttonsVBox.getChildren().remove(this.seedTF);
 				this.buttonsVBox.setAlignment(Pos.CENTER);
 				this.showButtons();
@@ -179,7 +192,7 @@ public class MainMenu extends Application {
 		this.buttonsVBox.setPadding(new Insets(20));
 		this.buttonsVBox.setSpacing(10);
 		this.buttonsVBox.prefWidthProperty().bind(Bindings.max(this.menuAnchorPane.widthProperty().subtract(PICTURES_ESTIMATED_MAX_WIDTH), BUTTONS_VBOX_MIN_WIDTH));
-		this.buttonsVBox.getChildren().addAll(this.soloButton, this.multiplayerButton, this.tutoButton, this.resumeButton, this.loadButton, this.exitButton);
+		this.buttonsVBox.getChildren().addAll(this.soloButton, this.multiplayerButton, this.tutoButton, this.resumeButton, this.loadButton, this.creditsButton, this.exitButton);
 
 		initButtons();
 		updateButtons();
@@ -252,6 +265,7 @@ public class MainMenu extends Application {
 		this.tutoButton.setVisible(false);
 		this.loadButton.setVisible(false);
 		this.resumeButton.setVisible(false);
+		this.creditsButton.setVisible(false);
 		this.exitButton.setVisible(false);
 	}
 
@@ -261,6 +275,7 @@ public class MainMenu extends Application {
 		this.tutoButton.setVisible(true);
 		this.loadButton.setVisible(true);
 		this.resumeButton.setVisible(true);
+		this.creditsButton.setVisible(true);
 		this.exitButton.setVisible(true);
 	}
 
@@ -278,9 +293,10 @@ public class MainMenu extends Application {
 				MainMenu.this.seedTF.setOnAction(new EventHandler<ActionEvent>() {
 					@Override
 					public void handle(ActionEvent event) {
-						if (MainMenu.this.seedTF.getText().equals("Enter your seed here")) {
+						if(MainMenu.this.seedTF.getText().equals("Enter your seed here")) {
 							MainMenu.this.game.initNew(1);
-						} else {
+						}
+						else {
 							MainMenu.this.game.initNew(1, new Seed(MainMenu.this.seedTF.getText()));
 						}
 						MainMenu.this.startGame();
@@ -371,6 +387,24 @@ public class MainMenu extends Application {
 			}
 		});
 
+		this.creditsButton.defaultButtonProperty().bind(this.creditsButton.focusedProperty());
+		this.creditsButton.setPrefWidth(BUTTONS_WIDTH);
+		this.creditsButton.getStylesheets().add(this.buttonsStyle);
+		this.creditsButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				MainMenu.this.primaryStage.setScene(MainMenu.this.credits.getScene());
+				MainMenu.this.credits.reset();
+			}
+		});
+		this.creditsButton.setOnMouseEntered(new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				setLoadLayout();
+				MainMenu.this.creditsButton.requestFocus();
+			}
+		});
+
 		this.exitButton.setCancelButton(true);
 		this.exitButton.setPrefWidth(BUTTONS_WIDTH);
 		this.exitButton.getStylesheets().add(this.buttonsStyle);
@@ -378,9 +412,10 @@ public class MainMenu extends Application {
 		this.exitButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				if (MainMenu.this.wait) {
+				if(MainMenu.this.wait) {
 					MainMenu.this.wait = false;
-				} else {
+				}
+				else {
 					MainMenu.this.primaryStage.close();
 					MainMenu.this.game.stop();
 				}
