@@ -21,6 +21,7 @@ public enum Sounds {
 
     DEATH_MUSIC(SOUNDS_BUNDLE.getString("death-music"), true),
     MAIN_MUSIC(SOUNDS_BUNDLE.getString("main-music"), true),
+    MENU_MUSIC(SOUNDS_BUNDLE.getString("menu-music"), true),
     CREDITS_MUSIC(SOUNDS_BUNDLE.getString("credits-music"), true);
 
 

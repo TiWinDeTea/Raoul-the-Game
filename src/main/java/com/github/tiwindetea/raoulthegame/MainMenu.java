@@ -89,7 +89,7 @@ public class MainMenu extends Application {
 			for(Sounds sound : Sounds.values()) {
 				Sound.player.put(sound, sound.toURL(), sound.isLooping());
 			}
-			Sound.player.play(Sounds.MAIN_MENU_START_SOUND);
+			Sound.player.play(Sounds.MENU_MUSIC);
 		} catch(Exception e) {
 			System.out.println("javafx.scene.media.MediaPlayer seems to be unsupported for your system.");
 			System.out.println("Sounds will be disabled");
@@ -106,6 +106,7 @@ public class MainMenu extends Application {
 			public void handle(KeyEvent event) {
 				if(event.getCode() == KeyCode.ESCAPE) {
 					updateButtons();
+					Sound.player.resume(Sounds.MENU_MUSIC);
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 					MainMenu.this.game.pause();
@@ -129,6 +130,8 @@ public class MainMenu extends Application {
 			public void handle(KeyEvent event) {
 				if(event.getCode() == KeyCode.ESCAPE) {
 					updateButtons();
+					Sound.player.stop(Sounds.CREDITS_MUSIC);
+					Sound.player.resume(Sounds.MENU_MUSIC);
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
 				}
@@ -208,6 +211,7 @@ public class MainMenu extends Application {
 
 	private void startGame() {
 		this.game.resume();
+		Sound.player.pause(Sounds.MENU_MUSIC);
 		this.primaryStage.setScene(this.GUI.getScene());
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.submit(this.game);
@@ -376,6 +380,7 @@ public class MainMenu extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				MainMenu.this.game.resume();
+				Sound.player.pause(Sounds.MENU_MUSIC);
 				MainMenu.this.primaryStage.setScene(MainMenu.this.GUI.getScene());
 			}
 		});
@@ -393,6 +398,8 @@ public class MainMenu extends Application {
 		this.creditsButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				Sound.player.pause(Sounds.MENU_MUSIC);
+				Sound.player.play(Sounds.CREDITS_MUSIC);
 				MainMenu.this.primaryStage.setScene(MainMenu.this.credits.getScene());
 				MainMenu.this.credits.reset();
 			}
