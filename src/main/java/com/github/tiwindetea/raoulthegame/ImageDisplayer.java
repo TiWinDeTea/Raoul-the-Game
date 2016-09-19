@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by maxime on 9/17/16.
+ * The type ImageDisplayer.
+ *
+ * @author Maxime PINARD.
  */
 public class ImageDisplayer {
 
@@ -36,6 +38,11 @@ public class ImageDisplayer {
 
 	private int imageIndex = 0;
 
+	/**
+	 * Instantiates a new ImageDisplayer.
+	 *
+	 * @param images the images
+	 */
 	public ImageDisplayer(Image... images) {
 
 		this.tutoStackPane.setBackground(new Background(new BackgroundFill(BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
@@ -85,10 +92,18 @@ public class ImageDisplayer {
 		});
 	}
 
+	/**
+	 * Gets scene.
+	 *
+	 * @return the scene
+	 */
 	public Scene getScene() {
 		return this.scene;
 	}
 
+	/**
+	 * Return to the first image.
+	 */
 	public void reset() {
 		this.imageIndex = 0;
 		ImageDisplayer.this.tutoStackPane.getChildren().clear();
