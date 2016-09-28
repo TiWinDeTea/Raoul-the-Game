@@ -12,6 +12,7 @@ import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -32,10 +33,10 @@ public class SampleSpell extends Spell {
     /**
      * Instantiates a new Spell.
      *
-     * @param owner        the spell's owner
+     * @param owner the spell's owner
      */
     public SampleSpell(Player owner) {
-        super(owner, 2, owner.getLos(), 2, "A wololo spell", null);
+        super(owner, 2, owner.getLos(), 2, "A wololo spell", SpellType.SAMPLE_SPELL);
     }
 
     @Override

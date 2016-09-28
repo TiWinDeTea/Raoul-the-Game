@@ -56,6 +56,11 @@ public class Vector2i {
         this.y = y;
     }
 
+    public void set(Vector2i newVal) {
+        this.x = newVal.x;
+        this.y = newVal.y;
+    }
+
     @Override
     public boolean equals(Object o) {
         /* Asserting o to be a Vector2i */

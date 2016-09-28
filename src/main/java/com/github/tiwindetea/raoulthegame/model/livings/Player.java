@@ -886,7 +886,7 @@ public class Player extends LivingThing {
      * {@inheritDoc}
      */
     @Override
-    public void live(List<Mob> mobs, Collection<Player> players, boolean[][] los) {
+    public void live(List<Mob> mobs, Collection<Player> players, Collection<LivingThing> others, boolean[][] los) {
         boolean localSawDuck = false;
         for (int i = 0; i < mobs.size() && !localSawDuck; ++i) {
             Vector2i pos = mobs.get(i).getPosition();

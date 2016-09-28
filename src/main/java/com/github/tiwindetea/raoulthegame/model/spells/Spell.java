@@ -23,6 +23,7 @@ import java.util.List;
  */
 public abstract class Spell implements Descriptable {
 
+    protected static SpellsController controller;
     private final WeakReference<LivingThing> owner;
     protected int targetNumber;
     protected int range;
@@ -31,6 +32,10 @@ public abstract class Spell implements Descriptable {
     protected String description;
 
     protected static final List<SpellListener> listeners = new LinkedList<>();
+
+    public static void setController(SpellsController controller) {
+        Spell.controller = controller;
+    }
 
     public static void addSpellListener(SpellListener listener) {
         if (!listeners.contains(listener))
@@ -57,8 +62,11 @@ public abstract class Spell implements Descriptable {
         }
     }
 
-    public Spell(LivingThing owner){
+    public Spell(LivingThing owner, SpellType spellType) {
         this.owner = new WeakReference<>(owner);
+        for (SpellListener listener : listeners) {
+            listener.createSpell(new SpellCreationEvent(this.id, spellType));
+        }
     }
 
     /**
@@ -87,6 +95,8 @@ public abstract class Spell implements Descriptable {
 
     /**
      * @return the range of the aoe effect
+     *
+     * @implNote Should be set to 0 if an aoe spell is not currently used
      */
     public int getSecondaryRange() {
         return this.secondaryRange;
@@ -104,7 +114,7 @@ public abstract class Spell implements Descriptable {
     /**
      * Gets the coordinate where the spell was casted.
      *
-     * @return the spell's coordinates or null if irrelevant for this spell
+     * @return the spell's coordinates or null if irrelevant
      */
     public abstract Vector2i getSpellSource();
 

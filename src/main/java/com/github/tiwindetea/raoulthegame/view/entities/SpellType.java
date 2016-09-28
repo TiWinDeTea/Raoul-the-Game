@@ -14,4 +14,23 @@ package com.github.tiwindetea.raoulthegame.view.entities;
  * @author Lucas LAZARE
  */
 public enum SpellType {
+    SAMPLE_SPELL;
+
+    static SpellType[] thisValues = SpellType.values();
+    static String[] thisStrings = null;
+
+    static SpellType parseSpellType(String str) {
+        if (thisStrings == null) {
+            thisStrings = new String[thisValues.length];
+            for (int i = 0; i < thisValues.length; i++) {
+                thisStrings[i] = thisValues[i].toString();
+            }
+        }
+        for (int i = 0; i < thisValues.length; i++) {
+            if (thisStrings[i].equals(str)) {
+                return thisValues[i];
+            }
+        }
+        return null;
+    }
 }

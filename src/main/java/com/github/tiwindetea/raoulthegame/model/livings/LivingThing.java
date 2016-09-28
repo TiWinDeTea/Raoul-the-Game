@@ -8,7 +8,6 @@
 
 package com.github.tiwindetea.raoulthegame.model.livings;
 
-import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
@@ -44,7 +43,7 @@ public abstract class LivingThing implements Descriptable {
     protected String name;
     protected long id;
     protected static final ArrayList<GameListener> listeners = new ArrayList<>();
-    protected List<Spell> spells = new ArrayList<>(Settings.SPELLS_MAX_QT);
+    protected List<Spell> spells = new ArrayList<>(0);
 
 
     /**
@@ -225,9 +224,10 @@ public abstract class LivingThing implements Descriptable {
      *
      * @param mobs    Mobs around this
      * @param players Players around this
+     * @param others  Other livings around this
      * @param los     LOS of this
      */
-    public abstract void live(List<Mob> mobs, Collection<Player> players, boolean[][] los);
+    public abstract void live(List<Mob> mobs, Collection<Player> players, Collection<LivingThing> others, boolean[][] los);
 
     /**
      * Gets the requested move.
@@ -300,5 +300,9 @@ public abstract class LivingThing implements Descriptable {
      */
     public String getDescription() {
         return this.name;
+    }
+
+    public double getAggro() {
+        return 0;
     }
 }
