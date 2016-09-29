@@ -6,6 +6,7 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Mob;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
+import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
@@ -24,10 +25,10 @@ public interface SpellsController {
      * @param entityType  Type of the entity (for display)
      * @param position    Position of the entity to create
      * @param description Descrition of this entity
-     * @param LOSRange    Range of the LOS of the ghost entity
-     * @return The graphic ID of this entity for further use (moving, deleting, etc…)
+     * @param direction
+     * @param LOSRange    Range of the LOS of the ghost entity  @return The graphic ID of this entity for further use (moving, deleting, etc…)
      */
-    long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, int LOSRange);
+    long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange);
 
 
     /**
@@ -64,14 +65,14 @@ public interface SpellsController {
     void deleteGhostLivingEntity(long entityId);
 
     /**
-     * Creates a real Living entity with logic consistency
+     * Creates a real Living entity with logic consistency.
      *
-     * @param entity the e
-     *               ntity to create
-     * @param aspect graphical aspect of the entity
-     * @return The logic ID of this entity for further use
+     * @param entity    The entity to create
+     * @param aspect    Graphical aspect of the entity
+     * @param direction Initial direction of the entity
+     * @implSpec LivingThing#live(List, Collection, Collection, boolean[][])   LivingThing#live won't be called
      */
-    long createEntity(LivingThing entity, LivingEntityType aspect);
+    void createEntity(LivingThing entity, LivingEntityType aspect, Direction direction);
 
     /**
      * Creates a real Storable entity with logic consistency
@@ -91,7 +92,7 @@ public interface SpellsController {
     void explore(Vector2i position, int range);
 
     /**
-     * Allows player to see the los of another living entity. Cannot be a 'ghost' entity
+     * Allows player to see the los of another living entity. Cannot be a 'ghost', as it is already set in ghosts entities
      *
      * @param id    ID of the entity who's LOS is shared
      * @param range Range of the entity's LOS

@@ -16,6 +16,7 @@ import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityCre
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSDefinitionEvent;
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
 import com.github.tiwindetea.raoulthegame.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
 import com.github.tiwindetea.raoulthegame.events.map.MapCreationEvent;
@@ -53,6 +54,8 @@ import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.model.spells.SpellsController;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
@@ -205,6 +208,124 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private int bulbXp;
     private int bulbXpGainPerLevel;
 
+    private SpellsController spellsController = new SpellsController() {
+
+        private void fireLivingEntityMoveEvent(LivingEntityMoveEvent e) {
+            for (GameListener listener : Game.this.listeners) {
+                listener.moveLivingEntity(e);
+            }
+        }
+
+        @Override
+        public long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange) {
+            long id = Pair.getUniqueId();
+            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(id, entityType, position, direction, description));
+            if (LOSRange > 0) {
+                boolean[][] tmp = Game.this.world.getLOS(position, LOSRange, 4);
+                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                fireFogAdditionEvent(new FogAdditionEvent(position, tmp));
+            }
+            Game.this.ghostsLiving.put(id, new javafx.util.Pair<>(position, LOSRange));
+            return id;
+        }
+
+        @Override
+        public long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange) {
+            long id = Pair.getUniqueId();
+            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(id, entityType, position, description));
+            Game.this.ghostsStatic.put(id, new javafx.util.Pair<>(position, LOSRange));
+            return id;
+        }
+
+        @Override
+        public void moveGhostLivingEntity(long entityId, Vector2i position) {
+            javafx.util.Pair pair = Game.this.ghostsLiving.get(entityId);
+            ((Vector2i) pair.getKey()).set(position);
+            fireLivingEntityMoveEvent(new LivingEntityMoveEvent(entityId, position));
+        }
+
+        @Override
+        public void deleteGhostStorableEntity(long entityId) {
+            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(entityId));
+            Game.this.ghostsStatic.remove(entityId);
+        }
+
+        @Override
+        public void deleteGhostLivingEntity(long entityId) {
+            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(entityId));
+            Game.this.ghostsLiving.remove(entityId);
+        }
+
+        @Override
+        public void createEntity(LivingThing entity, LivingEntityType aspect, Direction direction) {
+            Game.this.livingSpells.add(entity);
+            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(entity.getId(), aspect, entity.getPosition(), direction, entity.getDescription()));
+        }
+
+        @Override
+        public long createEntity(StorableObject entity, Vector2i position, StaticEntityType aspect) {
+            Pair<StorableObject> p = new Pair<>(entity);
+            Game.this.objectsOnGround.add(new javafx.util.Pair<>(position, p));
+            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), aspect, position, p.object.getDescription()));
+            return p.getId();
+        }
+
+        @Override
+        public void explore(Vector2i position, int range) {
+            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(Pair.ERROR_VAL, LivingEntityType.ARISTOCRAT_DUCK, position, Direction.DOWN, ""));
+            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, Game.this.world.getLOS(position, range, 4)));
+            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
+        }
+
+        @Override
+        public void shareLosWith(long id, int range) {
+            for (Mob mob : Game.this.mobs) {
+                if (mob.getId() == id) {
+                    Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(mob, range));
+                    return;
+                }
+            }
+            for (Player player : Game.this.players) {
+                if (player.getId() == id) {
+                    Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(player, range));
+                    return;
+                }
+            }
+            for (LivingThing livingSpell : Game.this.livingSpells) {
+                if (livingSpell.getId() == id) {
+                    Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(livingSpell, range));
+                    return;
+                }
+            }
+        }
+
+        @Override
+        public void unshareLos(long id) {
+            Game.this.livingsSharedLOS.remove(id);
+            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, new boolean[1][1]));
+        }
+
+        @Override
+        public Collection<Mob> retrieveMobs() {
+            return Game.this.mobs;
+        }
+
+        @Override
+        public Collection<Player> retrievePlayers() {
+            return Game.this.players;
+        }
+
+        @Override
+        public Collection<Pair<InteractiveObject>> retrieveIO() {
+            return Game.this.interactiveObjects;
+        }
+
+        @Override
+        public Collection<javafx.util.Pair<Vector2i, Pair<StorableObject>>> retrieveObjectsOnFloor() {
+            return Game.this.objectsOnGround;
+        }
+    };
+
     /**
      * Instantiates a new Game.
      *
@@ -216,6 +337,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.loadChests();
         this.loadTraps();
         this.loadBulb();
+        Spell.setController(this.spellsController);
     }
 
     /**
@@ -703,6 +825,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         this.mobsLootsQtt = random.nextInt(MAX_MOBS_LOOTS_PER_LEVEL - MIN_MOBS_LOOTS_PER_LEVEL + 1) + MIN_MOBS_LOOTS_PER_LEVEL;
 
+        Spell.setMap(this.world);
         this.players.addAll(this.playersOnNextLevel);
         this.playersOnNextLevel.clear();
         this.triggeredObjects.clear();
@@ -813,7 +936,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.updateConsumables();
         this.computeWorldInteractions(objectsJustDropped);
 
-        this.recomputePlayersLoses();
+        this.recomputeLoses();
     }
 
     private void nextTurnPlayers(HashMap<Integer, Pair<StorableObject>> objectsJustDropped) {
@@ -1136,7 +1259,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
     //-------------------------------------//
     private boolean isAccessible(Vector2i pos) {
         return !(Tile.isObstructed(this.world.getTile(pos))
-                || this.mobs.contains(new Mob(pos)));
+                || this.mobs.contains(new Mob(pos))
+                || this.livingSpells.contains(new Mob(pos)));
     }
 
     /**
@@ -1203,7 +1327,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
     }
 
-    private void recomputePlayersLoses() {
+    private void recomputeLoses() {
         for (Player player : this.players) {
             Vector2i pos = player.getPosition();
             boolean[][] playerLOS = this.world.getLOS(pos, player.getLos(), 4);
@@ -1217,6 +1341,33 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     this.world.getLOS(pos, player.getExploreLOS(), 4)
             ));
         }
+
+
+        this.ghostsLiving.forEach((id, pair) -> {
+            if (pair.getValue() > 0) {
+                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue(), 4);
+                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
+            }
+        });
+
+        this.ghostsStatic.forEach((id, pair) -> {
+            if (pair.getValue() > 0) {
+                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue(), 4);
+                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
+            }
+        });
+
+        this.livingsSharedLOS.forEach((id, pair) -> {
+                    boolean[][] tmp = this.world.getLOS(pair.getKey().getPosition(), pair.getValue(), 4);
+                    fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+                            id,
+                            tmp
+                    ));
+                    fireFogAdditionEvent(new FogAdditionEvent(pair.getKey().getPosition(), tmp));
+                }
+        );
     }
 
     private void addRandomMob(Vector2i mobPos, Random random) {
@@ -1617,7 +1768,17 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void clearLevel() {
+
         /* Next block deletes all entities on the GUI */
+        this.livingsSharedLOS.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.livingsSharedLOS.clear();
+
+        this.ghostsLiving.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.ghostsLiving.clear();
+
+        this.ghostsStatic.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.ghostsStatic.clear();
+
         for (Player player : this.players) {
             fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
         }
