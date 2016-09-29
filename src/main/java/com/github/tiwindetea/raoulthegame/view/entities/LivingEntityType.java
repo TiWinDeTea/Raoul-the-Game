@@ -100,7 +100,11 @@ public enum LivingEntityType {
 		public String toString() {
 			return resourceBundle.getString("peaceful-ectoplasma.string");
 		}
-	};
+	},
+    DOG {
+        @Override
+        public String toString() { throw new UnsupportedOperationException(); } //TODO
+    };
 
 	private final static String bundleName = MainPackage.name + ".LivingEntity";
 

@@ -127,6 +127,14 @@ public class Vector2i {
         }
     }
 
+    public int linearDistance(Vector2i that) {
+        if (that != null) {
+            return Math.abs(this.x - that.x) + Math.abs(this.x - that.y);
+        } else {
+            return Integer.MAX_VALUE;
+        }
+    }
+
     /**
      * Multiplies a Vector2i by a scalar.
      *
