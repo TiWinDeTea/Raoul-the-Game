@@ -8,6 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.model.space;
 
+import java.util.Random;
+
 /**
  * Direction
  *
@@ -17,5 +19,11 @@ public enum Direction {
     UP,
     DOWN,
     LEFT,
-    RIGHT
+    RIGHT;
+
+    public static Direction[] values = Direction.values();
+
+    public static Direction random() {
+        return Direction.values[new Random().nextInt(Direction.values.length)];
+    }
 }

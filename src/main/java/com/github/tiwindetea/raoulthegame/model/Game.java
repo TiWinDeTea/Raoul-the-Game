@@ -306,13 +306,18 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
 
         @Override
-        public Collection<Mob> retrieveMobs() {
+        public List<Mob> retrieveMobs() {
             return Game.this.mobs;
         }
 
         @Override
         public Collection<Player> retrievePlayers() {
             return Game.this.players;
+        }
+
+        @Override
+        public Collection<LivingThing> retrieveLivingSpells() {
+            return Game.this.livingSpells;
         }
 
         @Override

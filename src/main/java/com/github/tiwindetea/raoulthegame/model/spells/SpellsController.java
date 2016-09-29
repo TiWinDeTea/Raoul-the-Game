@@ -12,6 +12,7 @@ import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by maliafo on 9/18/16.
@@ -109,12 +110,17 @@ public interface SpellsController {
     /**
      * @return All living mobs
      */
-    Collection<Mob> retrieveMobs();
+    List<Mob> retrieveMobs();
 
     /**
      * @return All living players
      */
     Collection<Player> retrievePlayers();
+
+    /**
+     * @return All living spells
+     */
+    Collection<LivingThing> retrieveLivingSpells();
 
     /**
      * @return All interactive objects
