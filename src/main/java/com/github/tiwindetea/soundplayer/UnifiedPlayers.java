@@ -350,23 +350,6 @@ public class UnifiedPlayers<K> {
         }
     }
 
-    public void setLoopAndPlay(Object key, boolean loop) {
-        MediaPlayer p = this.players.get(key);
-        if (p != null) {
-            if (loop) {
-                p.setOnEndOfMedia(() -> p.seek(Duration.ZERO));
-            } else {
-                p.setOnEndOfMedia(() -> {
-                });
-            }
-            if (!this.stopped) {
-                p.play();
-            }
-        } else {
-            throw new NoSuchElementException();
-        }
-    }
-
     /**
      * Returns <tt>true</tt> if the player associated to
      * the key is playng a music
