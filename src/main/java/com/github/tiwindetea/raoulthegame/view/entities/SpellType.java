@@ -14,7 +14,13 @@ package com.github.tiwindetea.raoulthegame.view.entities;
  * @author Lucas LAZARE
  */
 public enum SpellType {
-    SAMPLE_SPELL;
+    SAVIOR,
+    SAMPLE_SPELL,
+    REGEN,
+    DRAINER,
+    BONUS_HP,
+    Berserker,
+    SUMMON_DOG;
 
     static SpellType[] thisValues = SpellType.values();
     static String[] thisStrings = null;

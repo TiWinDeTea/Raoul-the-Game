@@ -3,6 +3,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.passives;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -13,8 +14,8 @@ import java.util.Collection;
  */
 public class BonusHP extends Spell {
 
-    public BonusHP() {
-        super(null, null);
+    public BonusHP(LivingThing owner) {
+        super(owner, SpellType.BONUS_HP);
     }
 
     @Override

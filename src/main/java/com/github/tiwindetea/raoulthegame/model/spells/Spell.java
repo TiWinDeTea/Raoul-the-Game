@@ -5,6 +5,7 @@ import com.github.tiwindetea.raoulthegame.listeners.game.spell.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
@@ -30,8 +31,13 @@ public abstract class Spell implements Descriptable {
     protected int secondaryRange; // for aoe spells
     protected final long id = Pair.getUniqueId();
     protected String description;
+    protected static Map spellsMap;
 
     protected static final List<SpellListener> listeners = new LinkedList<>();
+
+    public static void setMap(Map map) {
+        spellsMap = map;
+    }
 
     public static void setController(SpellsController controller) {
         Spell.controller = controller;
@@ -160,6 +166,15 @@ public abstract class Spell implements Descriptable {
      * @return true if the spell was successfully casted, false otherwise
      */
     public abstract boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition);
+
+    /**
+     * Updates the description of a spell
+     *
+     * @param str new description
+     */
+    protected final void updateDescription(String str) {
+        this.description = str;
+    }
 
     /**
      * {@inheritDoc}

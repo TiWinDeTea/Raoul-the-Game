@@ -3,6 +3,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.passives;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -23,7 +24,7 @@ public class Savior extends Spell {
     private int cd = BASE_COOLDOWN;
 
     public Savior(LivingThing owner) {
-        super(owner, null);
+        super(owner, SpellType.SAVIOR);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.passives;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -13,8 +14,13 @@ import java.util.Collection;
  */
 public class Regen extends Spell {
 
-    public Regen() {
-        super(null, null);
+    private int turn = 0;
+    private int healQtt = 1;
+
+    private static final int CD_TURNS = 10;
+
+    public Regen(LivingThing owner) {
+        super(owner, SpellType.REGEN);
     }
 
     @Override
@@ -24,7 +30,7 @@ public class Regen extends Spell {
 
     @Override
     public boolean isPassive() {
-        return false;
+        return true;
     }
 
     @Override
@@ -44,17 +50,23 @@ public class Regen extends Spell {
 
     @Override
     public void update(Collection<LivingThing> targets) {
-
+        ++this.turn;
+        if (this.turn % CD_TURNS == 0) {
+            LivingThing owner = super.getOwner();
+            if (owner != null) {
+                owner.damage(-this.healQtt, null);
+            }
+        }
     }
 
     @Override
     public void nextOwnerLevel() {
-
+        this.turn = 1;
     }
 
     @Override
     public void nextSpellLevel() {
-
+        this.healQtt += 1;
     }
 
     @Override
@@ -62,4 +74,3 @@ public class Regen extends Spell {
         return false;
     }
 }
-//TODO

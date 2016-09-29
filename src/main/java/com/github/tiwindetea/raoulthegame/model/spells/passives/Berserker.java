@@ -3,6 +3,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.passives;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -20,7 +21,7 @@ public class Berserker extends Spell {
     private static final double DEFENSE_DOWN_PERCENTAGE_PER_LEVEL = 1;
 
     public Berserker(LivingThing owner) {
-        super(owner, null);
+        super(owner, SpellType.Berserker);
     }
 
     @Override
