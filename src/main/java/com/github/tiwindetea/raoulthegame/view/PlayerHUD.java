@@ -15,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -26,7 +27,8 @@ import javafx.util.Duration;
  * @author Maxime PINARD
  */
 public class PlayerHUD extends Parent {
-	private static final Vector2i MAIN_PANE_SIZE = new Vector2i(400, 100);
+	private static final Vector2i INFOS_PANE_SIZE = new Vector2i(400, 100);
+	private static final Vector2i SPELLS_PANE_SIZE = new Vector2i(100, 100);
 	private static final Vector2i PLAYER_PICTURE_SIZE = new Vector2i(64, 64);
 	private static final double HEALTH_RECTANGLES_HEIGHT = 20;
 	private static final double MANA_RECTANGLES_HEIGHT = 15;
@@ -42,7 +44,7 @@ public class PlayerHUD extends Parent {
 	private static final Color ACTUAL_MANA_RECTANGLE_COLOR = Color.BLUE;
 	private static final Color MAX_XP_RECTANGLE_COLOR = Color.DARKGREEN;
 	private static final Color ACTUAL_XP_RECTANGLE_COLOR = Color.CHARTREUSE;
-	private static final Color BACKGROUND_COLOR = Color.PURPLE;
+	private static final Color BACKGROUND_COLOR = Color.web("#2e2625");
 
 	private static final Duration ANIMATION_DURATION = Duration.millis(1000);
 
@@ -65,8 +67,16 @@ public class PlayerHUD extends Parent {
 	private final Rectangle actualManaRectangle = new Rectangle();
 	private final Rectangle maxXPRectangle = new Rectangle();
 	private final Rectangle actualXPRectangle = new Rectangle();
-	private final Rectangle backGroundRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
-	private final Rectangle maskRectangle = new Rectangle(MAIN_PANE_SIZE.x, MAIN_PANE_SIZE.y, BACKGROUND_COLOR);
+	private final Rectangle infosRectangle = new Rectangle(INFOS_PANE_SIZE.x, INFOS_PANE_SIZE.y, Color.TRANSPARENT);
+	private final Rectangle spellsRectangle = new Rectangle(SPELLS_PANE_SIZE.x, SPELLS_PANE_SIZE.y, BACKGROUND_COLOR);
+	private final Rectangle maskRectangle = new Rectangle(INFOS_PANE_SIZE.x + SPELLS_PANE_SIZE.x, INFOS_PANE_SIZE.y, BACKGROUND_COLOR);
+	private final HBox mainHBox = new HBox();
+
+	//temp
+	private final Rectangle spell1Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 12, 12, 32, 32);
+	private final Rectangle spell2Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 12, 32, 32);
+	private final Rectangle spell3Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 12, 56, 32, 32);
+	private final Rectangle spell4Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 56, 32, 32);
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -117,8 +127,10 @@ public class PlayerHUD extends Parent {
 	}
 
 	private void init() {
-		this.getChildren().add(this.backGroundRectangle);
-		this.getChildren().add(this.backgroundImage);
+		this.mainHBox.getChildren().add(this.backgroundImage);
+		this.mainHBox.getChildren().add(this.spellsRectangle);
+
+		this.getChildren().add(this.mainHBox);
 
 		this.getChildren().add(this.playerPicture);
 		double originalWidth = this.playerPicture.getViewport().getWidth();
@@ -128,9 +140,9 @@ public class PlayerHUD extends Parent {
 		this.playerPicture.setLayoutX(this.playerPicture.getLayoutX() - (originalWidth - PLAYER_PICTURE_SIZE.x) / 2);
 		this.playerPicture.setLayoutY(this.playerPicture.getLayoutY() - (originalHeight - PLAYER_PICTURE_SIZE.y) / 2);
 		this.playerPicture.setTranslateX(SPACE);
-		this.playerPicture.setTranslateY((MAIN_PANE_SIZE.y - PLAYER_PICTURE_SIZE.y) / 2.0);
+		this.playerPicture.setTranslateY((INFOS_PANE_SIZE.y - PLAYER_PICTURE_SIZE.y) / 2.0);
 
-		this.setOnMouseEntered(new EventHandler<MouseEvent>() {
+		/*this.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
@@ -143,12 +155,12 @@ public class PlayerHUD extends Parent {
 			public void handle(MouseEvent event) {
 				InformationsDisplayer.clear();
 			}
-		});
+		});*/
 
 		this.getChildren().add(this.maxHealthRectangle);
 		this.maxHealthRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
-		this.maxHealthRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT);
-		this.maxHealthRectangle.setWidth(MAIN_PANE_SIZE.x - 3 * SPACE - PLAYER_PICTURE_SIZE.x);
+		this.maxHealthRectangle.setTranslateY((INFOS_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT);
+		this.maxHealthRectangle.setWidth(INFOS_PANE_SIZE.x - 3 * SPACE - PLAYER_PICTURE_SIZE.x);
 		this.maxHealthRectangle.setHeight(HEALTH_RECTANGLES_HEIGHT);
 		this.maxHealthRectangle.setFill(MAX_HEALTH_RECTANGLE_COLOR);
 
@@ -161,7 +173,7 @@ public class PlayerHUD extends Parent {
 
 		this.getChildren().add(this.maxManaRectangle);
 		this.maxManaRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
-		this.maxManaRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT + HEALTH_RECTANGLES_HEIGHT);
+		this.maxManaRectangle.setTranslateY((INFOS_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d + XP_RECTANGLES_HEIGHT + HEALTH_RECTANGLES_HEIGHT);
 		this.maxManaRectangle.setWidth(MANA_RECTANGLES_WIDTH * this.maxHealthRectangle.getWidth());
 		this.maxManaRectangle.setHeight(MANA_RECTANGLES_HEIGHT);
 		this.maxManaRectangle.setFill(MAX_MANA_RECTANGLE_COLOR);
@@ -175,7 +187,7 @@ public class PlayerHUD extends Parent {
 
 		this.getChildren().add(this.maxXPRectangle);
 		this.maxXPRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
-		this.maxXPRectangle.setTranslateY((MAIN_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d);
+		this.maxXPRectangle.setTranslateY((INFOS_PANE_SIZE.y - HEALTH_RECTANGLES_HEIGHT - MANA_RECTANGLES_HEIGHT - XP_RECTANGLES_HEIGHT) / 2.0d);
 		this.maxXPRectangle.setWidth(XP_RECTANGLES_WIDTH * this.maxHealthRectangle.getWidth());
 		this.maxXPRectangle.setHeight(XP_RECTANGLES_HEIGHT);
 		this.maxXPRectangle.setFill(MAX_XP_RECTANGLE_COLOR);
@@ -214,6 +226,84 @@ public class PlayerHUD extends Parent {
 		getChildren().add(this.maskRectangle);
 		this.maskRectangle.setFill(MASK_COLOR);
 		this.maskRectangle.setVisible(false);
+
+		getChildren().add(this.infosRectangle);
+		this.infosRectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText(PlayerHUD.this.description);
+			}
+		});
+		this.infosRectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
+
+		getChildren().addAll(this.spell1Rectangle, this.spell2Rectangle, this.spell3Rectangle, this.spell4Rectangle);
+		this.spell1Rectangle.setFill(Color.YELLOW);
+		this.spell1Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText("Spell 1");
+			}
+		});
+		this.spell1Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
+		this.spell2Rectangle.setFill(Color.YELLOW);
+		this.spell2Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText("Spell 2");
+			}
+		});
+		this.spell2Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
+		this.spell3Rectangle.setFill(Color.YELLOW);
+		this.spell3Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText("Spell 3");
+			}
+		});
+		this.spell3Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
+		this.spell4Rectangle.setFill(Color.YELLOW);
+		this.spell4Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText("Spell 4");
+			}
+		});
+		this.spell4Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
 	}
 
 	/**
@@ -222,7 +312,7 @@ public class PlayerHUD extends Parent {
 	 * @return the size
 	 */
 	public static Vector2i getSize() {
-		return MAIN_PANE_SIZE;
+		return INFOS_PANE_SIZE;
 	}
 
 	private void updateHealth() {

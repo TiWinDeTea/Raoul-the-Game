@@ -73,9 +73,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -112,8 +110,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private final Pane cPane = new Pane();
 
 	private final Pane bPane = new Pane();
-	private final HBox bHBox = new HBox();
-	private final TilePane blTilePane = new TilePane();
+	private final VBox bVBox = new VBox();
 
 	private final Pane rPane = new Pane();
 	private final VBox rVBox = new VBox();
@@ -285,7 +282,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.getMaxHealth(), e.getMaxHealth(), e.getMaxMana(), e.getMaxMana(), 0, e.getMaxXP(), e.getLevel(), e.getPlayerName());
 				GUI.this.playersHUD.add(playerHUD);
-				GUI.this.blTilePane.getChildren().add(playerHUD);
+				GUI.this.bVBox.getChildren().add(playerHUD);
 
 				PlayerInventory playerInventory = new PlayerInventory(imageView2);
 				GUI.this.playersInventories.add(playerInventory);
@@ -300,7 +297,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void deletePlayer(PlayerDeletionEvent e) {
 			if(GUI.this.actualPlayersNumber > 0) {
 				--GUI.this.actualPlayersNumber;
-				GUI.this.blTilePane.getChildren().remove(GUI.this.playersHUD.get(e.getPlayerNumber()));
+				GUI.this.bVBox.getChildren().remove(GUI.this.playersHUD.get(e.getPlayerNumber()));
 				GUI.this.playersHUD.remove(e.getPlayerNumber());
 				GUI.this.rIventoryPane.getChildren().remove(GUI.this.playersInventories.get(e.getPlayerNumber()));
 				GUI.this.playersInventories.remove(e.getPlayerNumber());
@@ -673,12 +670,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		//Bootom pane
 		this.anchorPane.getChildren().add(this.bPane);
 		AnchorPane.setBottomAnchor(this.bPane, 0d);
-		this.bHBox.getChildren().add(this.blTilePane);
-		this.bHBox.prefWidthProperty().bind(this.bPane.widthProperty());
-		this.bPane.getChildren().add(this.bHBox);
-		this.bPane.setBackground(new Background(new BackgroundFill(BOTTOM_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
-		this.bPane.prefHeightProperty().bind(this.bHBox.heightProperty());
-		this.bPane.maxHeightProperty().bind(this.bHBox.heightProperty());
+		this.bPane.getChildren().add(this.bVBox);
+		this.bPane.prefHeightProperty().bind(this.bVBox.heightProperty());
+		this.bPane.maxHeightProperty().bind(this.bVBox.heightProperty());
 
 		//Right pane
 		this.anchorPane.getChildren().add(this.rPane);
