@@ -188,7 +188,7 @@ public class Mob extends LivingThing {
                     Double aggro, paggro = Double.NEGATIVE_INFINITY;
                     if (chasedTarget == null
                             || (aggro = this.aggro.get(target.getId())) != null
-                            && (paggro = this.aggro.get(chasedTarget.getId())) != null || aggro.doubleValue() > paggro.doubleValue()) {
+                      && (paggro = this.aggro.get(chasedTarget.getId())) != null && aggro.doubleValue() > paggro.doubleValue()) {
                         chasedTarget = target;
                         distance = this.distanceTo(pos, shadow);
                     }
