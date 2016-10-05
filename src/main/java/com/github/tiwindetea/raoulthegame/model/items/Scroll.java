@@ -11,8 +11,6 @@ package com.github.tiwindetea.raoulthegame.model.items;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 
-import java.util.Random;
-
 /**
  * Scroll
  *
@@ -39,8 +37,7 @@ public class Scroll implements Consumable {
         this.turns = turns;
         this.healthModifierPerTick = healthModifierPerTick;
         this.healthModifierModifierPerTick = healthModifierModifierPerTick;
-        Random random = new Random();
-        if (random.nextBoolean()) {
+        if (turns > 9) {
             this.gtype = StaticEntityType.SCROLL1;
         } else {
             this.gtype = StaticEntityType.SCROLL2;

@@ -149,7 +149,6 @@ public class Pot implements Consumable {
             --this.turns;
             this.healTarget();
             this.manaHealTarget();
-            this.target.addMana(this.mana_heal);
             return this.turns <= 0;
         }
         return true;

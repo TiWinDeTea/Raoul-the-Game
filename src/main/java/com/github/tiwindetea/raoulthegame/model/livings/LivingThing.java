@@ -86,7 +86,13 @@ public abstract class LivingThing implements Descriptable {
     }
 
     protected double getPowerGrade() {
-        return 5 * (this.getAttackPower() / 11 + this.getHitPoints() / 10 + this.getDefensePower());
+        double ap;
+        if (this.getType() == LivingThingType.PLAYER) {
+            ap = ((Player) this).getAttackPowerNoManaUse();
+        } else {
+            ap = this.getAttackPower();
+        }
+        return 5 * (ap / 11 + this.getHitPoints() / 10 + this.getDefensePower());
     }
 
     /**
