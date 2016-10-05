@@ -106,6 +106,7 @@ public class MainMenu extends Application {
 			public void handle(KeyEvent event) {
 				if(event.getCode() == KeyCode.ESCAPE) {
 					updateButtons();
+					Sound.player.stopAny();
 					Sound.player.resume(Sounds.MENU_MUSIC);
 					primaryStage.setScene(MainMenu.this.menuScene);
 					MainMenu.this.buttonsVBox.setAlignment(Pos.CENTER);
