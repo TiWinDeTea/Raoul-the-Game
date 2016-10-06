@@ -6,6 +6,7 @@ import com.github.tiwindetea.raoulthegame.model.livings.Mob;
 import com.github.tiwindetea.raoulthegame.model.livings.Pet;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Direction;
+import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
@@ -16,6 +17,7 @@ import com.sun.istack.internal.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 /**
@@ -30,9 +32,11 @@ public class SummonDog extends Spell {
 
     public SummonDog(LivingThing owner) {
         super(owner, SpellType.SUMMON_DOG);
-        this.dog = new Pet(owner, "Petto", SummonDog.this.level, 40, 10, 1, owner.getPosition()) {
+        this.dog = new Pet(owner, "Camembert.\nCamembert is binded to " + owner.getName() + ".", SummonDog.this.level, 100, 10, 1, owner.getPosition().copy()) {
 
-            Vector2i requestedPath = new Vector2i(0, 0);
+            private Vector2i requestedPath = new Vector2i(0, 0);
+            private boolean isGoingToOwner = false;
+            private boolean isAttacking = false;
 
             @Override
             public void levelUp() {
@@ -53,34 +57,72 @@ public class SummonDog extends Spell {
 
             @Override
             public Vector2i getRequestedMove() {
-                return this.requestedPath;
+                if (this.requestedPath != null) {
+                    return this.requestedPath;
+                } else {
+                    return this.position;
+                }
             }
 
+            @Override
             public void live(List<Mob> mobs, Collection<Player> players, Collection<LivingThing> all) {
+                if (this.hitPoints < this.maxHitPoints - 1.0625) {
+                    this.damage(-1, null);
+                }
                 LivingThing owner = super.getOwner();
                 this.requestedAttack = null;
                 if (owner != null) {
                     Stack<Vector2i> path = Spell.spellsMap.getPath(this.position, owner.getPosition(), true, all);
-                    if (path != null && path.size() > 10) {
-                        this.requestedPath = path.pop();
-                    } else {
-                        this.requestedPath = this.position.copy().add(Direction.random());
-                        ArrayList<LivingThing> targets;
-                        LivingThingType ownerType = owner.getType();
-                        if (ownerType == LivingThingType.MOB && players != null) {
-                            targets = new ArrayList<>(players);
-                        } else if (ownerType == LivingThingType.PLAYER && mobs != null) {
-                            targets = new ArrayList<>(mobs);
+                    if (path != null) {
+                        if (this.isGoingToOwner && path.size() > 3) {
+                            this.requestedPath = path.peek();
+                            this.isAttacking = false;
                         } else {
-                            targets = new ArrayList<>();
-                        }
-
-                        targets.forEach(ptarget -> {
-                            int distance = ptarget.getPosition().linearDistance(this.position);
-                            if (this.requestedAttack == null || distance < this.requestedAttack.getPosition().linearDistance(this.position)) {
-                                this.requestedAttack = ptarget;
+                            if (path.size() < 10 && new Random().nextInt() % 4 != 0 || path.size() < 4 || this.isAttacking) {
+                                this.isGoingToOwner = false;
+                                target(mobs, players, all, owner);
+                            } else {
+                                this.isAttacking = false;
+                                this.isGoingToOwner = true;
+                                this.requestedPath = path.peek();
                             }
-                        });
+                        }
+                    } else {
+                        target(mobs, players, all, owner);
+                    }
+                }
+            }
+
+            private void target(List<Mob> mobs, Collection<Player> players, Collection<LivingThing> all, LivingThing owner) {
+                System.out.println("Targeting");
+                if (new Random().nextBoolean()) {
+                    this.requestedPath = this.position.copy().add(Direction.random());
+                } else {
+                    this.requestedPath = this.position;
+                }
+
+                ArrayList<LivingThing> targets;
+                LivingThingType ownerType = owner.getType();
+                if (ownerType == LivingThingType.MOB && players != null) {
+                    targets = new ArrayList<>(players);
+                } else if (ownerType == LivingThingType.PLAYER && mobs != null) {
+                    targets = new ArrayList<>(mobs);
+                } else {
+                    targets = new ArrayList<>();
+                }
+
+                targets.forEach(ptarget -> {
+                    int distance = ptarget.getPosition().linearDistance(this.position);
+                    if (distance < 5 && (this.requestedAttack == null || distance < this.requestedAttack.getPosition().linearDistance(this.position))) {
+                        this.requestedAttack = ptarget;
+                    }
+                });
+                System.out.println("this.requestedAttack = " + this.requestedAttack);
+
+                if (this.requestedAttack != null) {
+                    this.isAttacking = true;
+                    if (this.requestedAttack.getPosition().linearDistance(this.position) > 1) {
+                        this.requestedPath = Spell.spellsMap.getPath(this.position, this.requestedAttack.getPosition(), true, null).peek();
                     }
                 }
             }
@@ -89,7 +131,7 @@ public class SummonDog extends Spell {
 
     @Override
     public boolean isAOE() {
-        return false;
+        return true;
     }
 
     @Override
@@ -118,10 +160,16 @@ public class SummonDog extends Spell {
     public void update(Collection<LivingThing> targets) {
         this.dog.live(Spell.controller.retrieveMobs(), Spell.controller.retrievePlayers(), targets);
         LivingThing target = this.dog.getRequestedAttack();
-        if (target != null) {
+        if (target != null && target.getPosition().linearDistance(this.dog.getPosition()) < 2) {
             target.damage(this.dog.getAttackPower(), this.dog);
         } else {
-            this.dog.setPosition(this.dog.getRequestedMove());
+            Vector2i pos = this.dog.getRequestedMove();
+            Tile tile = spellsMap.getTile(pos);
+            if (tile == Tile.CLOSED_DOOR) {
+                spellsMap.triggerTile(pos);
+            } else if (!Tile.isObstructed(tile) && !Spell.controller.retrieveLivingSpells().contains(new Mob(pos)) && !Spell.controller.retrieveMobs().contains(new Mob(pos))) {
+                this.dog.setPosition(pos);
+            }
 
         }
     }

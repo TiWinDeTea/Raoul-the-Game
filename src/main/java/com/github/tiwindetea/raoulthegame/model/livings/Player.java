@@ -27,6 +27,7 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
 import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
@@ -162,6 +163,11 @@ public class Player extends LivingThing {
             this.armors.add(new Pair<>());
         }
         this.position = new Vector2i(-1, -1);
+    }
+
+    public void test() {
+        this.spells.add(new SummonDog(this));
+        this.spells.get(0).cast(null, null);
     }
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {
@@ -317,6 +323,7 @@ public class Player extends LivingThing {
      *
      * @return the name
      */
+    @Override
     public String getName() {
         return this.name;
     }

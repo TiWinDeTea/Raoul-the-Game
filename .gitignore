@@ -26,3 +26,6 @@ target/*
 out/*
 raoulTheGame*
 *.rtg
+
+MANIFEST.MF
+*.db

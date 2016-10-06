@@ -103,8 +103,10 @@ public enum LivingEntityType {
 	},
     DOG {
         @Override
-        public String toString() { throw new UnsupportedOperationException(); } //TODO
-    };
+		public String toString() {
+			return resourceBundle.getString("dog-pet.string");
+		}
+	};
 
 	private final static String bundleName = MainPackage.name + ".LivingEntity";
 

@@ -308,6 +308,10 @@ public abstract class LivingThing implements Descriptable {
         return this.name;
     }
 
+    public String getName() {
+        return this.getType().toString();
+    }
+
     public double getAggro() {
         return 0;
     }

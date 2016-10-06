@@ -129,7 +129,7 @@ public class Vector2i {
 
     public int linearDistance(Vector2i that) {
         if (that != null) {
-            return Math.abs(this.x - that.x) + Math.abs(this.x - that.y);
+            return Math.abs(this.x - that.x) + Math.abs(this.y - that.y);
         } else {
             return Integer.MAX_VALUE;
         }

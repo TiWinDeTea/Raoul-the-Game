@@ -20,7 +20,6 @@ import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMov
 import com.github.tiwindetea.raoulthegame.events.map.CenterOnTileEvent;
 import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
 import com.github.tiwindetea.raoulthegame.events.map.MapCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.map.TileModificationEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerNextTickEvent;
@@ -584,6 +583,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     public void addGameListener(GameListener listener) {
         this.listeners.add(listener);
         LivingThing.addGameListener(listener);
+        Map.addListener(listener);
     }
 
     private GameListener[] getGameListeners() {
@@ -647,12 +647,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.defineStaticEntityLOS(event);
-        }
-    }
-
-    private void fireTileModificationEvent(TileModificationEvent event) {
-        for (GameListener listener : getGameListeners()) {
-            listener.modifyTile(event);
         }
     }
 
@@ -993,7 +987,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 distance = Math.max(Math.abs(playerPos.x - pos.x), Math.abs(playerPos.y - pos.y));
                 if (distance == 1) {
                     this.world.triggerTile(pos);
-                    fireTileModificationEvent(new TileModificationEvent(pos, this.world.getTile(pos)));
                 }
                 player.setRequestedInteraction(null);
             } else if ((drop = player.getObjectToDrop()) != null) {
@@ -1030,7 +1023,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 mob.live(this.mobs, this.players, this.livingSpells, this.world.getLOS(mob.getPosition(), mob.getChaseRange(), 4));
                 if ((pos = mob.getRequestedMove()) != null) {
                     int distance = Math.abs(mob.getPosition().x - pos.x) + Math.abs(mob.getPosition().y - pos.y);
-                    if (distance <= 1 && isAccessible(pos)) {
+                    if (distance <= 1 && isAccessible(pos) && !this.livingSpells.contains(new Mob(pos))) {
                         mob.setPosition(pos);
                     }
                 } else if ((target = mob.getRequestedAttack()) != null) {
@@ -1264,8 +1257,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     //-------------------------------------//
     private boolean isAccessible(Vector2i pos) {
         return !(Tile.isObstructed(this.world.getTile(pos))
-                || this.mobs.contains(new Mob(pos))
-                || this.livingSpells.contains(new Mob(pos)));
+                || this.mobs.contains(new Mob(pos)));
     }
 
     /**
@@ -1479,6 +1471,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.currentMusic = Sounds.MAIN_MUSIC;
         Sound.player.play(this.currentMusic);
         RequestEvent event;
+        this.currentPlayer.test();
         do {
             try {
                 Thread.sleep(REFRESH_TIME_MS);

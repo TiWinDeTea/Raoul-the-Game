@@ -20,6 +20,7 @@ public abstract class Pet extends LivingThing {
         this.name = name;
         this.level = level;
         this.maxHitPoints = maxHitPoints;
+        this.hitPoints = maxHitPoints;
         this.attackPower = attackPower;
         this.defensePower = defensePower;
         this.position = position.copy();

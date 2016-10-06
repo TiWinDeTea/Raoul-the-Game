@@ -8,6 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.model.space;
 
+import com.github.tiwindetea.raoulthegame.events.map.TileModificationEvent;
+import com.github.tiwindetea.raoulthegame.listeners.game.map.TileModificationListener;
 import com.github.tiwindetea.raoulthegame.model.Seed;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Mob;
@@ -71,12 +73,18 @@ public class Map {
     private static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
     private static final int DOOR_CHANCE = 70;
 
+    private static ArrayList<TileModificationListener> listeners = new ArrayList<>(1);
+
     private Seed seed;
     private Random random;
     private Vector2i stairsUpPosition;
     private Vector2i stairsDownPosition;
     private ArrayList<Vector2i> bulbPosition;
     private Tile[][] map;
+
+    public static void addListener(TileModificationListener listener) {
+        listeners.add(listener);
+    }
 
     /**
      * Instantiates a new Map.
@@ -117,6 +125,10 @@ public class Map {
         } else if (this.map[position.x][position.y] == Tile.OPENED_DOOR) {
             this.map[position.x][position.y] = Tile.CLOSED_DOOR;
             Sound.player.play(Sounds.DOOR_SOUND);
+        }
+
+        for (TileModificationListener listener : listeners) {
+            listener.modifyTile(new TileModificationEvent(position, this.map[position.x][position.y]));
         }
     }
 
