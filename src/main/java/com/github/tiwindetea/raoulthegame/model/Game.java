@@ -749,6 +749,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
      */
     private void generateLevel() {
 
+        ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size() + this.players.size());
+        livings.addAll(this.players);
+        livings.addAll(this.mobs);
+        livings.forEach(l -> l.getSpells().forEach(s -> s.nextFloor()));
+
         Sound.player.play(Sounds.NEXT_FLOOR_SOUND);
         System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
         fireLevelUpdateEvent(new LevelUpdateEvent(this.level));
@@ -929,8 +934,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
         ArrayList<Mob> mobsToDelete = new ArrayList<>(3);
 
         this.nextTurnPlayers(objectsJustDropped);
-        this.nextTurnMobs(mobsToDelete);
         this.updateLivingsSpells();
+        this.nextTurnMobs(mobsToDelete);
         this.killDeads(mobsToDelete);
         this.updateConsumables();
         this.computeWorldInteractions(objectsJustDropped);
@@ -1086,6 +1091,14 @@ public class Game implements RequestListener, Runnable, Stoppable {
             }
             this.mobs.remove(mob);
         }
+
+        this.livingSpells.stream()
+                .filter(spell -> !spell.isAlive())
+                .collect(Collectors.toCollection(ArrayList::new))
+                .forEach(e -> {
+                    this.livingSpells.remove(e);
+                    fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(e.getId()));
+                });
 
         ArrayList<Player> playerToDelete = new ArrayList<>();
         for (Player player : this.players) {

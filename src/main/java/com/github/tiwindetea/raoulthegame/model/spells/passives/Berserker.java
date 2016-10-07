@@ -73,4 +73,14 @@ public class Berserker extends Spell {
     public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
         return false;
     }
+
+    @Override
+    public void nextFloor() {
+
+    }
+
+    @Override
+    public void forgotten() {
+
+    }
 }

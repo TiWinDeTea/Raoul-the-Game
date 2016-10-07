@@ -14,16 +14,22 @@ package com.github.tiwindetea.raoulthegame.view.entities;
  * @author Lucas LAZARE
  */
 public enum SpellType {
-    SAVIOR,
-    SAMPLE_SPELL,
-    REGEN,
-    DRAINER,
-    BONUS_HP,
-    Berserker,
-    SUMMON_DOG;
+    SAVIOR("savior"),
+    SAMPLE_SPELL("sample-spell"),
+    REGEN("regen"),
+    DRAINER("drainer"),
+    BONUS_HP("bonus-hp"),
+    Berserker("berserker"),
+    SUMMON_DOG("summon-dog");
 
     static SpellType[] thisValues = SpellType.values();
     static String[] thisStrings = null;
+
+    public String key;
+
+    SpellType(String ressourceBundleName) {
+        this.key = ressourceBundleName;
+    }
 
     static SpellType parseSpellType(String str) {
         if (thisStrings == null) {

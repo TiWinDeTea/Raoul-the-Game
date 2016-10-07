@@ -14,7 +14,7 @@ import java.util.Collection;
  */
 public class Savior extends Spell {
     // TRIGGERS BEFORE THE HIT, NOT AFTER
-    private static final int BASE_COOLDOWN = 500; //(turns)
+    private static final int BASE_COOLDOWN = 5000; //(turns)
     private static final double BASE_HP_REGEN = 5;
     private static final double PERCENTAGE_HP_REGEN = 10;
     private static final double TRIGGER_TRESHOLD_PERCENTAGE = 5;
@@ -93,11 +93,21 @@ public class Savior extends Spell {
 
     @Override
     public void nextSpellLevel() {
-        this.cd /= 2;
+        this.cd = Math.max(1, this.cd - 100);
     }
 
     @Override
     public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
         return false;
+    }
+
+    @Override
+    public void nextFloor() {
+
+    }
+
+    @Override
+    public void forgotten() {
+
     }
 }

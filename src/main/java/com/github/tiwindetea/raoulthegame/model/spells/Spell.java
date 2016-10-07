@@ -3,6 +3,7 @@ package com.github.tiwindetea.raoulthegame.model.spells;
 import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.spell.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
+import com.github.tiwindetea.raoulthegame.model.MainPackage;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
@@ -15,6 +16,7 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The Spell class.
@@ -24,6 +26,7 @@ import java.util.List;
  */
 public abstract class Spell implements Descriptable {
 
+    protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainPackage.name + ".Spells");
     protected static SpellsController controller;
     private final WeakReference<LivingThing> owner;
     protected int targetNumber;
@@ -166,6 +169,16 @@ public abstract class Spell implements Descriptable {
      * @return true if the spell was successfully casted, false otherwise
      */
     public abstract boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition);
+
+    /**
+     * Method called whenever the floor changes.
+     */
+    public abstract void nextFloor();
+
+    /**
+     * Method called whenever the owner forgots the spell
+     */
+    public abstract void forgotten();
 
     /**
      * Updates the description of a spell

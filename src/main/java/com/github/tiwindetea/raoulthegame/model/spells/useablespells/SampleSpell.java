@@ -94,4 +94,14 @@ public class SampleSpell extends Spell {
         }
         return false;
     }
+
+    @Override
+    public void nextFloor() {
+
+    }
+
+    @Override
+    public void forgotten() {
+
+    }
 }
