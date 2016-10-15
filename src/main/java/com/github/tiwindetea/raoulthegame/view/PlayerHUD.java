@@ -9,8 +9,10 @@
 package com.github.tiwindetea.raoulthegame.view;
 
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.EventHandler;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -77,6 +79,11 @@ public class PlayerHUD extends Parent {
 	private final Rectangle spell2Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 12, 32, 32);
 	private final Rectangle spell3Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 12, 56, 32, 32);
 	private final Rectangle spell4Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 56, 32, 32);
+
+	private final ImageView spell1ImageView = new ImageView();
+	private final ImageView spell2ImageView = new ImageView();
+	private final ImageView spell3ImageView = new ImageView();
+	private final ImageView spell4ImageView = new ImageView();
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -244,6 +251,9 @@ public class PlayerHUD extends Parent {
 		});
 
 		getChildren().addAll(this.spell1Rectangle, this.spell2Rectangle, this.spell3Rectangle, this.spell4Rectangle);
+		getChildren().addAll(this.spell1ImageView, this.spell2ImageView, this.spell3ImageView, this.spell4ImageView);
+
+		//TODO: --------- tmp ----------
 		this.spell1Rectangle.setFill(Color.YELLOW);
 		this.spell1Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
 
@@ -304,6 +314,17 @@ public class PlayerHUD extends Parent {
 				InformationsDisplayer.clear();
 			}
 		});
+
+		this.spell1ImageView.setX(INFOS_PANE_SIZE.x + 12);
+		this.spell1ImageView.setY(12);
+		this.spell2ImageView.setX(INFOS_PANE_SIZE.x + 56);
+		this.spell2ImageView.setY(12);
+		this.spell3ImageView.setX(INFOS_PANE_SIZE.x + 12);
+		this.spell3ImageView.setY(56);
+		this.spell4ImageView.setX(INFOS_PANE_SIZE.x + 56);
+		this.spell4ImageView.setY(56);
+
+		setSpell(1, SpellType.REGEN, "regen description");
 	}
 
 	/**
@@ -472,6 +493,42 @@ public class PlayerHUD extends Parent {
 	public void setActualPowerGrade(int actualPowerGrade) {
 		this.actualPowerGrade = actualPowerGrade;
 		updateDescription();
+	}
+
+	public void setSpell(int spellNumber, SpellType spellType, String description) {
+
+		ImageView imageView;
+		switch(spellNumber) {
+		case 1:
+			imageView = this.spell1ImageView;
+			break;
+		case 2:
+			imageView = this.spell2ImageView;
+			break;
+		case 3:
+			imageView = this.spell3ImageView;
+			break;
+		default:
+			imageView = this.spell4ImageView;
+			break;
+		}
+
+		imageView.setImage(spellType.getImage());
+		imageView.setViewport(new Rectangle2D(spellType.getSpritePosition().x * ViewPackage.SPRITES_SIZE.x, spellType.getSpritePosition().y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
+		imageView.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.setText(description);
+			}
+		});
+		imageView.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event) {
+				InformationsDisplayer.clear();
+			}
+		});
 	}
 
 	/**
