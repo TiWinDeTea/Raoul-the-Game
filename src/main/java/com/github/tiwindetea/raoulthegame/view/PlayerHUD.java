@@ -324,6 +324,7 @@ public class PlayerHUD extends Parent {
 		this.spell4ImageView.setX(INFOS_PANE_SIZE.x + 56);
 		this.spell4ImageView.setY(56);
 
+		//TODO: --------- tmp test ---------
 		setSpell(1, SpellType.REGEN, "regen description");
 	}
 
@@ -495,6 +496,13 @@ public class PlayerHUD extends Parent {
 		updateDescription();
 	}
 
+	/**
+	 * Set a spell.
+	 *
+	 * @param spellNumber the spell number
+	 * @param spellType   the spell type
+	 * @param description the description
+	 */
 	public void setSpell(int spellNumber, SpellType spellType, String description) {
 
 		ImageView imageView;

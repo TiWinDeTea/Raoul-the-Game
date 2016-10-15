@@ -69,11 +69,21 @@ public enum SpellType {
 
 	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
 
+	/**
+	 * Gets sprite position.
+	 *
+	 * @return the sprite position
+	 */
 	public Vector2i getSpritePosition() {
 		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.x")),
 		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.y")));
 	}
 
+	/**
+	 * Gets Spells image.
+	 *
+	 * @return the image
+	 */
 	public Image getImage() {
 		switch(resourceBundle.getString(this.toString() + ".sprite.file")) {
 		case "Spells.png":
