@@ -8,19 +8,96 @@
 
 package com.github.tiwindetea.raoulthegame.view.entities;
 
+import com.github.tiwindetea.raoulthegame.model.MainPackage;
+import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.view.ViewPackage;
+import javafx.scene.image.Image;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 /**
  * The enum SpellType
  *
  * @author Lucas LAZARE
  */
 public enum SpellType {
-    SAVIOR("savior"),
-    SAMPLE_SPELL("sample-spell"),
-    REGEN("regen"),
-    DRAINER("drainer"),
-    BONUS_HP("bonus-hp"),
-    Berserker("berserker"),
-    SUMMON_DOG("summon-dog");
+	SAVIOR {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("savior.string");
+		}
+	},
+	SAMPLE_SPELL {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("sample_spell.string");
+		}
+	},
+	REGEN {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("regen.string");
+		}
+	},
+	DRAINER {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("drainer.string");
+		}
+	},
+	BONUS_HP {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("bonus_hp.string");
+		}
+	},
+	Berserker {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("berserker.string");
+		}
+	},
+	SUMMON_DOG {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("summon_dog.string");
+		}
+	};
+
+	private final static String bundleName = MainPackage.name + ".Spell";
+
+	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+
+	/**
+	 * Gets sprite position.
+	 *
+	 * @return the sprite position
+	 */
+	public Vector2i getSpritePosition() {
+		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.x")),
+		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.y")));
+	}
+
+	/**
+	 * Gets Spells image.
+	 *
+	 * @return the image
+	 */
+	public Image getImage() {
+		switch(resourceBundle.getString(this.toString() + ".sprite.file")) {
+		case "Spells.png":
+			return ViewPackage.SPELLS_IMAGE;
+		case "Objects.png":
+			return ViewPackage.OBJECTS_IMAGE;
+		case "Players.png":
+			return ViewPackage.PLAYERS_IMAGE;
+		case "Mobs.png":
+			return ViewPackage.MOBS_IMAGE;
+		default:
+			return null;
+		}
+	}
 
     static SpellType[] thisValues = SpellType.values();
     static String[] thisStrings = null;
