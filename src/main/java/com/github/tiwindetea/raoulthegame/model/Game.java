@@ -1484,6 +1484,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
         this.isRunning = true;
 
+        Sound.player.stopAny();
         this.currentMusic = Sounds.MAIN_MUSIC;
         Sound.player.play(this.currentMusic);
         RequestEvent event;

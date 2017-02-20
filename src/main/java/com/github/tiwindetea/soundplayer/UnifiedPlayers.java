@@ -17,11 +17,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * Created by organic-code on 5/30/16.
  */
-public class UnifiedPlayers<K> {
+public class UnifiedPlayers<K> implements Map<K, MediaPlayer> {
 
     private Map<K, MediaPlayer> players;
     private boolean stopped = false;
@@ -68,7 +69,7 @@ public class UnifiedPlayers<K> {
      * (A <tt>null</tt> return can also indicate that the map
      * previously associated <tt>null</tt> with <tt>key</tt>.)
      */
-    public MediaPlayer remove(K key) {
+    public MediaPlayer removeByKey(K key) {
         return this.players.remove(key);
     }
 
@@ -89,9 +90,9 @@ public class UnifiedPlayers<K> {
      *
      * @param keys keys whose mapping is to be removed from the map
      */
-    public void removeAll(K... keys) {
+    public void removeAllByKey(K... keys) {
         for (K key : keys) {
-            this.remove(key);
+            this.removeByKey(key);
         }
     }
 
@@ -100,8 +101,8 @@ public class UnifiedPlayers<K> {
      *
      * @param keys keys whose mapping is to be removed from the map
      */
-    public void removeAll(Collection<K> keys) {
-        keys.forEach(this::remove);
+    public void removeAllByKey(Collection<K> keys) {
+        keys.forEach(this::removeByKey);
     }
 
     /**
@@ -255,22 +256,6 @@ public class UnifiedPlayers<K> {
     }
 
     /**
-     * Associates a MediaPlayer with the specified key in the map.
-     * If the map previously contained a mapping for the key, the old
-     * value is replaced and returned.
-     *
-     * @param key    key with which the specified value is to be associated
-     * @param player MediaPlayer to be associated with the specied key.
-     * @return the previous value associated with <tt>key</tt>, or
-     * <tt>null</tt> if there was no mapping for <tt>key</tt>.
-     * (A <tt>null</tt> return can also indicate that the map
-     * previously associated <tt>null</tt> with <tt>key</tt>.)
-     */
-    public MediaPlayer put(K key, MediaPlayer player) {
-        return this.players.put(key, player);
-    }
-
-    /**
      * Adds the file to the map and plays it.
      *
      * @param key  key with which the specified value is to be associated
@@ -377,8 +362,111 @@ public class UnifiedPlayers<K> {
      * @apiNote All players will keep running forever if looping
      * or until manually stopped
      */
+    @Override
     public void clear() {
         this.players.clear();
+    }
+
+    /**
+     * Associates a MediaPlayer with the specified key in the map.
+     * If the map previously contained a mapping for the key, the old
+     * value is replaced and returned.
+     *
+     * @param key    key with which the specified value is to be associated
+     * @param player MediaPlayer to be associated with the specied key.
+     * @return the previous value associated with <tt>key</tt>, or
+     * <tt>null</tt> if there was no mapping for <tt>key</tt>.
+     * (A <tt>null</tt> return can also indicate that the map
+     * previously associated <tt>null</tt> with <tt>key</tt>.)
+     */
+    @Override
+    public MediaPlayer put(K key, MediaPlayer player) {
+        return this.players.put(key, player);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int size() {
+        return players.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEmpty() {
+        return players.isEmpty();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsKey(Object key) {
+        return players.containsKey(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean containsValue(Object value) {
+        return players.containsValue(value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public MediaPlayer get(Object key) {
+        return players.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <br/><br/>
+     * Note that if any player was mapped to the key, it won't be stopped
+     *
+     * @see UnifiedPlayers#removeByKey(Object)
+     * @see UnifiedPlayers#remove(Object, MediaPlayer)
+     */
+    @Override
+    public MediaPlayer remove(Object key) {
+        return players.remove(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void putAll(Map<? extends K, ? extends MediaPlayer> m) {
+        players.putAll(m);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<K> keySet() {
+        return players.keySet();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<MediaPlayer> values() {
+        return players.values();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<Entry<K, MediaPlayer>> entrySet() {
+        return players.entrySet();
     }
 
     public void setStopped(boolean stopped) {
