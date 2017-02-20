@@ -78,6 +78,11 @@ public enum SpellType {
 		public String toString() {
 			return resourceBundle.getString("heal.string");
 		}
+	}, EXPLORER {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("explorer.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".Spell";

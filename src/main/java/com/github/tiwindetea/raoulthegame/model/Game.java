@@ -131,14 +131,18 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private final List<Pair<InteractiveObject>> interactiveObjects = new ArrayList<>();
     private final List<Pair<Vector2i>> bulbsOn = new ArrayList<>();
     private final List<Pair<Vector2i>> bulbsOff = new ArrayList<>();
-    private final HashMap<Long, javafx.util.Pair<Vector2i, Integer>> ghostsStatic = new HashMap<>();
+
+    // pair's key : position on the map. pair's value : x = LOS, y = Explore LOS
+    private final HashMap<Long, javafx.util.Pair<Vector2i, Vector2i>> ghostsStatic = new HashMap<>();
 
     private List<Mob> mobs = new ArrayList<>();
     private final List<LivingThing> livingSpells = new ArrayList<>();
     private List<Player> players = new ArrayList<>();
     private final List<Player> playersOnNextLevel = new ArrayList<>();
     private final HashMap<Long, javafx.util.Pair<LivingThing, Integer>> livingsSharedLOS = new HashMap<>();
-    private final HashMap<Long, javafx.util.Pair<Vector2i, Integer>> ghostsLiving = new HashMap<>();
+
+    // pair's key : position on the map. pair's value : x = LOS, y = Explore LOS
+    private final HashMap<Long, javafx.util.Pair<Vector2i, Vector2i>> ghostsLiving = new HashMap<>();
 
     private Player currentPlayer;
     private int playerTurn;
@@ -216,23 +220,24 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
 
         @Override
-        public long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange) {
+        public long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange, int explorationRange) {
             long id = Pair.getUniqueId();
             fireLivingEntityCreationEvent(new LivingEntityCreationEvent(id, entityType, position, direction, description));
             if (LOSRange > 0) {
                 boolean[][] tmp = Game.this.world.getLOS(position, LOSRange, 4);
                 fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                tmp = Game.this.world.getLOS(position, explorationRange, 4);
                 fireFogAdditionEvent(new FogAdditionEvent(position, tmp));
             }
-            Game.this.ghostsLiving.put(id, new javafx.util.Pair<>(position, LOSRange));
+            Game.this.ghostsLiving.put(id, new javafx.util.Pair<>(position, new Vector2i(LOSRange, explorationRange)));
             return id;
         }
 
         @Override
-        public long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange) {
+        public long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange, int explorationRange) {
             long id = Pair.getUniqueId();
             fireStaticEntityCreationEvent(new StaticEntityCreationEvent(id, entityType, position, description));
-            Game.this.ghostsStatic.put(id, new javafx.util.Pair<>(position, LOSRange));
+            Game.this.ghostsStatic.put(id, new javafx.util.Pair<>(position, new Vector2i(LOSRange, explorationRange)));
             return id;
         }
 
@@ -1314,12 +1319,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
     //-------------------------------------//
     private void save() {
-        PriorityQueue<Player> playerPriorityQueue = new PriorityQueue<>(new Comparator<Player>() {
-            @Override
-            public int compare(Player o1, Player o2) {
-                return o1.getNumber() - o2.getNumber();
-            }
-        });
+        PriorityQueue<Player> playerPriorityQueue = new PriorityQueue<>(Comparator.comparingInt(Player::getNumber));
+
         playerPriorityQueue.addAll(this.playersOnNextLevel);
         try {
             FileWriter file = new FileWriter(new File(this.gameName));
@@ -1353,17 +1354,19 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
 
         this.ghostsLiving.forEach((id, pair) -> {
-            if (pair.getValue() > 0) {
-                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue(), 4);
+            if (pair.getValue().x > 0 || pair.getValue().y > 0) {
+                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
                 fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
                 fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
             }
         });
 
         this.ghostsStatic.forEach((id, pair) -> {
-            if (pair.getValue() > 0) {
-                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue(), 4);
-                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+            if (pair.getValue().x > 0 || pair.getValue().y > 0) {
+                boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
+                fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(id, tmp));
+                tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
                 fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
             }
         });

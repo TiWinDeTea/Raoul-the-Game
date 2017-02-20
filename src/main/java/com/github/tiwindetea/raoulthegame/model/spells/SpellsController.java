@@ -29,7 +29,7 @@ public interface SpellsController {
      * @param direction
      * @param LOSRange    Range of the LOS of the ghost entity  @return The graphic ID of this entity for further use (moving, deleting, etc…)
      */
-    long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange);
+    long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange, int explorationRange);
 
 
     /**
@@ -41,7 +41,7 @@ public interface SpellsController {
      * @param LOSRange    Range of the LOS of the ghost entity
      * @return The graphic ID of this entity for further use (moving, deleting, etc…)
      */
-    long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange);
+    long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange, int explorationRange);
 
     /**
      * Moves a ghost entity.

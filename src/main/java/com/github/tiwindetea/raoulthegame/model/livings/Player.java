@@ -27,7 +27,8 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
 import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
-import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Explorer;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
@@ -166,7 +167,7 @@ public class Player extends LivingThing {
     }
 
     public void test() {
-        this.spells.add(new SummonDog(this));
+        this.spells.add(new Regen(this));
         this.spells.get(0).cast(null, getPosition());
     }
 
