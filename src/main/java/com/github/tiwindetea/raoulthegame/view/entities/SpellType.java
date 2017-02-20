@@ -68,6 +68,11 @@ public enum SpellType {
 		public String toString() {
 			return resourceBundle.getString("teleport.string");
 		}
+	}, IRON_WILL{
+		@Override
+		public String toString() {
+			return resourceBundle.getString("iron_will.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".Spell";
