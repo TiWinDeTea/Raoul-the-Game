@@ -1063,10 +1063,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
         //livings.addAll(this.mobs); todo : uncomment if mobs have spells
 
         for (LivingThing living : livings) {
-            living.getSpells().stream()
-                    .filter(spell -> !spell.isPassive())
+            living.getSpells()
                     .forEach(spell -> {
-                        if (spell.isAOE()) {
+                        if (spell.isPassive()) {
+                            spell.update(null);
+                        } else if (spell.isAOE()) {
                             Vector2i pos = spell.getSpellSource();
                             int range = spell.getRange();
                             if (pos != null) {
