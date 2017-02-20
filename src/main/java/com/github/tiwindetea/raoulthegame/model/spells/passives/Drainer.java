@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Lucas on 01/09/2016.
  */
-public class Drainer extends Spell {
+public class Drainer extends Spell<LivingThing> {
 
     private double stealPercentage = 5;
     private static final double STEAL_PERCENTAGE_PER_LEVEL = 2;

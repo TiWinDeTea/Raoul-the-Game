@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Maxime on 20/02/2017.
  */
-public class Heal extends Spell {
+public class Heal extends Spell<LivingThing> {
 
 	private static final double BASE_HEAL = 100;
 	private static final int BASE_APPLY_TURNS = 10;

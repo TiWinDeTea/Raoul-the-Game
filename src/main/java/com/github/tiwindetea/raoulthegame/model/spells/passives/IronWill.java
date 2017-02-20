@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Maxime on 20/02/2017.
  */
-public class IronWill extends Spell {
+public class IronWill extends Spell<LivingThing> {
 
 	private static final double BASE_ARMOR = 2.5;
 

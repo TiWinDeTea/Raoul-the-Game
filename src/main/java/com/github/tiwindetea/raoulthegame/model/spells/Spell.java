@@ -31,12 +31,12 @@ import java.util.ResourceBundle;
  *
  * @author Lucas LAZARE
  */
-public abstract class Spell implements Descriptable {
+public abstract class Spell<T extends LivingThing> implements Descriptable {
 
     protected static final DecimalFormat DECIMAL = new DecimalFormat("#.0");
     protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainPackage.name + ".Spells");
     protected static SpellsController controller;
-    private final WeakReference<LivingThing> owner;
+    private final WeakReference<T> owner;
     protected int targetNumber;
     protected int range;
     protected int secondaryRange; // for aoe spells
@@ -68,7 +68,7 @@ public abstract class Spell implements Descriptable {
      * @param secondaryRange the aoe range of this spell
      * @param description    the description of this spell
      */
-    public Spell(LivingThing owner, int targetNumber, int range, int secondaryRange, String description, SpellType spellType) {
+    public Spell(T owner, int targetNumber, int range, int secondaryRange, String description, SpellType spellType) {
         this.owner = new WeakReference<>(owner);
         this.targetNumber = targetNumber;
         this.range = range;
@@ -79,7 +79,7 @@ public abstract class Spell implements Descriptable {
         }
     }
 
-    public Spell(LivingThing owner, SpellType spellType) {
+    public Spell(T owner, SpellType spellType) {
         this.owner = new WeakReference<>(owner);
         for (SpellListener listener : listeners) {
             listener.createSpell(new SpellCreationEvent(this.id, spellType));
@@ -99,7 +99,7 @@ public abstract class Spell implements Descriptable {
     /**
      * @return the owner of this spell
      */
-    protected LivingThing getOwner() {
+    protected T getOwner() {
         return this.owner.get();
     }
 
@@ -203,26 +203,5 @@ public abstract class Spell implements Descriptable {
     @Override
     public String getDescription() {
         return this.description;
-    }
-
-    public static Spell newSpell(SpellType spell, LivingThing owner) throws ClassNotFoundException {
-        switch (spell) {
-            case SAVIOR:
-                return new Savior(owner);
-            case SAMPLE_SPELL:
-                throw new UnsupportedOperationException();
-            case REGEN:
-                return new Regen(owner);
-            case DRAINER:
-                return new Drainer(owner);
-            case BONUS_HP:
-                return new BonusHP(owner);
-            case Berserker:
-                return new Berserker(owner);
-            case SUMMON_DOG:
-                return new SummonDog(owner);
-            default:
-                throw new ClassNotFoundException(spell.toString());
-        }
     }
 }

@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Lucas on 01/09/2016.
  */
-public class Savior extends Spell {
+public class Savior extends Spell<LivingThing> {
     // TRIGGERS BEFORE THE HIT, NOT AFTER
     private static final int BASE_COOLDOWN = 5000; //(turns)
     private static final double BASE_HP_REGEN = 5;

@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Lucas on 01/09/2016.
  */
-public class Berserker extends Spell {
+public class Berserker extends Spell<LivingThing> {
 
     private double damageUpPercentage = 10;
     private static final double DAMAGE_UP_PERCENTAGE_PER_LEVEL = 2;

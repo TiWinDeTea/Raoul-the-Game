@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by Lucas on 01/09/2016.
  */
-public class Regen extends Spell {
+public class Regen extends Spell<LivingThing> {
 
     private int turn = 0;
     private int healQtt = 1;

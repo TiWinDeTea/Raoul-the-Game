@@ -13,7 +13,7 @@ import java.util.Collection;
 /**
  * Created by Maxime on 20/02/2017.
  */
-public class Teleport extends Spell {
+public class Teleport extends Spell<Player> {
 
 	private static final int BASE_COOLDOWN = 200; //(turns)
 	private static final double BASE_MANA_COST = 5;
@@ -77,8 +77,8 @@ public class Teleport extends Spell {
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		LivingThing owner = getOwner();
-		if(owner != null && ((Player)owner).useMana(manaCost)) {
+		Player owner = getOwner();
+		if(owner != null && owner.useMana(manaCost)) {
 			cooldown = baseCooldown;
 			owner.setPosition(sourcePosition);
 			return true;

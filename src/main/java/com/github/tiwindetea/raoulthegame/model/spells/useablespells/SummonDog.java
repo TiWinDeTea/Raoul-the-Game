@@ -23,7 +23,7 @@ import java.util.Stack;
 /**
  * Created by maliafo on 9/28/16.
  */
-public class SummonDog extends Spell {
+public class SummonDog extends Spell<LivingThing> {
 
     private class Dog extends Pet {
 

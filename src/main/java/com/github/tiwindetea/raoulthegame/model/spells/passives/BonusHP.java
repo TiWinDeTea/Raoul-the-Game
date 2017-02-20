@@ -15,21 +15,16 @@ import java.util.Collection;
 /**
  * Created by Lucas on 01/09/2016.
  */
-public class BonusHP extends Spell {
+public class BonusHP extends Spell<Player> {
 
     public static final double BASE_HP = 20;
     public static final double HP_PER_LEVEL = 10;
 
     private double currentUp = 0;
-    private WeakReference<Player> p;
 
-    public BonusHP(LivingThing owner) {
+    public BonusHP(Player owner) {
         super(owner, SpellType.BONUS_HP);
-        if (owner.getType() == LivingThingType.PLAYER) {
-            Player e = (Player) owner;
-            this.p = new WeakReference<>(e);
-            e.increaseHP(BASE_HP);
-        }
+        owner.increaseHP(BASE_HP);
         this.currentUp = BASE_HP;
         updateDescription();
     }
@@ -71,7 +66,7 @@ public class BonusHP extends Spell {
 
     @Override
     public void nextSpellLevel() {
-        Player p = this.p.get();
+        Player p = getOwner();
         if (p != null) {
             p.increaseHP(HP_PER_LEVEL);
             this.currentUp += HP_PER_LEVEL;
@@ -86,7 +81,7 @@ public class BonusHP extends Spell {
 
     @Override
     public void nextFloor() {
-        Player p = this.p.get();
+        Player p = getOwner();
         if (p != null) {
             p.heal(p.getMaxHitPoints() / 10);
             p.addMana(p.getMaxMana() / 10);
@@ -95,7 +90,7 @@ public class BonusHP extends Spell {
 
     @Override
     public void forgotten() {
-        Player p = this.p.get();
+        Player p = getOwner();
         if (p != null) {
             p.increaseHP(-this.currentUp);
             this.currentUp = 0;
