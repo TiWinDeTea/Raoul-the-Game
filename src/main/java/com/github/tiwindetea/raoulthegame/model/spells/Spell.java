@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.raoulthegame.model.spells;
 
 import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
@@ -8,12 +16,6 @@ import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.Berserker;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.BonusHP;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.Drainer;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.Savior;
-import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;

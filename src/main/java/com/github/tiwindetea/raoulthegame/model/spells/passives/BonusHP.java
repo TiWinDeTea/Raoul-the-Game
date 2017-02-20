@@ -1,7 +1,14 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
-import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
@@ -9,7 +16,6 @@ import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
-import java.lang.ref.WeakReference;
 import java.util.Collection;
 
 /**
