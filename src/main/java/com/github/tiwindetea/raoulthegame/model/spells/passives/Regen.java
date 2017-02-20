@@ -15,7 +15,7 @@ import java.util.Collection;
 public class Regen extends Spell<LivingThing> {
 
     private int turn = 0;
-    private int healQtt = 1;
+    private double healQtt = 5;
 
     private static final int CD_TURNS = 10;
 
@@ -67,7 +67,7 @@ public class Regen extends Spell<LivingThing> {
 
     @Override
     public void nextSpellLevel() {
-        this.healQtt += 1;
+        this.healQtt += 5;
         updateDescription();
     }
 

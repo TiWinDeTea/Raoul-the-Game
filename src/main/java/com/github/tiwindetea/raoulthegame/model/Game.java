@@ -734,7 +734,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     /**
-     * {@inhericDoc}
+     * {@inheritDoc}
      */
     @Override
     public void requestLockView(LockViewRequestEvent e) {
@@ -978,7 +978,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     this.players.remove(i);
                     --i;
                 } else {
-                    logger.log(this.debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
+                    logger.log(debugLevel, "Player " + player.getName() + " requested an invalid move ! (from "
                             + playerPos + " to " + pos + ")");
                     player.moveRequestDenied();
                 }
@@ -1023,7 +1023,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             } else {
                 String msg = "Nothing to do with player " + player.getName()
                         + " (player #" + (player.getNumber() + 1) + ")";
-                logger.log(this.debugLevel, msg);
+                logger.log(debugLevel, msg);
             }
         }
     }
@@ -1135,7 +1135,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private void updateConsumables() {
         ArrayList<Consumable> consumableToDelete = this.triggeredObjects.stream()
                 /* if its effect is finished */
-                .filter(consumable -> consumable.nextTick())
+                .filter(Consumable::nextTick)
                 .collect(Collectors.toCollection(ArrayList::new));
 
         for (Consumable consumable : consumableToDelete) {
@@ -1584,7 +1584,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void treatRequestEvent(InteractionRequestEvent e) {
-        logger.log(this.debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
+        logger.log(debugLevel, "interaction requested for player " + this.currentPlayer.getNumber());
         Stack<Vector2i> path = this.world.getPath(this.currentPlayer.getPosition(), e.getTilePosition(), false, null);
         boolean success = true;
         Tile tile = this.world.getTile(e.getTilePosition());
@@ -1662,7 +1662,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void treatRequestEvent(UsageRequestEvent e) {
-        logger.log(this.debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
+        logger.log(debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
         List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
         this.objectToUse = null;
         Pair<StorableObject> obj = null;
@@ -1695,7 +1695,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void treatRequestEvent(MoveRequestEvent e) {
-        logger.log(this.debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
+        logger.log(debugLevel, "Move requested for player " + this.currentPlayer.getNumber());
         Vector2i pos = this.currentPlayer.getPosition().copy().add(e.getMoveDirection());
         if (isAccessible(pos)) {
             Stack<Vector2i> stack = new Stack<>();
@@ -1712,16 +1712,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.objectToUse = null;
         for (Pair<StorableObject> pair : inventory) {
             if (pair.getId() == e.getObjectId()) {
-                if (pair.object.getType() == StorableObjectType.CONSUMABLE) {
-                } else {
-                    if (pair != null) {
-                        this.currentPlayer.removeFromInventory(pair);
-                        if (pair.object.getType() == StorableObjectType.ARMOR) {
-                            this.currentPlayer.equipWithArmor(new Pair<>(pair.getId(), (Armor) pair.object));
-                        } else if (pair.object.getType() == StorableObjectType.WEAPON) {
-                            this.currentPlayer.equipWithWeapon(new Pair<>(pair.getId(), (Weapon) pair.object));
-                        }
-                    }
+                if (pair.object.getType() != StorableObjectType.CONSUMABLE) {
+                    this.currentPlayer.removeFromInventory(pair);
+                    if (pair.object.getType() == StorableObjectType.ARMOR) {
+						this.currentPlayer.equipWithArmor(new Pair<>(pair.getId(), (Armor) pair.object));
+					} else if (pair.object.getType() == StorableObjectType.WEAPON) {
+						this.currentPlayer.equipWithWeapon(new Pair<>(pair.getId(), (Weapon) pair.object));
+					}
                 }
                 return;
             }
