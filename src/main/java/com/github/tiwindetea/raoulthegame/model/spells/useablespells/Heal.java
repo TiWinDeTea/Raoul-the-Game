@@ -65,7 +65,8 @@ public class Heal extends Spell {
 
 	@Override
 	public void nextSpellLevel() {
-
+		--applyTurns;
+		heal += 25;
 	}
 
 	@Override
