@@ -63,6 +63,11 @@ public enum SpellType {
 		public String toString() {
 			return resourceBundle.getString("summon_dog.string");
 		}
+	}, TELEPORT{
+		@Override
+		public String toString() {
+			return resourceBundle.getString("teleport.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".Spell";
