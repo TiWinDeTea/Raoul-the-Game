@@ -8,6 +8,12 @@ import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Berserker;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.BonusHP;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Drainer;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Savior;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
@@ -195,5 +201,26 @@ public abstract class Spell implements Descriptable {
     @Override
     public String getDescription() {
         return this.description;
+    }
+
+    public static Spell newSpell(SpellType spell, LivingThing owner) throws ClassNotFoundException {
+        switch (spell) {
+            case SAVIOR:
+                return new Savior(owner);
+            case SAMPLE_SPELL:
+                throw new UnsupportedOperationException();
+            case REGEN:
+                return new Regen(owner);
+            case DRAINER:
+                return new Drainer(owner);
+            case BONUS_HP:
+                return new BonusHP(owner);
+            case Berserker:
+                return new Berserker(owner);
+            case SUMMON_DOG:
+                return new SummonDog(owner);
+            default:
+                throw new ClassNotFoundException(spell.toString());
+        }
     }
 }

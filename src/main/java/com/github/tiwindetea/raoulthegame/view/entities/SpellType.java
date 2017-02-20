@@ -104,6 +104,10 @@ public enum SpellType {
 
     public String key;
 
+	SpellType() {
+		
+	}
+
     SpellType(String ressourceBundleName) {
         this.key = ressourceBundleName;
     }

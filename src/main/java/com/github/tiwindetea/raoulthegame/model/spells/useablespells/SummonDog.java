@@ -80,9 +80,8 @@ public class SummonDog extends Spell {
                 if (path != null) {
                     if (this.isGoingToOwner && path.size() > 2) {
                         this.requestedPath = path.peek();
-                        this.isAttacking = false;
                     } else {
-                        if (path.size() > 10 && new Random().nextInt() % 4 != 0 || path.size() < 6 && this.isAttacking || path.size() < 3) {
+                        if (path.size() > 10 && new Random().nextInt() % 2 != 0 || path.size() < 6 && this.isAttacking || path.size() < 3) {
                             this.isGoingToOwner = false;
                             target(mobs, players, all, owner);
                         } else {
@@ -130,7 +129,7 @@ public class SummonDog extends Spell {
         }
 
         public void kill() {
-            this.hitPoints = 0;
+            this.damage(99999999d, null);
         }
 
         public void revive() {
@@ -146,7 +145,6 @@ public class SummonDog extends Spell {
     public SummonDog(LivingThing owner) {
         super(owner, SpellType.SUMMON_DOG);
         this.dog = new Dog(owner, "Camembert.\nCamembert is binded to " + owner.getName() + ".", SummonDog.this.level, 200, 10, 1, owner.getPosition().copy());
-        this.dog.kill();
     }
 
     @Override
@@ -215,8 +213,10 @@ public class SummonDog extends Spell {
             Player powner = (Player) owner;
             if (!this.dog.isAlive()) {
                 if (powner.useMana(this.manaConsumption)) {
+                    this.dog.setPosition(new Vector2i(0, 0));
                     Spell.controller.createEntity(this.dog, LivingEntityType.DOG, null);
                     Spell.controller.shareLosWith(this.dog.getId(), 3);
+                    this.dog.setPosition(sourcePosition);
                     this.dog.revive();
                     return true;
                 }
@@ -227,9 +227,11 @@ public class SummonDog extends Spell {
 
     @Override
     public void nextFloor() {
-        if (this.dog.isAlive()) {
+        LivingThing owner = getOwner();
+        if (this.dog.isAlive() && owner != null) {
             Spell.controller.createEntity(this.dog, LivingEntityType.DOG, null);
             Spell.controller.shareLosWith(this.dog.getId(), 3);
+            this.dog.setPosition(owner.getPosition());
         }
     }
 

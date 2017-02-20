@@ -167,7 +167,7 @@ public class Player extends LivingThing {
 
     public void test() {
         this.spells.add(new SummonDog(this));
-        this.spells.get(0).cast(null, null);
+        this.spells.get(0).cast(null, getPosition());
     }
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {

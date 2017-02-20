@@ -278,21 +278,21 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         @Override
         public void shareLosWith(long id, int range) {
-            for (Mob mob : Game.this.mobs) {
+            for (LivingThing livingSpell : Game.this.livingSpells) {
+                if (livingSpell.getId() == id) {
+                    Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(livingSpell, range));
+                    return;
+                }
+            }
+            for (LivingThing mob : Game.this.mobs) {
                 if (mob.getId() == id) {
                     Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(mob, range));
                     return;
                 }
             }
-            for (Player player : Game.this.players) {
+            for (LivingThing player : Game.this.players) {
                 if (player.getId() == id) {
                     Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(player, range));
-                    return;
-                }
-            }
-            for (LivingThing livingSpell : Game.this.livingSpells) {
-                if (livingSpell.getId() == id) {
-                    Game.this.livingsSharedLOS.put(id, new javafx.util.Pair<>(livingSpell, range));
                     return;
                 }
             }
@@ -749,11 +749,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
      */
     private void generateLevel() {
 
-        ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size() + this.players.size());
-        livings.addAll(this.players);
-        livings.addAll(this.mobs);
-        livings.forEach(l -> l.getSpells().forEach(s -> s.nextFloor()));
-
         Sound.player.play(Sounds.NEXT_FLOOR_SOUND);
         System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
         fireLevelUpdateEvent(new LevelUpdateEvent(this.level));
@@ -865,6 +860,16 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     this.world.getLOS(player.getPosition(), player.getLos(), 4)
             ));
         }
+
+        ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size()
+                + this.players.size()
+                + this.playersOnNextLevel.size());
+
+        livings.addAll(this.players);
+        livings.addAll(this.playersOnNextLevel);
+        //livings.addAll(this.mobs); todo : uncomment if mobs have spells
+        livings.forEach(l -> l.getSpells().forEach(Spell::nextFloor));
+
         fireCenterOnTileEvent(new CenterOnTileEvent(this.players.get(0).getPosition()));
     }
 
@@ -1050,7 +1055,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private void updateLivingsSpells() {
         ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size() + this.players.size());
         livings.addAll(this.players);
-        livings.addAll(this.mobs);
+        //livings.addAll(this.mobs); todo : uncomment if mobs have spells
 
         for (LivingThing living : livings) {
             living.getSpells().stream()
@@ -1092,13 +1097,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.mobs.remove(mob);
         }
 
-        this.livingSpells.stream()
-                .filter(spell -> !spell.isAlive())
-                .collect(Collectors.toCollection(ArrayList::new))
-                .forEach(e -> {
-                    this.livingSpells.remove(e);
-                    fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(e.getId()));
-                });
+        this.livingSpells.removeIf(spell -> !spell.isAlive());
 
         ArrayList<Player> playerToDelete = new ArrayList<>();
         for (Player player : this.players) {
@@ -1485,50 +1484,55 @@ public class Game implements RequestListener, Runnable, Stoppable {
         Sound.player.play(this.currentMusic);
         RequestEvent event;
         this.currentPlayer.test();
-        do {
-            try {
-                Thread.sleep(REFRESH_TIME_MS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (!this.isPaused) {
-                do {
-                    event = this.requestedEvent.poll();
-                    while (event != null) {
-                        try { // debug
-                            switch (event.getSubType()) {
-                                case MOVE_REQUEST_EVENT:
-                                    treatRequestEvent((MoveRequestEvent) event);
-                                    break;
-                                case INTERACTION_REQUEST_EVENT:
-                                    treatRequestEvent((InteractionRequestEvent) event);
-                                    break;
-                                case USAGE_REQUEST_EVENT:
-                                    treatRequestEvent((UsageRequestEvent) event);
-                                    break;
-                                case DROP_REQUEST_EVENT:
-                                    treatRequestEvent((DropRequestEvent) event);
-                                    break;
-                                case CENTER_VIEW_REQUEST_EVENT:
-                                    treatRequestEvent((CenterViewRequestEvent) event);
-                                    break;
-                                case EQUIP_REQUEST_EVENT:
-                                    treatRequestEvent((EquipRequestEvent) event);
-                                    break;
+        try {
+            do {
+                try {
+                    Thread.sleep(REFRESH_TIME_MS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (!this.isPaused) {
+                    do {
+                        event = this.requestedEvent.poll();
+                        while (event != null) {
+                            try { // debug
+                                switch (event.getSubType()) {
+                                    case MOVE_REQUEST_EVENT:
+                                        treatRequestEvent((MoveRequestEvent) event);
+                                        break;
+                                    case INTERACTION_REQUEST_EVENT:
+                                        treatRequestEvent((InteractionRequestEvent) event);
+                                        break;
+                                    case USAGE_REQUEST_EVENT:
+                                        treatRequestEvent((UsageRequestEvent) event);
+                                        break;
+                                    case DROP_REQUEST_EVENT:
+                                        treatRequestEvent((DropRequestEvent) event);
+                                        break;
+                                    case CENTER_VIEW_REQUEST_EVENT:
+                                        treatRequestEvent((CenterViewRequestEvent) event);
+                                        break;
+                                    case EQUIP_REQUEST_EVENT:
+                                        treatRequestEvent((EquipRequestEvent) event);
+                                        break;
+                                }
+                            } catch (Exception e) {
+                                // debug
+                                e.printStackTrace();
+                            } finally {
+                                event = this.requestedEvent.poll();
                             }
-                        } catch (Exception e) {
-                            // debug
-                            e.printStackTrace();
-                        } finally {
-                            event = this.requestedEvent.poll();
                         }
-                    }
-                    if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
-                        this.nextTick(); // modifies the here-above boolean
-                    }
-                } while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
-            }
-        } while (this.isRunning);
+                        if (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level) {
+                            this.nextTick(); // modifies the here-above boolean
+                        }
+                    } while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+                }
+            } while (this.isRunning);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
 
         Sound.player.stop(this.currentMusic);
 
@@ -1789,6 +1793,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         this.ghostsStatic.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
         this.ghostsStatic.clear();
+
+        this.livingSpells.forEach(l -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(l.getId())));
+        this.livingSpells.clear();
 
         for (Player player : this.players) {
             fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
