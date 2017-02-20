@@ -16,7 +16,7 @@ import java.util.Collections;
 /**
  * @author Lucas Lazare
  */
-public class Explorer extends Spell {
+public class Explorer extends Spell<Player> {
 
 	private static final double MANA_COST = 5;
 
@@ -25,8 +25,12 @@ public class Explorer extends Spell {
 	private int explorationRange = 0;
 	private boolean castedOnLastFloor = false;
 
-	public Explorer(LivingThing owner) {
+	public Explorer(Player owner) {
 		super(owner, SpellType.EXPLORER);
+		description = "Explorer (active).\n" +
+				"Summons a ghost spirit that explores the path to the" +
+				"next floor for you." +
+				"Cost: " + MANA_COST + " mana.";
 	}
 
 	@Override
@@ -83,9 +87,9 @@ public class Explorer extends Spell {
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		LivingThing owner = getOwner();
+		Player owner = getOwner();
 		if (owner != null) {
-			if (((Player) owner).useMana(MANA_COST)) {
+			if (owner.useMana(MANA_COST)) {
 				this.position = owner.getPosition();
 				makeGhost();
 				castedOnLastFloor = true;
@@ -117,9 +121,10 @@ public class Explorer extends Spell {
 		id = controller.createGhostEntity(
 				LivingEntityType.PEACEFUL_ECTOPLASMA
 				, position
-				, "Basically a living ward..."
+				, "Missing description"
 				, Direction.random()
-				, 3, explorationRange
+				, 3
+				, explorationRange
 		);
 	}
 }
