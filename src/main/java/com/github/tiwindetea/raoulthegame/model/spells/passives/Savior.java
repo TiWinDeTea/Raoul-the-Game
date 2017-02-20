@@ -21,10 +21,12 @@ public class Savior extends Spell {
     private static final double TRIGGER_TRESHOLD_HEALTH = 3;
     //will regen 5 + 10% of the max hp upon reaching less than 5% of max hp or less than 3 hp
 
-    private int cd = BASE_COOLDOWN;
+    private int baseCooldown = BASE_COOLDOWN;
+    private int cooldown = baseCooldown;
 
     public Savior(LivingThing owner) {
         super(owner, SpellType.SAVIOR);
+        updateDescription();
     }
 
     @Override
@@ -44,12 +46,12 @@ public class Savior extends Spell {
 
     @Override
     public double ownerDamaged(@Nullable LivingThing source, double damages) {
-        if (this.cd <= 0) {
+        if (this.cooldown <= 0) {
             LivingThing owner = this.getOwner();
             if (owner != null) {
                 double diff;
-                final double O_MAX_HP = owner.getMaxHitPoints();
-                final double O_HP = owner.getHitPoints();
+                double O_MAX_HP = owner.getMaxHitPoints();
+                double O_HP = owner.getHitPoints();
                 if (damages > 0) {
                     double tmp = 0;
                     for (Spell spell : owner.getSpells()) {
@@ -65,7 +67,7 @@ public class Savior extends Spell {
                 }
                 diff += O_HP;
                 if (diff < O_MAX_HP * TRIGGER_TRESHOLD_PERCENTAGE / 100 || diff < TRIGGER_TRESHOLD_HEALTH) {
-                    this.cd = BASE_COOLDOWN;
+                    this.cooldown = baseCooldown;
                     owner.damage(damages, null);
                     owner.damage(-(O_MAX_HP * PERCENTAGE_HP_REGEN / 100 + BASE_HP_REGEN + 1), null);
                 }
@@ -81,8 +83,8 @@ public class Savior extends Spell {
 
     @Override
     public void update(Collection<LivingThing> targets) {
-        if (this.cd > 0) {
-            --this.cd;
+        if (this.cooldown > 0) {
+            --this.cooldown;
         }
     }
 
@@ -93,7 +95,9 @@ public class Savior extends Spell {
 
     @Override
     public void nextSpellLevel() {
-        this.cd = Math.max(1, this.cd - 100);
+        this.cooldown = 0;
+        this.baseCooldown = Math.max(1, this.baseCooldown - 100);
+        updateDescription();
     }
 
     @Override
@@ -109,5 +113,11 @@ public class Savior extends Spell {
     @Override
     public void forgotten() {
 
+    }
+
+    private void updateDescription() {
+        description = "Savior (passive).\n" +
+                "Heals you when you are about to die.\n" +
+                "Cooldown: " + this.baseCooldown;
     }
 }

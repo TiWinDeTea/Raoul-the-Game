@@ -21,6 +21,7 @@ public class Regen extends Spell {
 
     public Regen(LivingThing owner) {
         super(owner, SpellType.REGEN);
+        updateDescription();
     }
 
     @Override
@@ -67,6 +68,7 @@ public class Regen extends Spell {
     @Override
     public void nextSpellLevel() {
         this.healQtt += 1;
+        updateDescription();
     }
 
     @Override
@@ -82,5 +84,10 @@ public class Regen extends Spell {
     @Override
     public void forgotten() {
 
+    }
+
+    private void updateDescription() {
+        description = "Rejuvenate (passive).\n" +
+                "Passively regenerate your health (" + this.healQtt + "hp per turn)";
     }
 }

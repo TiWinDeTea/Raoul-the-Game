@@ -17,11 +17,11 @@ import java.util.Collection;
  */
 public class BonusHP extends Spell {
 
-    public static final int BASE_HP = 20;
-    public static final int HP_PER_LEVEL = 10;
+    public static final double BASE_HP = 20;
+    public static final double HP_PER_LEVEL = 10;
 
-    private int currentUp = 0;
-    private WeakReference<Player> p = null;
+    private double currentUp = 0;
+    private WeakReference<Player> p;
 
     public BonusHP(LivingThing owner) {
         super(owner, SpellType.BONUS_HP);
@@ -31,6 +31,7 @@ public class BonusHP extends Spell {
             e.increaseHP(BASE_HP);
         }
         this.currentUp = BASE_HP;
+        updateDescription();
     }
 
     @Override
@@ -75,6 +76,7 @@ public class BonusHP extends Spell {
             p.increaseHP(HP_PER_LEVEL);
             this.currentUp += HP_PER_LEVEL;
         }
+        updateDescription();
     }
 
     @Override
@@ -98,5 +100,12 @@ public class BonusHP extends Spell {
             p.increaseHP(-this.currentUp);
             this.currentUp = 0;
         }
+    }
+
+    private void updateDescription() {
+        description = "An apple a day keeps the doctor away\n" +
+                "    (especially if you aim carefully).\n" +
+                "Give you some extra HP\n" +
+                "Current bonus: " + DECIMAL.format(this.currentUp) + "HP";
     }
 }

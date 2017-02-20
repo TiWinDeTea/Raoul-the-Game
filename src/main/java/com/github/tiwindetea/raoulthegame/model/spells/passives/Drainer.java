@@ -19,6 +19,7 @@ public class Drainer extends Spell {
 
     public Drainer(LivingThing owner) {
         super(owner, SpellType.DRAINER);
+        updateDescription();
     }
 
     @Override
@@ -76,6 +77,7 @@ public class Drainer extends Spell {
     @Override
     public void nextSpellLevel() {
         this.stealPercentage += Drainer.STEAL_PERCENTAGE_PER_LEVEL;
+        updateDescription();
     }
 
     @Override
@@ -91,5 +93,11 @@ public class Drainer extends Spell {
     @Override
     public void forgotten() {
 
+    }
+
+    private void updateDescription() {
+        description = "Drainer (passive).\n" +
+                "Heal you when you hit an ennemy.\n" +
+                "Current life steal: " + DECIMAL.format(this.stealPercentage) + "%";
     }
 }

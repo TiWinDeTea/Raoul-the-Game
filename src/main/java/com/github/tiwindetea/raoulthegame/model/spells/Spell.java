@@ -19,6 +19,7 @@ import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
 import java.lang.ref.WeakReference;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.ResourceBundle;
  */
 public abstract class Spell implements Descriptable {
 
+    protected static final DecimalFormat DECIMAL = new DecimalFormat("#.0");
     protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle(MainPackage.name + ".Spells");
     protected static SpellsController controller;
     private final WeakReference<LivingThing> owner;

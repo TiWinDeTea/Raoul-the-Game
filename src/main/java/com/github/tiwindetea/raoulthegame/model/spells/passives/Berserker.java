@@ -22,6 +22,7 @@ public class Berserker extends Spell {
 
     public Berserker(LivingThing owner) {
         super(owner, SpellType.Berserker);
+        updateDescription();
     }
 
     @Override
@@ -67,6 +68,7 @@ public class Berserker extends Spell {
     public void nextSpellLevel() {
         this.damageUpPercentage += Berserker.DAMAGE_UP_PERCENTAGE_PER_LEVEL;
         this.defenseDownPercentage += Berserker.DEFENSE_DOWN_PERCENTAGE_PER_LEVEL;
+        updateDescription();
     }
 
     @Override
@@ -82,5 +84,11 @@ public class Berserker extends Spell {
     @Override
     public void forgotten() {
 
+    }
+
+    private void updateDescription() {
+        description = "Berserker (passive).\nYou deal +" + DECIMAL.format(this.damageUpPercentage)
+                + "% increased damage, but also suffer from +" + DECIMAL.format(this.defenseDownPercentage)
+                + "% increased damage";
     }
 }
