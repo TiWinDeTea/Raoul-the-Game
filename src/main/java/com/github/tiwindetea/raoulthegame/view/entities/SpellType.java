@@ -73,6 +73,11 @@ public enum SpellType {
 		public String toString() {
 			return resourceBundle.getString("iron_will.string");
 		}
+	}, HEAL{
+		@Override
+		public String toString() {
+			return resourceBundle.getString("heal.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".Spell";
