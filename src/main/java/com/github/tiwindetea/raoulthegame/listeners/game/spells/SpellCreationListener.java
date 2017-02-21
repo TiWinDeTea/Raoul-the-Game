@@ -6,20 +6,22 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.game.spell;
+package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
 import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
 
 /**
- * The interface SpellCreationListener
+ * The interface SpellCreationListener.
  *
  * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
 public interface SpellCreationListener {
+
     /**
-     * Handler associated to a SpellCreationEvent
+     * Handler associated to a SpellCreationEvent.
      *
      * @param e Event to handle
      */
-    void createSpell(SpellCreationEvent e);
+    void handle(SpellCreationEvent e);
 }

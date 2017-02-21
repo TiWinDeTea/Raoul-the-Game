@@ -44,6 +44,11 @@ import com.github.tiwindetea.raoulthegame.events.requests.MoveRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.UsageRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellDescriptionUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellEvent;
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityEvent;
@@ -631,9 +636,31 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					updateScore((ScoreUpdateEvent) gameEvent);
 					break;
 				}
-				case LEVEL_UPDATE_EVENT:
+				case LEVEL_UPDATE_EVENT: {
 					updateLevel((LevelUpdateEvent) gameEvent);
 					break;
+				}
+				case SPELL_EVENT:{
+					SpellEvent e = (SpellEvent) gameEvent;
+					switch(e.getSubType()) {
+					case SPELL_CREATION_EVENT:{
+						//TODO
+						break;
+					}
+					case SPELL_DELETION_EVENT:{
+						//TODO
+						break;
+					}
+					case SPELL_COOLDOWN_UPDATE_EVENT:{
+						//TODO
+						break;
+					}
+					case SPELL_DESCRIPTION_UPDATE_EVENT:{
+						//TODO
+						break;
+					}
+					}
+				}
 				}
 				gameEvent = GUI.this.eventQueue.poll();
 			}
@@ -942,6 +969,26 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void handle(LivingEntityXpUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void handle(SpellCooldownUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void handle(SpellDescriptionUpdateEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void handle(SpellCreationEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void handle(SpellDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 

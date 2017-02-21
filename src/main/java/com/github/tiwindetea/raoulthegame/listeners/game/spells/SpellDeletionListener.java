@@ -6,17 +6,22 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.game;
+package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.listeners.game.entities.EntityListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.map.MapListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.players.PlayerListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellDeletionEvent;
 
 /**
- * The interface GameListener, that regroups some other listeners.
+ * The interface SpellDeletionListener.
  *
+ * @author Lucas LAZARE
  * @author Maxime PINARD
  */
-public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener, SpellListener {
+public interface SpellDeletionListener {
+
+    /**
+     * Handler associated to a SpellDeletionEvent.
+     *
+     * @param e Event to handle
+     */
+    void handle(SpellDeletionEvent e);
 }

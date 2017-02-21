@@ -6,13 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.game.spell;
+package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
+import com.github.tiwindetea.raoulthegame.events.spells.SpellCooldownUpdateEvent;
 
 /**
- * The interface GameListener, that regroups some other listeners
+ * The interface SpellCooldownUpdateListener.
  *
- * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
-public interface SpellListener extends SpellCreationListener, SpellDeletionListener {
+public interface SpellCooldownUpdateListener {
+
+	/**
+	 * Handler associated to a SpellCooldownUpdateEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(SpellCooldownUpdateEvent e);
 }

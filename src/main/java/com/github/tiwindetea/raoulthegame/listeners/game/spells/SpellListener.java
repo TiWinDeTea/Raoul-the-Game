@@ -6,17 +6,14 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.game;
+package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.listeners.game.entities.EntityListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.map.MapListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.players.PlayerListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
 
 /**
  * The interface GameListener, that regroups some other listeners.
  *
+ * @author Lucas LAZARE
  * @author Maxime PINARD
  */
-public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener, SpellListener {
+public interface SpellListener extends SpellCooldownUpdateListener, SpellCreationListener, SpellDeletionListener, SpellDescriptionUpdateListener {
 }

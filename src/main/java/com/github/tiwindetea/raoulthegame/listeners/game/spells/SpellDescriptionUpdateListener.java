@@ -6,20 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.game.spell;
+package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.events.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.spells.SpellDescriptionUpdateEvent;
 
 /**
- * The interface SpellDeletionListener
+ * The interface SpellDescriptionUpdateListener.
  *
- * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
-public interface SpellDeletionListener {
-    /**
-     * Handler associated to a SpellDeletionEvent
-     *
-     * @param e Event to handle
-     */
-    void deleteSpell(SpellDeletionEvent e);
+public interface SpellDescriptionUpdateListener {
+
+	/**
+	 * Handler associated to a SpellDescriptionUpdateEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(SpellDescriptionUpdateEvent e);
 }
