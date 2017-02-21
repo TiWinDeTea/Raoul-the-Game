@@ -507,6 +507,22 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			}
 		}
 
+		public void createSpell(SpellCreationEvent e) {
+			//TODO
+		}
+
+		public void deleteSpell(SpellDeletionEvent e) {
+			//TODO
+		}
+
+		public void updateSpellCooldown(SpellCooldownUpdateEvent e) {
+			//TODO
+		}
+
+		public void updateSpellDescription(SpellDescriptionUpdateEvent e) {
+			//TODO
+		}
+
 		@Override
 		public void handle(ActionEvent event) {
 			Event gameEvent = GUI.this.eventQueue.poll();
@@ -644,19 +660,19 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					SpellEvent e = (SpellEvent) gameEvent;
 					switch(e.getSubType()) {
 					case SPELL_CREATION_EVENT:{
-						//TODO
+						createSpell((SpellCreationEvent) e);
 						break;
 					}
 					case SPELL_DELETION_EVENT:{
-						//TODO
+						deleteSpell((SpellDeletionEvent) e);
 						break;
 					}
 					case SPELL_COOLDOWN_UPDATE_EVENT:{
-						//TODO
+						updateSpellCooldown((SpellCooldownUpdateEvent) e);
 						break;
 					}
 					case SPELL_DESCRIPTION_UPDATE_EVENT:{
-						//TODO
+						updateSpellDescription((SpellDescriptionUpdateEvent) e);
 						break;
 					}
 					}

@@ -12,7 +12,6 @@ import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.event.EventHandler;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
@@ -74,16 +73,10 @@ public class PlayerHUD extends Parent {
 	private final Rectangle maskRectangle = new Rectangle(INFOS_PANE_SIZE.x + SPELLS_PANE_SIZE.x, INFOS_PANE_SIZE.y, BACKGROUND_COLOR);
 	private final HBox mainHBox = new HBox();
 
-	//temp
-	private final Rectangle spell1Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 12, 12, 32, 32);
-	private final Rectangle spell2Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 12, 32, 32);
-	private final Rectangle spell3Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 12, 56, 32, 32);
-	private final Rectangle spell4Rectangle = new Rectangle(INFOS_PANE_SIZE.x + 56, 56, 32, 32);
-
-	private final ImageView spell1ImageView = new ImageView();
-	private final ImageView spell2ImageView = new ImageView();
-	private final ImageView spell3ImageView = new ImageView();
-	private final ImageView spell4ImageView = new ImageView();
+	private final SpellDisplayer spell1Displayer = new SpellDisplayer();
+	private final SpellDisplayer spell2Displayer = new SpellDisplayer();
+	private final SpellDisplayer spell3Displayer = new SpellDisplayer();
+	private final SpellDisplayer spell4Displayer = new SpellDisplayer();
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -149,20 +142,6 @@ public class PlayerHUD extends Parent {
 		this.playerPicture.setTranslateX(SPACE);
 		this.playerPicture.setTranslateY((INFOS_PANE_SIZE.y - PLAYER_PICTURE_SIZE.y) / 2.0);
 
-		/*this.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText(PlayerHUD.this.description);
-			}
-		});
-		this.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});*/
 
 		this.getChildren().add(this.maxHealthRectangle);
 		this.maxHealthRectangle.setTranslateX(2 * SPACE + PLAYER_PICTURE_SIZE.x);
@@ -250,82 +229,25 @@ public class PlayerHUD extends Parent {
 			}
 		});
 
-		getChildren().addAll(this.spell1Rectangle, this.spell2Rectangle, this.spell3Rectangle, this.spell4Rectangle);
-		getChildren().addAll(this.spell1ImageView, this.spell2ImageView, this.spell3ImageView, this.spell4ImageView);
-
-		//TODO: --------- tmp ----------
-		this.spell1Rectangle.setFill(Color.YELLOW);
-		this.spell1Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText("Spell 1");
-			}
-		});
-		this.spell1Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});
-		this.spell2Rectangle.setFill(Color.YELLOW);
-		this.spell2Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText("Spell 2");
-			}
-		});
-		this.spell2Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});
-		this.spell3Rectangle.setFill(Color.YELLOW);
-		this.spell3Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText("Spell 3");
-			}
-		});
-		this.spell3Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});
-		this.spell4Rectangle.setFill(Color.YELLOW);
-		this.spell4Rectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText("Spell 4");
-			}
-		});
-		this.spell4Rectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});
-
-		this.spell1ImageView.setX(INFOS_PANE_SIZE.x + 12);
-		this.spell1ImageView.setY(12);
-		this.spell2ImageView.setX(INFOS_PANE_SIZE.x + 56);
-		this.spell2ImageView.setY(12);
-		this.spell3ImageView.setX(INFOS_PANE_SIZE.x + 12);
-		this.spell3ImageView.setY(56);
-		this.spell4ImageView.setX(INFOS_PANE_SIZE.x + 56);
-		this.spell4ImageView.setY(56);
+		getChildren().addAll(this.spell1Displayer, this.spell2Displayer, this.spell3Displayer, this.spell4Displayer);
+		this.spell1Displayer.setTranslateX(INFOS_PANE_SIZE.x + 12);
+		this.spell1Displayer.setTranslateY(12);
+		this.spell2Displayer.setTranslateX(INFOS_PANE_SIZE.x + 56);
+		this.spell2Displayer.setTranslateY(12);
+		this.spell3Displayer.setTranslateX(INFOS_PANE_SIZE.x + 12);
+		this.spell3Displayer.setTranslateY(56);
+		this.spell4Displayer.setTranslateX(INFOS_PANE_SIZE.x + 56);
+		this.spell4Displayer.setTranslateY(56);
 
 		//TODO: --------- tmp test ---------
-		setSpell(1, SpellType.REGEN, "regen description");
+		setSpellType(1, SpellType.EXPLORER);
+		setSpellBaseCooldown(1, 100);
+		setSpellCooldown(1, 60);
+		setSpellDescription(1, "test 1");
+		setSpellType(2, SpellType.REGEN);
+		setSpellBaseCooldown(2, 30);
+		setSpellCooldown(2, 8);
+		setSpellDescription(2, "test 2");
 	}
 
 	/**
@@ -368,6 +290,20 @@ public class PlayerHUD extends Parent {
 		    "\nRange: " + this.actualRange +
 		    "\n" +
 		    "\nPower grade: " + this.actualPowerGrade;
+	}
+
+	private SpellDisplayer getSpellDisplayer(int spellNumber) {
+		switch(spellNumber) {
+		case 1:
+			return this.spell1Displayer;
+		case 2:
+			return this.spell2Displayer;
+		case 3:
+			return this.spell3Displayer;
+		case 4:
+			return this.spell4Displayer;
+		}
+		return null;
 	}
 
 	/**
@@ -497,46 +433,63 @@ public class PlayerHUD extends Parent {
 	}
 
 	/**
-	 * Set a spell.
+	 * Sets spell type.
 	 *
 	 * @param spellNumber the spell number
 	 * @param spellType   the spell type
+	 */
+	void setSpellType(int spellNumber, SpellType spellType) {
+		if(spellNumber > 0 && spellNumber < 5) {
+			getSpellDisplayer(spellNumber).setSpellType(spellType);
+		}
+		else {
+			System.out.println("PlayerHUD::setSpellType : invalid spell number " + spellNumber);
+		}
+	}
+
+	/**
+	 * Sets spell description.
+	 *
+	 * @param spellNumber the spell number
 	 * @param description the description
 	 */
-	public void setSpell(int spellNumber, SpellType spellType, String description) {
-
-		ImageView imageView;
-		switch(spellNumber) {
-		case 1:
-			imageView = this.spell1ImageView;
-			break;
-		case 2:
-			imageView = this.spell2ImageView;
-			break;
-		case 3:
-			imageView = this.spell3ImageView;
-			break;
-		default:
-			imageView = this.spell4ImageView;
-			break;
+	void setSpellDescription(int spellNumber, String description) {
+		if(spellNumber > 0 && spellNumber < 5) {
+			getSpellDisplayer(spellNumber).setDescription(description);
 		}
+		else {
+			System.out.println("PlayerHUD::setSpellDescription : invalid spell number " + spellNumber);
+		}
+	}
 
-		imageView.setImage(spellType.getImage());
-		imageView.setViewport(new Rectangle2D(spellType.getSpritePosition().x * ViewPackage.SPRITES_SIZE.x, spellType.getSpritePosition().y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
-		imageView.setOnMouseEntered(new EventHandler<MouseEvent>() {
+	/**
+	 * Sets spell base cooldown.
+	 *
+	 * @param spellNumber  the spell number
+	 * @param baseCooldown the base cooldown
+	 */
+	void setSpellBaseCooldown(int spellNumber, int baseCooldown) {
+		if(spellNumber > 0 && spellNumber < 5) {
+			getSpellDisplayer(spellNumber).setBaseCooldown(baseCooldown);
+		}
+		else {
+			System.out.println("PlayerHUD::setSpellBaseCooldown : invalid spell number " + spellNumber);
+		}
+	}
 
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.setText(description);
-			}
-		});
-		imageView.setOnMouseExited(new EventHandler<MouseEvent>() {
-
-			@Override
-			public void handle(MouseEvent event) {
-				InformationsDisplayer.clear();
-			}
-		});
+	/**
+	 * Sets spell cooldown.
+	 *
+	 * @param spellNumber the spell number
+	 * @param cooldown    the cooldown
+	 */
+	void setSpellCooldown(int spellNumber, int cooldown) {
+		if(spellNumber > 0 && spellNumber < 5) {
+			getSpellDisplayer(spellNumber).setCooldown(cooldown);
+		}
+		else {
+			System.out.println("PlayerHUD::setSpellCooldown : invalid spell number " + spellNumber);
+		}
 	}
 
 	/**
