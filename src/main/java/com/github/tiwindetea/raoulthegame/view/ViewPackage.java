@@ -13,6 +13,7 @@ import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -51,6 +52,10 @@ public class ViewPackage {
 	  Integer.parseInt(TILES_RESOURCE_BUNDLE.getString("fog.sprite.position.y")));
 
 	public static final String MAIN_FONT_PATH = "/" + PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("font.mainfont.file");
+
+
+	private final static String LET_bundleName = MainPackage.name + ".LivingEntity";
+	public final static ResourceBundle LET_resourceBundle = ResourceBundle.getBundle(LET_bundleName, Locale.getDefault());
 
 	/**
 	 * Gets main font.
