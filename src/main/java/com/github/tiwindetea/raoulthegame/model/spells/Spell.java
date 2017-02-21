@@ -14,8 +14,25 @@ import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Berserker;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.BonusHP;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Drainer;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.IronWill;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Savior;
+import com.github.tiwindetea.raoulthegame.model.spells.passives.Thorn;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Explorer;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.FireBall;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Grenade;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Heal;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Octopus;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.PotCreator;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.ScrollSpell;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Teleport;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
@@ -205,5 +222,43 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     @Override
     public String getDescription() {
         return this.description;
+    }
+
+    public static Spell<? extends LivingThing> toSpell(SpellType type, Player owner) {
+        switch (type) {
+            case SUMMON_DOG:
+                return new SummonDog(owner);
+            case HEAL:
+                return new Heal(owner);
+            case DRAINER:
+                return new Drainer(owner);
+            case SAVIOR:
+                return new Savior(owner);
+            case FIRE_BALL:
+                return new FireBall(owner);
+            case TELEPORT:
+                return new Teleport(owner);
+            case REGEN:
+                return new Regen(owner);
+            case BERSERKER:
+                return new Berserker(owner);
+            case OCTOPUS:
+                return new Octopus(owner);
+            case POT_CREATOR:
+                return new PotCreator(owner);
+            case BONUS_HP:
+                return new BonusHP(owner);
+            case IRON_WILL:
+                return new IronWill(owner);
+            case GRENADE:
+                return new Grenade(owner);
+            case SCROLL_SPELL:
+                return new ScrollSpell(owner);
+            case THORN:
+                return new Thorn(owner);
+            case EXPLORER:
+                return new Explorer(owner);
+        }
+        return null;
     }
 }

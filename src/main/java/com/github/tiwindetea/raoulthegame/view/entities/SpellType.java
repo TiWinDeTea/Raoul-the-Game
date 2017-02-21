@@ -27,11 +27,11 @@ public enum SpellType {
 	REGEN("regen"),
 	BERSERKER("berserker"),
 	OCTOPUS("octopus"), // todo
-	POT("pot"), // todo
+	POT_CREATOR("pot_creator"), // todo
 	BONUS_HP("bonus_hp"),
 	IRON_WILL("iron_will"),
 	GRENADE("grenade"), // todo
-	SCROLL("scroll"), // todo
+	SCROLL_SPELL("scroll_spell"), // todo
 	THORN("thorn"), // todo
 	EXPLORER("explorer");
 
