@@ -57,6 +57,9 @@ public class ViewPackage {
 	private final static String LET_bundleName = MainPackage.name + ".LivingEntity";
 	public final static ResourceBundle LET_resourceBundle = ResourceBundle.getBundle(LET_bundleName, Locale.getDefault());
 
+	private final static String ST_bundleName = MainPackage.name + ".Spell";
+	public final static ResourceBundle ST_resourceBundle = ResourceBundle.getBundle(ST_bundleName, Locale.getDefault());
+
 	/**
 	 * Gets main font.
 	 *

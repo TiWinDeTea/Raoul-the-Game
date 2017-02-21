@@ -8,13 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.view.entities;
 
-import com.github.tiwindetea.raoulthegame.model.MainPackage;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.scene.image.Image;
-
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * The enum SpellType
@@ -22,77 +18,24 @@ import java.util.ResourceBundle;
  * @author Lucas LAZARE
  */
 public enum SpellType {
-	SAVIOR {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("savior.string");
-		}
-	},
-	SAMPLE_SPELL {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("sample_spell.string");
-		}
-	},
-	REGEN {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("regen.string");
-		}
-	},
-	DRAINER {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("drainer.string");
-		}
-	},
-	BONUS_HP {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("bonus_hp.string");
-		}
-	},
-	Berserker {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("berserker.string");
-		}
-	},
-	SUMMON_DOG {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("summon_dog.string");
-		}
-	}, TELEPORT{
-		@Override
-		public String toString() {
-			return resourceBundle.getString("teleport.string");
-		}
-	}, IRON_WILL{
-		@Override
-		public String toString() {
-			return resourceBundle.getString("iron_will.string");
-		}
-	}, HEAL{
-		@Override
-		public String toString() {
-			return resourceBundle.getString("heal.string");
-		}
-	}, EXPLORER {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("explorer.string");
-		}
-	}, FIRE_BALL {
-		@Override
-		public String toString() {
-			return resourceBundle.getString("fire_ball.string");
-		}
-	};
+	SUMMON_DOG("summon_dog"),
+	HEAL("heal"),
+	DRAINER("drainer"),
+	SAVIOR("savior"),
+	FIRE_BALL("fire_ball"),
+	TELEPORT("teleport"),
+	REGEN("regen"),
+	BERSERKER("berserker"),
+	OCTOPUS("octopus"), // todo
+	POT("pot"), // todo
+	BONUS_HP("bonus_hp"),
+	IRON_WILL("iron_will"),
+	GRENADE("grenade"), // todo
+	SCROLL("scroll"), // todo
+	THORN("thorn"), // todo
+	EXPLORER("explorer");
 
-	private final static String bundleName = MainPackage.name + ".Spell";
-
-	private final static ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+	public String name;
 
 	/**
 	 * Gets sprite position.
@@ -100,8 +43,8 @@ public enum SpellType {
 	 * @return the sprite position
 	 */
 	public Vector2i getSpritePosition() {
-		return new Vector2i(Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.x")),
-		  Integer.parseInt(resourceBundle.getString(this.toString() + ".sprite.position.y")));
+		return new Vector2i(Integer.parseInt(ViewPackage.ST_resourceBundle.getString(this.toString() + ".sprite.position.x")),
+		  Integer.parseInt(ViewPackage.ST_resourceBundle.getString(this.toString() + ".sprite.position.y")));
 	}
 
 	/**
@@ -110,8 +53,8 @@ public enum SpellType {
 	 * @return the image
 	 */
 	public Image getImage() {
-		switch(resourceBundle.getString(this.toString() + ".sprite.file")) {
-		case "Spells.png":
+		switch(ViewPackage.ST_resourceBundle.getString(this.name + ".sprite.file")) {
+		case "SpellsIcons.png":
 			return ViewPackage.SPELLS_IMAGE;
 		case "Objects.png":
 			return ViewPackage.OBJECTS_IMAGE;
@@ -124,31 +67,16 @@ public enum SpellType {
 		}
 	}
 
-    static SpellType[] thisValues = SpellType.values();
-    static String[] thisStrings = null;
+    SpellType(String name) {
+        this.name = name;
+    }
 
-    public String key;
-
-	SpellType() {
-		
+    @Override
+    public String toString() {
+    	return this.name;
 	}
 
-    SpellType(String ressourceBundleName) {
-        this.key = ressourceBundleName;
-    }
-
-    static SpellType parseSpellType(String str) {
-        if (thisStrings == null) {
-            thisStrings = new String[thisValues.length];
-            for (int i = 0; i < thisValues.length; i++) {
-                thisStrings[i] = thisValues[i].toString();
-            }
-        }
-        for (int i = 0; i < thisValues.length; i++) {
-            if (thisStrings[i].equals(str)) {
-                return thisValues[i];
-            }
-        }
-        return null;
-    }
+    public String getString(String key) {
+    	return ViewPackage.ST_resourceBundle.getString(this.name + "." + key);
+	}
 }

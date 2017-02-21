@@ -29,7 +29,7 @@ public class Berserker extends Spell<LivingThing> {
     private static final double DEFENSE_DOWN_PERCENTAGE_PER_LEVEL = 1;
 
     public Berserker(LivingThing owner) {
-        super(owner, SpellType.Berserker);
+        super(owner, SpellType.BERSERKER);
         updateDescription();
     }
 
