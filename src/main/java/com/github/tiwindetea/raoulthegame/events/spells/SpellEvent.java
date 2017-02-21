@@ -14,24 +14,52 @@ import com.github.tiwindetea.raoulthegame.events.EventType;
 /**
  * The type SpellEvent.
  *
+ * @author Maxime PINARD
  * @author Lucas LAZARE
  */
 public abstract class SpellEvent extends Event {
 
-    private long id;
+    private int playerNumber;
+    private int spellNumber;
 
-    public SpellEvent(long id) {
-        this.id = id;
-    }
+	/**
+	 * Instantiates a new Spell event.
+	 *
+	 * @param playerNumber the player number
+	 * @param spellNumber  the spell number
+	 */
+	public SpellEvent(int playerNumber, int spellNumber) {
+		this.playerNumber = playerNumber;
+		this.spellNumber = spellNumber;
+	}
 
-    @Override
+	@Override
     public EventType getType() {
         return EventType.SPELL_EVENT;
     }
 
-    public abstract SpellEventType getSubType();
+	/**
+	 * Gets sub type.
+	 *
+	 * @return the sub type
+	 */
+	public abstract SpellEventType getSubType();
 
-    public long getSpellId() {
-        return this.id;
-    }
+	/**
+	 * Gets player number.
+	 *
+	 * @return the player number
+	 */
+	public int getPlayerNumber() {
+		return playerNumber;
+	}
+
+	/**
+	 * Gets spell number.
+	 *
+	 * @return the spell number
+	 */
+	public int getSpellNumber() {
+		return spellNumber;
+	}
 }

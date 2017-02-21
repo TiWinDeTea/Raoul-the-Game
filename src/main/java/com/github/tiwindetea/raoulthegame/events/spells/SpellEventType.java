@@ -15,5 +15,7 @@ package com.github.tiwindetea.raoulthegame.events.spells;
  */
 public enum SpellEventType {
     SPELL_CREATION_EVENT,
-    SPELL_DELETION_EVENT
+    SPELL_DELETION_EVENT,
+    SPELL_COOLDOWN_UPDATE_EVENT,
+	SPELL_DESCRIPTION_UPDATE_EVENT
 }

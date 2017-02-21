@@ -94,14 +94,16 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
         this.secondaryRange = secondaryRange;
         this.description = description;
         for (SpellListener listener : listeners) {
-            listener.createSpell(new SpellCreationEvent(this.id, spellType));
+            //listener.createSpell(new SpellCreationEvent(this.id, spellType));
+            //TODO
         }
     }
 
     public Spell(T owner, SpellType spellType) {
         this.owner = new WeakReference<>(owner);
         for (SpellListener listener : listeners) {
-            listener.createSpell(new SpellCreationEvent(this.id, spellType));
+            //listener.createSpell(new SpellCreationEvent(this.id, spellType));
+            //TODO
         }
     }
 

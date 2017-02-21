@@ -14,22 +14,64 @@ import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
  * The type SpellCreationEvent.
  *
  * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
 public class SpellCreationEvent extends SpellEvent {
 
     private SpellType spellType;
+	private int baseCooldown;
+	private String description;
 
-    public SpellCreationEvent(long id, SpellType spellType) {
-        super(id);
-        this.spellType = spellType;
-    }
+	/**
+	 * Instantiates a new SpellCreationEvent.
+	 *
+	 * @param playerNumber the player number
+	 * @param spellNumber  the spell number
+	 * @param spellType    the spell type
+	 * @param baseCooldown the base cooldown
+	 * @param description  the description
+	 */
+	public SpellCreationEvent(int playerNumber,
+	                          int spellNumber,
+	                          SpellType spellType,
+	                          int baseCooldown,
+	                          String description) {
+		super(playerNumber, spellNumber);
+		this.spellType = spellType;
+		this.baseCooldown = baseCooldown;
+		this.description = description;
+	}
 
-    @Override
-    public SpellEventType getSubType() {
-        return SpellEventType.SPELL_CREATION_EVENT;
-    }
+	@Override
+	public SpellEventType getSubType() {
+		return SpellEventType.SPELL_CREATION_EVENT;
+	}
 
-    public SpellType getSpellType() {
-        return this.spellType;
-    }
+	/**
+	 * Gets spell type.
+	 *
+	 * @return the spell type
+	 */
+	public SpellType getSpellType() {
+		return spellType;
+	}
+
+	/**
+	 * Gets base cooldown.
+	 *
+	 * @return the base cooldown
+	 */
+	public int getBaseCooldown() {
+		return baseCooldown;
+	}
+
+	/**
+	 * Gets description.
+	 *
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
 }

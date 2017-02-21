@@ -12,15 +12,23 @@ package com.github.tiwindetea.raoulthegame.events.spells;
  * The type SpellDeletionEvent.
  *
  * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
 public class SpellDeletionEvent extends SpellEvent {
 
-    public SpellDeletionEvent(long id) {
-        super(id);
+    /**
+     * Instantiates a new SpellDeletionEvent.
+     *
+     * @param playerNumber the player number
+     * @param spellNumber  the spell number
+     */
+    public SpellDeletionEvent(int playerNumber, int spellNumber) {
+        super(playerNumber, spellNumber);
     }
 
     @Override
     public SpellEventType getSubType() {
-        return null;
+        return SpellEventType.SPELL_DELETION_EVENT;
     }
+
 }
