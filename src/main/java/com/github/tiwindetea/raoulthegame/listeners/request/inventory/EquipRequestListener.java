@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request.inventory;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.EquipRequestEvent;
 
 /**
- * The interface EquipRequestListener
+ * The interface EquipRequestListener.
+ *
  * @author Lucas LAZARE
  */
 public interface EquipRequestListener {
+
     /**
-     * Handler associated to an EquipRequestEvent
+     * Handler associated to an EquipRequestEvent.
+     *
      * @param e Event to handle
      */
-    void requestEquipping(EquipRequestEvent e);
+    void handle(EquipRequestEvent e);
 }

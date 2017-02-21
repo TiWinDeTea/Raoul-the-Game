@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entiti
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityLOSDefinitionEvent;
 
 /**
- * The interface StaticEntityLOSDefinitionListener
+ * The interface StaticEntityLOSDefinitionListener.
+ *
  * @author Maxime PINARD
  */
 public interface StaticEntityLOSDefinitionListener {
+
 	/**
-	 * Handler associated to a StaticEntityLOSDefinitionEvent
+	 * Handler associated to a StaticEntityLOSDefinitionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e);
+	void handle(StaticEntityLOSDefinitionEvent e);
 }

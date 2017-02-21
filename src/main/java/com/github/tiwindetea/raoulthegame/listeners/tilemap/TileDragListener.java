@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.tilemap;
 import com.github.tiwindetea.raoulthegame.events.tilemap.TileDragEvent;
 
 /**
- * The interface TileDrageListener
+ * The interface TileDragListener.
+ *
  * @author Maxime PINARD
  */
 public interface TileDragListener {
+
     /**
-     * Handler associated to a TileDragEvent
+     * Handler associated to a TileDragEvent.
+     *
      * @param e Event to handle
      */
-    void tileDragged(TileDragEvent e);
+    void handle(TileDragEvent e);
 }

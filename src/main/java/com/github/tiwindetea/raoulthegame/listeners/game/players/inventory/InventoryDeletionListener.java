@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players.inventory;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryDeletionEvent;
 
 /**
- * The interface InventoryDeletionListener
+ * The interface InventoryDeletionListener.
+ *
  * @author Maxime PINARD
  */
 public interface InventoryDeletionListener {
+
 	/**
-	 * Handler associated to an InventoryDeletionEvent
+	 * Handler associated to an InventoryDeletionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void deleteInventory(InventoryDeletionEvent e);
+	void handle(InventoryDeletionEvent e);
 }

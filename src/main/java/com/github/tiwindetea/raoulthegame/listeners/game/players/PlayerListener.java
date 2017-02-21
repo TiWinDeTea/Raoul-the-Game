@@ -11,7 +11,8 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players;
 import com.github.tiwindetea.raoulthegame.listeners.game.players.inventory.InventoryListener;
 
 /**
- * The interface PlayerListener, that regroups some other listeners
+ * The interface PlayerListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface PlayerListener extends PlayerCreationListener, PlayerDeletionListener, PlayerStatListener, InventoryListener, PlayerNextTickListener {

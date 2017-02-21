@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entiti
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityDeletionEvent;
 
 /**
- * The interface StaticEntityDeletionListener
+ * The interface StaticEntityDeletionListener.
+ *
  * @author Maxime PINARD
  */
 public interface StaticEntityDeletionListener {
+
 	/**
-	 * Handler associated to a StaticEntityDeletionEvent
+	 * Handler associated to a StaticEntityDeletionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void deleteStaticEntity(StaticEntityDeletionEvent e);
+	void handle(StaticEntityDeletionEvent e);
 }

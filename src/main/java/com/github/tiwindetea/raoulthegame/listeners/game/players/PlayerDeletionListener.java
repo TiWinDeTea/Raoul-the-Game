@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerDeletionEvent;
 
 /**
- * The interface PlayerDeletionEvent
+ * The interface PlayerDeletionEvent.
+ *
  * @author Maxime PINARD
  */
 public interface PlayerDeletionListener {
+
 	/**
-	 * Handler associated to a PlayerDeletionEvent
+	 * Handler associated to a PlayerDeletionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void deletePlayer(PlayerDeletionEvent e);
+	void handle(PlayerDeletionEvent e);
 }

@@ -12,7 +12,8 @@ import com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entitie
 import com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entities.StaticEntityListener;
 
 /**
- * The interface EntityListener, that regroups some other listeners
+ * The interface EntityListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface EntityListener extends LivingEntityListener, StaticEntityListener {

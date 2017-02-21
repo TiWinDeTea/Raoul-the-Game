@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request;
 import com.github.tiwindetea.raoulthegame.events.requests.CenterViewRequestEvent;
 
 /**
- * The interface CenterViewRequestListener
+ * The interface CenterViewRequestListener.
+ *
  * @author Maxime PINARD
  */
 public interface CenterViewRequestListener {
+
 	/**
-	 * Handler associated to a CenterViewRequestEvent
+	 * Handler associated to a CenterViewRequestEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void requestCenterView(CenterViewRequestEvent e);
+	void handle(CenterViewRequestEvent e);
 }

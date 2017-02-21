@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.playerinventory;
 import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectClickEvent;
 
 /**
- * The interface ObjectClickListener
+ * The interface ObjectClickListener.
+ *
  * @author Maxime PINARD
  */
 public interface ObjectClickListener {
+
 	/**
 	 * Handler associated to an ObjectClickEvent.
+	 *
 	 * @param e Event to handle
      */
-	void objectClicked(ObjectClickEvent e);
+	void handle(ObjectClickEvent e);
 }

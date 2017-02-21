@@ -63,25 +63,25 @@ public abstract class LivingThing implements Descriptable {
     protected void fireHealthUpdate(LivingEntityHealthUpdateEvent event) {
 
         for (GameListener listener : getPlayersListeners()) {
-            listener.updateLivingEntityHealth(event);
+            listener.handle(event);
         }
     }
 
     protected void fireMoveEvent(LivingEntityMoveEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.moveLivingEntity(event);
+            listener.handle(event);
         }
     }
 
     protected void fireXpUpdateEvent(LivingEntityXpUpdateEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.updateLivingEntityXp(event);
+            listener.handle(event);
         }
     }
 
     protected void fireManaUpdateEvent(LivingEntityManaUpdateEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.updateLivingEntityMana(event);
+            listener.handle(event);
         }
     }
 

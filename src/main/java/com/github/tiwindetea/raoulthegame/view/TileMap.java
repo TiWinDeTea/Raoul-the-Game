@@ -680,13 +680,13 @@ public class TileMap extends Parent {
 
 	private void fireTileClickEvent(TileClickEvent event) {
 		for(TileMapListener listener : this.getTileMapListeners()) {
-			listener.tileClicked(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireTileDragEvent(TileDragEvent event) {
 		for (TileMapListener listener : this.getTileMapListeners()) {
-			listener.tileDragged(event);
+			listener.handle(event);
 		}
 	}
 

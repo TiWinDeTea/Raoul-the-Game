@@ -171,31 +171,31 @@ public class Player extends LivingThing {
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {
         for (GameListener listener : this.getPlayersListeners()) {
-            listener.addInventory(event);
+            listener.handle(event);
         }
     }
 
     private void fireInventoryDeletionEvent(InventoryDeletionEvent event) {
         for (GameListener listener : this.getPlayersListeners()) {
-            listener.deleteInventory(event);
+            listener.handle(event);
         }
     }
 
     private static void firePlayerStatEvent(PlayerStatEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.changePlayerStat(event);
+            listener.handle(event);
         }
     }
 
     private static void firePlayerCreationEvent(PlayerCreationEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.createPlayer(event);
+            listener.handle(event);
         }
     }
 
     private static void fireLevelUpdateEvent(LevelUpdateEvent event) {
         for (GameListener listener : getPlayersListeners()) {
-            listener.updateLevel(event);
+            listener.handle(event);
         }
     }
 

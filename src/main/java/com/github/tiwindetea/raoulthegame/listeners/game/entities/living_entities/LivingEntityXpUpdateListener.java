@@ -11,15 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
 
 /**
- * The interface LivingEntityXpUpdateListener
+ * The interface LivingEntityXpUpdateListener.
  *
  * @author Maxime PINARD
  */
 public interface LivingEntityXpUpdateListener {
+
 	/**
-	 * Handler associated to a LivingEntityXpUpdateListener
+	 * Handler associated to a LivingEntityXpUpdateListener.
 	 *
 	 * @param e Event to handle
 	 */
-	void updateLivingEntityXp(LivingEntityXpUpdateEvent e);
+	void handle(LivingEntityXpUpdateEvent e);
 }

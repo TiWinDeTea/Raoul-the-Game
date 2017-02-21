@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.request.inventory;
 
 /**
- * The interface InventoryRequestListener, that regroups some other listeners
+ * The interface InventoryRequestListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface InventoryRequestListener extends DropRequestListener, UsageRequestListener, EquipRequestListener {

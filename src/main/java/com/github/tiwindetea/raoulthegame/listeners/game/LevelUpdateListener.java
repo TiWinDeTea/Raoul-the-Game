@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game;
 import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
 
 /**
- * The interface LevelUpdateListener
+ * The interface LevelUpdateListener.
+ *
  * @author Maxime PINARD
  */
 public interface LevelUpdateListener {
+
 	/**
-	 * Handler associated to a LevelUpdateListener
+	 * Handler associated to a LevelUpdateListener.
+	 *
 	 * @param e Event to handle
 	 */
-	void updateLevel(LevelUpdateEvent e);
+	void handle(LevelUpdateEvent e);
 }

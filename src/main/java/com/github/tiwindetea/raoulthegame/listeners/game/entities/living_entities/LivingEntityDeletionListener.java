@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityDeletionEvent;
 
 /**
- * The interface LivingEntityDeletionEvent
+ * The interface LivingEntityDeletionEvent.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityDeletionListener {
+
 	/**
-	 * Handler associated to a LivingEntityTypeDeletionEvent
+	 * Handler associated to a LivingEntityTypeDeletionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void deleteLivingEntity(LivingEntityDeletionEvent e);
+	void handle(LivingEntityDeletionEvent e);
 }

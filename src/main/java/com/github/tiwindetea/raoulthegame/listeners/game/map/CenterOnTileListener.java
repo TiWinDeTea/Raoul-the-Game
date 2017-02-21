@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.map;
 import com.github.tiwindetea.raoulthegame.events.map.CenterOnTileEvent;
 
 /**
- * The interface CenterOnTileListener
+ * The interface CenterOnTileListener.
+ *
  * @author Maxime PINARD
  */
 public interface CenterOnTileListener {
+
 	/**
-	 * Handler associated to a CenterOnTileEvent
+	 * Handler associated to a CenterOnTileEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void centerOnTile(CenterOnTileEvent e);
+	void handle(CenterOnTileEvent e);
 }

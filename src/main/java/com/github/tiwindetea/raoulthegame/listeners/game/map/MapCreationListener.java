@@ -11,12 +11,15 @@ package com.github.tiwindetea.raoulthegame.listeners.game.map;
 import com.github.tiwindetea.raoulthegame.events.map.MapCreationEvent;
 
 /**
- * The interface MapCreationListener
+ * The interface MapCreationListener.
+ *
+ * @author Maxime PINARD
  */
 public interface MapCreationListener {
+
 	/**
 	 * Handler associated to a MapCreationEvent
 	 * @param e Event to handle
 	 */
-	void createMap(MapCreationEvent e);
+	void handle(MapCreationEvent e);
 }

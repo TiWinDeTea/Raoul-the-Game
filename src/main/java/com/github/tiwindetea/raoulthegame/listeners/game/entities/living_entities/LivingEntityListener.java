@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entities;
 
 /**
- * The interface LivingEntityListener, that regroups some other listeners
+ * The interface LivingEntityListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityListener extends LivingEntityCreationListener, LivingEntityDeletionListener, LivingEntityHealthUpdateListener, LivingEntityHealthVisibilityListener, LivingEntityLOSDefinitionListener, LivingEntityLOSModificationListener, LivingEntityManaUpdateListener, LivingEntityMoveListener, LivingEntityXpUpdateListener {

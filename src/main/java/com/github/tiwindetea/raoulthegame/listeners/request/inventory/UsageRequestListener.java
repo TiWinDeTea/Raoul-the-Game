@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request.inventory;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.UsageRequestEvent;
 
 /**
- * The interface UsageRequestListener
+ * The interface UsageRequestListener.
+ *
  * @author Maxime PINARD
  */
 public interface UsageRequestListener {
+
 	/**
-	 * Handler associated to an UsageRequestEvent
+	 * Handler associated to an UsageRequestEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void requestUsage(UsageRequestEvent e);
+	void handle(UsageRequestEvent e);
 }

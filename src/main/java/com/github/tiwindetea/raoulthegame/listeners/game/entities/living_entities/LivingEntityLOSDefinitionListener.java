@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSDefinitionEvent;
 
 /**
- * The interface LivingEntityLOSDefinitionListener
+ * The interface LivingEntityLOSDefinitionListener.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityLOSDefinitionListener {
+
 	/**
-	 * Handler associated to a LivingEntityLOSDefinitionEvent
+	 * Handler associated to a LivingEntityLOSDefinitionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e);
+	void handle(LivingEntityLOSDefinitionEvent e);
 }

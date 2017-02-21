@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
 
 /**
- * The interface PlayerCreationListener
+ * The interface PlayerCreationListener.
+ *
  * @author Maxime Pinard
  */
 public interface PlayerCreationListener {
+
 	/**
-	 * Handler associated to a PlayerCreationEvent
+	 * Handler associated to a PlayerCreationEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void createPlayer(PlayerCreationEvent e);
+	void handle(PlayerCreationEvent e);
 }

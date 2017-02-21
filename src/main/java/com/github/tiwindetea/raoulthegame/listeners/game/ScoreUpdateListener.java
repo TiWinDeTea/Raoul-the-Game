@@ -11,14 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game;
 import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
 
 /**
- * The interface ScoreUpdateListener
+ * The interface ScoreUpdateListener.
  *
  * @author Maxime PINARD
  */
 public interface ScoreUpdateListener{
-		/**
-		 * Handler associated to a ScoreUpdateEvent
-		 * @param e Event to handle
-		 */
-	void updateScore(ScoreUpdateEvent e);
+
+	/**
+	 * Handler associated to a ScoreUpdateEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(ScoreUpdateEvent e);
 }

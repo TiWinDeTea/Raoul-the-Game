@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSModificationEvent;
 
 /**
- * The interface LivingEntityLOSModificationListener
+ * The interface LivingEntityLOSModificationListener.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityLOSModificationListener {
+
 	/**
-	 * Handler associated to a LivingEntityLOSModificationEvent
+	 * Handler associated to a LivingEntityLOSModificationEvent.
+ *
 	 * @param e Event to handle
 	 */
-	void modifyLivingEntityLOS(LivingEntityLOSModificationEvent e);
+	void handle(LivingEntityLOSModificationEvent e);
 }

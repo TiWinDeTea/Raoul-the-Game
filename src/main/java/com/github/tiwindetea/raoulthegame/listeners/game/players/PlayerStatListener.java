@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
 
 /**
- * The interface PlayerStatListener
+ * The interface PlayerStatListener.
+ *
  * @author Maxime PINARD
  */
 public interface PlayerStatListener {
+
 	/**
-	 * Handler associated to a PlayerStatEvent
+	 * Handler associated to a PlayerStatEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void changePlayerStat(PlayerStatEvent e);
+	void handle(PlayerStatEvent e);
 }

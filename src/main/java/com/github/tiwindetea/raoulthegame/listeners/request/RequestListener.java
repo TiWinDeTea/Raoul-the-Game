@@ -11,7 +11,8 @@ package com.github.tiwindetea.raoulthegame.listeners.request;
 import com.github.tiwindetea.raoulthegame.listeners.request.inventory.InventoryRequestListener;
 
 /**
- * The interface RequestListener, that regroups some other listener
+ * The interface RequestListener, that regroups some other listener.
+ *
  * @author Maxime PINARD
  */
 public interface RequestListener extends CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener, LockViewRequestListener {

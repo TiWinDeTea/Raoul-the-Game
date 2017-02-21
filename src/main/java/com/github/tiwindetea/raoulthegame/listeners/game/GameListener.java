@@ -13,7 +13,8 @@ import com.github.tiwindetea.raoulthegame.listeners.game.map.MapListener;
 import com.github.tiwindetea.raoulthegame.listeners.game.players.PlayerListener;
 
 /**
- * The interface GameListener, that regroups some other listeners
+ * The interface GameListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener {

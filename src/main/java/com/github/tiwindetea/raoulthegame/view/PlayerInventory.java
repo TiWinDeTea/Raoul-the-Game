@@ -196,13 +196,13 @@ public class PlayerInventory extends Parent {
 
 	private void fireObjectClickEvent(ObjectClickEvent event) {
 		for(PlayerInventoryListener listener : this.getPlayerInventoryListener()) {
-			listener.objectClicked(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireObjectDragEvent(ObjectDragEvent event) {
 		for (PlayerInventoryListener listener : getPlayerInventoryListener()) {
-			listener.objectDragged(event);
+			listener.handle(event);
 		}
 	}
 

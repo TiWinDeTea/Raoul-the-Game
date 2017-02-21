@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.game.players.inventory;
 
 /**
- * The interface InventoryListener, that regroups some other listeners
+ * The interface InventoryListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface InventoryListener extends InventoryAdditionListener, InventoryDeletionListener {

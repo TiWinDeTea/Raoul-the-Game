@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.game.map;
 
 /**
- * The interface MapListener, that regroups some other listeners
+ * The interface MapListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface MapListener extends CenterOnTileListener, FogAdditionListener, FogResetListener, MapCreationListener, TileModificationListener {

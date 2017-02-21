@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entiti
 import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityCreationEvent;
 
 /**
- * The interface StaticEntityCreationListener
+ * The interface StaticEntityCreationListener.
+ *
  * @author Maxime PINARD
  */
 public interface StaticEntityCreationListener {
+
 	/**
-	 * Handler associated to a StaticEntityCreationEvent
+	 * Handler associated to a StaticEntityCreationEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void createStaticEntity(StaticEntityCreationEvent e);
+	void handle(StaticEntityCreationEvent e);
 }

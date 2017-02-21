@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.playerinventory;
 
 /**
- * The interface PlayerInventoryListener, that regroups some other listeners
+ * The interface PlayerInventoryListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface PlayerInventoryListener extends ObjectClickListener, ObjectDragListener {

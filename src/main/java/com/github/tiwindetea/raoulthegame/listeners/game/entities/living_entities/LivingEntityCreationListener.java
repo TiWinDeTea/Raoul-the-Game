@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityCreationEvent;
 
 /**
- * The interface LivingEntityCreationListener
+ * The interface LivingEntityCreationListener.
+ *
  * @author Maxime Pinard
  */
 public interface LivingEntityCreationListener {
+
 	/**
-	 * Handler associated to a LivingEntityCreationEvent
+	 * Handler associated to a LivingEntityCreationEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void createLivingEntity(LivingEntityCreationEvent e);
+	void handle(LivingEntityCreationEvent e);
 }

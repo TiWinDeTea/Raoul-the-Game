@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request;
 import com.github.tiwindetea.raoulthegame.events.requests.InteractionRequestEvent;
 
 /**
- * The interface InteractionRequestListener
+ * The interface InteractionRequestListener.
+ *
  * @author Maxime PINARD
  */
 public interface InteractionRequestListener {
+
 	/**
-	 * Handler associated to an InteractionRequestEvent
+	 * Handler associated to an InteractionRequestEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void requestInteraction(InteractionRequestEvent e);
+	void handle(InteractionRequestEvent e);
 }

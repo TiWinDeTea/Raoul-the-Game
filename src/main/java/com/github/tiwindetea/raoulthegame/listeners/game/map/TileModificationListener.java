@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.map;
 import com.github.tiwindetea.raoulthegame.events.map.TileModificationEvent;
 
 /**
- * The interface TileModificationListener
+ * The interface TileModificationListener.
+ *
  * @author Maxime PINARD
  */
 public interface TileModificationListener {
+
 	/**
-	 * Handler associated to a TileModificationEvent
+	 * Handler associated to a TileModificationEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void modifyTile(TileModificationEvent e);
+	void handle(TileModificationEvent e);
 }

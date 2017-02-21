@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.map;
 import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
 
 /**
- * The interface FogAdditionListener
+ * The interface FogAdditionListener.
+ *
  * @author Maxime PINARD
  */
 public interface FogAdditionListener {
+
 	/**
-	 * Handler associated to a FogAdditionEvent
+	 * Handler associated to a FogAdditionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void addFog(FogAdditionEvent e);
+	void handle(FogAdditionEvent e);
 }

@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
 
 /**
- * The interface LivingEntityMoveListener
+ * The interface LivingEntityMoveListener.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityMoveListener {
+
 	/**
-	 * Handler associated to a LivingEntityMoveEvent
+	 * Handler associated to a LivingEntityMoveEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void moveLivingEntity(LivingEntityMoveEvent e);
+	void handle(LivingEntityMoveEvent e);
 }

@@ -11,14 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerNextTickEvent;
 
 /**
- * The interface PlayerNextTickListener
+ * The interface PlayerNextTickListener.
  *
  * @author Lucas LAZARE
  */
 public interface PlayerNextTickListener {
+
 	/**
-	 * Handler associated to a PlayerNextTickEvent
+	 * Handler associated to a PlayerNextTickEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void playerNextTick(PlayerNextTickEvent e);
+	void handle(PlayerNextTickEvent e);
 }

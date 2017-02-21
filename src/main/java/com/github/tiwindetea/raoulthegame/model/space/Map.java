@@ -128,7 +128,7 @@ public class Map {
         }
 
         for (TileModificationListener listener : listeners) {
-            listener.modifyTile(new TileModificationEvent(position, this.map[position.x][position.y]));
+            listener.handle(new TileModificationEvent(position, this.map[position.x][position.y]));
         }
     }
 

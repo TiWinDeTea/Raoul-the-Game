@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.map;
 import com.github.tiwindetea.raoulthegame.events.map.FogResetEvent;
 
 /**
- * The inteface FogResetListener
+ * The interface FogResetListener.
+ *
  * @author Maxime PINARD
  */
 public interface FogResetListener {
+
 	/**
-	 * Handler associated to a FogResetEvent
+	 * Handler associated to a FogResetEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void resetFog(FogResetEvent e);
+	void handle(FogResetEvent e);
 }

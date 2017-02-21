@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.tilemap;
 
 /**
- * The interface TileMapListener, that regroups some other listeners
+ * The interface TileMapListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface TileMapListener extends TileClickListener, TileDragListener {

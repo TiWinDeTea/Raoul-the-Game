@@ -215,7 +215,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         private void fireLivingEntityMoveEvent(LivingEntityMoveEvent e) {
             for (GameListener listener : Game.this.listeners) {
-                listener.moveLivingEntity(e);
+                listener.handle(e);
             }
         }
 
@@ -597,91 +597,91 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
     private void fireLivingEntityCreationEvent(LivingEntityCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.createLivingEntity(event);
+            listener.handle(event);
         }
     }
 
     private void fireLivingEntityDeletionEvent(LivingEntityDeletionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.deleteLivingEntity(event);
+            listener.handle(event);
         }
     }
 
     private void fireLivingEntityLOSDefinitionEvent(LivingEntityLOSDefinitionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.defineLivingEntityLOS(event);
+            listener.handle(event);
         }
     }
 
     private void fireLivingEntityLOSModificationEvent(LivingEntityLOSModificationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.modifyLivingEntityLOS(event);
+            listener.handle(event);
         }
     }
 
     private void fireScoreUpdateEvent(ScoreUpdateEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.updateScore(event);
+            listener.handle(event);
         }
     }
 
     private void fireMapCreationEvent(MapCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.createMap(event);
+            listener.handle(event);
         }
     }
 
     private void firePlayerCreationEvent(PlayerCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.createPlayer(event);
+            listener.handle(event);
         }
     }
 
     private void fireStaticEntityCreationEvent(StaticEntityCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.createStaticEntity(event);
+            listener.handle(event);
         }
     }
 
     private void fireStaticEntityDeletionEvent(StaticEntityDeletionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.deleteStaticEntity(event);
+            listener.handle(event);
         }
     }
 
     private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
-            listener.defineStaticEntityLOS(event);
+            listener.handle(event);
         }
     }
 
     private void fireNextTickEvent(PlayerNextTickEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.playerNextTick(event);
+            listener.handle(event);
         }
     }
 
     private void fireFogAdditionEvent(FogAdditionEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.addFog(event);
+            listener.handle(event);
         }
     }
 
     private void fireCenterOnTileEvent(CenterOnTileEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.centerOnTile(event);
+            listener.handle(event);
         }
     }
 
     private void firePlayerDeletionEvent(PlayerDeletionEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.deletePlayer(event);
+            listener.handle(event);
         }
     }
 
     private void fireLevelUpdateEvent(LevelUpdateEvent event) {
         for (GameListener listener : getGameListeners()) {
-            listener.updateLevel(event);
+            listener.handle(event);
         }
     }
 
@@ -689,7 +689,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestDrop(DropRequestEvent e) {
+    public void handle(DropRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -697,7 +697,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestInteraction(InteractionRequestEvent e) {
+    public void handle(InteractionRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -705,7 +705,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestUsage(UsageRequestEvent e) {
+    public void handle(UsageRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -713,7 +713,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestMove(MoveRequestEvent e) {
+    public void handle(MoveRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -721,7 +721,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestCenterView(CenterViewRequestEvent e) {
+    public void handle(CenterViewRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -729,7 +729,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestEquipping(EquipRequestEvent e) {
+    public void handle(EquipRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -737,7 +737,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
      * {@inheritDoc}
      */
     @Override
-    public void requestLockView(LockViewRequestEvent e) {
+    public void handle(LockViewRequestEvent e) {
         this.viewIsLocked = !this.viewIsLocked;
     }
 
@@ -1704,7 +1704,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.currentPlayer.setRequestedPath(stack);
             this.nextTick();
         } else {
-            this.requestInteraction(new InteractionRequestEvent(pos));
+            this.handle(new InteractionRequestEvent(pos));
         }
     }
 

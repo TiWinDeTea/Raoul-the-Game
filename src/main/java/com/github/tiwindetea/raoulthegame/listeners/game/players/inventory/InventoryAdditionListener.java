@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.players.inventory;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
 
 /**
- * The interface InventoryAdditionListener
+ * The interface InventoryAdditionListener.
+ *
  * @author Maxime PINARD
  */
 public interface InventoryAdditionListener {
+
 	/**
-	 * Handler associated to an InventoryAdditionEvent
+	 * Handler associated to an InventoryAdditionEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void addInventory(InventoryAdditionEvent e);
+	void handle(InventoryAdditionEvent e);
 }

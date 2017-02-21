@@ -11,10 +11,17 @@ package com.github.tiwindetea.raoulthegame.listeners.request;
 import com.github.tiwindetea.raoulthegame.events.requests.LockViewRequestEvent;
 
 /**
- * The interface CenterViewRequestListener
+ * The interface CenterViewRequestListener.
  *
  * @author Lucas LAZARE
+ * @author Maxime PINARD
  */
 public interface LockViewRequestListener {
-    void requestLockView(LockViewRequestEvent e);
+
+    /**
+     * Handler associated to an LockViewRequestEvent.
+     *
+     * @param e Event to handle
+     */
+    void handle(LockViewRequestEvent e);
 }

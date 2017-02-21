@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.tilemap;
 import com.github.tiwindetea.raoulthegame.events.tilemap.TileClickEvent;
 
 /**
- * The interface TileClickListener
+ * The interface TileClickListener.
+ *
  * @author Maxime PINARD
  */
 public interface TileClickListener {
+
 	/**
-	 * Handler associated to a TileClickEvent
+	 * Handler associated to a TileClickEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void tileClicked(TileClickEvent e);
+	void handle(TileClickEvent e);
 }

@@ -760,188 +760,189 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private void fireLockViewRequestEvent(LockViewRequestEvent event) {
 		for (RequestListener listener : this.getRequestListener()) {
-			listener.requestLockView(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireDropRequestEvent(DropRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestDrop(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireUsageRequestEvent(UsageRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestUsage(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireEquipEvent(EquipRequestEvent event) {
 		for (RequestListener listener : getRequestListener()) {
-			listener.requestEquipping(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireMoveRequestEvent(MoveRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestMove(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireInteractionRequestEvent(InteractionRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestInteraction(event);
+			listener.handle(event);
 		}
 	}
 
 	private void fireCenterViewRequestEvent(CenterViewRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
-			listener.requestCenterView(event);
+			listener.handle(event);
 		}
 	}
 
 	@Override
-	public void addInventory(InventoryAdditionEvent e) {
+	public void handle(InventoryAdditionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void deleteInventory(InventoryDeletionEvent e) {
+	public void handle(InventoryDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void createLivingEntity(LivingEntityCreationEvent e) {
+	public void handle(LivingEntityCreationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void deleteLivingEntity(LivingEntityDeletionEvent e) {
+	public void handle(LivingEntityDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void defineLivingEntityLOS(LivingEntityLOSDefinitionEvent e) {
+	public void handle(LivingEntityLOSDefinitionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void modifyLivingEntityLOS(LivingEntityLOSModificationEvent e) {
+	public void handle(LivingEntityLOSModificationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void moveLivingEntity(LivingEntityMoveEvent e) {
+	public void handle(LivingEntityMoveEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void createPlayer(PlayerCreationEvent e) {
+	public void handle(PlayerCreationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void changePlayerStat(PlayerStatEvent e) {
+	public void handle(PlayerStatEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void createStaticEntity(StaticEntityCreationEvent e) {
+	public void handle(StaticEntityCreationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void deleteStaticEntity(StaticEntityDeletionEvent e) {
+	public void handle(StaticEntityDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void defineStaticEntityLOS(StaticEntityLOSDefinitionEvent e) {
+	public void handle(StaticEntityLOSDefinitionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void createMap(MapCreationEvent e) {
+	public void handle(MapCreationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void tileClicked(TileClickEvent e) {
+	public void handle(TileClickEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void modifyTile(TileModificationEvent e) {
+	public void handle(TileModificationEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void playerNextTick(PlayerNextTickEvent e) {
+	public void handle(PlayerNextTickEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void objectClicked(ObjectClickEvent e) {
+	public void handle(ObjectClickEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void addFog(FogAdditionEvent e) {
+	public void handle(FogAdditionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void resetFog(FogResetEvent e) {
+	public void handle(FogResetEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void centerOnTile(CenterOnTileEvent e) {
+	public void handle(CenterOnTileEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e) {
+	public void handle(LivingEntityHealthUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e) {
+	public void handle(LivingEntityHealthVisibilityEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void updateScore(ScoreUpdateEvent e) {
+	public void handle(ScoreUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void tileDragged(TileDragEvent e) {
+	public void handle(TileDragEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void deletePlayer(PlayerDeletionEvent e) {
+	public void handle(PlayerDeletionEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void updateLevel(LevelUpdateEvent e) {
+	public void handle(LevelUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void objectDragged(ObjectDragEvent e) {
+	public void handle(ObjectDragEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void updateLivingEntityMana(LivingEntityManaUpdateEvent e) {
+	public void handle(LivingEntityManaUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
 
 	@Override
-	public void updateLivingEntityXp(LivingEntityXpUpdateEvent e) {
+	public void handle(LivingEntityXpUpdateEvent e) {
 		this.eventQueue.add(e);
 	}
+
 }

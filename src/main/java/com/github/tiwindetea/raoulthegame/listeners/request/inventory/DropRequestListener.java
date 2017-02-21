@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request.inventory;
 import com.github.tiwindetea.raoulthegame.events.requests.inventory.DropRequestEvent;
 
 /**
- * The interface DropRequestListener
+ * The interface DropRequestListener.
+ *
  * @author Maxime PINARD
  */
 public interface DropRequestListener {
+
 	/**
-	 * Handler associated to a DropRequestEvent
+	 * Handler associated to a DropRequestEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void requestDrop(DropRequestEvent e);
+	void handle(DropRequestEvent e);
 }

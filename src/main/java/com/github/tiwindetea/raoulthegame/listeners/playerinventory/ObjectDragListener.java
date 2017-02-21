@@ -11,15 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.playerinventory;
 import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectDragEvent;
 
 /**
- * The interface ObjectDragListener
+ * The interface ObjectDragListener.
  *
  * @author Lucas LAZARE
  */
-
 public interface ObjectDragListener {
+
     /**
      * Handler associated to an ObjectDragEvent.
+     *
      * @param e Event to handle
      */
-    void objectDragged(ObjectDragEvent e);
+    void handle(ObjectDragEvent e);
 }

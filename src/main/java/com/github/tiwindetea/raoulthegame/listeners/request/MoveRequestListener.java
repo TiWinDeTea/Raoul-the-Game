@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.request;
 import com.github.tiwindetea.raoulthegame.events.requests.MoveRequestEvent;
 
 /**
- * The interface MoveRequestListener
+ * The interface MoveRequestListener.
+ *
  * @author Maxime PINARD
  */
 public interface MoveRequestListener {
+
 	/**
-	 * Handler associated to a MoveRequestEvent
+	 * Handler associated to a MoveRequestEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void requestMove(MoveRequestEvent e);
+	void handle(MoveRequestEvent e);
 }

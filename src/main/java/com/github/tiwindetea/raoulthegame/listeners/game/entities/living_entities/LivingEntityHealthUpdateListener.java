@@ -11,13 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
 
 /**
- * The interface LivingEntityHealthUpdateListener
+ * The interface LivingEntityHealthUpdateListener.
+ *
  * @author Maxime PINARD
  */
 public interface LivingEntityHealthUpdateListener {
+
 	/**
-	 * Handler associated to a LivingEntityHealthUpdateEvent
+	 * Handler associated to a LivingEntityHealthUpdateEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void updateLivingEntityHealth(LivingEntityHealthUpdateEvent e);
+	void handle(LivingEntityHealthUpdateEvent e);
 }

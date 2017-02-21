@@ -9,7 +9,8 @@
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entities;
 
 /**
- * The interface StaticEntityListener, that regroups some other listeners
+ * The interface StaticEntityListener, that regroups some other listeners.
+ *
  * @author Maxime PINARD
  */
 public interface StaticEntityListener extends StaticEntityCreationListener, StaticEntityDeletionListener, StaticEntityLOSDefinitionListener {

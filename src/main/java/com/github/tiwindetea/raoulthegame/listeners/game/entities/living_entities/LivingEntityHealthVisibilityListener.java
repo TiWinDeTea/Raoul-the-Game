@@ -11,14 +11,16 @@ package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entiti
 import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthVisibilityEvent;
 
 /**
- * The interface LivingEntityHealthVisibilityListener
+ * The interface LivingEntityHealthVisibilityListener.
  *
  * @author Maxime PINARD
  */
 public interface LivingEntityHealthVisibilityListener {
+
 	/**
-	 * Handler associated to a LivingEntityHealthVisibilityEvent
+	 * Handler associated to a LivingEntityHealthVisibilityEvent.
+	 *
 	 * @param e Event to handle
 	 */
-	void setLivingEntityHealthVisibility(LivingEntityHealthVisibilityEvent e);
+	void handle(LivingEntityHealthVisibilityEvent e);
 }
