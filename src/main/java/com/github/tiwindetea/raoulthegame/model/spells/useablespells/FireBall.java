@@ -18,19 +18,20 @@ import com.sun.istack.internal.Nullable;
 import java.util.Collection;
 
 /**
- * Created by Maxime on 20/02/2017.
+ * Created by Maxime on 21/02/2017.
  */
-public class Heal extends Spell<LivingThing> {
+public class FireBall extends Spell<LivingThing> {
 
-	private static final double BASE_HEAL = 100;
-	private static final int BASE_APPLY_TURNS = 10;
+	private static final double BASE_DAMAGES = 50;
+	private static final int BASE_COOLDOWN = 75;
 
-	private double heal = BASE_HEAL;
-	private int applyTurns = BASE_APPLY_TURNS;
-	private int remainingTurns = 0;
+	private double damages = BASE_DAMAGES;
+	private int baseCooldown = BASE_COOLDOWN;
+	private int cooldown = baseCooldown;
 
-	public Heal(LivingThing owner) {
-		super(owner, SpellType.HEAL);
+	public FireBall(LivingThing owner) {
+		super(owner, SpellType.FIRE_BALL);
+		targetNumber = 1;
 	}
 
 	@Override
@@ -60,10 +61,7 @@ public class Heal extends Spell<LivingThing> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		if(remainingTurns > 0){
-			getOwner().damage(-heal / applyTurns, null);
-			--remainingTurns;
-		}
+		cooldown -= cooldown > 0 ? 1 : 0;
 	}
 
 	@Override
@@ -73,14 +71,22 @@ public class Heal extends Spell<LivingThing> {
 
 	@Override
 	public void nextSpellLevel() {
-		applyTurns -= 2;
-		heal += 25;
+		damages += 25;
+		baseCooldown = Math.max(25, baseCooldown - 10);
 	}
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		remainingTurns = applyTurns;
-		return true;
+		if(cooldown == 0){
+			if(!targets.isEmpty()){
+				for(LivingThing target : targets) {
+					target.damage(damages,getOwner());
+				}
+				cooldown = baseCooldown;
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -91,10 +97,5 @@ public class Heal extends Spell<LivingThing> {
 	@Override
 	public void forgotten() {
 
-	}
-
-	private void updateDescription(){
-		description = "Heal (active).\n" +
-		  "Heal " + heal + " hp in " + applyTurns + " turns";
 	}
 }

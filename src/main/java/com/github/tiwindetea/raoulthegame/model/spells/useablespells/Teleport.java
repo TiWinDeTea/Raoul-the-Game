@@ -85,11 +85,13 @@ public class Teleport extends Spell<Player> {
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		Player owner = getOwner();
-		if(owner != null && owner.useMana(manaCost)) {
-			cooldown = baseCooldown;
-			owner.setPosition(sourcePosition);
-			return true;
+		if(cooldown == 0){
+			Player owner = getOwner();
+			if(owner != null && owner.useMana(manaCost)) {
+				owner.setPosition(sourcePosition);
+				cooldown = baseCooldown;
+				return true;
+			}
 		}
 		return false;
 	}

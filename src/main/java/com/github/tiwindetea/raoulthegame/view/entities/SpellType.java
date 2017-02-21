@@ -83,6 +83,11 @@ public enum SpellType {
 		public String toString() {
 			return resourceBundle.getString("explorer.string");
 		}
+	}, FIRE_BALL {
+		@Override
+		public String toString() {
+			return resourceBundle.getString("fire_ball.string");
+		}
 	};
 
 	private final static String bundleName = MainPackage.name + ".Spell";
