@@ -712,6 +712,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					}
 					}
+					break;
 				}
 				case SPELL_CLICK_EVENT: {
 					spellClicked((SpellClickEvent) gameEvent);
