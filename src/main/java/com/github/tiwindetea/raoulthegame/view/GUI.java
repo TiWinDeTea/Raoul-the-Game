@@ -37,6 +37,7 @@ import com.github.tiwindetea.raoulthegame.events.players.PlayerNextTickEvent;
 import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
 import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.requests.CastSpellRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.InteractionRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.requests.LockViewRequestEvent;
@@ -867,6 +868,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	}
 
 	private void fireCenterViewRequestEvent(CenterViewRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.handle(event);
+		}
+	}
+
+	private void fireCastSpellRequestEvent(CastSpellRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
 			listener.handle(event);
 		}

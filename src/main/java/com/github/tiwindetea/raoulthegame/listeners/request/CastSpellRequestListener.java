@@ -8,12 +8,20 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.request;
 
-import com.github.tiwindetea.raoulthegame.listeners.request.inventory.InventoryRequestListener;
+import com.github.tiwindetea.raoulthegame.events.requests.CastSpellRequestEvent;
 
 /**
- * The interface RequestListener, that regroups some other listener.
+ * The interface CastSpellRequestListener.
  *
  * @author Maxime PINARD
  */
-public interface RequestListener extends CastSpellRequestListener, CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener, LockViewRequestListener {
+public interface CastSpellRequestListener {
+
+	/**
+	 * Handler associated to a CastSpellRequestEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(CastSpellRequestEvent e);
+
 }
