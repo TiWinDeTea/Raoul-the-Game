@@ -8,15 +8,19 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game;
 
-import com.github.tiwindetea.raoulthegame.listeners.game.entities.EntityListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.map.MapListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.players.PlayerListener;
-import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
+import com.github.tiwindetea.raoulthegame.events.game.SpellSelectionEvent;
 
 /**
- * The interface GameListener, that regroups some other listeners.
+ * The interface SpellSelectionListener.
  *
  * @author Maxime PINARD
  */
-public interface GameListener extends EntityListener, MapListener, ScoreUpdateListener, LevelUpdateListener, PlayerListener, SpellListener, SpellSelectionListener {
+public interface SpellSelectionListener {
+
+	/**
+	 * Handler associated to a SpellSelectionEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(SpellSelectionEvent e);
 }

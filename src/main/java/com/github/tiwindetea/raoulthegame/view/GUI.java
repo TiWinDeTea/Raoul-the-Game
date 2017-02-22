@@ -11,6 +11,7 @@ package com.github.tiwindetea.raoulthegame.view;
 import com.github.tiwindetea.raoulthegame.events.Event;
 import com.github.tiwindetea.raoulthegame.events.game.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.game.ScoreUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.SpellSelectionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityEvent;
@@ -85,6 +86,7 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -563,7 +565,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void selectorSpellClicked(SelectorSpellClickEvent gameEvent) {
-			//TODO
+			//TODO: fire event
+		}
+
+		private void selectSpell(SpellSelectionEvent gameEvent) {
+			//TODO: ask user
 		}
 
 		@Override
@@ -727,6 +733,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				}
 				case SELECTOR_SPELL_CLICK_EVENT: {
 					selectorSpellClicked((SelectorSpellClickEvent) gameEvent);
+					break;
+				}
+				case SPELL_SELECTION_EVENT: {
+					selectSpell((SpellSelectionEvent) gameEvent);
 					break;
 				}
 				}
@@ -1073,6 +1083,11 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	@Override
 	public void handle(SelectorSpellClickEvent e) {
+		this.eventQueue.add(e);
+	}
+
+	@Override
+	public void handle(SpellSelectionEvent e) {
 		this.eventQueue.add(e);
 	}
 
