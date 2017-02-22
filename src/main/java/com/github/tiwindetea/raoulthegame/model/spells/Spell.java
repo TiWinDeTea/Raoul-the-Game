@@ -122,6 +122,13 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     }
 
     /**
+     * @return true if the spells needs a source position to be casted, false otherwise
+     */
+    public boolean needSourcePosition() {
+        return false;
+    }
+
+    /**
      * @return true if this spell is an aoe spell, false otherwise
      */
     public abstract boolean isAOE();
@@ -208,10 +215,10 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
      * Method called whenever the spell is casted on a LivingThing // a group of LivingThing(s)
      *
      * @param targets        the potential targets of this spell (from 0 to targetNumber if the spell isn't an aoe spell)
-     * @param sourcePosition position where the spell was cast. nullable if the spell isn't an aoe spell
+     * @param sourcePosition position where the spell was cast. nullable if {@link Spell#needSourcePosition()} returns false
      * @return true if the spell was successfully casted, false otherwise
      */
-    public abstract boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition);
+    public abstract boolean cast(Collection<LivingThing> targets, @Nullable Vector2i sourcePosition);
 
     /**
      * Method called whenever the floor changes.

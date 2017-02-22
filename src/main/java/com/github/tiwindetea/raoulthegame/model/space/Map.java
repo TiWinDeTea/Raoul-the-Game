@@ -75,6 +75,8 @@ public class Map {
 
     private static ArrayList<TileModificationListener> listeners = new ArrayList<>(1);
 
+    public boolean[][] explored;
+
     private Seed seed;
     private Random random;
     private Vector2i stairsUpPosition;
@@ -293,9 +295,11 @@ public class Map {
         this.random = this.seed.getRandomizer(level);
         this.map = new Tile[this.random.nextInt(MAX_LEVEL_WIDTH - MIN_LEVEL_WIDTH + 1) + MIN_LEVEL_WIDTH]
                 [this.random.nextInt(MAX_LEVEL_HEIGHT - MIN_LEVEL_HEIGHT + 1) + MIN_LEVEL_HEIGHT];
+        this.explored = new boolean[this.map.length][this.map[0].length];
         for (int i = 0; i < this.map.length; i++) {
             for (int j = 0; j < this.map[i].length; j++) {
                 this.map[i][j] = Tile.UNKNOWN;
+                this.explored[i][j] = false;
             }
         }
 

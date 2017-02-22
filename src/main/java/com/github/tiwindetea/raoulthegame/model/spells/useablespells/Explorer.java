@@ -39,7 +39,7 @@ public class Explorer extends Spell<Player> {
 	public Explorer(Player owner) {
 		super(owner, owner.getSpells().size());
 		this.description = "Explorer (active).\n" +
-				"Summons a ghost spirit that explores the path to the" +
+				"Summons a ghost spirit that explores the path to the " +
 				"next floor for you." +
 				"Cost: " + MANA_COST + " mana.";
 		fire(new SpellCreationEvent(
@@ -158,9 +158,9 @@ public class Explorer extends Spell<Player> {
 
 	private void makeGhost() {
 		this.ghostId = controller.createGhostEntity(
-				LivingEntityType.PEACEFUL_ECTOPLASMA
+				LivingEntityType.GHOST
 				, this.position
-				, "Missing description"
+				, "Basically a living ward.\n"
 				, Direction.random()
 				, 3
 				, this.explorationRange

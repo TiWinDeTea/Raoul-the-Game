@@ -49,6 +49,11 @@ public class Teleport extends Spell<Player> {
 	}
 
 	@Override
+	public boolean needSourcePosition() {
+		return true;
+	}
+
+	@Override
 	public boolean isAOE() {
 		return false;
 	}
@@ -111,7 +116,7 @@ public class Teleport extends Spell<Player> {
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		if (this.cooldown == 0) {
+		if (this.cooldown == 0 && spellsMap.explored[sourcePosition.x][sourcePosition.y]) {
 			Player owner = getOwner();
 			if (owner != null && owner.useMana(this.manaCost)) {
 				owner.setPosition(sourcePosition);
@@ -136,8 +141,9 @@ public class Teleport extends Spell<Player> {
 	}
 
 	private void updateDescription(){
-		this.description = "Teleport (active).\n" +
+		this.description = "Teleport (active).\n\n" +
 		  "Teleport the player to the target location.\n" +
+				"(Anywhere where you have explored).\n" +
 				"\tMana cost: " + DECIMAL.format(this.manaCost) + "\n" +
 				"\tCooldown: " + this.baseCooldown;
 	}

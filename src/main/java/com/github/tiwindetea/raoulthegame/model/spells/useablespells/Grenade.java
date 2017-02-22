@@ -29,6 +29,11 @@ public class Grenade extends Spell<Player> {
     }
 
     @Override
+    public boolean needSourcePosition() {
+        return true;
+    }
+
+    @Override
     public Vector2i getSpellSource() {
         // todo
         return null;

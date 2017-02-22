@@ -281,7 +281,6 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		public void createPlayer(PlayerCreationEvent e) {
 			if(GUI.this.actualPlayersNumber < GUI.this.maxPlayersNumber) {
-				++GUI.this.actualPlayersNumber;
 
 				ImageView imageView1 = new ImageView(e.getPlayerType().getImage());
 				ImageView imageView2 = new ImageView(e.getPlayerType().getImage());
@@ -296,6 +295,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				GUI.this.playersInventories.add(playerInventory);
 				GUI.this.rIventoryPane.getChildren().add(playerInventory);
 				playerInventory.addPlayerInventoryListener(GUI.this);
+				++GUI.this.actualPlayersNumber;
 			}
 			else {
 				System.out.println("GUI::createPlayer : too much players - " + GUI.this.actualPlayersNumber);
@@ -513,10 +513,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void createSpell(SpellCreationEvent e) {
 			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
 				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
-				playerHUD.setSpellType(e.getPlayerNumber(), e.getSpellType());
-				playerHUD.setSpellBaseCooldown(e.getPlayerNumber(), e.getBaseCooldown());
-				playerHUD.setSpellCooldown(e.getPlayerNumber(), 0);
-				playerHUD.setSpellDescription(e.getPlayerNumber(), e.getDescription());
+				playerHUD.setSpellType(e.getSpellNumber(), e.getSpellType());
+				playerHUD.setSpellBaseCooldown(e.getSpellNumber(), e.getBaseCooldown());
+				playerHUD.setSpellCooldown(e.getSpellNumber(), 0);
+				playerHUD.setSpellDescription(e.getSpellNumber(), e.getDescription());
 				playerHUD.enableSpell(e.getSpellNumber());
 			}
 			else {

@@ -28,6 +28,9 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Explorer;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.FireBall;
+import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Teleport;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
@@ -41,7 +44,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.*;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BOOTS;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BREAST_PLATE;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.GLOVES;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.HELMET;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.PANTS;
 
 /**
  * Player
@@ -163,6 +170,9 @@ public class Player extends LivingThing {
 
     public void test() {
         new Regen(this);
+        new Explorer(this);
+        new Teleport(this);
+        new FireBall(this);
     }
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {

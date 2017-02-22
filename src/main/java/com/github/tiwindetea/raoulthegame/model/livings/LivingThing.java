@@ -43,7 +43,7 @@ public abstract class LivingThing implements Descriptable {
     protected String name;
     protected long id;
     protected static final ArrayList<GameListener> listeners = new ArrayList<>();
-    protected List<Spell> spells = new ArrayList<>(0);
+    protected final ArrayList<Spell> spells = new ArrayList<>(0);
 
 
     /**

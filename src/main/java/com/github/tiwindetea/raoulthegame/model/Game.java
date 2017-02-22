@@ -68,20 +68,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Random;
-import java.util.ResourceBundle;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -148,6 +135,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
     private Player currentPlayer;
     private int playerTurn;
+
+    private Spell<?> currentSpell = null;
+    private final Collection<LivingThing> currentSpellTargets = new ArrayList<>(8);
 
     private Pair<Consumable> objectToUse = null;
     private List<Consumable> triggeredObjects = new ArrayList<>();
@@ -876,6 +866,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     player.getId(),
                     this.world.getLOS(player.getPosition(), player.getLos(), 4)
             ));
+
+            explore(player.getPosition(), this.world.getLOS(player.getPosition(), player.getExploreLOS(), 4));
         }
 
         ArrayList<LivingThing> livings = new ArrayList<>(this.mobs.size()
@@ -1357,10 +1349,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     player.getId(),
                     playerLOS
             ));
-            fireFogAdditionEvent(new FogAdditionEvent(
-                    pos,
-                    this.world.getLOS(pos, player.getExploreLOS(), 4)
-            ));
+            explore(pos, this.world.getLOS(pos, player.getExploreLOS(), 4));
         }
 
 
@@ -1369,7 +1358,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
                 fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
                 tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
-                fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
+                explore(pair.getKey(), tmp);
             }
         });
 
@@ -1378,17 +1367,20 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
                 fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(id, tmp));
                 tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
-                fireFogAdditionEvent(new FogAdditionEvent(pair.getKey(), tmp));
+                explore(pair.getKey(), tmp);
             }
         });
 
-        this.livingsSharedLOS.forEach((id, pair) -> {
-                    boolean[][] tmp = this.world.getLOS(pair.getKey().getPosition(), pair.getValue(), 4);
+        this.livingsSharedLOS
+                .forEach((id, pair) -> {
+                    boolean[][] tmp = this.world.getLOS(pair.getKey().getPosition(),
+                                                        pair.getValue(),
+                                                        4);
                     fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
                             id,
                             tmp
                     ));
-                    fireFogAdditionEvent(new FogAdditionEvent(pair.getKey().getPosition(), tmp));
+                    explore(pair.getKey().getPosition(), tmp);
                 }
         );
     }
@@ -1590,7 +1582,26 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void treatRequestEvent(CastSpellRequestEvent event) {
-        // todo
+        this.objectToUse = null;
+        this.currentSpellTargets.clear();
+
+        Spell<?> spell = this.players.stream()
+                .filter(player -> player.getNumber() == event.getPlayerNumber())
+                .findAny()
+                .get()
+                .getSpells()
+                .get(event.getSpellNumber());
+
+        if (spell == this.currentSpell) {
+            this.currentSpell = null;
+            return;
+        }
+
+        this.currentSpell = spell;
+        if (this.currentSpell.getTargetNumber() == 0 && !this.currentSpell.needSourcePosition()) {
+            this.currentSpell.cast(Collections.emptyList(), null);
+            this.currentSpell = null;
+        }
     }
 
     private void treatRequestEvent(CenterViewRequestEvent e) {
@@ -1617,73 +1628,101 @@ public class Game implements RequestListener, Runnable, Stoppable {
         int distance = Math.max(Math.abs(e.getTilePosition().x - this.currentPlayer.getPosition().x),
                 Math.abs(e.getTilePosition().y - this.currentPlayer.getPosition().y));
 
-        if ((tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR) && distance > 1) {
-            path = shortestPathApprox(this.currentPlayer.getPosition(), e.getTilePosition(), false, null);
-            if (path != null) {
-                this.currentPlayer.setRequestedPath(path);
-                this.currentPlayer.setRequestedInteraction(e.getTilePosition());
+        if (this.currentSpell != null) {
+            if (this.currentSpell.getTargetNumber() >= this.currentSpellTargets.size()) {
+                this.currentSpell.cast(this.currentSpellTargets, e.getTilePosition());
+                this.currentSpellTargets.clear();
+                this.currentSpell = null;
             } else {
-                success = false;
-            }
-        } else if (distance <= this.currentPlayer.getLos()) {
-        /* Looking for a mob to attack*/
-            boolean[][] los;
-            if (this.objectToUse != null) {
-                los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos(), 4);
-            } else {
-                los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getAttackRange(), 1);
-            }
-            Vector2i p = this.currentPlayer.getPosition();
-            if (distance <= los.length / 2 && los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e.getTilePosition().y]) {
-                int i = this.findMob(e.getTilePosition());
-                if (i >= 0) {
-                    if (this.objectToUse != null) {
-                        if (this.objectToUse.object.getConsumableType() == ConsumableType.SCROLL) {
-                            ((Scroll) this.objectToUse.object).setSource(this.currentPlayer);
+                boolean[][] los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos(), 4);
+                Vector2i p = this.currentPlayer.getPosition();
+                if (distance <= los.length / 2
+                        && los[los.length / 2 - p.x + e.getTilePosition().x]
+                        [los[0].length / 2 - p.y + e.getTilePosition().y]
+                        ) {
+                    Mob mob = getMob(e.getTilePosition());
+                    if (mob != null) {
+                        this.currentSpellTargets.add(mob);
+                        if (this.currentSpellTargets.size() == this.currentSpell.getTargetNumber() && !this.currentSpell
+                                .needSourcePosition()) {
+                            this.currentSpell.cast(this.currentSpellTargets, null);
+                            this.currentSpell = null;
+                            this.currentSpellTargets.clear();
                         }
-                        this.objectToUse.object.trigger(this.mobs.get(i));
-                        this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
-                        this.triggeredObjects.add(this.objectToUse.object);
-                        this.objectToUse = null;
-                        success = false;
-                        path = null;
-                    } else {
-                        this.currentPlayer.setRequestedAttack(this.mobs.get(i));
                     }
-                } else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
-                    /* interaction with doors */
+                }
+            }
+        } else {
+            if ((tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR) && distance > 1) {
+                path = shortestPathApprox(this.currentPlayer.getPosition(), e.getTilePosition(), false, null);
+                if (path != null) {
+                    this.currentPlayer.setRequestedPath(path);
                     this.currentPlayer.setRequestedInteraction(e.getTilePosition());
                 } else {
-                    success = false; // no mob found, neither doors
+                    success = false;
                 }
-            } else {
-                success = false; // tile not in the los or out of range for damages
-                if (p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(), 2) && this.findMob(e.getTilePosition()) > -1) {
-                    Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
-                    shadow.addAll(this.mobs);
-                    shadow.addAll(this.players);
-                    Stack<Vector2i> tmp = shortestPathApprox(p, e.getTilePosition(), false, shadow);
-                    if (tmp != null) {
-                        path = new Stack<>();
-                        path.add(tmp.peek());
+            } else if (distance <= this.currentPlayer.getLos()) {
+                /* Looking for a mob to attack*/
+                boolean[][] los;
+                if (this.objectToUse != null) {
+                    los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getLos(), 4);
+                } else {
+                    los = this.world.getLOS(this.currentPlayer.getPosition(), this.currentPlayer.getAttackRange(), 1);
+                }
+                Vector2i p = this.currentPlayer.getPosition();
+                if (distance <= los.length / 2 && los[los.length / 2 - p.x + e.getTilePosition().x][los[0].length / 2 - p.y + e
+                        .getTilePosition().y]) {
+                    int i = this.findMob(e.getTilePosition());
+                    if (i >= 0) {
+                        if (this.objectToUse != null) {
+                            if (this.objectToUse.object.getConsumableType() == ConsumableType.SCROLL) {
+                                ((Scroll) this.objectToUse.object).setSource(this.currentPlayer);
+                            }
+                            this.objectToUse.object.trigger(this.mobs.get(i));
+                            this.currentPlayer.removeFromInventory(new Pair<>(this.objectToUse));
+                            this.triggeredObjects.add(this.objectToUse.object);
+                            this.objectToUse = null;
+                            success = false;
+                            path = null;
+                        } else {
+                            this.currentPlayer.setRequestedAttack(this.mobs.get(i));
+                        }
+                    } else if (distance == 1 && (tile == Tile.CLOSED_DOOR || tile == Tile.OPENED_DOOR)) {
+                    /* interaction with doors */
+                        this.currentPlayer.setRequestedInteraction(e.getTilePosition());
+                    } else {
+                        success = false; // no mob found, neither doors
+                    }
+                } else {
+                    success = false; // tile not in the los or out of range for damages
+                    if (p.squaredDistance(e.getTilePosition()) > Math.pow(this.currentPlayer.getAttackRange(),
+                                                                          2) && this.findMob(e.getTilePosition()) > -1) {
+                        Collection<LivingThing> shadow = new ArrayList<>(this.mobs.size());
+                        shadow.addAll(this.mobs);
+                        shadow.addAll(this.players);
+                        Stack<Vector2i> tmp = shortestPathApprox(p, e.getTilePosition(), false, shadow);
+                        if (tmp != null) {
+                            path = new Stack<>();
+                            path.add(tmp.peek());
+                        }
                     }
                 }
+            } else {
+                success = false; // tile too far away
             }
-        } else {
-            success = false; // tile too far away
-        }
 
 		/* If you weren't able to do anything, just go to the tile */
-        if (!success && path != null) {
-            this.currentPlayer.setRequestedPath(path);
-            success = true;
-        }
+            if (!success && path != null) {
+                this.currentPlayer.setRequestedPath(path);
+                success = true;
+            }
 
 		/* If you did something, keep going */
-        if (success) {
-            nextTick();
-        } else {
-            this.currentPlayer.doNothing();
+            if (success) {
+                nextTick();
+            } else {
+                this.currentPlayer.doNothing();
+            }
         }
     }
 
@@ -1691,6 +1730,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
         logger.log(debugLevel, "Usage requested for player " + this.currentPlayer.getNumber());
         List<Pair<StorableObject>> inventory = this.currentPlayer.getInventory();
         this.objectToUse = null;
+        this.currentSpell = null;
+        this.currentSpellTargets.clear();
         Pair<StorableObject> obj = null;
         for (Pair<StorableObject> pair : inventory) {
             if (pair.getId() == e.getObjectId()) {
@@ -1874,5 +1915,22 @@ public class Game implements RequestListener, Runnable, Stoppable {
         return i;
     }
 
+    private Mob getMob(Vector2i position) {
+        return this.mobs.stream().filter(m -> m.getPosition().equals(position)).findFirst().orElse(null);
+    }
 
+    private void explore(Vector2i fogCenterTile, boolean[][] los) {
+        int pX = fogCenterTile.x - ((los.length - 1) / 2);
+        int pY = fogCenterTile.y - ((los[0].length - 1) / 2);
+        for (int i = 0; i < los.length; i++) {
+            for (int j = 0; j < los[i].length; j++) {
+                if (los[i][j]
+                        && (i + pX) >= 0 && (i + pX) < this.world.explored.length
+                        && (j + pY) >= 0 && (j + pY) < this.world.explored[0].length) {
+                    this.world.explored[i + pX][j + pY] = true;
+                }
+            }
+        }
+        fireFogAdditionEvent(new FogAdditionEvent(fogCenterTile, los));
+    }
 }
