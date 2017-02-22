@@ -57,7 +57,7 @@ public class SpellDisplayer extends Parent {
 	}
 
 	private void updateColldown() {
-		if(this.baseCooldown > 0 && this.cooldown >= 0 && this.cooldown < this.baseCooldown) {
+		if(this.baseCooldown > 0 && this.cooldown >= 0 && this.cooldown <= this.baseCooldown) {
 			this.cooldownRectangle.heightProperty()
 			  .setValue(this.cooldown / (double) this.baseCooldown * ViewPackage.SPRITES_SIZE.y);
 		}
