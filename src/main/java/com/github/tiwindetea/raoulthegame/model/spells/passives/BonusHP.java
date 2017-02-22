@@ -39,7 +39,7 @@ public class BonusHP extends Spell<Player> {
         fire(new SpellCreationEvent(
                 owner.getNumber(),
                 this.id,
-                SpellType.BONUS_HP,
+                getSpellType(),
                 0,
                 this.description
         ));
@@ -81,7 +81,7 @@ public class BonusHP extends Spell<Player> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         Player p = getOwner();
         if (p != null) {
             p.increaseHP(HP_PER_LEVEL);
@@ -120,6 +120,11 @@ public class BonusHP extends Spell<Player> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.BONUS_HP;
     }
 
     private void updateDescription() {

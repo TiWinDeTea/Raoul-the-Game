@@ -179,7 +179,7 @@ public class SummonDog extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.SUMMON_DOG,
+                    getSpellType(),
                     1,
                     this.description
             ));
@@ -241,7 +241,7 @@ public class SummonDog extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         ++this.level;
         this.dog.levelUp();
         this.manaConsumption += MANA_CONSUMPTION_PER_LEVEL;
@@ -293,6 +293,11 @@ public class SummonDog extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.SUMMON_DOG;
     }
 
     private void updateDescription() {

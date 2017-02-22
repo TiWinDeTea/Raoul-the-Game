@@ -43,7 +43,7 @@ public class Berserker extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.BERSERKER,
+                    getSpellType(),
                     0,
                     this.description
             ));
@@ -92,7 +92,7 @@ public class Berserker extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         this.damageUpPercentage += Berserker.DAMAGE_UP_PERCENTAGE_PER_LEVEL;
         this.defenseDownPercentage += Berserker.DEFENSE_DOWN_PERCENTAGE_PER_LEVEL;
         if (this.pid != -1) {
@@ -123,6 +123,11 @@ public class Berserker extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.BERSERKER;
     }
 
     private void updateDescription() {

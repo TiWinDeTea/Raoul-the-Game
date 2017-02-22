@@ -32,7 +32,7 @@ public class Thorn extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.THORN,
+                    getSpellType(),
                     0,
                     this.description
             ));
@@ -80,7 +80,7 @@ public class Thorn extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         this.percentage += 1;
         if (this.pid != -1) {
             updateDescription();
@@ -110,6 +110,11 @@ public class Thorn extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.THORN;
     }
 
     private void updateDescription() {

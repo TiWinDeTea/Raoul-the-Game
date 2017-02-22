@@ -42,7 +42,7 @@ public class Teleport extends Spell<Player> {
 		fire(new SpellCreationEvent(
 				owner.getNumber(),
 				this.id,
-				SpellType.TELEPORT,
+				getSpellType(),
 				this.baseCooldown,
 				this.description
 		));
@@ -98,7 +98,7 @@ public class Teleport extends Spell<Player> {
 	}
 
 	@Override
-	public void nextSpellLevel() {
+	public void spellUpgraded() {
 		if (this.oddLevel) {
 			this.baseCooldown = Math.max(0, this.baseCooldown - 20);
 		}
@@ -121,6 +121,12 @@ public class Teleport extends Spell<Player> {
 			if (owner != null && owner.useMana(this.manaCost)) {
 				owner.setPosition(sourcePosition);
 				this.cooldown = this.baseCooldown;
+				fire(new SpellCooldownUpdateEvent(
+						owner.getNumber(),
+						this.id,
+						this.baseCooldown,
+						this.cooldown
+				));
 				return true;
 			}
 		}
@@ -138,6 +144,11 @@ public class Teleport extends Spell<Player> {
 		if (owner != null) {
 			fire(new SpellDeletionEvent(owner.getNumber(), this.id));
 		}
+	}
+
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.TELEPORT;
 	}
 
 	private void updateDescription(){

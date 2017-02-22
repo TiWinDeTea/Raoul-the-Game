@@ -27,11 +27,11 @@ import java.util.Collection;
 public class FireBall extends Spell<Player> {
 
 	private static final double BASE_DAMAGES = 3;
-	private static final int BASE_COOLDOWN = 75;
+	private static final int BASE_COOLDOWN = 20;
 
 	private double damages = BASE_DAMAGES;
 	private int baseCooldown = BASE_COOLDOWN;
-	private int cooldown = this.baseCooldown;
+	private int cooldown = 0;
 	private double manaCost = 5;
 
 	public FireBall(Player owner) {
@@ -41,7 +41,7 @@ public class FireBall extends Spell<Player> {
 		fire(new SpellCreationEvent(
 				owner.getNumber(),
 				this.id,
-				SpellType.FIRE_BALL,
+				getSpellType(),
 				this.baseCooldown,
 				this.description
 		));
@@ -74,7 +74,10 @@ public class FireBall extends Spell<Player> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		this.cooldown -= this.cooldown > 0 ? 1 : 0;
+		if (this.cooldown > 0) {
+			--this.cooldown;
+		}
+
 		Player owner = getOwner();
 		if (owner != null) {
 			fire(new SpellCooldownUpdateEvent(
@@ -92,7 +95,7 @@ public class FireBall extends Spell<Player> {
 	}
 
 	@Override
-	public void nextSpellLevel() {
+	public void spellUpgraded() {
 		this.damages += 1;
 		this.baseCooldown = Math.max(25, this.baseCooldown - 10);
 		updateDescription();
@@ -109,8 +112,8 @@ public class FireBall extends Spell<Player> {
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
 		if (this.cooldown == 0) {
-			if(!targets.isEmpty()){
-				Player owner = getOwner();
+			Player owner = getOwner();
+			if (!targets.isEmpty() && owner != null && owner.useMana(this.manaCost)) {
 				for(LivingThing target : targets) {
 					target.damage(this.damages + target.getDefensePower(), owner);
 				}
@@ -135,13 +138,18 @@ public class FireBall extends Spell<Player> {
 	}
 
 	@Override
+	public SpellType getSpellType() {
+		return SpellType.FIRE_BALL;
+	}
+
+	@Override
 	protected void forgotten() {
 	}
 
 	private void updateDescription() {
-		this.description = "Fireball (active).\n" +
+		this.description = "Fireball (active).\n\n" +
 				"Throw a mighty fireball at your ennemy for " +
-				DECIMAL.format(this.damages) + "true damages.\n" +
+				DECIMAL.format(this.damages) + " true damages.\n\n" +
 				"Cost: " + this.manaCost + " mana.";
 	}
 }

@@ -45,7 +45,7 @@ public class Explorer extends Spell<Player> {
 		fire(new SpellCreationEvent(
 				owner.getNumber(),
 				this.id,
-				SpellType.EXPLORER,
+				getSpellType(),
 				0,
 				this.description
 		));
@@ -85,6 +85,15 @@ public class Explorer extends Spell<Player> {
 				controller.moveGhostLivingEntity(this.ghostId, this.position);
 			} else {
 				controller.deleteGhostLivingEntity(this.ghostId);
+				Player owner = getOwner();
+				if (owner != null) {
+					fire(new SpellCooldownUpdateEvent(
+							owner.getNumber(),
+							this.id,
+							1,
+							0
+					));
+				}
 				this.position = null;
 			}
 		}
@@ -95,20 +104,11 @@ public class Explorer extends Spell<Player> {
 	}
 
 	@Override
-	public void nextSpellLevel() {
+	public void spellUpgraded() {
 		++this.explorationRange;
 		if (this.position != null) {
 			controller.deleteGhostLivingEntity(this.ghostId);
 			makeGhost();
-			Player owner = getOwner();
-			if (owner != null) {
-				fire(new SpellCooldownUpdateEvent(
-						owner.getNumber(),
-						this.id,
-						1,
-						0
-				));
-			}
 		}
 	}
 
@@ -134,8 +134,22 @@ public class Explorer extends Spell<Player> {
 
 	@Override
 	public void nextFloor() {
+
+		LivingThing owner = getOwner();
+
+		if (this.position != null) {
+			this.position = null;
+			if (owner != null) {
+				fire(new SpellCooldownUpdateEvent(
+						getOwner().getNumber(),
+						this.id,
+						1,
+						0
+				));
+			}
+		}
+
 		if (this.castedOnLastFloor && this.explorationRange == 2) {
-			LivingThing owner = getOwner();
 			if (owner != null) {
 				this.position = owner.getPosition();
 				makeGhost();
@@ -154,6 +168,11 @@ public class Explorer extends Spell<Player> {
 					this.id
 			));
 		}
+	}
+
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.EXPLORER;
 	}
 
 	private void makeGhost() {

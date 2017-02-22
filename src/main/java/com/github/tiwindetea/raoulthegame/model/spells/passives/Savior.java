@@ -49,7 +49,7 @@ public class Savior extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.SAVIOR,
+                    getSpellType(),
                     this.baseCooldown,
                     this.description
             ));
@@ -131,7 +131,7 @@ public class Savior extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         this.cooldown = 0;
         this.baseCooldown = Math.max(1, this.baseCooldown - 100);
         if (this.pid != -1) {
@@ -162,6 +162,11 @@ public class Savior extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.SAVIOR;
     }
 
     private void updateDescription() {

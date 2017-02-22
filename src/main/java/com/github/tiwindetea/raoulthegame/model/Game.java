@@ -1303,11 +1303,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.players.clear();
             while (file.hasNext()) {
                 str = file.nextLine();
-                this.players.add(Player.parsePlayer(str));
-                this.players.get(this.players.size() - 1).setFloor(this.level);
+                Player tmp = Player.parsePlayer(str);
+                this.players.add(tmp);
+                tmp.setFloor(this.level);
             }
             file.close();
             this.currentPlayer = this.players.get(0);
+            this.currentPlayer.test();
             fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
             fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
             this.generateLevel();
@@ -1629,7 +1631,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 Math.abs(e.getTilePosition().y - this.currentPlayer.getPosition().y));
 
         if (this.currentSpell != null) {
-            if (this.currentSpell.getTargetNumber() >= this.currentSpellTargets.size()) {
+            if (this.currentSpellTargets.size() >= this.currentSpell.getTargetNumber()) {
                 this.currentSpell.cast(this.currentSpellTargets, e.getTilePosition());
                 this.currentSpellTargets.clear();
                 this.currentSpell = null;

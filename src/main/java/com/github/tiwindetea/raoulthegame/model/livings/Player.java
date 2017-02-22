@@ -27,10 +27,7 @@ import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
 import com.github.tiwindetea.raoulthegame.model.items.StorableObjectType;
 import com.github.tiwindetea.raoulthegame.model.items.Weapon;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
-import com.github.tiwindetea.raoulthegame.model.spells.passives.Regen;
-import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Explorer;
-import com.github.tiwindetea.raoulthegame.model.spells.useablespells.FireBall;
-import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Teleport;
+import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
@@ -168,11 +165,11 @@ public class Player extends LivingThing {
         this.position = new Vector2i(-1, -1);
     }
 
-    public void test() {
+    public void test() {/*
         new Regen(this);
         new Explorer(this);
         new Teleport(this);
-        new FireBall(this);
+        new FireBall(this);*/
     }
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {
@@ -818,6 +815,13 @@ public class Player extends LivingThing {
             }
         }
 
+        /* Parsing the spells */
+        str = str.substring(str.indexOf("spells={") + 8);
+        while (!str.startsWith("}")) {
+            Spell.parse(str, p);
+            str = str.substring(str.indexOf("},") + 2);
+        }
+
 		/* Parsing for the inventory */
         str = "," + str.substring(str.indexOf("inventory=") + 11);
         String item;
@@ -888,11 +892,19 @@ public class Player extends LivingThing {
                 ans += anArmor.object;
             }
         }
-        ans += ",inventory={";
-        for (Pair<StorableObject> storableObjectPair : this.inventory) {
-            ans += storableObjectPair.object + ",";
+        ans += ",spells={";
+        for (Spell spell : this.spells) {
+            ans += spell + ",";
         }
-        return ans.substring(0, ans.length() - 1) + ",},}";
+        ans += "},inventory={";
+        if (this.inventory.isEmpty()) {
+            ans += ",";
+        } else {
+            for (Pair<StorableObject> storableObjectPair : this.inventory) {
+                ans += storableObjectPair.object + ",";
+            }
+        }
+        return ans + "},}";
     }
 
     /**
@@ -957,18 +969,19 @@ public class Player extends LivingThing {
         this.xp += earnedXp;
         super.fireXpUpdateEvent(new LivingEntityXpUpdateEvent(this.id, earnedXp));
         if (this.xp >= this.requiredXp) {
-            Sound.player.play(Sounds.LEVEL_UP_SOUND);
-            int levelUpping = this.xp / this.requiredXp;
-            this.xp %= this.requiredXp;
-            this.requiredXp += this.requiredXpPerLevel * levelUpping;
-            this.level += levelUpping;
-            this.maxHitPoints = Math.round(this.hitPointsPerLevel * levelUpping + this.maxHitPoints);
-            this.maxMana = Math.round(this.manaPerLevel * levelUpping + this.maxMana);
-            this.attackPower = Math.round(this.attackPowerPerLevel * levelUpping + this.attackPower);
-            this.defensePower = Math.round(this.defensePowerPerLevel * levelUpping + this.defensePower);
-            this.aggro = Math.round(this.aggroPerLevel * levelUpping + this.aggro);
-            this.hitPoints = this.maxHitPoints;
-            this.mana = this.maxMana;
+            do {
+                Sound.player.play(Sounds.LEVEL_UP_SOUND);
+                this.xp -= this.requiredXp;
+                this.requiredXp += this.requiredXpPerLevel;
+                ++this.level;
+                this.maxHitPoints = Math.round(this.hitPointsPerLevel + this.maxHitPoints);
+                this.maxMana = Math.round(this.manaPerLevel + this.maxMana);
+                this.attackPower = Math.round(this.attackPowerPerLevel + this.attackPower);
+                this.defensePower = Math.round(this.defensePowerPerLevel + this.defensePower);
+                this.aggro = Math.round(this.aggroPerLevel + this.aggro);
+                this.hitPoints = this.maxHitPoints;
+                this.mana = this.maxMana;
+            } while (this.xp >= this.requiredXp);
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.MAX, (int) this.maxHitPoints));
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.HEALTH, PlayerStatEvent.ValueType.ACTUAL, (int) this.hitPoints));
             firePlayerStatEvent(new PlayerStatEvent(this.number, PlayerStatEvent.StatType.MANA, PlayerStatEvent.ValueType.MAX, (int) this.maxMana));

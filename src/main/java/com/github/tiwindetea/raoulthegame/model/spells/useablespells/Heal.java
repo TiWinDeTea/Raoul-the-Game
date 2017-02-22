@@ -41,7 +41,7 @@ public class Heal extends Spell<Player> {
 		fire(new SpellCreationEvent(
 				owner.getNumber(),
 				this.id,
-				SpellType.HEAL,
+				getSpellType(),
 				0,
 				this.description
 		));
@@ -86,7 +86,7 @@ public class Heal extends Spell<Player> {
 	}
 
 	@Override
-	public void nextSpellLevel() {
+	public void spellUpgraded() {
 		this.applyTurns -= 2;
 		this.heal += 25;
 		updateDescription();
@@ -123,6 +123,11 @@ public class Heal extends Spell<Player> {
 					this.id
 			));
 		}
+	}
+
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.HEAL;
 	}
 
 	private void updateDescription(){

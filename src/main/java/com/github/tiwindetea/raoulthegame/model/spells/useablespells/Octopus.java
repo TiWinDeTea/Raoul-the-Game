@@ -4,6 +4,7 @@ import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -53,7 +54,7 @@ public class Octopus extends Spell<Player> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
 
     }
 
@@ -70,5 +71,10 @@ public class Octopus extends Spell<Player> {
     @Override
     public void forgotten() {
 
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.OCTOPUS;
     }
 }

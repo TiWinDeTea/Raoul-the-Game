@@ -4,6 +4,7 @@ import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -54,7 +55,7 @@ public class ScrollSpell extends Spell<Player> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         // todo
     }
 
@@ -72,5 +73,10 @@ public class ScrollSpell extends Spell<Player> {
     @Override
     protected void forgotten() {
         // todo
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.SCROLL_SPELL;
     }
 }

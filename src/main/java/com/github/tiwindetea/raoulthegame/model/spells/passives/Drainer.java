@@ -40,7 +40,7 @@ public class Drainer extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.DRAINER,
+                    getSpellType(),
                     0,
                     this.description
             ));
@@ -102,7 +102,7 @@ public class Drainer extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         this.stealPercentage += Drainer.STEAL_PERCENTAGE_PER_LEVEL;
         if (this.pid != -1) {
             updateDescription();
@@ -132,6 +132,11 @@ public class Drainer extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.DRAINER;
     }
 
     private void updateDescription() {

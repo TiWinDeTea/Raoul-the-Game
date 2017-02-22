@@ -547,8 +547,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void updateSpellCooldown(SpellCooldownUpdateEvent e) {
 			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
 				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
-				playerHUD.setSpellBaseCooldown(e.getPlayerNumber(), e.getBaseCooldown());
-				playerHUD.setSpellCooldown(e.getPlayerNumber(), e.getCooldown());
+				playerHUD.setSpellBaseCooldown(e.getSpellNumber(), e.getBaseCooldown());
+				playerHUD.setSpellCooldown(e.getSpellNumber(), e.getCooldown());
 			}
 			else {
 				System.out.println("GUI::updateSpellCooldown : invalid player number " + e.getPlayerNumber());
@@ -558,7 +558,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		public void updateSpellDescription(SpellDescriptionUpdateEvent e) {
 			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
 				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
-				playerHUD.setSpellDescription(e.getPlayerNumber(), e.getDescription());
+				playerHUD.setSpellDescription(e.getSpellNumber(), e.getDescription());
 			}
 			else {
 				System.out.println("GUI::updateSpellDescription : invalid player number " + e.getPlayerNumber());

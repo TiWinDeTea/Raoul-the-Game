@@ -62,6 +62,8 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     protected final int id;
     protected String description;
     protected static Map spellsMap;
+    protected int level = 0;
+    protected int cooldown;
 
     public static void setMap(Map map) {
         spellsMap = map;
@@ -209,7 +211,15 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     /**
      * Handler. This function should be called each time the spell gained a level.
      */
-    public abstract void nextSpellLevel();
+    public abstract void spellUpgraded();
+
+    /**
+     * Handler. This function should be called each time the spell gained a level.
+     */
+    public final void nextSpellLevel() {
+        ++this.level;
+        spellUpgraded();
+    }
 
     /**
      * Method called whenever the spell is casted on a LivingThing // a group of LivingThing(s)
@@ -238,6 +248,7 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
         if (owner != null) {
             owner.getSpells().remove(this);
         }
+        forgotten();
     }
 
     /**
@@ -247,6 +258,8 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     public String getDescription() {
         return this.description;
     }
+
+    public abstract SpellType getSpellType();
 
     public static Spell<? extends LivingThing> toSpell(SpellType type, Player owner) {
         switch (type) {
@@ -284,5 +297,18 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
                 return new Explorer(owner);
         }
         return null;
+    }
+
+    public static Spell<?> parse(String str, Player owner) {
+        Spell<?> spell = toSpell(SpellType.parse(str.substring(0, str.indexOf('='))), owner);
+        for (int i = Integer.parseInt(str.substring(str.indexOf("level=") + 6, str.indexOf(','))); i > 0; i--) {
+            spell.spellUpgraded();
+        }
+        spell.cooldown = Integer.parseInt(str.substring(str.indexOf("cooldown=") + 9, str.indexOf('}')));
+        return spell;
+    }
+
+    public final String toString() {
+        return getSpellType() + "={level=" + this.level + ",cooldown=" + this.cooldown + "}";
     }
 }

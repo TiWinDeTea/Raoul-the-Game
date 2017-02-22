@@ -43,7 +43,7 @@ public class Regen extends Spell<LivingThing> {
             fire(new SpellCreationEvent(
                     this.pid,
                     this.id,
-                    SpellType.REGEN,
+                    getSpellType(),
                     CD_TURNS,
                     this.description
             ));
@@ -102,7 +102,7 @@ public class Regen extends Spell<LivingThing> {
     }
 
     @Override
-    public void nextSpellLevel() {
+    public void spellUpgraded() {
         this.healQtt += 5;
         if (this.pid != -1) {
             updateDescription();
@@ -132,6 +132,11 @@ public class Regen extends Spell<LivingThing> {
                     this.id
             ));
         }
+    }
+
+    @Override
+    public SpellType getSpellType() {
+        return SpellType.REGEN;
     }
 
     private void updateDescription() {

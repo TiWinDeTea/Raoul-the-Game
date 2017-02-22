@@ -85,7 +85,7 @@ public class IronWill extends Spell<LivingThing> {
 	}
 
 	@Override
-	public void nextSpellLevel() {
+	public void spellUpgraded() {
 		++this.armor;
 		if (this.pid != -1) {
 			updateDescription();
@@ -115,6 +115,11 @@ public class IronWill extends Spell<LivingThing> {
 					this.id
 			));
 		}
+	}
+
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.IRON_WILL;
 	}
 
 	private void updateDescription(){

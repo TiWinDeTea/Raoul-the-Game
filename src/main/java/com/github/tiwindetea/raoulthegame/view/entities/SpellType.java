@@ -76,6 +76,15 @@ public enum SpellType {
     	return this.name;
 	}
 
+	public static SpellType parse(String str) {
+		for (SpellType spellType : SpellType.values()) {
+			if (spellType.toString().equals(str)) {
+				return spellType;
+			}
+		}
+		return null;
+	}
+
     public String getString(String key) {
     	return ViewPackage.ST_resourceBundle.getString(this.name + "." + key);
 	}
