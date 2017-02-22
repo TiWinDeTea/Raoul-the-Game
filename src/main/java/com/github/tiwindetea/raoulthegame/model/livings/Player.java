@@ -162,7 +162,7 @@ public class Player extends LivingThing {
     }
 
     public void test() {
-        this.spells.add(new Regen(this));
+        new Regen(this);
     }
 
     private void fireInventoryAdditionEvent(InventoryAdditionEvent event) {

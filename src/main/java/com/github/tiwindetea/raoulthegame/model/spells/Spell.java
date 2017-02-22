@@ -8,10 +8,13 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.MainPackage;
-import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Map;
@@ -39,8 +42,6 @@ import com.sun.istack.internal.Nullable;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -58,11 +59,9 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     protected int targetNumber;
     protected int range;
     protected int secondaryRange; // for aoe spells
-    protected final long id = Pair.getUniqueId();
+    protected final int id;
     protected String description;
     protected static Map spellsMap;
-
-    protected static final List<SpellListener> listeners = new LinkedList<>();
 
     public static void setMap(Map map) {
         spellsMap = map;
@@ -72,10 +71,30 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
         Spell.controller = controller;
     }
 
-    public static void addSpellListener(SpellListener listener) {
-        if (!listeners.contains(listener))
-            listeners.add(listener);
+    protected static void fire(SpellCreationEvent e) {
+        for (SpellListener listener : controller.getSpellListeners()) {
+            listener.handle(e);
+        }
     }
+
+    protected static void fire(SpellDeletionEvent e) {
+        for (SpellListener listener : controller.getSpellListeners()) {
+            listener.handle(e);
+        }
+    }
+
+    protected static void fire(SpellDescriptionUpdateEvent e) {
+        for (SpellListener listener : controller.getSpellListeners()) {
+            listener.handle(e);
+        }
+    }
+
+    protected static void fire(SpellCooldownUpdateEvent e) {
+        for (SpellListener listener : controller.getSpellListeners()) {
+            listener.handle(e);
+        }
+    }
+
 
     /**
      * Instantiates a new Spell.
@@ -86,24 +105,20 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
      * @param secondaryRange the aoe range of this spell
      * @param description    the description of this spell
      */
-    public Spell(T owner, int targetNumber, int range, int secondaryRange, String description, SpellType spellType) {
+    public Spell(T owner, int targetNumber, int range, int secondaryRange, String description, int id) {
         this.owner = new WeakReference<>(owner);
         this.targetNumber = targetNumber;
         this.range = range;
         this.secondaryRange = secondaryRange;
         this.description = description;
-        for (SpellListener listener : listeners) {
-            //listener.createSpell(new SpellCreationEvent(this.id, spellType));
-            //TODO
-        }
+        this.id = id;
+        owner.getSpells().add(this);
     }
 
-    public Spell(T owner, SpellType spellType) {
+    public Spell(T owner, int id) {
         this.owner = new WeakReference<>(owner);
-        for (SpellListener listener : listeners) {
-            //listener.createSpell(new SpellCreationEvent(this.id, spellType));
-            //TODO
-        }
+        this.id = id;
+        owner.getSpells().add(this);
     }
 
     /**
@@ -206,15 +221,16 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     /**
      * Method called whenever the owner forgots the spell
      */
-    public abstract void forgotten();
+    protected abstract void forgotten();
 
     /**
-     * Updates the description of a spell
-     *
-     * @param str new description
+     * Method called whenever the owner forgots the spell
      */
-    protected final void updateDescription(String str) {
-        this.description = str;
+    public final void forgot() {
+        T owner = getOwner();
+        if (owner != null) {
+            owner.getSpells().remove(this);
+        }
     }
 
     /**

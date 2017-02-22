@@ -4,7 +4,6 @@ import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
-import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -16,7 +15,7 @@ import java.util.Collection;
 public class PotCreator extends Spell<Player> {
 
     public PotCreator(Player owner) {
-        super(owner, SpellType.GRENADE);
+        super(owner, owner.getSpells().size());
     }
 
     @Override
@@ -71,7 +70,7 @@ public class PotCreator extends Spell<Player> {
     }
 
     @Override
-    public void forgotten() {
-
+    protected void forgotten() {
+        // todo
     }
 }

@@ -8,6 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Direction;
@@ -29,16 +32,23 @@ public class Explorer extends Spell<Player> {
 	private static final double MANA_COST = 5;
 
 	private Vector2i position;
-	private long id;
 	private int explorationRange = 0;
+	private long ghostId;
 	private boolean castedOnLastFloor = false;
 
 	public Explorer(Player owner) {
-		super(owner, SpellType.EXPLORER);
-		description = "Explorer (active).\n" +
+		super(owner, owner.getSpells().size());
+		this.description = "Explorer (active).\n" +
 				"Summons a ghost spirit that explores the path to the" +
 				"next floor for you." +
 				"Cost: " + MANA_COST + " mana.";
+		fire(new SpellCreationEvent(
+				owner.getNumber(),
+				this.id,
+				SpellType.EXPLORER,
+				0,
+				this.description
+		));
 	}
 
 	@Override
@@ -68,13 +78,13 @@ public class Explorer extends Spell<Player> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		if (position != null) {
+		if (this.position != null) {
 			Vector2i stairsPosition = spellsMap.getStairsDownPosition();
-			if (!position.equals(stairsPosition)) {
+			if (!this.position.equals(stairsPosition)) {
 				this.position = spellsMap.getPath(this.position, stairsPosition, true, Collections.emptyList()).peek();
-				controller.moveGhostLivingEntity(id, this.position);
+				controller.moveGhostLivingEntity(this.ghostId, this.position);
 			} else {
-				controller.deleteGhostLivingEntity(id);
+				controller.deleteGhostLivingEntity(this.ghostId);
 				this.position = null;
 			}
 		}
@@ -86,21 +96,36 @@ public class Explorer extends Spell<Player> {
 
 	@Override
 	public void nextSpellLevel() {
-		++explorationRange;
-		if (position != null) {
-			controller.deleteGhostLivingEntity(id);
+		++this.explorationRange;
+		if (this.position != null) {
+			controller.deleteGhostLivingEntity(this.ghostId);
 			makeGhost();
+			Player owner = getOwner();
+			if (owner != null) {
+				fire(new SpellCooldownUpdateEvent(
+						owner.getNumber(),
+						this.id,
+						1,
+						0
+				));
+			}
 		}
 	}
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
 		Player owner = getOwner();
-		if (owner != null) {
+		if (owner != null && this.position == null) {
 			if (owner.useMana(MANA_COST)) {
 				this.position = owner.getPosition();
 				makeGhost();
-				castedOnLastFloor = true;
+				this.castedOnLastFloor = true;
+				fire(new SpellCooldownUpdateEvent(
+						owner.getNumber(),
+						this.id,
+						1,
+						1
+				));
 				return true;
 			}
 		}
@@ -109,7 +134,7 @@ public class Explorer extends Spell<Player> {
 
 	@Override
 	public void nextFloor() {
-		if (castedOnLastFloor && explorationRange == 2) {
+		if (this.castedOnLastFloor && this.explorationRange == 2) {
 			LivingThing owner = getOwner();
 			if (owner != null) {
 				this.position = owner.getPosition();
@@ -121,18 +146,24 @@ public class Explorer extends Spell<Player> {
 	}
 
 	@Override
-	public void forgotten() {
-
+	protected void forgotten() {
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellDeletionEvent(
+					owner.getNumber(),
+					this.id
+			));
+		}
 	}
 
 	private void makeGhost() {
-		id = controller.createGhostEntity(
+		this.ghostId = controller.createGhostEntity(
 				LivingEntityType.PEACEFUL_ECTOPLASMA
-				, position
+				, this.position
 				, "Missing description"
 				, Direction.random()
 				, 3
-				, explorationRange
+				, this.explorationRange
 		);
 	}
 }

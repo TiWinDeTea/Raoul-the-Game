@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells;
 
+import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.items.InteractiveObject;
 import com.github.tiwindetea.raoulthegame.model.items.StorableObject;
@@ -140,4 +141,9 @@ public interface SpellsController {
      */
     Collection<javafx.util.Pair<Vector2i, Pair<StorableObject>>> retrieveObjectsOnFloor();
 
+    /**
+     * @return The list of all registered spell listeners
+     * @see SpellListener
+     */
+    Collection<? extends SpellListener> getSpellListeners();
 }

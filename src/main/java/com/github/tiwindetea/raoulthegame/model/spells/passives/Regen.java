@@ -8,7 +8,13 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -27,9 +33,23 @@ public class Regen extends Spell<LivingThing> {
 
     private static final int CD_TURNS = 10;
 
+    private final int pid;
+
     public Regen(LivingThing owner) {
-        super(owner, SpellType.REGEN);
-        updateDescription();
+        super(owner, owner.getSpells().size());
+        if (LivingThingType.PLAYER.equals(owner.getType())) {
+            updateDescription();
+            this.pid = ((Player) owner).getNumber();
+            fire(new SpellCreationEvent(
+                    this.pid,
+                    this.id,
+                    SpellType.REGEN,
+                    CD_TURNS,
+                    this.description
+            ));
+        } else {
+            this.pid = -1;
+        }
     }
 
     @Override
@@ -66,6 +86,14 @@ public class Regen extends Spell<LivingThing> {
                 owner.damage(-this.healQtt, null);
             }
         }
+        if (this.pid != -1) {
+            fire(new SpellCooldownUpdateEvent(
+                    this.pid,
+                    this.id,
+                    CD_TURNS - 1,
+                    CD_TURNS - this.turn % CD_TURNS - 1
+            ));
+        }
     }
 
     @Override
@@ -76,7 +104,14 @@ public class Regen extends Spell<LivingThing> {
     @Override
     public void nextSpellLevel() {
         this.healQtt += 5;
-        updateDescription();
+        if (this.pid != -1) {
+            updateDescription();
+            fire(new SpellDescriptionUpdateEvent(
+                    this.pid,
+                    this.id,
+                    this.description
+            ));
+        }
     }
 
     @Override
@@ -91,11 +126,16 @@ public class Regen extends Spell<LivingThing> {
 
     @Override
     public void forgotten() {
-
+        if (this.pid != -1) {
+            fire(new SpellDeletionEvent(
+                    this.pid,
+                    this.id
+            ));
+        }
     }
 
     private void updateDescription() {
-        description = "Rejuvenate (passive).\n" +
+        this.description = "Rejuvenate (passive).\n" +
                 "Passively regenerate your health (" + this.healQtt + "hp per turn)";
     }
 }

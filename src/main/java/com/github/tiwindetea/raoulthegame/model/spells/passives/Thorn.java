@@ -1,6 +1,11 @@
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -14,8 +19,26 @@ import java.util.Collection;
  */
 public class Thorn extends Spell<LivingThing> {
 
+    public final int pid;
+
+    public double percentage = 5;
+
     public Thorn(LivingThing owner) {
-        super(owner, SpellType.THORN);
+        super(owner, owner.getSpells().size());
+
+        if (LivingThingType.PLAYER.equals(owner.getType())) {
+            updateDescription();
+            this.pid = ((Player) owner).getNumber();
+            fire(new SpellCreationEvent(
+                    this.pid,
+                    this.id,
+                    SpellType.THORN,
+                    0,
+                    this.description
+            ));
+        } else {
+            this.pid = -1;
+        }
     }
 
     @Override
@@ -36,9 +59,9 @@ public class Thorn extends Spell<LivingThing> {
     @Override
     public double ownerDamaged(@Nullable LivingThing source, double damages) {
         if (source != null) {
-            // todo
+            source.damage(damages * this.percentage / 100, null);
         }
-        return 0;
+        return damages * this.percentage / 100;
     }
 
     @Override
@@ -58,7 +81,15 @@ public class Thorn extends Spell<LivingThing> {
 
     @Override
     public void nextSpellLevel() {
-        // todo
+        this.percentage += 1;
+        if (this.pid != -1) {
+            updateDescription();
+            fire(new SpellDescriptionUpdateEvent(
+                    this.pid,
+                    this.id,
+                    this.description
+            ));
+        }
     }
 
     @Override
@@ -72,7 +103,18 @@ public class Thorn extends Spell<LivingThing> {
     }
 
     @Override
-    public void forgotten() {
+    protected void forgotten() {
+        if (this.pid != -1) {
+            fire(new SpellDeletionEvent(
+                    this.pid,
+                    this.id
+            ));
+        }
+    }
 
+    private void updateDescription() {
+        this.description = "Thorn (passive).\n" +
+                "Returns " + this.percentage + "% " +
+                "of the incomming damages to the attacker";
     }
 }

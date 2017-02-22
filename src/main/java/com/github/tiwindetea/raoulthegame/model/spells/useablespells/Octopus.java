@@ -4,7 +4,6 @@ import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
-import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
@@ -15,7 +14,7 @@ import java.util.Collection;
  */
 public class Octopus extends Spell<Player> {
     public Octopus(Player owner) {
-        super(owner, SpellType.OCTOPUS);
+        super(owner, owner.getSpells().size());
     }
 
     @Override

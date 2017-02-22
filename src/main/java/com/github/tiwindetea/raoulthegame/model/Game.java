@@ -26,6 +26,7 @@ import com.github.tiwindetea.raoulthegame.events.game.players.PlayerNextTickEven
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityLOSDefinitionEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.CastSpellRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.CenterViewRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.InteractionRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.LockViewRequestEvent;
@@ -35,6 +36,7 @@ import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.DropRequ
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.UsageRequestEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
+import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
 import com.github.tiwindetea.raoulthegame.listeners.gui.request.RequestListener;
 import com.github.tiwindetea.raoulthegame.model.items.Armor;
 import com.github.tiwindetea.raoulthegame.model.items.ArmorType;
@@ -332,6 +334,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
         @Override
         public Collection<javafx.util.Pair<Vector2i, Pair<StorableObject>>> retrieveObjectsOnFloor() {
             return Game.this.objectsOnGround;
+        }
+
+        @Override
+        public Collection<? extends SpellListener> getSpellListeners() {
+            return Game.this.listeners;
         }
     };
 
@@ -739,6 +746,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
     @Override
     public void handle(LockViewRequestEvent e) {
         this.viewIsLocked = !this.viewIsLocked;
+    }
+
+    @Override
+    public void handle(CastSpellRequestEvent e) {
+        this.requestedEvent.add(e);
     }
 
     /**
@@ -1164,7 +1176,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     if (objPair.getValue().object.getType() == StorableObjectType.ARMOR) {
                         if (Settings.autoEquip) {
                             Pair<Armor> arm = player.autoEquipArmor(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
-                            //noinspection Duplicates
                             if (arm == null) {
                                 fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
@@ -1195,7 +1206,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     } else if (objPair.getValue().object.getType() == StorableObjectType.WEAPON) {
                         if (Settings.autoEquip) {
                             Pair<Weapon> weap = player.autoEquipWeapon(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
-                            //noinspection Duplicates
                             if (weap == null) {
                                 fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
@@ -1517,8 +1527,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
                                     case CENTER_VIEW_REQUEST_EVENT:
                                         treatRequestEvent((CenterViewRequestEvent) event);
                                         break;
+                                    case LOCK_VIEW_REQUEST_EVENT:
+                                        break;
                                     case EQUIP_REQUEST_EVENT:
                                         treatRequestEvent((EquipRequestEvent) event);
+                                        break;
+                                    case CAST_SPELL_REQUEST_EVENT:
+                                        treatRequestEvent((CastSpellRequestEvent) event);
                                         break;
                                 }
                             } catch (Exception e) {
@@ -1566,6 +1581,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
         fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
         this.currentMusic = Sounds.DEATH_MUSIC;
         Sound.player.play(this.currentMusic);
+    }
+
+    private void treatRequestEvent(CastSpellRequestEvent event) {
+        // todo
     }
 
     private void treatRequestEvent(CenterViewRequestEvent e) {
@@ -1848,4 +1867,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
         return i;
     }
+
+
 }

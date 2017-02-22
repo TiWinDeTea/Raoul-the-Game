@@ -8,6 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
 import com.github.tiwindetea.raoulthegame.model.livings.Mob;
@@ -143,6 +146,21 @@ public class SummonDog extends Spell<LivingThing> {
         public void revive() {
             this.hitPoints = this.maxHitPoints;
         }
+
+        @Override
+        public void damage(double damages, @Nullable LivingThing source) {
+            super.damage(damages, source);
+            if (!this.isAlive()) {
+                if (SummonDog.this.pid != -1) {
+                    fire(new SpellCooldownUpdateEvent(
+                            SummonDog.this.pid,
+                            SummonDog.this.id,
+                            1,
+                            0
+                    ));
+                }
+            }
+        }
     }
 
     private Dog dog;
@@ -150,9 +168,24 @@ public class SummonDog extends Spell<LivingThing> {
     private double manaConsumption = 10.0;
     private static final double MANA_CONSUMPTION_PER_LEVEL = 2.0;
 
+    private final int pid;
+
     public SummonDog(LivingThing owner) {
-        super(owner, SpellType.SUMMON_DOG);
+        super(owner, owner.getSpells().size());
         this.dog = new Dog(owner, "Camembert.\nCamembert is binded to " + owner.getName() + ".", SummonDog.this.level, 200, 10, 1, owner.getPosition().copy());
+        if (LivingThingType.PLAYER.equals(owner.getType())) {
+            this.pid = ((Player) owner).getNumber();
+            updateDescription();
+            fire(new SpellCreationEvent(
+                    this.pid,
+                    this.id,
+                    SpellType.SUMMON_DOG,
+                    1,
+                    this.description
+            ));
+        } else {
+            this.pid = -1;
+        }
     }
 
     @Override
@@ -226,6 +259,14 @@ public class SummonDog extends Spell<LivingThing> {
                     Spell.controller.shareLosWith(this.dog.getId(), 3);
                     this.dog.setPosition(sourcePosition);
                     this.dog.revive();
+                    if (this.pid != -1) {
+                        fire(new SpellCooldownUpdateEvent(
+                                this.pid,
+                                this.id,
+                                1,
+                                1
+                        ));
+                    }
                     return true;
                 }
             }
@@ -246,5 +287,17 @@ public class SummonDog extends Spell<LivingThing> {
     @Override
     public void forgotten() {
         this.dog.kill();
+        if (this.pid != -1) {
+            fire(new SpellDeletionEvent(
+                    this.pid,
+                    this.id
+            ));
+        }
+    }
+
+    private void updateDescription() {
+        this.description = "Summon dog (active).\n" +
+                "Summons a dog to fight with you.\n" +
+                "Cost: " + this.manaConsumption + " mana";
     }
 }

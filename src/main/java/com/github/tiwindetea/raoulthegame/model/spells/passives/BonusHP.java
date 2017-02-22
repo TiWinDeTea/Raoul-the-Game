@@ -8,6 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
@@ -29,10 +32,17 @@ public class BonusHP extends Spell<Player> {
     private double currentUp = 0;
 
     public BonusHP(Player owner) {
-        super(owner, SpellType.BONUS_HP);
+        super(owner, owner.getNumber());
         owner.increaseHP(BASE_HP);
         this.currentUp = BASE_HP;
         updateDescription();
+        fire(new SpellCreationEvent(
+                owner.getNumber(),
+                this.id,
+                SpellType.BONUS_HP,
+                0,
+                this.description
+        ));
     }
 
     @Override
@@ -76,8 +86,13 @@ public class BonusHP extends Spell<Player> {
         if (p != null) {
             p.increaseHP(HP_PER_LEVEL);
             this.currentUp += HP_PER_LEVEL;
+            updateDescription();
+            fire(new SpellDescriptionUpdateEvent(
+                    p.getNumber(),
+                    this.id,
+                    this.description
+            ));
         }
-        updateDescription();
     }
 
     @Override
@@ -100,11 +115,15 @@ public class BonusHP extends Spell<Player> {
         if (p != null) {
             p.increaseHP(-this.currentUp);
             this.currentUp = 0;
+            fire(new SpellDeletionEvent(
+                    p.getNumber(),
+                    this.id
+            ));
         }
     }
 
     private void updateDescription() {
-        description = "An apple a day keeps the doctor away\n" +
+        this.description = "An apple a day keeps the doctor away\n" +
                 "    (especially if you aim carefully).\n" +
                 "Give you some extra HP\n" +
                 "Current bonus: " + DECIMAL.format(this.currentUp) + "HP";

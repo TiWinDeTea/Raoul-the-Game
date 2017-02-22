@@ -8,7 +8,12 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -25,9 +30,23 @@ public class IronWill extends Spell<LivingThing> {
 	private static final double BASE_ARMOR = 2.5;
 
 	private double armor = BASE_ARMOR;
+	private final int pid;
 
 	public IronWill(LivingThing owner) {
-		super(owner, SpellType.IRON_WILL);
+		super(owner, owner.getSpells().size());
+		if (LivingThingType.PLAYER.equals(owner.getType())) {
+			this.pid = ((Player) owner).getNumber();
+			updateDescription();
+			fire(new SpellCreationEvent(
+					this.pid,
+					this.id,
+					SpellType.IRON_WILL,
+					0,
+					this.description
+			));
+		} else {
+			this.pid = -1;
+		}
 	}
 
 	@Override
@@ -47,7 +66,7 @@ public class IronWill extends Spell<LivingThing> {
 
 	@Override
 	public double ownerDamaged(@Nullable LivingThing source, double damages) {
-		return -armor;
+		return -this.armor;
 	}
 
 	@Override
@@ -67,8 +86,15 @@ public class IronWill extends Spell<LivingThing> {
 
 	@Override
 	public void nextSpellLevel() {
-		++armor;
-		updateDescription();
+		++this.armor;
+		if (this.pid != -1) {
+			updateDescription();
+			fire(new SpellDescriptionUpdateEvent(
+					this.pid,
+					this.id,
+					this.description
+			));
+		}
 	}
 
 	@Override
@@ -82,12 +108,17 @@ public class IronWill extends Spell<LivingThing> {
 	}
 
 	@Override
-	public void forgotten() {
-
+	protected void forgotten() {
+		if (this.pid != -1) {
+			fire(new SpellDeletionEvent(
+					this.pid,
+					this.id
+			));
+		}
 	}
 
 	private void updateDescription(){
-		description = "Iron Will (passive).\n" +
-		  "Increase the armor by " + DECIMAL.format(armor);
+		this.description = "Iron Will (passive).\n" +
+				"Increase the armor by " + DECIMAL.format(this.armor);
 	}
 }

@@ -8,6 +8,10 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
@@ -32,8 +36,16 @@ public class Teleport extends Spell<Player> {
 	private boolean oddLevel = true;
 
 	public Teleport(Player owner) {
-		super(owner, SpellType.TELEPORT);
-		range = owner.getLos();
+		super(owner, owner.getSpells().size());
+		this.range = owner.getLos();
+		updateDescription();
+		fire(new SpellCreationEvent(
+				owner.getNumber(),
+				this.id,
+				SpellType.TELEPORT,
+				this.baseCooldown,
+				this.description
+		));
 	}
 
 	@Override
@@ -63,33 +75,47 @@ public class Teleport extends Spell<Player> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		cooldown -= cooldown > 0 ? 1 : 0;
+		this.cooldown -= this.cooldown > 0 ? 1 : 0;
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellCooldownUpdateEvent(
+					owner.getNumber(),
+					this.id,
+					this.baseCooldown,
+					this.cooldown
+			));
+		}
 	}
 
 	@Override
 	public void nextOwnerLevel() {
-		cooldown = 0;
+		this.cooldown = 0;
 	}
 
 	@Override
 	public void nextSpellLevel() {
-		if(oddLevel){
-			baseCooldown = Math.max(0, baseCooldown - 20);
+		if (this.oddLevel) {
+			this.baseCooldown = Math.max(0, this.baseCooldown - 20);
 		}
 		else{
-			manaCost = Math.max(1, manaCost - 0.6);
+			this.manaCost = Math.max(1, this.manaCost - 0.6);
 		}
-		oddLevel = !oddLevel;
+		this.oddLevel = !this.oddLevel;
 		updateDescription();
+		fire(new SpellDescriptionUpdateEvent(
+				getOwner().getNumber(),
+				this.id,
+				this.description
+		));
 	}
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		if(cooldown == 0){
+		if (this.cooldown == 0) {
 			Player owner = getOwner();
-			if(owner != null && owner.useMana(manaCost)) {
+			if (owner != null && owner.useMana(this.manaCost)) {
 				owner.setPosition(sourcePosition);
-				cooldown = baseCooldown;
+				this.cooldown = this.baseCooldown;
 				return true;
 			}
 		}
@@ -103,13 +129,16 @@ public class Teleport extends Spell<Player> {
 
 	@Override
 	public void forgotten() {
-
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellDeletionEvent(owner.getNumber(), this.id));
+		}
 	}
 
 	private void updateDescription(){
-		description = "Teleport (active).\n" +
+		this.description = "Teleport (active).\n" +
 		  "Teleport the player to the target location.\n" +
-		  "\tMana cost: " + DECIMAL.format(manaCost) + "\n" +
-		  "\tCooldown: " + baseCooldown;
+				"\tMana cost: " + DECIMAL.format(this.manaCost) + "\n" +
+				"\tCooldown: " + this.baseCooldown;
 	}
 }

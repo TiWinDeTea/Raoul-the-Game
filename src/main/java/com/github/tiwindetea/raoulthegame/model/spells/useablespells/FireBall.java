@@ -8,7 +8,11 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -20,18 +24,27 @@ import java.util.Collection;
 /**
  * Created by Maxime on 21/02/2017.
  */
-public class FireBall extends Spell<LivingThing> {
+public class FireBall extends Spell<Player> {
 
-	private static final double BASE_DAMAGES = 50;
+	private static final double BASE_DAMAGES = 3;
 	private static final int BASE_COOLDOWN = 75;
 
 	private double damages = BASE_DAMAGES;
 	private int baseCooldown = BASE_COOLDOWN;
-	private int cooldown = baseCooldown;
+	private int cooldown = this.baseCooldown;
+	private double manaCost = 5;
 
-	public FireBall(LivingThing owner) {
-		super(owner, SpellType.FIRE_BALL);
-		targetNumber = 1;
+	public FireBall(Player owner) {
+		super(owner, owner.getSpells().size());
+		this.targetNumber = 1;
+		updateDescription();
+		fire(new SpellCreationEvent(
+				owner.getNumber(),
+				this.id,
+				SpellType.FIRE_BALL,
+				this.baseCooldown,
+				this.description
+		));
 	}
 
 	@Override
@@ -61,7 +74,16 @@ public class FireBall extends Spell<LivingThing> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		cooldown -= cooldown > 0 ? 1 : 0;
+		this.cooldown -= this.cooldown > 0 ? 1 : 0;
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellCooldownUpdateEvent(
+					owner.getNumber(),
+					this.id,
+					this.baseCooldown,
+					this.cooldown
+			));
+		}
 	}
 
 	@Override
@@ -71,18 +93,36 @@ public class FireBall extends Spell<LivingThing> {
 
 	@Override
 	public void nextSpellLevel() {
-		damages += 25;
-		baseCooldown = Math.max(25, baseCooldown - 10);
+		this.damages += 1;
+		this.baseCooldown = Math.max(25, this.baseCooldown - 10);
+		updateDescription();
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellDescriptionUpdateEvent(
+					owner.getNumber(),
+					this.id,
+					this.description
+			));
+		}
 	}
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		if(cooldown == 0){
+		if (this.cooldown == 0) {
 			if(!targets.isEmpty()){
+				Player owner = getOwner();
 				for(LivingThing target : targets) {
-					target.damage(damages,getOwner());
+					target.damage(this.damages + target.getDefensePower(), owner);
 				}
-				cooldown = baseCooldown;
+				this.cooldown = this.baseCooldown;
+				if (owner != null) {
+					fire(new SpellCooldownUpdateEvent(
+							owner.getNumber(),
+							this.id,
+							this.baseCooldown,
+							this.cooldown
+					));
+				}
 				return true;
 			}
 		}
@@ -95,7 +135,13 @@ public class FireBall extends Spell<LivingThing> {
 	}
 
 	@Override
-	public void forgotten() {
+	protected void forgotten() {
+	}
 
+	private void updateDescription() {
+		this.description = "Fireball (active).\n" +
+				"Throw a mighty fireball at your ennemy for " +
+				DECIMAL.format(this.damages) + "true damages.\n" +
+				"Cost: " + this.manaCost + " mana.";
 	}
 }

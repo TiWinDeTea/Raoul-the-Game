@@ -8,7 +8,13 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.passives;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.LivingThingType;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -30,11 +36,26 @@ public class Savior extends Spell<LivingThing> {
     //will regen 5 + 10% of the max hp upon reaching less than 5% of max hp or less than 3 hp
 
     private int baseCooldown = BASE_COOLDOWN;
-    private int cooldown = baseCooldown;
+    private int cooldown = this.baseCooldown;
+
+    private final int pid;
 
     public Savior(LivingThing owner) {
-        super(owner, SpellType.SAVIOR);
-        updateDescription();
+        super(owner, owner.getSpells().size());
+
+        if (LivingThingType.PLAYER.equals(owner.getType())) {
+            this.pid = ((Player) owner).getNumber();
+            updateDescription();
+            fire(new SpellCreationEvent(
+                    this.pid,
+                    this.id,
+                    SpellType.SAVIOR,
+                    this.baseCooldown,
+                    this.description
+            ));
+        } else {
+            this.pid = -1;
+        }
     }
 
     @Override
@@ -61,23 +82,23 @@ public class Savior extends Spell<LivingThing> {
                 double O_MAX_HP = owner.getMaxHitPoints();
                 double O_HP = owner.getHitPoints();
                 if (damages > 0) {
-                    double tmp = 0;
-                    for (Spell spell : owner.getSpells()) {
-                        tmp += spell.ownerDamaged(source, damages);
-                    }
-                    damages += tmp;
-                    diff = owner.getDefensePower() - damages;
-                    if (diff >= -1) {
-                        diff = -1;
-                    }
+                    diff = Math.max(-1, owner.getDefensePower() - damages);
                 } else {
                     diff = Math.min(O_MAX_HP - O_HP, -damages);
                 }
                 diff += O_HP;
                 if (diff < O_MAX_HP * TRIGGER_TRESHOLD_PERCENTAGE / 100 || diff < TRIGGER_TRESHOLD_HEALTH) {
-                    this.cooldown = baseCooldown;
-                    owner.damage(damages, null);
+                    this.cooldown = this.baseCooldown;
+                    owner.damage(-damages, null);
                     owner.damage(-(O_MAX_HP * PERCENTAGE_HP_REGEN / 100 + BASE_HP_REGEN + 1), null);
+                    if (this.pid != -1) {
+                        fire(new SpellCooldownUpdateEvent(
+                                this.pid,
+                                this.id,
+                                this.baseCooldown,
+                                this.cooldown
+                        ));
+                    }
                 }
             }
         }
@@ -93,6 +114,14 @@ public class Savior extends Spell<LivingThing> {
     public void update(Collection<LivingThing> targets) {
         if (this.cooldown > 0) {
             --this.cooldown;
+            if (this.pid != -1) {
+                fire(new SpellCooldownUpdateEvent(
+                        this.pid,
+                        this.id,
+                        this.baseCooldown,
+                        this.cooldown
+                ));
+            }
         }
     }
 
@@ -105,7 +134,14 @@ public class Savior extends Spell<LivingThing> {
     public void nextSpellLevel() {
         this.cooldown = 0;
         this.baseCooldown = Math.max(1, this.baseCooldown - 100);
-        updateDescription();
+        if (this.pid != -1) {
+            updateDescription();
+            fire(new SpellDescriptionUpdateEvent(
+                    this.pid,
+                    this.id,
+                    this.description
+            ));
+        }
     }
 
     @Override
@@ -119,12 +155,17 @@ public class Savior extends Spell<LivingThing> {
     }
 
     @Override
-    public void forgotten() {
-
+    protected void forgotten() {
+        if (this.pid != -1) {
+            fire(new SpellDeletionEvent(
+                    this.pid,
+                    this.id
+            ));
+        }
     }
 
     private void updateDescription() {
-        description = "Savior (passive).\n" +
+        this.description = "Savior (passive).\n" +
                 "Heals you when you are about to die.\n" +
                 "Cooldown: " + this.baseCooldown;
     }

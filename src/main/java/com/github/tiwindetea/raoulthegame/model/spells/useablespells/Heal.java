@@ -8,7 +8,11 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
+import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
@@ -20,17 +24,27 @@ import java.util.Collection;
 /**
  * Created by Maxime on 20/02/2017.
  */
-public class Heal extends Spell<LivingThing> {
+public class Heal extends Spell<Player> {
 
 	private static final double BASE_HEAL = 100;
 	private static final int BASE_APPLY_TURNS = 10;
 
+	private double manaCost = 10;
 	private double heal = BASE_HEAL;
 	private int applyTurns = BASE_APPLY_TURNS;
 	private int remainingTurns = 0;
 
-	public Heal(LivingThing owner) {
-		super(owner, SpellType.HEAL);
+
+	public Heal(Player owner) {
+		super(owner, owner.getSpells().size());
+		updateDescription();
+		fire(new SpellCreationEvent(
+				owner.getNumber(),
+				this.id,
+				SpellType.HEAL,
+				0,
+				this.description
+		));
 	}
 
 	@Override
@@ -60,9 +74,9 @@ public class Heal extends Spell<LivingThing> {
 
 	@Override
 	public void update(Collection<LivingThing> targets) {
-		if(remainingTurns > 0){
-			getOwner().damage(-heal / applyTurns, null);
-			--remainingTurns;
+		if (this.remainingTurns > 0) {
+			getOwner().damage(-this.heal / this.applyTurns, null);
+			--this.remainingTurns;
 		}
 	}
 
@@ -73,13 +87,25 @@ public class Heal extends Spell<LivingThing> {
 
 	@Override
 	public void nextSpellLevel() {
-		applyTurns -= 2;
-		heal += 25;
+		this.applyTurns -= 2;
+		this.heal += 25;
+		updateDescription();
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellDescriptionUpdateEvent(
+					owner.getNumber(),
+					this.id,
+					this.description
+			));
+		}
 	}
 
 	@Override
 	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-		remainingTurns = applyTurns;
+		Player owner = getOwner();
+		if (owner != null && owner.useMana(this.manaCost)) {
+			this.remainingTurns += this.applyTurns;
+		}
 		return true;
 	}
 
@@ -89,12 +115,18 @@ public class Heal extends Spell<LivingThing> {
 	}
 
 	@Override
-	public void forgotten() {
-
+	protected void forgotten() {
+		Player owner = getOwner();
+		if (owner != null) {
+			fire(new SpellDeletionEvent(
+					owner.getNumber(),
+					this.id
+			));
+		}
 	}
 
 	private void updateDescription(){
-		description = "Heal (active).\n" +
-		  "Heal " + heal + " hp in " + applyTurns + " turns";
+		this.description = "Heal (active).\n" +
+				"Heal " + this.heal + " hp in " + this.applyTurns + " turns";
 	}
 }
