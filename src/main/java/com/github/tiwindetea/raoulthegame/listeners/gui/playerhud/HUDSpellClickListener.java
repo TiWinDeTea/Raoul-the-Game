@@ -6,25 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events;
+package com.github.tiwindetea.raoulthegame.listeners.gui.playerhud;
+
+import com.github.tiwindetea.raoulthegame.events.gui.playerhud.HUDSpellClickEvent;
 
 /**
- * The enum EventType.
+ * The interface HUDSpellClickListener.
  *
  * @author Maxime PINARD
- * @author Lucas LAZARE
  */
-public enum EventType {
-    TILEMAP_EVENT,
-    STATIC_ENTITY_EVENT,
-    REQUEST_EVENT,
-    PLAYER_EVENT,
-    PLAYER_INVENTORY_EVENT,
-    MAP_EVENT,
-	LIVING_ENTITY_EVENT,
-	SCORE_UPDATE_EVENT,
-    LEVEL_UPDATE_EVENT,
-	SPELL_EVENT,
-	HUD_SPELL_CLICK_EVENT,
-	SELECTOR_SPELL_CLICK_EVENT
+public interface HUDSpellClickListener {
+
+	/**
+	 * Handler associated to an HUDSpellClickEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(HUDSpellClickEvent e);
 }

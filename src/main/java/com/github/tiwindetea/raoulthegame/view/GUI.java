@@ -43,7 +43,7 @@ import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEnti
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityEvent;
 import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityLOSDefinitionEvent;
-import com.github.tiwindetea.raoulthegame.events.gui.playerhud.SpellClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerhud.HUDSpellClickEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectClickEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectDragEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.PlayerInventoryEvent;
@@ -55,17 +55,20 @@ import com.github.tiwindetea.raoulthegame.events.gui.requests.MoveRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.UsageRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.spellselector.SelectorSpellClickEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileClickEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileDragEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileMapEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
-import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.SpellClickListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.HUDSpellClickListener;
 import com.github.tiwindetea.raoulthegame.listeners.gui.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.raoulthegame.listeners.gui.request.RequestListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.spellselector.SelectorSpellClickListener;
 import com.github.tiwindetea.raoulthegame.listeners.gui.tilemap.TileMapListener;
 import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntity;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
 import com.github.tiwindetea.soundplayer.Sound;
 import javafx.animation.KeyFrame;
@@ -99,7 +102,7 @@ import java.util.concurrent.Executors;
  *
  * @author Maxime PINARD.
  */
-public class GUI implements GameListener, TileMapListener, PlayerInventoryListener, SpellClickListener {
+public class GUI implements GameListener, TileMapListener, PlayerInventoryListener, HUDSpellClickListener, SelectorSpellClickListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
@@ -555,8 +558,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			}
 		}
 
-		public void spellClicked(SpellClickEvent e) {
+		public void HUDSpellClicked(HUDSpellClickEvent e) {
 			fireCastSpellRequestEvent(new CastSpellRequestEvent(e.getPlayerNumber(), e.getSpellNumber()));
+		}
+
+		public void selectorSpellClicked(SelectorSpellClickEvent gameEvent) {
+			//TODO
 		}
 
 		@Override
@@ -714,8 +721,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 					}
 					break;
 				}
-				case SPELL_CLICK_EVENT: {
-					spellClicked((SpellClickEvent) gameEvent);
+				case HUD_SPELL_CLICK_EVENT: {
+					HUDSpellClicked((HUDSpellClickEvent) gameEvent);
+					break;
+				}
+				case SELECTOR_SPELL_CLICK_EVENT: {
+					selectorSpellClicked((SelectorSpellClickEvent) gameEvent);
 					break;
 				}
 				}
@@ -1056,7 +1067,13 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	}
 
 	@Override
-	public void handle(SpellClickEvent e) {
+	public void handle(HUDSpellClickEvent e) {
 		this.eventQueue.add(e);
 	}
+
+	@Override
+	public void handle(SelectorSpellClickEvent e) {
+		this.eventQueue.add(e);
+	}
+
 }

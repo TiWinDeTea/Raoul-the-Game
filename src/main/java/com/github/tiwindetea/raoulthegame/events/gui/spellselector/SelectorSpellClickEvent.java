@@ -6,53 +6,42 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events.gui.playerhud;
+package com.github.tiwindetea.raoulthegame.events.gui.spellselector;
 
 import com.github.tiwindetea.raoulthegame.events.Event;
 import com.github.tiwindetea.raoulthegame.events.EventType;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 
 /**
- * The type SpellClickEvent.
+ * The type SelectorSpellClickListener.
  *
  * @author Maxime PINARD
  */
-public class SpellClickEvent extends Event {
+public class SelectorSpellClickEvent extends Event {
 
-	private int playerNumber;
-	private int spellNumber;
+	private SpellType eventType;
 
 	/**
-	 * Instantiates a new SpellClickEvent.
+	 * Instantiates a new SelectorSpellClickListener.
 	 *
-	 * @param playerNumber the player number
-	 * @param spellNumber  the spell number
+	 * @param eventType the event type
 	 */
-	public SpellClickEvent(int playerNumber, int spellNumber) {
-		this.playerNumber = playerNumber;
-		this.spellNumber = spellNumber;
+	public SelectorSpellClickEvent(SpellType eventType) {
+		this.eventType = eventType;
 	}
 
 	@Override
 	public EventType getType() {
-		return EventType.SPELL_CLICK_EVENT;
+		return EventType.SELECTOR_SPELL_CLICK_EVENT;
 	}
 
 	/**
-	 * Gets player number.
+	 * Gets event type.
 	 *
-	 * @return the player number
+	 * @return the event type
 	 */
-	public int getPlayerNumber() {
-		return this.playerNumber;
-	}
-
-	/**
-	 * Gets spell number.
-	 *
-	 * @return the spell number
-	 */
-	public int getSpellNumber() {
-		return this.spellNumber;
+	public SpellType getEventType() {
+		return this.eventType;
 	}
 
 }

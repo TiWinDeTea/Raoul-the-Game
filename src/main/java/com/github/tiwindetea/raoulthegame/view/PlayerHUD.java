@@ -8,8 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
-import com.github.tiwindetea.raoulthegame.events.gui.playerhud.SpellClickEvent;
-import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.SpellClickListener;
+import com.github.tiwindetea.raoulthegame.events.gui.playerhud.HUDSpellClickEvent;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.HUDSpellClickListener;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import javafx.beans.property.SimpleStringProperty;
@@ -101,7 +101,7 @@ public class PlayerHUD extends Parent {
 	private int actualRange;
 	private int actualPowerGrade;
 
-	private SpellClickListener listener;
+	private HUDSpellClickListener listener;
 
 	/**
 	 * Instantiates a new PlayerHUD.
@@ -118,7 +118,7 @@ public class PlayerHUD extends Parent {
 	 * @param playerName    the player name
 	 * @param listener      the spell click listener
 	 */
-	public PlayerHUD(int playerNumber, ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel, String playerName, SpellClickListener listener) {
+	public PlayerHUD(int playerNumber, ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel, String playerName, HUDSpellClickListener listener) {
 		this.playerNumber = playerNumber;
 		this.playerPicture = playerPicture;
 		this.actualHealth = actualHealth;
@@ -243,7 +243,7 @@ public class PlayerHUD extends Parent {
 			this.spellDisplayers[i].setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					PlayerHUD.this.listener.handle(new SpellClickEvent(PlayerHUD.this.playerNumber, spellnumber));
+					PlayerHUD.this.listener.handle(new HUDSpellClickEvent(PlayerHUD.this.playerNumber, spellnumber));
 				}
 			});
 		}

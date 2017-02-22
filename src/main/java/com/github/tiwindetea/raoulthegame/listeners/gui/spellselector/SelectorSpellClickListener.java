@@ -6,21 +6,21 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.listeners.gui.playerhud;
+package com.github.tiwindetea.raoulthegame.listeners.gui.spellselector;
 
-import com.github.tiwindetea.raoulthegame.events.gui.playerhud.SpellClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.spellselector.SelectorSpellClickEvent;
 
 /**
- * The interface SpellClickListener.
+ * The interface SelectorSpellClickListener.
  *
  * @author Maxime PINARD
  */
-public interface SpellClickListener {
+public interface SelectorSpellClickListener {
 
 	/**
-	 * Handler associated to an SpellClickEvent.
+	 * Handler associated to an SelectorSpellClickEvent.
 	 *
 	 * @param e Event to handle
 	 */
-	void handle(SpellClickEvent e);
+	void handle(SelectorSpellClickEvent e);
 }
