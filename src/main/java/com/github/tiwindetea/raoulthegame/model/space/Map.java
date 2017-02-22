@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.model.space;
 
-import com.github.tiwindetea.raoulthegame.events.map.TileModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.TileModificationEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.map.TileModificationListener;
 import com.github.tiwindetea.raoulthegame.model.Seed;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;

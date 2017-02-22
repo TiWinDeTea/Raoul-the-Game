@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.map;
 
-import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.FogAdditionEvent;
 
 /**
  * The interface FogAdditionListener.

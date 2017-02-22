@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.players;
 
-import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerCreationEvent;
 
 /**
  * The interface PlayerCreationListener.

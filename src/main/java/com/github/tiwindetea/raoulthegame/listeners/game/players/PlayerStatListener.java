@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.players;
 
-import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerStatEvent;
 
 /**
  * The interface PlayerStatListener.

@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entities;
 
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityXpUpdateEvent;
 
 /**
  * The interface LivingEntityXpUpdateListener.

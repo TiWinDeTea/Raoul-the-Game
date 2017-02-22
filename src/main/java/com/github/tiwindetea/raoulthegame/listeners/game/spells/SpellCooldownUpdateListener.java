@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.events.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
 
 /**
  * The interface SpellCooldownUpdateListener.

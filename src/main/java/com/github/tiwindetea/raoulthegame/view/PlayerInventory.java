@@ -8,9 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
-import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectClickEvent;
-import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectDragEvent;
-import com.github.tiwindetea.raoulthegame.listeners.playerinventory.PlayerInventoryListener;
+import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectDragEvent;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerinventory.PlayerInventoryListener;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
 import javafx.event.EventHandler;
@@ -75,6 +75,7 @@ public class PlayerInventory extends Parent {
 
 	private EventHandler<MouseEvent> onMouseReleaseEventHandler = new EventHandler<MouseEvent>() {
 
+		@Override
 		public void handle(MouseEvent event) {
 
 			// right mouse button
@@ -102,7 +103,7 @@ public class PlayerInventory extends Parent {
 		@Override
 		public void handle(DragEvent event) {
 			Dragboard db = event.getDragboard();
-			if (db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.EQUIPPED_ITEMS) {
+			if(db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.EQUIPPED_ITEMS) {
 				event.acceptTransferModes(TransferMode.COPY);
 			}
 			event.consume();
@@ -114,11 +115,11 @@ public class PlayerInventory extends Parent {
 		public void handle(DragEvent event) {
 			boolean success = false;
 			Dragboard db = event.getDragboard();
-			if (db.hasString() && db.hasContent(StaticEntity.place)) {
+			if(db.hasString() && db.hasContent(StaticEntity.place)) {
 				try {
 					fireObjectDragEvent(new ObjectDragEvent(Long.parseLong(db.getString())));
 					success = true;
-				} catch (Exception e) {
+				} catch(Exception e) {
 					System.out.println("Cannot parse " + db.getString() + " to a long");
 				}
 			}
@@ -131,7 +132,7 @@ public class PlayerInventory extends Parent {
 		@Override
 		public void handle(DragEvent event) {
 			Dragboard db = event.getDragboard();
-			if (db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.UNEQUIPPED_ITEMS) {
+			if(db.hasString() && db.hasContent(StaticEntity.place) && db.getContent(StaticEntity.place) != Place.UNEQUIPPED_ITEMS) {
 				event.acceptTransferModes(TransferMode.COPY);
 			}
 			event.consume();
@@ -201,7 +202,7 @@ public class PlayerInventory extends Parent {
 	}
 
 	private void fireObjectDragEvent(ObjectDragEvent event) {
-		for (PlayerInventoryListener listener : getPlayerInventoryListener()) {
+		for(PlayerInventoryListener listener : getPlayerInventoryListener()) {
 			listener.handle(event);
 		}
 	}

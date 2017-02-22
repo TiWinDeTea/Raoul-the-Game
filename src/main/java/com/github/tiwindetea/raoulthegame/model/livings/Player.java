@@ -9,14 +9,14 @@
 package com.github.tiwindetea.raoulthegame.model.livings;
 
 import com.github.tiwindetea.raoulthegame.Settings;
-import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
-import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
-import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.LevelUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityManaUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityXpUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerStatEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.inventory.InventoryDeletionEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.items.Armor;
@@ -41,11 +41,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BOOTS;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BREAST_PLATE;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.GLOVES;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.HELMET;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.PANTS;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.*;
 
 /**
  * Player
@@ -378,6 +374,7 @@ public class Player extends LivingThing {
      *
      * @return the aggro
      */
+    @Override
     public double getAggro() {
         return this.aggro;
     }

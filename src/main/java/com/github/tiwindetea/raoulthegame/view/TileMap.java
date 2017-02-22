@@ -8,9 +8,9 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
-import com.github.tiwindetea.raoulthegame.events.tilemap.TileClickEvent;
-import com.github.tiwindetea.raoulthegame.events.tilemap.TileDragEvent;
-import com.github.tiwindetea.raoulthegame.listeners.tilemap.TileMapListener;
+import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileDragEvent;
+import com.github.tiwindetea.raoulthegame.listeners.gui.tilemap.TileMapListener;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.Entity;
@@ -72,6 +72,7 @@ public class TileMap extends Parent {
 
 	private EventHandler<MouseEvent> onMousePressedEventHandler = new EventHandler<MouseEvent>() {
 
+		@Override
 		public void handle(MouseEvent event) {
 
 			// left mouse button
@@ -108,6 +109,7 @@ public class TileMap extends Parent {
 	};
 
 	private EventHandler<MouseEvent> onMouseDraggedEventHandler = new EventHandler<MouseEvent>() {
+		@Override
 		public void handle(MouseEvent event) {
 
 			// right mouse button

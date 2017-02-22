@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entities;
 
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityDeletionEvent;
 
 /**
  * The interface StaticEntityDeletionListener.

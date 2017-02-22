@@ -8,6 +8,8 @@
 
 package com.github.tiwindetea.raoulthegame.view;
 
+import com.github.tiwindetea.raoulthegame.events.gui.playerhud.SpellClickEvent;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.SpellClickListener;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import javafx.beans.property.SimpleStringProperty;
@@ -84,6 +86,7 @@ public class PlayerHUD extends Parent {
 
 	private final ImageView backgroundImage = new ImageView(ViewPackage.HUD_IMAGE);
 
+	private int playerNumber;
 	private String description;
 	private String playerName;
 	private int maxHealth;
@@ -98,9 +101,12 @@ public class PlayerHUD extends Parent {
 	private int actualRange;
 	private int actualPowerGrade;
 
+	private SpellClickListener listener;
+
 	/**
 	 * Instantiates a new PlayerHUD.
 	 *
+	 * @param playerNumber  the player number
 	 * @param playerPicture the player picture
 	 * @param actualHealth  the actual health
 	 * @param maxHealth     the max health
@@ -109,8 +115,11 @@ public class PlayerHUD extends Parent {
 	 * @param actualXP      the actual xp
 	 * @param maxXP         the max xp
 	 * @param actualLevel   the actual level
+	 * @param playerName    the player name
+	 * @param listener      the spell click listener
 	 */
-	public PlayerHUD(ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel, String playerName) {
+	public PlayerHUD(int playerNumber, ImageView playerPicture, int actualHealth, int maxHealth, int actualMana, int maxMana, int actualXP, int maxXP, int actualLevel, String playerName, SpellClickListener listener) {
+		this.playerNumber = playerNumber;
 		this.playerPicture = playerPicture;
 		this.actualHealth = actualHealth;
 		this.maxHealth = maxHealth;
@@ -120,6 +129,7 @@ public class PlayerHUD extends Parent {
 		this.maxXP = maxXP;
 		this.actualLevel = actualLevel;
 		this.playerName = playerName;
+		this.listener = listener;
 		this.init();
 	}
 
@@ -229,6 +239,13 @@ public class PlayerHUD extends Parent {
 		for(int i = 0; i < this.spellDisplayers.length; i++) {
 			this.spellDisplayers[i] = new SpellDisplayer();
 			this.spellDisplayers[i].setVisible(false);
+			final int spellnumber = i;
+			this.spellDisplayers[i].setOnMouseClicked(new EventHandler<MouseEvent>() {
+				@Override
+				public void handle(MouseEvent event) {
+					PlayerHUD.this.listener.handle(new SpellClickEvent(PlayerHUD.this.playerNumber, spellnumber));
+				}
+			});
 		}
 		getChildren().addAll(this.spellDisplayers);
 		this.spellDisplayers[0].setTranslateX(INFOS_PANE_SIZE.x + 12);

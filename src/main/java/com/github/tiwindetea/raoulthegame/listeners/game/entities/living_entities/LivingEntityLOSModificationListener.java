@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.living_entities;
 
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityLOSModificationEvent;
 
 /**
  * The interface LivingEntityLOSModificationListener.

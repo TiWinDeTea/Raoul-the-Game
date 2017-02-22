@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.events.spells.SpellDescriptionUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 
 /**
  * The interface SpellDescriptionUpdateListener.

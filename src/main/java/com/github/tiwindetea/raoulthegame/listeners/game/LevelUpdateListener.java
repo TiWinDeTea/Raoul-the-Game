@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game;
 
-import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.LevelUpdateEvent;
 
 /**
  * The interface LevelUpdateListener.

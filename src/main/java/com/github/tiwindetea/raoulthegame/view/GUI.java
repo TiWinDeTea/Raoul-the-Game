@@ -9,58 +9,60 @@
 package com.github.tiwindetea.raoulthegame.view;
 
 import com.github.tiwindetea.raoulthegame.events.Event;
-import com.github.tiwindetea.raoulthegame.events.LevelUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityDeletionEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthVisibilityEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSDefinitionEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityLOSModificationEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.map.CenterOnTileEvent;
-import com.github.tiwindetea.raoulthegame.events.map.FogAdditionEvent;
-import com.github.tiwindetea.raoulthegame.events.map.FogResetEvent;
-import com.github.tiwindetea.raoulthegame.events.map.MapCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.map.MapEvent;
-import com.github.tiwindetea.raoulthegame.events.map.TileModificationEvent;
-import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectClickEvent;
-import com.github.tiwindetea.raoulthegame.events.playerinventory.ObjectDragEvent;
-import com.github.tiwindetea.raoulthegame.events.playerinventory.PlayerInventoryEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerDeletionEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerNextTickEvent;
-import com.github.tiwindetea.raoulthegame.events.players.PlayerStatEvent;
-import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
-import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryDeletionEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.CastSpellRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.CenterViewRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.InteractionRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.LockViewRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.MoveRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.inventory.DropRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.inventory.EquipRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.requests.inventory.UsageRequestEvent;
-import com.github.tiwindetea.raoulthegame.events.spells.SpellCooldownUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.spells.SpellDeletionEvent;
-import com.github.tiwindetea.raoulthegame.events.spells.SpellDescriptionUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.spells.SpellEvent;
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityCreationEvent;
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityDeletionEvent;
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityEvent;
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityLOSDefinitionEvent;
-import com.github.tiwindetea.raoulthegame.events.tilemap.TileClickEvent;
-import com.github.tiwindetea.raoulthegame.events.tilemap.TileDragEvent;
-import com.github.tiwindetea.raoulthegame.events.tilemap.TileMapEvent;
+import com.github.tiwindetea.raoulthegame.events.game.LevelUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.ScoreUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityHealthVisibilityEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityLOSDefinitionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityLOSModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityManaUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityXpUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.CenterOnTileEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.FogAdditionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.FogResetEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.MapCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.MapEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.TileModificationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerNextTickEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerStatEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.inventory.InventoryDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityLOSDefinitionEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerhud.SpellClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.ObjectDragEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.playerinventory.PlayerInventoryEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.CastSpellRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.CenterViewRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.InteractionRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.LockViewRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.MoveRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.DropRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.EquipRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.UsageRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileClickEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileDragEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.tilemap.TileMapEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
-import com.github.tiwindetea.raoulthegame.listeners.playerinventory.PlayerInventoryListener;
-import com.github.tiwindetea.raoulthegame.listeners.request.RequestListener;
-import com.github.tiwindetea.raoulthegame.listeners.tilemap.TileMapListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerhud.SpellClickListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.playerinventory.PlayerInventoryListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.request.RequestListener;
+import com.github.tiwindetea.raoulthegame.listeners.gui.tilemap.TileMapListener;
 import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntity;
@@ -97,7 +99,7 @@ import java.util.concurrent.Executors;
  *
  * @author Maxime PINARD.
  */
-public class GUI implements GameListener, TileMapListener, PlayerInventoryListener {
+public class GUI implements GameListener, TileMapListener, PlayerInventoryListener, SpellClickListener {
 	private final List<RequestListener> listeners = new ArrayList<>();
 
 	private static final Duration REFRESH_DURATION = Duration.millis(100);
@@ -286,7 +288,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 				Vector2i spritePosition = e.getPlayerType().getSpritePosition(Direction.DOWN);
 				imageView1.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
 				imageView2.setViewport(new Rectangle2D(spritePosition.x * ViewPackage.SPRITES_SIZE.x, spritePosition.y * ViewPackage.SPRITES_SIZE.y, ViewPackage.SPRITES_SIZE.x, ViewPackage.SPRITES_SIZE.y));
-				PlayerHUD playerHUD = new PlayerHUD(imageView1, e.getMaxHealth(), e.getMaxHealth(), e.getMaxMana(), e.getMaxMana(), 0, e.getMaxXP(), e.getLevel(), e.getPlayerName());
+				PlayerHUD playerHUD = new PlayerHUD(GUI.this.actualPlayersNumber, imageView1, e.getMaxHealth(), e.getMaxHealth(), e.getMaxMana(), e.getMaxMana(), 0, e.getMaxXP(), e.getLevel(), e.getPlayerName(), GUI.this);
 				GUI.this.playersHUD.add(playerHUD);
 				GUI.this.bVBox.getChildren().add(playerHUD);
 
@@ -553,6 +555,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			}
 		}
 
+		public void spellClicked(SpellClickEvent e) {
+			fireCastSpellRequestEvent(new CastSpellRequestEvent(e.getPlayerNumber(), e.getSpellNumber()));
+		}
+
 		@Override
 		public void handle(ActionEvent event) {
 			Event gameEvent = GUI.this.eventQueue.poll();
@@ -706,6 +712,10 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 						break;
 					}
 					}
+				}
+				case SPELL_CLICK_EVENT: {
+					spellClicked((SpellClickEvent) gameEvent);
+					break;
 				}
 				}
 				gameEvent = GUI.this.eventQueue.poll();
@@ -1044,4 +1054,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.eventQueue.add(e);
 	}
 
+	@Override
+	public void handle(SpellClickEvent e) {
+		this.eventQueue.add(e);
+	}
 }

@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.players.inventory;
 
-import com.github.tiwindetea.raoulthegame.events.players.inventory.InventoryAdditionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.inventory.InventoryAdditionEvent;
 
 /**
  * The interface InventoryAdditionListener.

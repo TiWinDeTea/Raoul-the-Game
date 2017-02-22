@@ -8,10 +8,10 @@
 
 package com.github.tiwindetea.raoulthegame.model.livings;
 
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityHealthUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityManaUpdateEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityMoveEvent;
-import com.github.tiwindetea.raoulthegame.events.living_entities.LivingEntityXpUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityHealthUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityManaUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityMoveEvent;
+import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityXpUpdateEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.GameListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
@@ -304,6 +304,7 @@ public abstract class LivingThing implements Descriptable {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getDescription() {
         return this.name;
     }

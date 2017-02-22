@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.players;
 
-import com.github.tiwindetea.raoulthegame.events.players.PlayerNextTickEvent;
+import com.github.tiwindetea.raoulthegame.events.game.players.PlayerNextTickEvent;
 
 /**
  * The interface PlayerNextTickListener.

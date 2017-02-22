@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.entities.static_entities;
 
-import com.github.tiwindetea.raoulthegame.events.static_entities.StaticEntityCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.static_entities.StaticEntityCreationEvent;
 
 /**
  * The interface StaticEntityCreationListener.

@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.map;
 
-import com.github.tiwindetea.raoulthegame.events.map.MapCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.map.MapCreationEvent;
 
 /**
  * The interface MapCreationListener.

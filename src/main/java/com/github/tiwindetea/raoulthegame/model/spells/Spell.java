@@ -8,7 +8,6 @@
 
 package com.github.tiwindetea.raoulthegame.model.spells;
 
-import com.github.tiwindetea.raoulthegame.events.spells.SpellCreationEvent;
 import com.github.tiwindetea.raoulthegame.listeners.game.spells.SpellListener;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.MainPackage;

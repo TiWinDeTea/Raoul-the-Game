@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game.spells;
 
-import com.github.tiwindetea.raoulthegame.events.spells.SpellDeletionEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
 
 /**
  * The interface SpellDeletionListener.

@@ -8,7 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.game;
 
-import com.github.tiwindetea.raoulthegame.events.ScoreUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.ScoreUpdateEvent;
 
 /**
  * The interface ScoreUpdateListener.
