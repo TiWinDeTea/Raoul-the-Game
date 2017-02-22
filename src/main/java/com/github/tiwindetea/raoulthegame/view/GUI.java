@@ -70,11 +70,11 @@ import com.github.tiwindetea.raoulthegame.listeners.gui.tilemap.TileMapListener;
 import com.github.tiwindetea.raoulthegame.model.space.Direction;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntity;
-import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntity;
 import com.github.tiwindetea.soundplayer.Sound;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -115,6 +115,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	private static final Color RIGHT_BACKGROUND_COLOR1 = Color.rgb(53, 53, 53);
 	private static final Color RIGHT_BACKGROUND_COLOR2 = Color.DARKGRAY;
 	private static final Color CENTER_BACKGROUND_COLOR = Color.BLACK;
+	private static final Color BLOCKING_BACKGROUND_COLOR = Color.rgb(100, 100, 100, 0.9);
 
 	private static final Vector2i ANCHOR_PANE_MIN_SIZE = new Vector2i(1000, 500);
 
@@ -141,6 +142,9 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 	private final TileMap cTileMap = new TileMap();
 
+	private final SimpleBooleanProperty blockInput = new SimpleBooleanProperty(false);
+	private final StackPane blockPane = new StackPane();
+
 	private final Queue<Event> eventQueue = new LinkedList<>();
 
 	private boolean moveRencentlyRequested = false;
@@ -149,7 +153,7 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		@Override
 		public void handle(KeyEvent event) {
-			if(!GUI.this.moveRencentlyRequested) {
+			if(!GUI.this.moveRencentlyRequested && !GUI.this.blockInput.get()) {
 
 				GUI.this.moveRencentlyRequested = true;
 				ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -567,10 +571,14 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 
 		public void selectorSpellClicked(SelectorSpellClickEvent e) {
 			fireSpellSelectedRequestEvent(new SpellSelectedRequestEvent(e.getSpellType()));
+			GUI.this.blockPane.getChildren().clear();
+			GUI.this.blockInput.set(false);
 		}
 
-		private void selectSpell(SpellSelectionEvent gameEvent) {
-			//TODO: ask user
+		private void selectSpell(SpellSelectionEvent e) {
+			SpellSelector spellSelector = new SpellSelector(e.getText(), e.getSpellTypes(), GUI.this);
+			GUI.this.blockPane.getChildren().add(spellSelector);
+			GUI.this.blockInput.set(true);
 		}
 
 		@Override
@@ -790,6 +798,14 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		this.rVBox.getChildren().add(InformationsDisplayer.getInstance());
 		this.rPane.setBackground(new Background(new BackgroundFill(RIGHT_BACKGROUND_COLOR2, CornerRadii.EMPTY, Insets.EMPTY)));
 		this.rPane.getChildren().add(this.rVBox);
+
+		this.anchorPane.getChildren().add(this.blockPane);
+		this.blockPane.setBackground(new Background(new BackgroundFill(BLOCKING_BACKGROUND_COLOR, CornerRadii.EMPTY, Insets.EMPTY)));
+		AnchorPane.setTopAnchor(this.blockPane, 0d);
+		AnchorPane.setBottomAnchor(this.blockPane, 0d);
+		AnchorPane.setLeftAnchor(this.blockPane, 0d);
+		AnchorPane.setRightAnchor(this.blockPane, 0d);
+		this.blockPane.visibleProperty().bind(this.blockInput);
 
 		this.timeline.setCycleCount(Timeline.INDEFINITE);
 		this.timeline.play();
