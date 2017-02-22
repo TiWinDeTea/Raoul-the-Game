@@ -16,7 +16,7 @@ import javafx.scene.shape.Rectangle;
  */
 public class SpellDisplayer extends Parent {
 
-	private static final Color SPELLS_COOLDOWN_MASK_COLOR = Color.rgb(194, 194, 194, 0.5);
+	private static final Color SPELLS_COOLDOWN_MASK_COLOR = Color.rgb(40, 40, 40, 0.7);
 
 	private ImageView spellImageView = new ImageView();
 	private Rectangle cooldownRectangle = new Rectangle();

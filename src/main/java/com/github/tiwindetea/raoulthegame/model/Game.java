@@ -109,7 +109,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private static final int MAX_MOBS_LOOTS_PER_LEVEL = 10;
     private static final int BULB_LOS = 2;
     private static final int MINIMUN_TURN_TIME_MS = 100;
-    private static final int REFRESH_TIME_MS = 100;
+    private static final int REFRESH_TIME_MS = 10;
 
 
     private static Logger logger = Logger.getLogger(MainPackage.name + ".model.Game");
@@ -1501,13 +1501,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.currentPlayer.test();
         try {
             do {
-                try {
-                    Thread.sleep(REFRESH_TIME_MS);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 if (!this.isPaused) {
                     do {
+                        try {
+                            Thread.sleep(REFRESH_TIME_MS);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         event = this.requestedEvent.poll();
                         while (event != null) {
                             try { // debug
@@ -1547,6 +1547,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
                             this.nextTick(); // modifies the here-above boolean
                         }
                     } while (this.currentPlayer.isARequestPending() || this.currentPlayer.getFloor() != this.level);
+                } else {
+                    try {
+                        Thread.sleep(REFRESH_TIME_MS * 20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             } while (this.isRunning);
         } catch (Exception e) {
