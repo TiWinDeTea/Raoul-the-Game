@@ -6,39 +6,39 @@
 //                                                                              //
 //////////////////////////////////////////////////////////////////////////////////
 
-package com.github.tiwindetea.raoulthegame.events.gui.spellselector;
+package com.github.tiwindetea.raoulthegame.events.gui.requests;
 
 import com.github.tiwindetea.raoulthegame.events.Event;
 import com.github.tiwindetea.raoulthegame.events.EventType;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 
 /**
- * The type SelectorSpellClickListener.
+ * The type SpellSelectedRequestEvent.
  *
  * @author Maxime PINARD
  */
-public class SelectorSpellClickEvent extends Event {
+public class SpellSelectedRequestEvent extends Event {
 
 	private SpellType spellType;
 
 	/**
-	 * Instantiates a new SelectorSpellClickListener.
+	 * Instantiates a new SpellSelectedRequestEvent.
 	 *
-	 * @param eventType the event type
+	 * @param spellType the spell type
 	 */
-	public SelectorSpellClickEvent(SpellType eventType) {
-		this.spellType = eventType;
+	public SpellSelectedRequestEvent(SpellType spellType) {
+		this.spellType = spellType;
 	}
 
 	@Override
 	public EventType getType() {
-		return EventType.SELECTOR_SPELL_CLICK_EVENT;
+		return null;
 	}
 
 	/**
-	 * Gets event type.
+	 * Gets spell type.
 	 *
-	 * @return the event type
+	 * @return the spell type
 	 */
 	public SpellType getSpellType() {
 		return this.spellType;

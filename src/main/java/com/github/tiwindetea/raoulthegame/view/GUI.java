@@ -53,6 +53,7 @@ import com.github.tiwindetea.raoulthegame.events.gui.requests.CenterViewRequestE
 import com.github.tiwindetea.raoulthegame.events.gui.requests.InteractionRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.LockViewRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.MoveRequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.SpellSelectedRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.UsageRequestEvent;
@@ -564,8 +565,8 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 			fireCastSpellRequestEvent(new CastSpellRequestEvent(e.getPlayerNumber(), e.getSpellNumber()));
 		}
 
-		public void selectorSpellClicked(SelectorSpellClickEvent gameEvent) {
-			//TODO: fire event
+		public void selectorSpellClicked(SelectorSpellClickEvent e) {
+			fireSpellSelectedRequestEvent(new SpellSelectedRequestEvent(e.getSpellType()));
 		}
 
 		private void selectSpell(SpellSelectionEvent gameEvent) {
@@ -906,6 +907,12 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 	}
 
 	private void fireCastSpellRequestEvent(CastSpellRequestEvent event) {
+		for(RequestListener listener : this.getRequestListener()) {
+			listener.handle(event);
+		}
+	}
+
+	private void fireSpellSelectedRequestEvent(SpellSelectedRequestEvent event) {
 		for(RequestListener listener : this.getRequestListener()) {
 			listener.handle(event);
 		}

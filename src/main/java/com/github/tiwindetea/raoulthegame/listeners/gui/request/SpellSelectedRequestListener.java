@@ -8,12 +8,19 @@
 
 package com.github.tiwindetea.raoulthegame.listeners.gui.request;
 
-import com.github.tiwindetea.raoulthegame.listeners.gui.request.inventory.InventoryRequestListener;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.SpellSelectedRequestEvent;
 
 /**
- * The interface RequestListener, that regroups some other listener.
+ * The interface SpellSelectedRequestListener.
  *
  * @author Maxime PINARD
  */
-public interface RequestListener extends CastSpellRequestListener, CenterViewRequestListener, InventoryRequestListener, MoveRequestListener, InteractionRequestListener, LockViewRequestListener, SpellSelectedRequestListener {
+public interface SpellSelectedRequestListener {
+
+	/**
+	 * Handler associated to a SpellSelectedRequestEvent.
+	 *
+	 * @param e Event to handle
+	 */
+	void handle(SpellSelectedRequestEvent e);
 }
