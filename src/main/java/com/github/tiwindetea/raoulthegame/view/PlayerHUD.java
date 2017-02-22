@@ -73,10 +73,7 @@ public class PlayerHUD extends Parent {
 	private final Rectangle maskRectangle = new Rectangle(INFOS_PANE_SIZE.x + SPELLS_PANE_SIZE.x, INFOS_PANE_SIZE.y, BACKGROUND_COLOR);
 	private final HBox mainHBox = new HBox();
 
-	private final SpellDisplayer spell1Displayer = new SpellDisplayer();
-	private final SpellDisplayer spell2Displayer = new SpellDisplayer();
-	private final SpellDisplayer spell3Displayer = new SpellDisplayer();
-	private final SpellDisplayer spell4Displayer = new SpellDisplayer();
+	private final SpellDisplayer[] spellDisplayers = new SpellDisplayer[4];
 
 	private final Label healthLabel = new Label();
 	private final Label manaLabel = new Label();
@@ -229,25 +226,19 @@ public class PlayerHUD extends Parent {
 			}
 		});
 
-		getChildren().addAll(this.spell1Displayer, this.spell2Displayer, this.spell3Displayer, this.spell4Displayer);
-		this.spell1Displayer.setTranslateX(INFOS_PANE_SIZE.x + 12);
-		this.spell1Displayer.setTranslateY(12);
-		this.spell2Displayer.setTranslateX(INFOS_PANE_SIZE.x + 56);
-		this.spell2Displayer.setTranslateY(12);
-		this.spell3Displayer.setTranslateX(INFOS_PANE_SIZE.x + 12);
-		this.spell3Displayer.setTranslateY(56);
-		this.spell4Displayer.setTranslateX(INFOS_PANE_SIZE.x + 56);
-		this.spell4Displayer.setTranslateY(56);
-
-		//TODO: --------- tmp test ---------
-		setSpellType(1, SpellType.EXPLORER);
-		setSpellBaseCooldown(1, 100);
-		setSpellCooldown(1, 60);
-		setSpellDescription(1, "test 1");
-		setSpellType(2, SpellType.REGEN);
-		setSpellBaseCooldown(2, 30);
-		setSpellCooldown(2, 8);
-		setSpellDescription(2, "test 2");
+		for(int i = 0; i < this.spellDisplayers.length; i++) {
+			this.spellDisplayers[i] = new SpellDisplayer();
+			this.spellDisplayers[i].setVisible(false);
+		}
+		getChildren().addAll(this.spellDisplayers);
+		this.spellDisplayers[0].setTranslateX(INFOS_PANE_SIZE.x + 12);
+		this.spellDisplayers[0].setTranslateY(12);
+		this.spellDisplayers[1].setTranslateX(INFOS_PANE_SIZE.x + 56);
+		this.spellDisplayers[1].setTranslateY(12);
+		this.spellDisplayers[2].setTranslateX(INFOS_PANE_SIZE.x + 12);
+		this.spellDisplayers[2].setTranslateY(56);
+		this.spellDisplayers[3].setTranslateX(INFOS_PANE_SIZE.x + 56);
+		this.spellDisplayers[3].setTranslateY(56);
 	}
 
 	/**
@@ -290,20 +281,6 @@ public class PlayerHUD extends Parent {
 		    "\nRange: " + this.actualRange +
 		    "\n" +
 		    "\nPower grade: " + this.actualPowerGrade;
-	}
-
-	private SpellDisplayer getSpellDisplayer(int spellNumber) {
-		switch(spellNumber) {
-		case 1:
-			return this.spell1Displayer;
-		case 2:
-			return this.spell2Displayer;
-		case 3:
-			return this.spell3Displayer;
-		case 4:
-			return this.spell4Displayer;
-		}
-		return null;
 	}
 
 	/**
@@ -433,14 +410,42 @@ public class PlayerHUD extends Parent {
 	}
 
 	/**
+	 * Enable spell.
+	 *
+	 * @param spellNumber the spell number
+	 */
+	void enableSpell(int spellNumber) {
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setVisible(true);
+		}
+		else {
+			System.out.println("PlayerHUD::enableSpell : invalid spell number " + spellNumber);
+		}
+	}
+
+	/**
+	 * Disable spell.
+	 *
+	 * @param spellNumber the spell number
+	 */
+	void disableSpell(int spellNumber) {
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setVisible(false);
+		}
+		else {
+			System.out.println("PlayerHUD::disableSpell : invalid spell number " + spellNumber);
+		}
+	}
+
+	/**
 	 * Sets spell type.
 	 *
 	 * @param spellNumber the spell number
 	 * @param spellType   the spell type
 	 */
 	void setSpellType(int spellNumber, SpellType spellType) {
-		if(spellNumber > 0 && spellNumber < 5) {
-			getSpellDisplayer(spellNumber).setSpellType(spellType);
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setSpellType(spellType);
 		}
 		else {
 			System.out.println("PlayerHUD::setSpellType : invalid spell number " + spellNumber);
@@ -454,8 +459,8 @@ public class PlayerHUD extends Parent {
 	 * @param description the description
 	 */
 	void setSpellDescription(int spellNumber, String description) {
-		if(spellNumber > 0 && spellNumber < 5) {
-			getSpellDisplayer(spellNumber).setDescription(description);
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setDescription(description);
 		}
 		else {
 			System.out.println("PlayerHUD::setSpellDescription : invalid spell number " + spellNumber);
@@ -469,8 +474,8 @@ public class PlayerHUD extends Parent {
 	 * @param baseCooldown the base cooldown
 	 */
 	void setSpellBaseCooldown(int spellNumber, int baseCooldown) {
-		if(spellNumber > 0 && spellNumber < 5) {
-			getSpellDisplayer(spellNumber).setBaseCooldown(baseCooldown);
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setBaseCooldown(baseCooldown);
 		}
 		else {
 			System.out.println("PlayerHUD::setSpellBaseCooldown : invalid spell number " + spellNumber);
@@ -484,8 +489,8 @@ public class PlayerHUD extends Parent {
 	 * @param cooldown    the cooldown
 	 */
 	void setSpellCooldown(int spellNumber, int cooldown) {
-		if(spellNumber > 0 && spellNumber < 5) {
-			getSpellDisplayer(spellNumber).setCooldown(cooldown);
+		if(spellNumber >= 0 && spellNumber < this.spellDisplayers.length) {
+			this.spellDisplayers[spellNumber].setCooldown(cooldown);
 		}
 		else {
 			System.out.println("PlayerHUD::setSpellCooldown : invalid spell number " + spellNumber);

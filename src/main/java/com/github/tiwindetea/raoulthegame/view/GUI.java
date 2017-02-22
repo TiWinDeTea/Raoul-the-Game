@@ -508,19 +508,48 @@ public class GUI implements GameListener, TileMapListener, PlayerInventoryListen
 		}
 
 		public void createSpell(SpellCreationEvent e) {
-			//TODO
+			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
+				playerHUD.setSpellType(e.getPlayerNumber(), e.getSpellType());
+				playerHUD.setSpellBaseCooldown(e.getPlayerNumber(), e.getBaseCooldown());
+				playerHUD.setSpellCooldown(e.getPlayerNumber(), 0);
+				playerHUD.setSpellDescription(e.getPlayerNumber(), e.getDescription());
+				playerHUD.enableSpell(e.getSpellNumber());
+			}
+			else {
+				System.out.println("GUI::changePlayerStat : invalid player number " + e.getPlayerNumber());
+			}
 		}
 
 		public void deleteSpell(SpellDeletionEvent e) {
-			//TODO
+			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
+				playerHUD.disableSpell(e.getSpellNumber());
+			}
+			else {
+				System.out.println("GUI::deleteSpell : invalid player number " + e.getPlayerNumber());
+			}
 		}
 
 		public void updateSpellCooldown(SpellCooldownUpdateEvent e) {
-			//TODO
+			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
+				playerHUD.setSpellBaseCooldown(e.getPlayerNumber(), e.getBaseCooldown());
+				playerHUD.setSpellCooldown(e.getPlayerNumber(), e.getCooldown());
+			}
+			else {
+				System.out.println("GUI::updateSpellCooldown : invalid player number " + e.getPlayerNumber());
+			}
 		}
 
 		public void updateSpellDescription(SpellDescriptionUpdateEvent e) {
-			//TODO
+			if(e.getPlayerNumber() >= 0 && e.getPlayerNumber() < GUI.this.actualPlayersNumber) {
+				PlayerHUD playerHUD = GUI.this.playersHUD.get(e.getPlayerNumber());
+				playerHUD.setSpellDescription(e.getPlayerNumber(), e.getDescription());
+			}
+			else {
+				System.out.println("GUI::updateSpellDescription : invalid player number " + e.getPlayerNumber());
+			}
 		}
 
 		@Override
