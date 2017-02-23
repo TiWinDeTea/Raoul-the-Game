@@ -8,7 +8,6 @@
 
 package com.github.tiwindetea.raoulthegame.events.gui.requests;
 
-import com.github.tiwindetea.raoulthegame.events.Event;
 import com.github.tiwindetea.raoulthegame.events.EventType;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 
@@ -17,7 +16,7 @@ import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
  *
  * @author Maxime PINARD
  */
-public class SpellSelectedRequestEvent extends Event {
+public class SpellSelectedRequestEvent extends RequestEvent {
 
 	private SpellType spellType;
 
@@ -28,6 +27,11 @@ public class SpellSelectedRequestEvent extends Event {
 	 */
 	public SpellSelectedRequestEvent(SpellType spellType) {
 		this.spellType = spellType;
+	}
+
+	@Override
+	public RequestEventType getSubType() {
+		return RequestEventType.SPELL_SELECTED_REQUEST_EVENT;
 	}
 
 	@Override
