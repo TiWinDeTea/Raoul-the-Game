@@ -1,31 +1,28 @@
-*.class
+########################
+### IntellijIDEA
+########################
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-# IDE
-.idea/*
-.gitignore
+.idea/
+out/
 *.iml
-pom.xml
 
-#SublimeText
-*.sublime-workspace
-*.sublime-project
+########################
+### Eclipse
+########################
 
-# Other
-target/*
-out/*
-raoulTheGame*
+bin/
+.settings/
+.project
+.classpath
+
+########################
+### Maven
+########################
+
+target/
+
+########################
+### Raoul-the-Game
+########################
+
 *.rtg
-
-MANIFEST.MF
-*.db
