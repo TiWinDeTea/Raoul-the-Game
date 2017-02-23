@@ -36,9 +36,9 @@ import com.github.tiwindetea.raoulthegame.model.spells.useablespells.ScrollSpell
 import com.github.tiwindetea.raoulthegame.model.spells.useablespells.SummonDog;
 import com.github.tiwindetea.raoulthegame.model.spells.useablespells.Teleport;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.Collection;
@@ -194,7 +194,7 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
      * @param target the damages' target
      * @return the damage modifier of this spell
      */
-    public abstract double ownerAttacking(@NotNull LivingThing target);
+    public abstract double ownerAttacking(@Nonnull LivingThing target);
 
     /**
      * Handler. Updates the spell. This function should be called once and only once each turn.

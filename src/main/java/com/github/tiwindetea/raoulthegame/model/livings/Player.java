@@ -31,9 +31,9 @@ import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,11 +41,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BOOTS;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BREAST_PLATE;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.GLOVES;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.HELMET;
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.PANTS;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.*;
 
 /**
  * Player
@@ -399,7 +395,7 @@ public class Player extends LivingThing {
      * {@inheritDoc}
      */
     @Override
-    public void attack(@NotNull LivingThing target) {
+    public void attack(@Nonnull LivingThing target) {
         if (target.getType() == LivingThingType.MOB) {
             Sound.player.play(Sounds.ATTACK_SOUND);
             super.attack(target);

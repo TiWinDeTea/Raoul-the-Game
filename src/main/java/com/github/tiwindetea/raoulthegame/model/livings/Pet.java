@@ -9,9 +9,9 @@
 package com.github.tiwindetea.raoulthegame.model.livings;
 
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +23,13 @@ public abstract class Pet extends LivingThing {
     protected WeakReference<LivingThing> owner;
     protected LivingThing target;
 
-    public Pet(LivingThing owner, String name, int level, double maxHitPoints, double attackPower, double defensePower, @NotNull Vector2i position) {
+    public Pet(LivingThing owner,
+               String name,
+               int level,
+               double maxHitPoints,
+               double attackPower,
+               double defensePower,
+               @Nonnull Vector2i position) {
         super();
         this.name = name;
         this.level = level;
@@ -61,7 +67,7 @@ public abstract class Pet extends LivingThing {
      *
      * @param target the damages' target
      */
-    public abstract void ownerAttacking(@NotNull LivingThing target);
+    public abstract void ownerAttacking(@Nonnull LivingThing target);
 
 
     @Override

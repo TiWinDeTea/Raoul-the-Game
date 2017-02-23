@@ -16,9 +16,9 @@ import com.github.tiwindetea.raoulthegame.model.livings.Player;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
@@ -68,7 +68,7 @@ public class Heal extends Spell<Player> {
 	}
 
 	@Override
-	public double ownerAttacking(@NotNull LivingThing target) {
+	public double ownerAttacking(@Nonnull LivingThing target) {
 		return 0;
 	}
 

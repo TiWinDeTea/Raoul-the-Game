@@ -18,9 +18,9 @@ import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.space.Tile;
 import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -265,7 +265,7 @@ public abstract class LivingThing implements Descriptable {
      *
      * @param target target of the attack
      */
-    public void attack(@NotNull LivingThing target) {
+    public void attack(@Nonnull LivingThing target) {
         double damages = this.getAttackPower();
         for (Spell spell : this.spells) {
             damages += spell.ownerAttacking(target);
