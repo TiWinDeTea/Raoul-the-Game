@@ -140,6 +140,7 @@ public class Explorer extends Spell<Player> {
 		if (this.position != null) {
 			this.position = null;
 			if (owner != null) {
+				controller.deleteGhostLivingEntity(this.ghostId);
 				fire(new SpellCooldownUpdateEvent(
 						getOwner().getNumber(),
 						this.id,

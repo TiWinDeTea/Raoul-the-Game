@@ -32,7 +32,8 @@ public enum LivingEntityType {
 	LITTLE_SATANIC_DUCK(ViewPackage.LET_resourceBundle.getString("little-satanic-duck.string")),
 	SATANIC_DUCK(ViewPackage.LET_resourceBundle.getString("satanic-duck.string")),
 	PEACEFUL_ECTOPLASMA(ViewPackage.LET_resourceBundle.getString("peaceful-ectoplasma.string")),
-    DOG(ViewPackage.LET_resourceBundle.getString("dog-pet.string")),
+	DOG(ViewPackage.LET_resourceBundle.getString("dog-pet.string")),
+	OCTOPUS(ViewPackage.LET_resourceBundle.getString("octopus-pet.string")),
 	GHOST(ViewPackage.LET_resourceBundle.getString("ghost.string"));
 
 	private final String string;

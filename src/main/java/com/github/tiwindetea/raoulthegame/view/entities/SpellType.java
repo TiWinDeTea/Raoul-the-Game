@@ -31,8 +31,8 @@ public enum SpellType {
 	TELEPORT("teleport"),
 	REGEN("regen"),
 	BERSERKER("berserker"),
-	OCTOPUS("octopus"), // todo
-	POT_CREATOR("pot_creator"), // todo
+	OCTOPUS("octopus"),
+	POT_CREATOR("pot_creator"),
 	BONUS_HP("bonus_hp"),
 	IRON_WILL("iron_will"),
 	GRENADE("grenade"), // todo

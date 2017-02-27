@@ -38,11 +38,11 @@ public class Thorn extends Spell<LivingThing> {
             updateDescription();
             this.pid = ((Player) owner).getNumber();
             fire(new SpellCreationEvent(
-                    this.pid,
-                    this.id,
-                    getSpellType(),
-                    0,
-                    this.description
+              this.pid,
+              this.id,
+              getSpellType(),
+              0,
+              this.description
             ));
         } else {
             this.pid = -1;
@@ -93,9 +93,9 @@ public class Thorn extends Spell<LivingThing> {
         if (this.pid != -1) {
             updateDescription();
             fire(new SpellDescriptionUpdateEvent(
-                    this.pid,
-                    this.id,
-                    this.description
+              this.pid,
+              this.id,
+              this.description
             ));
         }
     }
@@ -114,8 +114,8 @@ public class Thorn extends Spell<LivingThing> {
     protected void forgotten() {
         if (this.pid != -1) {
             fire(new SpellDeletionEvent(
-                    this.pid,
-                    this.id
+              this.pid,
+              this.id
             ));
         }
     }
@@ -127,7 +127,7 @@ public class Thorn extends Spell<LivingThing> {
 
     private void updateDescription() {
         this.description = "Thorn (passive).\n" +
-                "Returns " + this.percentage + "% " +
-                "of the incomming damages to the attacker";
+          "Returns " + this.percentage + "% " +
+          "of the incomming damages to the attacker";
     }
 }
