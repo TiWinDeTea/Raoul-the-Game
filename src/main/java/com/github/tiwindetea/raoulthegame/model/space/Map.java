@@ -55,7 +55,7 @@ public class Map {
     private static final int MIN_LEVEL_HEIGHT = 50; // >= MIN_ROOM_HEIGHT + MIN_CORRIDOR_LENGTH
     private static final int MAX_LEVEL_HEIGHT = 275; // >= MIN_LEVEL_HEIGHT
     private static final int RETRIES_NBR = 5000; // < Integer.MAX_VALUE / 2
-    private static final Tile DEFAULT_DOOR = Tile.HOLE;
+    private static final Tile DEFAULT_DOOR = Tile.CLOSED_DOOR;
     private static final int BULB_MINIMUM_NBR = 2; // >= 0 ;
     private static final int BULB_MAXIMUM_NBR = 3; // >= BULB_MINIMUM_NBR
 
@@ -71,7 +71,7 @@ public class Map {
     private static final int REBIND_CORRIDOR_TO_CORRIDOR_CHANCE = 30;
     private static final int REBIND_ROOM_TO_CORRIDOR_CHANCE = 15;
     private static final int REBIND_ROOM_TO_ROOM_CHANCE = 10;
-    private static final int DOOR_CHANCE = 100;
+    private static final int DOOR_CHANCE = 70;
 
     private static ArrayList<TileModificationListener> listeners = new ArrayList<>(1);
 
