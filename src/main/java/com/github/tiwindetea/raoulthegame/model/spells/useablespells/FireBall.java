@@ -10,6 +10,7 @@ package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
 import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCreationEvent;
+import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.spells.SpellDescriptionUpdateEvent;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
 import com.github.tiwindetea.raoulthegame.model.livings.Player;
@@ -104,7 +105,7 @@ public class FireBall extends Spell<Player> {
 	@Override
 	public void spellUpgraded() {
 		this.damages += 1;
-		this.baseCooldown = Math.max(25, this.baseCooldown - 10);
+		this.baseCooldown = Math.max(5, this.baseCooldown - 10);
 		updateDescription();
 		Player owner = getOwner();
 		if (owner != null) {
@@ -149,6 +150,13 @@ public class FireBall extends Spell<Player> {
 
 	@Override
 	protected void forgotten() {
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellDeletionEvent(
+			  owner.getNumber(),
+			  this.id
+			));
+		}
 	}
 
 	private void updateDescription() {

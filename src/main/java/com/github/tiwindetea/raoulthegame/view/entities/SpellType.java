@@ -35,7 +35,7 @@ public enum SpellType {
 	POT_CREATOR("pot_creator"),
 	BONUS_HP("bonus_hp"),
 	IRON_WILL("iron_will"),
-	GRENADE("grenade"), // todo
+	GRENADE("grenade"),
 	SCROLL_SPELL("scroll_spell"),
 	THORN("thorn"),
 	EXPLORER("explorer"),
