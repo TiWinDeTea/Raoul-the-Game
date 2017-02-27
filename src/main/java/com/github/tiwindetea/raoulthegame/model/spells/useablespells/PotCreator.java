@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
 import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
@@ -51,115 +59,115 @@ public class PotCreator extends Spell<Player> {
 		));
 	}
 
-    @Override
-    public boolean isAOE() {
-        return false;
-    }
+	@Override
+	public boolean isAOE() {
+		return false;
+	}
 
-    @Override
-    public boolean isPassive() {
-        return false;
-    }
+	@Override
+	public boolean isPassive() {
+		return false;
+	}
 
-    @Override
-    public Vector2i getSpellSource() {
-        return null;
-    }
+	@Override
+	public Vector2i getSpellSource() {
+		return null;
+	}
 
-    @Override
-    public double ownerDamaged(@Nullable LivingThing source, double damages) {
-        return 0;
-    }
+	@Override
+	public double ownerDamaged(@Nullable LivingThing source, double damages) {
+		return 0;
+	}
 
-    @Override
-    public double ownerAttacking(@Nonnull LivingThing target) {
-        return 0;
-    }
+	@Override
+	public double ownerAttacking(@Nonnull LivingThing target) {
+		return 0;
+	}
 
-    @Override
-    public void update(Collection<LivingThing> targets) {
-	    if(this.cooldown > 0) {
-		    --this.cooldown;
-	    }
+	@Override
+	public void update(Collection<LivingThing> targets) {
+		if(this.cooldown > 0) {
+			--this.cooldown;
+		}
 
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellCooldownUpdateEvent(
-		      owner.getNumber(),
-		      this.id,
-		      this.baseCooldown,
-		      this.cooldown
-		    ));
-	    }
-    }
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellCooldownUpdateEvent(
+			  owner.getNumber(),
+			  this.id,
+			  this.baseCooldown,
+			  this.cooldown
+			));
+		}
+	}
 
-    @Override
-    public void nextOwnerLevel() {
+	@Override
+	public void nextOwnerLevel() {
 
-    }
+	}
 
-    @Override
-    public void spellUpgraded() {
-	    this.heal += 20 + this.random.nextInt(20);
-	    this.mana_heal += 10 + this.random.nextInt(10);
-	    updateDescription();
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellDescriptionUpdateEvent(
-		      owner.getNumber(),
-		      this.id,
-		      this.description
-		    ));
-	    }
-    }
+	@Override
+	public void spellUpgraded() {
+		this.heal += 20 + this.random.nextInt(20);
+		this.mana_heal += 10 + this.random.nextInt(10);
+		updateDescription();
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellDescriptionUpdateEvent(
+			  owner.getNumber(),
+			  this.id,
+			  this.description
+			));
+		}
+	}
 
-    @Override
-    public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-	    if(this.cooldown == 0) {
-		    Player owner = getOwner();
-		    if(owner != null && owner.useMana(this.manaCost)) {
-			    int turns = this.random.nextInt(10);
-			    Pot pot;
-			    if(this.random.nextBoolean()) {
-				    pot = new Pot(turns, this.heal / (double) turns, 0, 0, 0, 0, 0);
-			    }
-			    else {
-				    pot = new Pot(turns, 0, this.mana_heal / (double) turns, 0, 0, 0, 0);
-			    }
-			    owner.addToInventory(new Pair<>(pot));
-			    this.cooldown = this.baseCooldown;
-			    fire(new SpellCooldownUpdateEvent(
-			      owner.getNumber(),
-			      this.id,
-			      this.baseCooldown,
-			      this.cooldown
-			    ));
-			    return true;
-		    }
-	    }
-        return false;
-    }
+	@Override
+	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
+		if(this.cooldown == 0) {
+			Player owner = getOwner();
+			if(owner != null && owner.useMana(this.manaCost)) {
+				int turns = this.random.nextInt(10);
+				Pot pot;
+				if(this.random.nextBoolean()) {
+					pot = new Pot(turns, this.heal / (double) turns, 0, 0, 0, 0, 0);
+				}
+				else {
+					pot = new Pot(turns, 0, this.mana_heal / (double) turns, 0, 0, 0, 0);
+				}
+				owner.addToInventory(new Pair<>(pot));
+				this.cooldown = this.baseCooldown;
+				fire(new SpellCooldownUpdateEvent(
+				  owner.getNumber(),
+				  this.id,
+				  this.baseCooldown,
+				  this.cooldown
+				));
+				return true;
+			}
+		}
+		return false;
+	}
 
-    @Override
-    public void nextFloor() {
+	@Override
+	public void nextFloor() {
 
-    }
+	}
 
-    @Override
-    protected void forgotten() {
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellDeletionEvent(
-		      owner.getNumber(),
-		      this.id
-		    ));
-	    }
-    }
+	@Override
+	protected void forgotten() {
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellDeletionEvent(
+			  owner.getNumber(),
+			  this.id
+			));
+		}
+	}
 
-    @Override
-    public SpellType getSpellType() {
-        return SpellType.POT_CREATOR;
-    }
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.POT_CREATOR;
+	}
 
 	private void updateDescription() {
 		this.description = "Pot Creator (active)\n" +

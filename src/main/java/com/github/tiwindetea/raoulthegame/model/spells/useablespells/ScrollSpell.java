@@ -1,3 +1,11 @@
+//////////////////////////////////////////////////////////////////////////////////
+//                                                                              //
+//     This Source Code Form is subject to the terms of the Mozilla Public      //
+//     License, v. 2.0. If a copy of the MPL was not distributed with this      //
+//     file, You can obtain one at http://mozilla.org/MPL/2.0/.                 //
+//                                                                              //
+//////////////////////////////////////////////////////////////////////////////////
+
 package com.github.tiwindetea.raoulthegame.model.spells.useablespells;
 
 import com.github.tiwindetea.raoulthegame.events.game.spells.SpellCooldownUpdateEvent;
@@ -57,111 +65,111 @@ public class ScrollSpell extends Spell<Player> {
 		return false;
 	}
 
-    @Override
-    public boolean isPassive() {
-        return false;
-    }
+	@Override
+	public boolean isPassive() {
+		return false;
+	}
 
-    @Override
-    public Vector2i getSpellSource() {
-        return null;
-    }
+	@Override
+	public Vector2i getSpellSource() {
+		return null;
+	}
 
-    @Override
-    public double ownerDamaged(@Nullable LivingThing source, double damages) {
-        return 0;
-    }
+	@Override
+	public double ownerDamaged(@Nullable LivingThing source, double damages) {
+		return 0;
+	}
 
-    @Override
-    public double ownerAttacking(@Nonnull LivingThing target) {
-        return 0;
-    }
+	@Override
+	public double ownerAttacking(@Nonnull LivingThing target) {
+		return 0;
+	}
 
-    @Override
-    public void update(Collection<LivingThing> targets) {
+	@Override
+	public void update(Collection<LivingThing> targets) {
 
-	    if(this.remainingTurns > 0 && this.targets != null) {
-		    for(LivingThing target : this.targets) {
-			    target.damage(this.damages / APPLY_TURNS, null);
-		    }
-		    --this.remainingTurns;
-	    }
+		if(this.remainingTurns > 0 && this.targets != null) {
+			for(LivingThing target : this.targets) {
+				target.damage(this.damages / APPLY_TURNS, null);
+			}
+			--this.remainingTurns;
+		}
 
-	    if(this.cooldown > 0) {
-		    --this.cooldown;
-	    }
+		if(this.cooldown > 0) {
+			--this.cooldown;
+		}
 
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellCooldownUpdateEvent(
-		      owner.getNumber(),
-		      this.id,
-		      this.baseCooldown,
-		      this.cooldown
-		    ));
-	    }
-    }
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellCooldownUpdateEvent(
+			  owner.getNumber(),
+			  this.id,
+			  this.baseCooldown,
+			  this.cooldown
+			));
+		}
+	}
 
-    @Override
-    public void nextOwnerLevel() {
+	@Override
+	public void nextOwnerLevel() {
 
-    }
+	}
 
-    @Override
-    public void spellUpgraded() {
-	    this.damages += 4;
-	    this.baseCooldown = Math.max(25, this.baseCooldown - 10);
-	    updateDescription();
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellDescriptionUpdateEvent(
-		      owner.getNumber(),
-		      this.id,
-		      this.description
-		    ));
-	    }
-    }
+	@Override
+	public void spellUpgraded() {
+		this.damages += 4;
+		this.baseCooldown = Math.max(25, this.baseCooldown - 10);
+		updateDescription();
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellDescriptionUpdateEvent(
+			  owner.getNumber(),
+			  this.id,
+			  this.description
+			));
+		}
+	}
 
-    @Override
-    public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
-	    if(this.cooldown == 0) {
-		    Player owner = getOwner();
-		    if(owner != null && owner.useMana(this.manaCost) && !targets.isEmpty()) {
-			    this.targets = new ArrayList<>(targets);
-			    this.remainingTurns += APPLY_TURNS;
-			    this.cooldown = this.baseCooldown;
-			    fire(new SpellCooldownUpdateEvent(
-			      owner.getNumber(),
-			      this.id,
-			      this.baseCooldown,
-			      this.cooldown
-			    ));
-		    }
-		    return true;
-	    }
-        return false;
-    }
+	@Override
+	public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
+		if(this.cooldown == 0) {
+			Player owner = getOwner();
+			if(owner != null && owner.useMana(this.manaCost) && !targets.isEmpty()) {
+				this.targets = new ArrayList<>(targets);
+				this.remainingTurns += APPLY_TURNS;
+				this.cooldown = this.baseCooldown;
+				fire(new SpellCooldownUpdateEvent(
+				  owner.getNumber(),
+				  this.id,
+				  this.baseCooldown,
+				  this.cooldown
+				));
+			}
+			return true;
+		}
+		return false;
+	}
 
-    @Override
-    public void nextFloor() {
+	@Override
+	public void nextFloor() {
 
-    }
+	}
 
-    @Override
-    protected void forgotten() {
-	    Player owner = getOwner();
-	    if(owner != null) {
-		    fire(new SpellDeletionEvent(
-		      owner.getNumber(),
-		      this.id
-		    ));
-	    }
-    }
+	@Override
+	protected void forgotten() {
+		Player owner = getOwner();
+		if(owner != null) {
+			fire(new SpellDeletionEvent(
+			  owner.getNumber(),
+			  this.id
+			));
+		}
+	}
 
-    @Override
-    public SpellType getSpellType() {
-        return SpellType.SCROLL_SPELL;
-    }
+	@Override
+	public SpellType getSpellType() {
+		return SpellType.SCROLL_SPELL;
+	}
 
 	private void updateDescription() {
 		this.description = "Scroll (active).\n" +
