@@ -23,7 +23,9 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
- * Created by Maxime on 20/02/2017.
+ * The type Teleport.
+ *
+ * @author Maxime PINARD
  */
 public class Teleport extends Spell<Player> {
 
@@ -35,16 +37,21 @@ public class Teleport extends Spell<Player> {
 	private double manaCost = BASE_MANA_COST;
 	private boolean oddLevel = true;
 
+	/**
+	 * Instantiates a new Teleport.
+	 *
+	 * @param owner the owner
+	 */
 	public Teleport(Player owner) {
 		super(owner, owner.getSpells().size());
 		this.range = owner.getLos();
 		updateDescription();
 		fire(new SpellCreationEvent(
-				owner.getNumber(),
-				this.id,
-				getSpellType(),
-				this.baseCooldown,
-				this.description
+		  owner.getNumber(),
+		  this.id,
+		  getSpellType(),
+		  this.baseCooldown,
+		  this.description
 		));
 	}
 

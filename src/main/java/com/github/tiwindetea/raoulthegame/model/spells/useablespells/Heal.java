@@ -22,7 +22,9 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
- * Created by Maxime on 20/02/2017.
+ * The type Heal.
+ *
+ * @author Maxime PINARD
  */
 public class Heal extends Spell<Player> {
 
@@ -35,15 +37,20 @@ public class Heal extends Spell<Player> {
 	private int remainingTurns = 0;
 
 
+	/**
+	 * Instantiates a new Heal.
+	 *
+	 * @param owner the owner
+	 */
 	public Heal(Player owner) {
 		super(owner, owner.getSpells().size());
 		updateDescription();
 		fire(new SpellCreationEvent(
-				owner.getNumber(),
-				this.id,
-				getSpellType(),
-				0,
-				this.description
+		  owner.getNumber(),
+		  this.id,
+		  getSpellType(),
+		  0,
+		  this.description
 		));
 	}
 

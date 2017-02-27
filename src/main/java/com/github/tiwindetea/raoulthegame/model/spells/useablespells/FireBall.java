@@ -23,6 +23,8 @@ import java.util.Collection;
 
 /**
  * The type FireBall.
+ *
+ * @author Maxime PINARD
  */
 public class FireBall extends Spell<Player> {
 
