@@ -1144,6 +1144,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.mobs.remove(mob);
         }
 
+        for (LivingThing livingSpell : this.livingSpells) {
+            if (!livingSpell.isAlive()) {
+                fire(new LivingEntityDeletionEvent(livingSpell.getId()));
+                livingsSharedLOS.remove(new Long(livingSpell.getId()));
+            }
+        }
         this.livingSpells.removeIf(spell -> !spell.isAlive());
 
         ArrayList<Player> playerToDelete = new ArrayList<>();
@@ -1958,17 +1964,18 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private void clearLevel() {
 
         /* Next block deletes all entities on the GUI */
+
         this.livingsSharedLOS.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.livingsSharedLOS.clear();
+        // colision with previous deletion
+        this.livingSpells.forEach(l -> fire(new LivingEntityDeletionEvent(l.getId())));
+        this.livingSpells.clear();
 
         this.ghostsLiving.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.ghostsLiving.clear();
 
         this.ghostsStatic.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.ghostsStatic.clear();
-
-        this.livingSpells.forEach(l -> fire(new LivingEntityDeletionEvent(l.getId())));
-        this.livingSpells.clear();
 
         for (Player player : this.players) {
             fire(new LivingEntityDeletionEvent(player.getId()));

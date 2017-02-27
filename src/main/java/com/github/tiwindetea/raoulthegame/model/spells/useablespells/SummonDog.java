@@ -45,6 +45,7 @@ public class SummonDog extends Spell<LivingThing> {
 
         public Dog(LivingThing owner, String description, int level, int maxHp, int ap, int def, Vector2i pos) {
             super(owner, description, level, maxHp, ap, def, pos);
+            this.hitPoints = 0;
         }
 
         public void attackThem() {
@@ -57,7 +58,7 @@ public class SummonDog extends Spell<LivingThing> {
             ++this.level;
             this.attackPower += Math.max(this.attackPower / 10, 1);
             this.defensePower += Math.max(this.defensePower / 10, 0.5);
-            this.maxHitPoints += Math.max(this.maxHitPoints / 10, 5);
+            this.maxHitPoints += Math.max(this.maxHitPoints / 2, 5);
             this.hitPoints = this.maxHitPoints;
         }
 
@@ -89,10 +90,10 @@ public class SummonDog extends Spell<LivingThing> {
             if (owner != null) {
                 Stack<Vector2i> path = Spell.spellsMap.getPath(this.position, owner.getPosition(), true, all);
                 if (path != null) {
-                    if (this.isGoingToOwner && path.size() > 2) {
+                    if (this.isGoingToOwner && path.size() > 5) {
                         this.requestedPath = path.peek();
                     } else {
-                        if (path.size() > 10 && new Random().nextInt() % 2 != 0 || path.size() < 6 && this.isAttacking || path.size() < 3) {
+                        if (path.size() > 15 && new Random().nextInt() % 2 != 0 || path.size() < 10 && this.isAttacking || path.size() < 5) {
                             this.isGoingToOwner = false;
                             target(mobs, players, all, owner);
                         } else {
@@ -249,6 +250,7 @@ public class SummonDog extends Spell<LivingThing> {
 
     @Override
     public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
+
         LivingThing owner = super.getOwner();
         if (owner != null && owner.getType() == LivingThingType.PLAYER) {
             Player powner = (Player) owner;

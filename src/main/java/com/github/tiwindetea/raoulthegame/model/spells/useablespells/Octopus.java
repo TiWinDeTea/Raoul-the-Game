@@ -52,8 +52,8 @@ public class Octopus extends Spell<LivingThing> {
 		@Override
 		public void levelUp() {
 			++this.level;
-			this.attackPower += Math.max(this.attackPower / 10, 1);
-			this.defensePower += Math.max(this.defensePower / 10, 0.5);
+			this.attackPower += Math.max(this.attackPower / 5, 1);
+			this.defensePower += Math.max(this.defensePower / 5, 0.5);
 			this.maxHitPoints += Math.max(this.maxHitPoints / 10, 5);
 			this.hitPoints = this.maxHitPoints;
 		}

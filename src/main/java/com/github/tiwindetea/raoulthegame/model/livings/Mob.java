@@ -173,11 +173,11 @@ public class Mob extends LivingThing {
         Collection<LivingThing> targets = new ArrayList<>(players.size() + others.size());
         LivingThing chasedTarget = null;
         shadow.addAll(mobs);
-        shadow.addAll(players);
         shadow.addAll(others);
+        shadow.addAll(players);
 
-        targets.addAll(players);
         targets.addAll(others);
+        targets.addAll(players);
 
         for (LivingThing target : targets) {
             Vector2i pos = target.getPosition();
@@ -185,7 +185,7 @@ public class Mob extends LivingThing {
             int distanceToTarget = Math.max(Math.abs(pos.x - this.position.x), Math.abs(pos.y - this.position.y));
             if (distanceToTarget < los.length / 2) {
                 if (los[los.length / 2 - this.position.x + pos.x][los[0].length / 2 - this.position.y + pos.y]) {
-                    Double aggro, paggro = Double.NEGATIVE_INFINITY;
+                    Double aggro, paggro;
                     if (chasedTarget == null
                             || (aggro = this.aggro.get(target.getId())) != null
                       && (paggro = this.aggro.get(chasedTarget.getId())) != null && aggro.doubleValue() > paggro.doubleValue()) {
@@ -204,49 +204,44 @@ public class Mob extends LivingThing {
             this.state = State.CHASING;
         } else if (this.requestedPathStack.isEmpty()) {
 
+            int value;
 			/* Let's do something at random, if I can't chase anyone */
             switch (this.state) {
                 case PATROLING:
                     this.keepPatroling(mobs);
-                    switch (new Random().nextInt(20)) {
-                        case 0:
-                            this.state = State.STANDING;
-                            break;
-                        case 1:
-                            this.state = State.WANDERING;
-                            break;
-                        default:
+                    value = new Random().nextInt(20);
+                    if (value == 0) {
+                        this.state = State.STANDING;
+
+                    } else if (value == 1) {
+                        this.state = State.WANDERING;
+
                     }
                     break;
                 case STANDING:
-                    switch (new Random().nextInt(4)) {
-                        case 0:
-                            this.state = State.PATROLING;
-                            break;
-                        case 1:
-                            this.state = State.WANDERING;
-                            break;
-                        default:
+                    value = new Random().nextInt(4);
+                    if (value == 0) {
+                        this.state = State.PATROLING;
+
+                    } else if (value == 1) {
+                        this.state = State.WANDERING;
+
                     }
                     break;
                 case SLEEPING:
-                    switch (new Random().nextInt(3)) {
-                        case 0:
-                            this.state = State.STANDING;
-                            break;
-                        default:
+                    if (new Random().nextInt(3) == 0) {
+                        this.state = State.STANDING;
+
                     }
                     break;
                 case WANDERING:
                     wander();
-                    switch (new Random().nextInt(20)) {
-                        case 0:
-                            this.state = State.PATROLING;
-                            break;
-                        case 1:
-                            this.state = State.STANDING;
-                            break;
-                        default:
+                    value = new Random().nextInt(20);
+                    if (value == 0) {
+                        this.state = State.PATROLING;
+
+                    } else if (value == 1) {
+                        this.state = State.STANDING;
                     }
                     this.wander();
                     break;
