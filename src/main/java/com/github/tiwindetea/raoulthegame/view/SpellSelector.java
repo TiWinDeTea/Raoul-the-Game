@@ -12,7 +12,6 @@ import com.github.tiwindetea.raoulthegame.events.gui.spellselector.SelectorSpell
 import com.github.tiwindetea.raoulthegame.listeners.gui.spellselector.SelectorSpellClickListener;
 import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -35,7 +34,7 @@ public class SpellSelector extends Parent {
 
 	private static final Font TEXT_FONT = ViewPackage.getMainFont(15);
 	private static final Color TEXT_COLOR = Color.WHITE;
-	private static final int TITLE_SPACE = 33;
+	private static final int TITLE_SPACE = 10;
 
 	private SelectorSpellClickListener listener;
 
@@ -49,21 +48,22 @@ public class SpellSelector extends Parent {
 	 *
 	 * @param text       the text
 	 * @param spellTypes the spell types
-	 * @param listener
+	 * @param listener   the spell click listener
 	 */
 	public SpellSelector(String text, Collection<SpellType> spellTypes, SelectorSpellClickListener listener) {
 		this.listener = listener;
-		getChildren().add(this.backgroundImage);
+		//getChildren().add(this.backgroundImage);
 
 		Label label = new Label(text);
 		label.setFont(TEXT_FONT);
 		label.setTextFill(TEXT_COLOR);
-		StackPane stackPane = new StackPane();
-		stackPane.getChildren().add(label);
-		this.vBox.getChildren().add(stackPane);
+		StackPane labelStackPane = new StackPane();
+		labelStackPane.getChildren().add(label);
+		this.vBox.getChildren().add(labelStackPane);
 
 		double width = this.backgroundImage.getBoundsInParent().getWidth();
-		double delta = (width - (spellTypes.size() * ViewPackage.SPRITES_SIZE.x)) / (spellTypes.size() + 1);
+		double height = this.backgroundImage.getBoundsInParent().getHeight();
+		double deltaX = (width - (spellTypes.size() * ViewPackage.SPRITES_SIZE.x)) / (spellTypes.size() + 1);
 
 		for(SpellType spellType : spellTypes) {
 			ImageView imageView = new ImageView();
@@ -82,9 +82,13 @@ public class SpellSelector extends Parent {
 			});
 			this.hBox.getChildren().add(imageView);
 		}
-		this.hBox.setSpacing(delta);
-		this.hBox.setPadding(new Insets(0, 0, 0, delta));
-		this.vBox.getChildren().add(this.hBox);
+		this.hBox.setSpacing(deltaX);
+		StackPane spellsStackpane = new StackPane();
+		spellsStackpane.getChildren().add(this.backgroundImage);
+		spellsStackpane.getChildren().add(this.hBox);
+		this.hBox.setMaxSize(spellTypes.size() * ViewPackage.SPRITES_SIZE.x + (spellTypes.size() - 1) * deltaX, ViewPackage.SPRITES_SIZE.y);
+		spellsStackpane.setMinSize(width + 10, height + 10);
+		this.vBox.getChildren().add(spellsStackpane);
 
 		this.vBox.setPrefWidth(width);
 		this.vBox.setSpacing(TITLE_SPACE);
