@@ -31,8 +31,8 @@ public enum SpellType {
 	BONUS_HP("bonus_hp"),
 	IRON_WILL("iron_will"),
 	GRENADE("grenade"), // todo
-	SCROLL_SPELL("scroll_spell"), // todo
-	THORN("thorn"), // todo
+	SCROLL_SPELL("scroll_spell"),
+	THORN("thorn"),
 	EXPLORER("explorer");
 
 	public String name;
