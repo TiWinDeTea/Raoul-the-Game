@@ -35,11 +35,11 @@ public class SpellSelector extends Parent {
 
 	private static final Font TEXT_FONT = ViewPackage.getMainFont(15);
 	private static final Color TEXT_COLOR = Color.WHITE;
-	private static final int TITLE_SPACE = 10;
+	private static final int TITLE_SPACE = 33;
 
 	private SelectorSpellClickListener listener;
 
-	private final ImageView backgroundImage = new ImageView(ViewPackage.INVENTORY_IMAGE); //TODO: spell selector image
+	private final ImageView backgroundImage = new ImageView(ViewPackage.DIALOG_IMAGE);
 
 	private VBox vBox = new VBox();
 	private HBox hBox = new HBox();
@@ -77,7 +77,7 @@ public class SpellSelector extends Parent {
 			imageView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent event) {
-					listener.handle(new SelectorSpellClickEvent(spellType));
+					SpellSelector.this.listener.handle(new SelectorSpellClickEvent(spellType));
 				}
 			});
 			this.hBox.getChildren().add(imageView);

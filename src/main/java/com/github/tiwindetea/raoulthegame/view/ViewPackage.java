@@ -30,6 +30,7 @@ public class ViewPackage {
 	public static final Image ICON_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("icon.file"));
 	public static final Image HUD_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("playerhud.file"));
 	public static final Image INVENTORY_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("playerinventory.file"));
+	public static final Image DIALOG_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("dialogimage.file"));
 	public final static Image SPELLS_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("spells.file"));
 
 	public static final Image SOLO_IMAGE = new Image(PATH + "/" + VIEW_PACKAGE_BUNDLE.getString("menu.solo.file"));
