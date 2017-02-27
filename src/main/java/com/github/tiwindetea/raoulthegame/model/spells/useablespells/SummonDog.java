@@ -171,7 +171,7 @@ public class SummonDog extends Spell<LivingThing> {
     private final int pid;
 
     public SummonDog(LivingThing owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
         this.dog = new Dog(owner, "Camembert.\nCamembert is binded to " + owner.getName() + ".", SummonDog.this.level, 200, 10, 1, owner.getPosition().copy());
         if (LivingThingType.PLAYER.equals(owner.getType())) {
             this.pid = ((Player) owner).getNumber();
@@ -257,7 +257,7 @@ public class SummonDog extends Spell<LivingThing> {
                     this.dog.setPosition(new Vector2i(0, 0));
                     Spell.controller.createEntity(this.dog, LivingEntityType.DOG, null);
                     Spell.controller.shareLosWith(this.dog.getId(), 3);
-                    this.dog.setPosition(sourcePosition);
+                    this.dog.setPosition(owner.getPosition());
                     this.dog.revive();
                     if (this.pid != -1) {
                         fire(new SpellCooldownUpdateEvent(
@@ -278,6 +278,7 @@ public class SummonDog extends Spell<LivingThing> {
     public void nextFloor() {
         LivingThing owner = getOwner();
         if (this.dog.isAlive() && owner != null) {
+            this.dog.setPosition(new Vector2i(0, 0));
             Spell.controller.createEntity(this.dog, LivingEntityType.DOG, null);
             Spell.controller.shareLosWith(this.dog.getId(), 3);
             this.dog.setPosition(owner.getPosition());

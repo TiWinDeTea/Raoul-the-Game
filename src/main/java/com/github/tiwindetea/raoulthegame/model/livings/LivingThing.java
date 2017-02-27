@@ -43,7 +43,7 @@ public abstract class LivingThing implements Descriptable {
     protected String name;
     protected long id;
     protected static final ArrayList<GameListener> listeners = new ArrayList<>();
-    protected final ArrayList<Spell> spells = new ArrayList<>(0);
+    protected final Spell[] spells;
 
 
     /**
@@ -100,6 +100,11 @@ public abstract class LivingThing implements Descriptable {
      */
     public LivingThing() {
         this.id = Pair.getUniqueId();
+        if (this.getType() == LivingThingType.PLAYER) {
+            this.spells = new Spell[4];
+        } else {
+            this.spells = new Spell[1];
+        }
     }
 
     /**
@@ -116,7 +121,7 @@ public abstract class LivingThing implements Descriptable {
      *
      * @return the spells
      */
-    public List<Spell> getSpells() {
+    public Spell[] getSpells() {
         return this.spells;
     }
 
@@ -204,7 +209,9 @@ public abstract class LivingThing implements Descriptable {
         if (damages > 0) {
             double tmp = 0;
             for (Spell spell : this.spells) {
-                tmp += spell.ownerDamaged(source, damages);
+                if (spell != null) {
+                    tmp += spell.ownerDamaged(source, damages);
+                }
             }
             damages += tmp;
             diff = this.getDefensePower() - damages;
@@ -268,7 +275,9 @@ public abstract class LivingThing implements Descriptable {
     public void attack(@Nonnull LivingThing target) {
         double damages = this.getAttackPower();
         for (Spell spell : this.spells) {
-            damages += spell.ownerAttacking(target);
+            if (spell != null) {
+                damages += spell.ownerAttacking(target);
+            }
         }
         target.damage(damages, this);
     }

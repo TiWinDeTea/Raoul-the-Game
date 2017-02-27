@@ -48,7 +48,7 @@ public class ScrollSpell extends Spell<Player> {
 	 * @param owner the owner
 	 */
 	public ScrollSpell(Player owner) {
-		super(owner, owner.getSpells().size());
+		super(owner, Spell.firstNull(owner.getSpells()));
 		this.targetNumber = 1;
 		updateDescription();
 		fire(new SpellCreationEvent(

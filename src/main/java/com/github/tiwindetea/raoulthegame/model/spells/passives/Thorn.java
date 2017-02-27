@@ -32,7 +32,7 @@ public class Thorn extends Spell<LivingThing> {
     public double percentage = 5;
 
     public Thorn(LivingThing owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
 
         if (LivingThingType.PLAYER.equals(owner.getType())) {
             updateDescription();

@@ -27,13 +27,13 @@ import java.util.Collection;
  */
 public class Drainer extends Spell<LivingThing> {
 
-    private double stealPercentage = 5;
-    private static final double STEAL_PERCENTAGE_PER_LEVEL = 2;
+    private double stealPercentage = 100;
+    private static final double STEAL_PERCENTAGE_PER_LEVEL = 75;
 
     private final int pid;
 
     public Drainer(LivingThing owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
         if (LivingThingType.PLAYER.equals(owner.getType())) {
             updateDescription();
             this.pid = ((Player) owner).getNumber();
@@ -71,15 +71,11 @@ public class Drainer extends Spell<LivingThing> {
 
     @Override
     public double ownerAttacking(@Nonnull LivingThing target) {
-        double outputDamages = 0;
         LivingThing owner = this.getOwner();
         if (owner != null) {
             double ownerAttackPower = owner.getAttackPower();
+            double outputDamages = ownerAttackPower - target.getDefensePower();
             if (ownerAttackPower > 0) {
-                for (Spell spell : target.getSpells()) {
-                    outputDamages += spell.ownerDamaged(owner, ownerAttackPower);
-                }
-                outputDamages = outputDamages + ownerAttackPower - target.getDefensePower();
                 if (outputDamages < 1) {
                     outputDamages = 1;
                 }

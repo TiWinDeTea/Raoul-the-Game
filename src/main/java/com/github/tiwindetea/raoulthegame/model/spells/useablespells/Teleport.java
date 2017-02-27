@@ -43,7 +43,7 @@ public class Teleport extends Spell<Player> {
 	 * @param owner the owner
 	 */
 	public Teleport(Player owner) {
-		super(owner, owner.getSpells().size());
+		super(owner, Spell.firstNull(owner.getSpells()));
 		this.range = owner.getLos();
 		updateDescription();
 		fire(new SpellCreationEvent(

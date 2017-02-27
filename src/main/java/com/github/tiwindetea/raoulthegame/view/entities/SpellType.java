@@ -12,6 +12,11 @@ import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
 import javafx.scene.image.Image;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
 /**
  * The enum SpellType
  *
@@ -33,7 +38,8 @@ public enum SpellType {
 	GRENADE("grenade"), // todo
 	SCROLL_SPELL("scroll_spell"),
 	THORN("thorn"),
-	EXPLORER("explorer");
+	EXPLORER("explorer"),
+	NOT_A_SPELL("not_a_spell");
 
 	public String name;
 
@@ -87,5 +93,28 @@ public enum SpellType {
 
     public String getString(String key) {
     	return ViewPackage.ST_resourceBundle.getString(this.name + "." + key);
+	}
+
+	/**
+	 * Generates n different random spell types that
+	 * does not figure in the exception list
+	 */
+	public static Collection<SpellType> randomExcept(int n, Collection<SpellType> exceptions) {
+		if (n > SpellType.values().length - exceptions.size() || n < 0) {
+			throw new IllegalArgumentException(String.valueOf(n));
+		}
+
+		Collection<SpellType> ans = new ArrayList<>(n);
+		List<SpellType> spellTypeList = new ArrayList<>(SpellType.values().length - exceptions.size());
+		for (SpellType type : SpellType.values()) {
+			if (!exceptions.contains(type)) {
+				spellTypeList.add(type);
+			}
+		}
+		Random r = new Random();
+		for (int i = 0; i < n; i++) {
+			ans.add(spellTypeList.remove(r.nextInt(spellTypeList.size())));
+		}
+		return ans;
 	}
 }

@@ -41,7 +41,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Stack;
 
-import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.*;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BOOTS;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.BREAST_PLATE;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.GLOVES;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.HELMET;
+import static com.github.tiwindetea.raoulthegame.model.items.ArmorType.PANTS;
 
 /**
  * Player
@@ -890,7 +894,9 @@ public class Player extends LivingThing {
         }
         ans += ",spells={";
         for (Spell spell : this.spells) {
-            ans += spell + ",";
+            if (spell != null) {
+                ans += spell + ",";
+            }
         }
         ans += "},inventory={";
         if (this.inventory.isEmpty()) {

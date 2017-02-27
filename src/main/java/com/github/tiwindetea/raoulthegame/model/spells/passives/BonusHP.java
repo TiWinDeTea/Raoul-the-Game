@@ -32,7 +32,7 @@ public class BonusHP extends Spell<Player> {
     private double currentUp = 0;
 
     public BonusHP(Player owner) {
-        super(owner, owner.getNumber());
+        super(owner, Spell.firstNull(owner.getSpells()));
         owner.increaseHP(BASE_HP);
         this.currentUp = BASE_HP;
         updateDescription();

@@ -114,13 +114,13 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
         this.secondaryRange = secondaryRange;
         this.description = description;
         this.id = id;
-        owner.getSpells().add(this);
+        owner.getSpells()[id] = this;
     }
 
     public Spell(T owner, int id) {
         this.owner = new WeakReference<>(owner);
         this.id = id;
-        owner.getSpells().add(this);
+        owner.getSpells()[id] = this;
     }
 
     /**
@@ -211,7 +211,7 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     /**
      * Handler. This function should be called each time the spell gained a level.
      */
-    public abstract void spellUpgraded();
+    protected abstract void spellUpgraded();
 
     /**
      * Handler. This function should be called each time the spell gained a level.
@@ -246,7 +246,7 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
     public final void forgot() {
         T owner = getOwner();
         if (owner != null) {
-            owner.getSpells().remove(this);
+            owner.getSpells()[this.id] = null;
         }
         forgotten();
     }
@@ -261,7 +261,11 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
 
     public abstract SpellType getSpellType();
 
-    public static Spell<? extends LivingThing> toSpell(SpellType type, Player owner) {
+    public static void makeSpell(SpellType type, Player owner) {
+        toSpell(type, owner);
+    }
+
+    private static Spell<?> toSpell(SpellType type, Player owner) {
         switch (type) {
             case SUMMON_DOG:
                 return new SummonDog(owner);
@@ -295,8 +299,9 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
                 return new Thorn(owner);
             case EXPLORER:
                 return new Explorer(owner);
+            default:
+                return null;
         }
-        return null;
     }
 
     public static Spell<?> parse(String str, Player owner) {
@@ -310,5 +315,14 @@ public abstract class Spell<T extends LivingThing> implements Descriptable {
 
     public final String toString() {
         return getSpellType() + "={level=" + this.level + ",cooldown=" + this.cooldown + "}";
+    }
+
+    protected static final <T> int firstNull(T... values) {
+        for (int idx = 0; idx < values.length; ++idx) {
+            if (values[idx] == null) {
+                return idx;
+            }
+        }
+        return -1;
     }
 }

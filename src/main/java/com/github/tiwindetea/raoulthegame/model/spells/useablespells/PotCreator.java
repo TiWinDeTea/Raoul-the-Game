@@ -33,6 +33,9 @@ import java.util.Random;
 public class PotCreator extends Spell<Player> {
 
 	private static final int BASE_COOLDOWN = 20;
+    public PotCreator(Player owner) {
+        super(owner, Spell.firstNull(owner.getSpells()));
+    }
 
 	private int baseCooldown = BASE_COOLDOWN;
 	private int cooldown = 0;

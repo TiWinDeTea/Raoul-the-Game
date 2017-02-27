@@ -37,7 +37,7 @@ public class Explorer extends Spell<Player> {
 	private boolean castedOnLastFloor = false;
 
 	public Explorer(Player owner) {
-		super(owner, owner.getSpells().size());
+		super(owner, Spell.firstNull(owner.getSpells()));
 		this.description = "Explorer (active).\n" +
 				"Summons a ghost spirit that explores the path to the " +
 				"next floor for you." +

@@ -12,6 +12,7 @@ package com.github.tiwindetea.raoulthegame.model;
 import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.events.game.LevelUpdateEvent;
 import com.github.tiwindetea.raoulthegame.events.game.ScoreUpdateEvent;
+import com.github.tiwindetea.raoulthegame.events.game.SpellSelectionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityCreationEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityDeletionEvent;
 import com.github.tiwindetea.raoulthegame.events.game.living_entities.LivingEntityLOSDefinitionEvent;
@@ -32,6 +33,7 @@ import com.github.tiwindetea.raoulthegame.events.gui.requests.InteractionRequest
 import com.github.tiwindetea.raoulthegame.events.gui.requests.LockViewRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.MoveRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.RequestEvent;
+import com.github.tiwindetea.raoulthegame.events.gui.requests.SpellSelectedRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.DropRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.EquipRequestEvent;
 import com.github.tiwindetea.raoulthegame.events.gui.requests.inventory.UsageRequestEvent;
@@ -58,6 +60,7 @@ import com.github.tiwindetea.raoulthegame.model.space.Vector2i;
 import com.github.tiwindetea.raoulthegame.model.spells.Spell;
 import com.github.tiwindetea.raoulthegame.model.spells.SpellsController;
 import com.github.tiwindetea.raoulthegame.view.entities.LivingEntityType;
+import com.github.tiwindetea.raoulthegame.view.entities.SpellType;
 import com.github.tiwindetea.raoulthegame.view.entities.StaticEntityType;
 import com.github.tiwindetea.soundplayer.Sound;
 import com.github.tiwindetea.soundplayer.Sounds;
@@ -107,6 +110,10 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private volatile boolean isRunning = false;
     private volatile boolean isPaused = false;
     private volatile boolean viewIsLocked = false;
+
+    private boolean selectingSpell = true;
+    private SpellType selectedSpell = SpellType.NOT_A_SPELL;
+
     private static final Level debugLevel = Level.FINEST; //debug
 
     private final List<GameListener> listeners = new ArrayList<>();
@@ -141,6 +148,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
     private Pair<Consumable> objectToUse = null;
     private List<Consumable> triggeredObjects = new ArrayList<>();
+
+    private final PriorityQueue<Player> sortedPlayers = new PriorityQueue<>(Comparator.comparingInt(Player::getNumber));
 
     /* Level generation variables. Charged at the creation of a game */
     private LivingEntityType[] mobsTypes;
@@ -214,12 +223,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
         @Override
         public long createGhostEntity(LivingEntityType entityType, Vector2i position, String description, Direction direction, int LOSRange, int explorationRange) {
             long id = Pair.getUniqueId();
-            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(id, entityType, position, direction, description));
+            fire(new LivingEntityCreationEvent(id, entityType, position, direction, description));
             if (LOSRange > 0) {
                 boolean[][] tmp = Game.this.world.getLOS(position, LOSRange, 4);
-                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                fire(new LivingEntityLOSDefinitionEvent(id, tmp));
                 tmp = Game.this.world.getLOS(position, explorationRange, 4);
-                fireFogAdditionEvent(new FogAdditionEvent(position, tmp));
+                fire(new FogAdditionEvent(position, tmp));
             }
             Game.this.ghostsLiving.put(id, new javafx.util.Pair<>(position, new Vector2i(LOSRange, explorationRange)));
             return id;
@@ -228,7 +237,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         @Override
         public long createGhostEntity(StaticEntityType entityType, Vector2i position, String description, int LOSRange, int explorationRange) {
             long id = Pair.getUniqueId();
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(id, entityType, position, description));
+            fire(new StaticEntityCreationEvent(id, entityType, position, description));
             Game.this.ghostsStatic.put(id, new javafx.util.Pair<>(position, new Vector2i(LOSRange, explorationRange)));
             return id;
         }
@@ -242,35 +251,35 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         @Override
         public void deleteGhostStorableEntity(long entityId) {
-            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(entityId));
+            fire(new StaticEntityDeletionEvent(entityId));
             Game.this.ghostsStatic.remove(entityId);
         }
 
         @Override
         public void deleteGhostLivingEntity(long entityId) {
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(entityId));
+            fire(new LivingEntityDeletionEvent(entityId));
             Game.this.ghostsLiving.remove(entityId);
         }
 
         @Override
         public void createEntity(LivingThing entity, LivingEntityType aspect, Direction direction) {
             Game.this.livingSpells.add(entity);
-            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(entity.getId(), aspect, entity.getPosition(), direction, entity.getDescription()));
+            fire(new LivingEntityCreationEvent(entity.getId(), aspect, entity.getPosition(), direction, entity.getDescription()));
         }
 
         @Override
         public long createEntity(StorableObject entity, Vector2i position, StaticEntityType aspect) {
             Pair<StorableObject> p = new Pair<>(entity);
             Game.this.objectsOnGround.add(new javafx.util.Pair<>(position, p));
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), aspect, position, p.object.getDescription()));
+            fire(new StaticEntityCreationEvent(p.getId(), aspect, position, p.object.getDescription()));
             return p.getId();
         }
 
         @Override
         public void explore(Vector2i position, int range) {
-            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(Pair.ERROR_VAL, LivingEntityType.ARISTOCRAT_DUCK, position, Direction.DOWN, ""));
-            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, Game.this.world.getLOS(position, range, 4)));
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
+            fire(new LivingEntityCreationEvent(Pair.ERROR_VAL, LivingEntityType.ARISTOCRAT_DUCK, position, Direction.DOWN, ""));
+            fire(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, Game.this.world.getLOS(position, range, 4)));
+            fire(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
         }
 
         @Override
@@ -298,7 +307,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         @Override
         public void unshareLos(long id) {
             Game.this.livingsSharedLOS.remove(id);
-            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, new boolean[1][1]));
+            fire(new LivingEntityLOSDefinitionEvent(id, new boolean[1][1]));
         }
 
         @Override
@@ -416,7 +425,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 tiles[i][j] = Tile.UNKNOWN;
             }
         }
-        fireMapCreationEvent(new MapCreationEvent(tiles));
+        fire(new MapCreationEvent(tiles));
 
         for (Player player : players) {
             player.addToInventory(new Pair<>(new Pot(4, 15, 15, 0, 0, 0, 0)));
@@ -424,7 +433,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             player.addToInventory(new Pair<>(new Weapon(5, 1, 0)));
         }
         this.currentPlayer = this.players.get(0);
-        fireNextTickEvent(new PlayerNextTickEvent(0));
+        fire(new PlayerNextTickEvent(0));
         this.generateLevel();
         this.globalScore = 0;
     }
@@ -592,92 +601,98 @@ public class Game implements RequestListener, Runnable, Stoppable {
         return this.listeners.toArray(new GameListener[this.listeners.size()]);
     }
 
-    private void fireLivingEntityCreationEvent(LivingEntityCreationEvent event) {
+    private void fire(LivingEntityCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireLivingEntityDeletionEvent(LivingEntityDeletionEvent event) {
+    private void fire(LivingEntityDeletionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireLivingEntityLOSDefinitionEvent(LivingEntityLOSDefinitionEvent event) {
+    private void fire(LivingEntityLOSDefinitionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireLivingEntityLOSModificationEvent(LivingEntityLOSModificationEvent event) {
+    private void fire(LivingEntityLOSModificationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireScoreUpdateEvent(ScoreUpdateEvent event) {
+    private void fire(ScoreUpdateEvent event) {
         for (GameListener listener : getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireMapCreationEvent(MapCreationEvent event) {
+    private void fire(MapCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void firePlayerCreationEvent(PlayerCreationEvent event) {
+    private void fire(PlayerCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireStaticEntityCreationEvent(StaticEntityCreationEvent event) {
+    private void fire(StaticEntityCreationEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireStaticEntityDeletionEvent(StaticEntityDeletionEvent event) {
+    private void fire(StaticEntityDeletionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireStaticEntityLOSDefinitionEvent(StaticEntityLOSDefinitionEvent event) {
+    private void fire(StaticEntityLOSDefinitionEvent event) {
         for (GameListener listener : this.getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireNextTickEvent(PlayerNextTickEvent event) {
+    private void fire(PlayerNextTickEvent event) {
         for (GameListener listener : getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireFogAdditionEvent(FogAdditionEvent event) {
+    private void fire(FogAdditionEvent event) {
         for (GameListener listener : getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireCenterOnTileEvent(CenterOnTileEvent event) {
+    private void fire(CenterOnTileEvent event) {
         for (GameListener listener : getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void firePlayerDeletionEvent(PlayerDeletionEvent event) {
+    private void fire(PlayerDeletionEvent event) {
         for (GameListener listener : getGameListeners()) {
             listener.handle(event);
         }
     }
 
-    private void fireLevelUpdateEvent(LevelUpdateEvent event) {
+    private void fire(LevelUpdateEvent event) {
         for (GameListener listener : getGameListeners()) {
+            listener.handle(event);
+        }
+    }
+
+    private void fire(SpellSelectionEvent event) {
+        for (GameListener listener : this.listeners) {
             listener.handle(event);
         }
     }
@@ -738,8 +753,19 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.viewIsLocked = !this.viewIsLocked;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void handle(CastSpellRequestEvent e) {
+        this.requestedEvent.add(e);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void handle(SpellSelectedRequestEvent e) {
         this.requestedEvent.add(e);
     }
 
@@ -758,20 +784,20 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         Sound.player.play(Sounds.NEXT_FLOOR_SOUND);
         System.out.println("Entering level " + this.level + " of seed [" + this.seed.getAlphaSeed() + " ; " + this.seed.getBetaSeed() + "]");
-        fireLevelUpdateEvent(new LevelUpdateEvent(this.level));
+        fire(new LevelUpdateEvent(this.level));
 
 		/* Generate the level and bulbs to turn off */
         List<Map.Room> rooms = this.world.generateLevel(this.level);
-        fireMapCreationEvent(new MapCreationEvent(this.world.getMapCopy()));
+        fire(new MapCreationEvent(this.world.getMapCopy()));
 
         for (Vector2i bulb : this.world.getBulbPosition()) {
             Pair<Vector2i> p = new Pair<>(bulb);
             Pair<Vector2i> p2 = new Pair<>(bulb);
             this.bulbsOn.add(p);
             this.bulbsOff.add(p2);
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p2.getId(), StaticEntityType.UNLIT_BULB, bulb, "An Unlit bulb"));
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb, "A Lit bulb"));
-            fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(
+            fire(new StaticEntityCreationEvent(p2.getId(), StaticEntityType.UNLIT_BULB, bulb, "An Unlit bulb"));
+            fire(new StaticEntityCreationEvent(p.getId(), StaticEntityType.LIT_BULB, bulb, "A Lit bulb"));
+            fire(new StaticEntityLOSDefinitionEvent(
                     p.getId(),
                     this.world.getLOS(bulb, BULB_LOS, 4)
             ));
@@ -791,17 +817,17 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     this.trapsBaseHP[selection] + this.trapsHPPerLevel[selection] * random.nextInt(3) + this.level - 1,
                     this.trapsBaseMana[selection] + this.trapsManaPerLevel[selection] * random.nextInt(3) + this.level - 1));
             this.interactiveObjects.add(pair);
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.TRAP, pos, pair.object.getDescription()));
+            fire(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.TRAP, pos, pair.object.getDescription()));
         }
 
 		/* Generate some chests */
         for (int i = 0; i < chestsNbr; i++) {
             Pair<InteractiveObject> pair;
-            //TODOchestLevel = random.nextInt(3) + this.level - 1;
+            //TODOchestLevel = randomExcept.nextInt(3) + this.level - 1;
             pos = selectRandomGroundPosition(rooms, random);
             pair = new Pair<>(new InteractiveObject(pos, lootSelector(random)));
             this.interactiveObjects.add(pair);
-            fireStaticEntityCreationEvent(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.CHEST, pos, pair.object.getDescription()));
+            fire(new StaticEntityCreationEvent(pair.getId(), StaticEntityType.CHEST, pos, pair.object.getDescription()));
         }
 
 		/* Generate the mobs */
@@ -836,9 +862,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.playersOnNextLevel.clear();
         this.triggeredObjects.clear();
 
+        this.sortedPlayers.clear();
+
 		/* Move the players to the right position */
         for (Player player : this.players) {
-            fireLivingEntityCreationEvent(new LivingEntityCreationEvent(
+            this.sortedPlayers.add(player);
+            fire(new LivingEntityCreationEvent(
                     player.getId(),
                     player.getGType(),
                     new Vector2i(0, 0),
@@ -862,7 +891,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 player.addMana(player.getMaxMana());
                 player.setPosition(this.world.getStairsUpPosition());
             }
-            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+            fire(new LivingEntityLOSDefinitionEvent(
                     player.getId(),
                     this.world.getLOS(player.getPosition(), player.getLos(), 4)
             ));
@@ -877,9 +906,15 @@ public class Game implements RequestListener, Runnable, Stoppable {
         livings.addAll(this.players);
         livings.addAll(this.playersOnNextLevel);
         //livings.addAll(this.mobs); todo : uncomment if mobs have spells
-        livings.forEach(l -> l.getSpells().forEach(Spell::nextFloor));
+        livings.forEach(l -> {
+            for (Spell spell : l.getSpells()) {
+                if (spell != null) {
+                    spell.nextFloor();
+                }
+            }
+        });
 
-        fireCenterOnTileEvent(new CenterOnTileEvent(this.players.get(0).getPosition()));
+        fire(new CenterOnTileEvent(this.players.get(0).getPosition()));
     }
 
     //-------------------------------------//
@@ -925,7 +960,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.currentPlayer = this.players.get(this.playerTurn);
         }
         if (!this.players.isEmpty()) {
-            fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+            fire(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
         }
 
         if (this.players.size() == 0 && this.playersOnNextLevel.size() > 0) {
@@ -933,10 +968,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
             this.save();
             this.clearLevel();
             this.generateLevel(); // Hot dog !
+            this.treatRequestEvent((SpellSelectedRequestEvent) null);
         }
 
         if (this.viewIsLocked) {
-            fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
+            fire(new CenterOnTileEvent(this.currentPlayer.getPosition()));
         }
     }
 
@@ -971,13 +1007,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 distance = Math.abs(playerPos.x - pos.x) + Math.abs(playerPos.y - pos.y);
                 if (distance <= 1 && isAccessible(pos)) {
                     player.setPosition(pos);
-                    fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos(), 4)));
+                    fire(new LivingEntityLOSDefinitionEvent(player.getId(), this.world.getLOS(pos, player.getLos(), 4)));
                 } else if (distance <= 1 && this.world.getTile(pos) == Tile.HOLE) {
                     player.setFloor(this.level + 1);
                     player.setPosition(new Vector2i(0, 0));
                     player.hasFallen = true;
                     player.damage(player.getMaxHitPoints() / 5, null);
-                    fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+                    fire(new LivingEntityDeletionEvent(player.getId()));
                     this.playersOnNextLevel.add(player);
                     this.players.remove(i);
                     --i;
@@ -1015,7 +1051,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     player.dropRequestAccepted();
                     if (this.world.getTile(pos) != Tile.HOLE) {
                         objectsJustDropped.put(new Integer(player.getNumber()), drop);
-                        fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+                        fire(new StaticEntityCreationEvent(
                                 drop.getId(),
                                 drop.object.getGType(),
                                 pos,
@@ -1067,37 +1103,38 @@ public class Game implements RequestListener, Runnable, Stoppable {
         //livings.addAll(this.mobs); todo : uncomment if mobs have spells
 
         for (LivingThing living : livings) {
-            living.getSpells()
-                    .forEach(spell -> {
-                        if (spell.isPassive()) {
-                            spell.update(null);
-                        } else if (spell.isAOE()) {
-                            Vector2i pos = spell.getSpellSource();
-                            int range = spell.getRange();
-                            if (pos != null) {
-                                LinkedList<LivingThing> targets = livings.stream()
-                                        .filter(thing -> pos.squaredDistance(thing.getPosition()) < range)
-                                        .collect(Collectors.toCollection(LinkedList::new));
-                                spell.update(targets);
-                            } else {
-                                spell.update(null);
-                            }
+            for (Spell spell : living.getSpells()) {
+                if (spell != null) {
+                    if (spell.isPassive()) {
+                        spell.update(null);
+                    } else if (spell.isAOE()) {
+                        Vector2i pos = spell.getSpellSource();
+                        int range = spell.getRange();
+                        if (pos != null) {
+                            LinkedList<LivingThing> targets = livings.stream()
+                                    .filter(thing -> pos.squaredDistance(thing.getPosition()) < range)
+                                    .collect(Collectors.toCollection(LinkedList::new));
+                            spell.update(targets);
                         } else {
                             spell.update(null);
                         }
-                    });
+                    } else {
+                        spell.update(null);
+                    }
+                }
+            }
         }
     }
 
     private void killDeads(ArrayList<Mob> mobToDelete) {
         Random random = new Random();
         for (Mob mob : mobToDelete) {
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
+            fire(new LivingEntityDeletionEvent(mob.getId()));
             if (random.nextInt(101) < 100 * this.mobsLootsQtt / this.mobs.size()) {
                 this.mobsLootsQtt--;
                 Pair<StorableObject> loot = new Pair<>(lootSelector(random));
                 this.objectsOnGround.add(new javafx.util.Pair<>(mob.getPosition(), loot));
-                fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+                fire(new StaticEntityCreationEvent(
                         loot.getId(),
                         loot.object.getGType(),
                         mob.getPosition(),
@@ -1117,11 +1154,11 @@ public class Game implements RequestListener, Runnable, Stoppable {
         }
 
         for (Player player : playerToDelete) {
-            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+            fire(new LivingEntityLOSDefinitionEvent(
                     player.getId(),
                     new boolean[0][]
             ));
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+            fire(new LivingEntityDeletionEvent(player.getId()));
             this.players.remove(player);
             this.deletePlayer(player);
             for (int number = player.getNumber(); number < this.players.size(); number++) {
@@ -1169,12 +1206,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
                         if (Settings.autoEquip) {
                             Pair<Armor> arm = player.autoEquipArmor(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
                             if (arm == null) {
-                                fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
                             } else {
                                 if (arm.getId() != Pair.ERROR_VAL) {
-                                    fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
-                                    fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+                                    fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                    fire(new StaticEntityCreationEvent(
                                             arm.getId(),
                                             arm.object.getGType(),
                                             objPair.getKey(),
@@ -1187,7 +1224,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                             }
                         } else if (Settings.simpleAutoEquip) {
                             if (player.simpleAutoEquipArmor(new Pair<>(objPair.getValue(), false))) {
-                                fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
                             } else {
                                 obj = objPair.getValue();
@@ -1199,12 +1236,12 @@ public class Game implements RequestListener, Runnable, Stoppable {
                         if (Settings.autoEquip) {
                             Pair<Weapon> weap = player.autoEquipWeapon(new Pair<>(objPair.getValue(), false), Settings.autoEquipCanDrop);
                             if (weap == null) {
-                                fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
                             } else {
                                 if (weap.getId() != Pair.ERROR_VAL) {
-                                    fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
-                                    fireStaticEntityCreationEvent(new StaticEntityCreationEvent(
+                                    fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                    fire(new StaticEntityCreationEvent(
                                             weap.getId(),
                                             weap.object.getGType(),
                                             objPair.getKey(),
@@ -1217,7 +1254,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                             }
                         } else if (Settings.simpleAutoEquip) {
                             if (player.simpleAutoEquipWeapon(new Pair<>(objPair.getValue(), false))) {
-                                fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                                fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                                 iter.remove();
                             } else {
                                 obj = objPair.getValue();
@@ -1230,7 +1267,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     }
 
                     if (obj != null && obj.object != null && player.addToInventory(obj)) {
-                        fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(objPair.getValue().getId()));
+                        fire(new StaticEntityDeletionEvent(objPair.getValue().getId()));
                         iter.remove();
                     }
                 }
@@ -1241,7 +1278,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 if (player.getPosition().equals(this.world.getStairsDownPosition())) {
                     player.setFloor(this.level + 1);
                     player.setPosition(new Vector2i(0, 0));
-                    fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+                    fire(new LivingEntityDeletionEvent(player.getId()));
                     this.playersOnNextLevel.add(player);
                     this.players.remove(i);
                     --i;
@@ -1251,13 +1288,13 @@ public class Game implements RequestListener, Runnable, Stoppable {
 			/* bulbs */
             for (int j = 0; j < this.bulbsOn.size(); j++) {
                 if (this.bulbsOn.get(j).object.equals(player.getPosition())) {
-                    fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(this.bulbsOn.get(j).getId()));
+                    fire(new StaticEntityDeletionEvent(this.bulbsOn.get(j).getId()));
                     this.bulbsOn.remove(j);
                     Sound.player.play(Sounds.BULB_SOUND);
                     player.heal(2 * player.getMaxHitPoints() / 3);
                     player.xp(this.bulbXp + this.bulbXpGainPerLevel * this.level);
                     ++this.globalScore;
-                    fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
+                    fire(new ScoreUpdateEvent(this.globalScore));
                 }
             }
 
@@ -1268,7 +1305,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     .collect(Collectors.toCollection(ArrayList::new));
 
             for (Pair<InteractiveObject> interactiveObject : objectsToDelete) {
-                fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(interactiveObject.getId()));
+                fire(new StaticEntityDeletionEvent(interactiveObject.getId()));
                 this.interactiveObjects.remove(interactiveObject);
             }
         }
@@ -1293,7 +1330,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     tiles[i][j] = Tile.UNKNOWN;
                 }
             }
-            fireMapCreationEvent(new MapCreationEvent(tiles));
+            fire(new MapCreationEvent(tiles));
             this.seed = Seed.parseSeed(file.nextLine());
             this.world = new Map(this.seed);
             String str = file.nextLine();
@@ -1310,8 +1347,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
             file.close();
             this.currentPlayer = this.players.get(0);
             this.currentPlayer.test();
-            fireNextTickEvent(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
-            fireScoreUpdateEvent(new ScoreUpdateEvent(this.globalScore));
+            fire(new PlayerNextTickEvent(this.currentPlayer.getNumber()));
+            fire(new ScoreUpdateEvent(this.globalScore));
             this.generateLevel();
         } catch (FileNotFoundException e) {
             System.out.println("Failed to open the save file");
@@ -1347,7 +1384,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
             Vector2i pos = player.getPosition();
             boolean[][] playerLOS = this.world.getLOS(pos, player.getLos(), 4);
             player.live(this.mobs, this.players, this.livingSpells, playerLOS);
-            fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+            fire(new LivingEntityLOSDefinitionEvent(
                     player.getId(),
                     playerLOS
             ));
@@ -1358,7 +1395,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.ghostsLiving.forEach((id, pair) -> {
             if (pair.getValue().x > 0 || pair.getValue().y > 0) {
                 boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
-                fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(id, tmp));
+                fire(new LivingEntityLOSDefinitionEvent(id, tmp));
                 tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
                 explore(pair.getKey(), tmp);
             }
@@ -1367,7 +1404,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         this.ghostsStatic.forEach((id, pair) -> {
             if (pair.getValue().x > 0 || pair.getValue().y > 0) {
                 boolean[][] tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().x, 4);
-                fireStaticEntityLOSDefinitionEvent(new StaticEntityLOSDefinitionEvent(id, tmp));
+                fire(new StaticEntityLOSDefinitionEvent(id, tmp));
                 tmp = Game.this.world.getLOS(pair.getKey(), pair.getValue().y, 4);
                 explore(pair.getKey(), tmp);
             }
@@ -1378,7 +1415,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     boolean[][] tmp = this.world.getLOS(pair.getKey().getPosition(),
                                                         pair.getValue(),
                                                         4);
-                    fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(
+                    fire(new LivingEntityLOSDefinitionEvent(
                             id,
                             tmp
                     ));
@@ -1400,7 +1437,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 this.mobsChaseRange[selectedMob],
                 mobPos.copy());
         this.mobs.add(mob);
-        fireLivingEntityCreationEvent(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
+        fire(new LivingEntityCreationEvent(mob.getId(), this.mobsTypes[selectedMob],
                 mobPos.copy(), Direction.DOWN, mob.getDescription()));
     }
 
@@ -1529,6 +1566,9 @@ public class Game implements RequestListener, Runnable, Stoppable {
                                     case CAST_SPELL_REQUEST_EVENT:
                                         treatRequestEvent((CastSpellRequestEvent) event);
                                         break;
+                                    case SPELL_SELECTED_REQUEST_EVENT:
+                                        treatRequestEvent((SpellSelectedRequestEvent) event);
+                                        break;
                                 }
                             } catch (Exception e) {
                                 // debug
@@ -1570,17 +1610,80 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 bool[i][j] = true;
             }
         }
-        fireLivingEntityCreationEvent(new LivingEntityCreationEvent(
+        fire(new LivingEntityCreationEvent(
                 Pair.ERROR_VAL,
                 LivingEntityType.LITTLE_SATANIC_DUCK,
                 new Vector2i(this.world.getSize().x / 2, this.world.getSize().y / 2),
                 Direction.DOWN,
                 ""
         ));
-        fireLivingEntityLOSDefinitionEvent(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, bool));
-        fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
+        fire(new LivingEntityLOSDefinitionEvent(Pair.ERROR_VAL, bool));
+        fire(new LivingEntityDeletionEvent(Pair.ERROR_VAL));
         this.currentMusic = Sounds.DEATH_MUSIC;
         Sound.player.play(this.currentMusic);
+    }
+
+    private void treatRequestEvent(SpellSelectedRequestEvent event) {
+        if (!this.sortedPlayers.isEmpty()) {
+            if (this.selectingSpell) {
+                if (event != null) {
+                    Player player = this.sortedPlayers.poll();
+                    Spell<?> s = null;
+                    for (Spell spell : player.getSpells()) {
+                        if (spell != null) {
+                            if (spell.getSpellType().equals(event.getSpellType())) {
+                                s = spell;
+                                break;
+                            }
+                        }
+                    }
+                    if (s != null) {
+                        s.nextSpellLevel();
+                    } else {
+
+                        Spell.makeSpell(event.getSpellType(), player);
+                    }
+                }
+
+                if (!this.sortedPlayers.isEmpty()) {
+                    Collection<SpellType> upgradeableSpells = new ArrayList<>(4);
+                    for (Spell spell : this.sortedPlayers.peek().getSpells()) {
+                        if (spell != null) {
+                            upgradeableSpells.add(spell.getSpellType());
+                        }
+                    }
+                    while (upgradeableSpells.size() < 4) {
+                        upgradeableSpells.add(SpellType.NOT_A_SPELL);
+                    }
+                    fire(new SpellSelectionEvent("Select a spell to upgrade / change", upgradeableSpells));
+                    this.selectingSpell = false;
+                }
+            } else {
+                if (event != null) {
+                    this.selectedSpell = event.getSpellType();
+                } else {
+                    this.selectedSpell = SpellType.NOT_A_SPELL;
+                }
+
+                Collection<SpellType> spells = new ArrayList<>(4);
+
+                if (this.selectedSpell != SpellType.NOT_A_SPELL) {
+                    spells.add(this.selectedSpell);
+                }
+
+                Collection<SpellType> tmp = new ArrayList<>(5);
+                for (Spell spell : this.sortedPlayers.peek().getSpells()) {
+                    if (spell != null) {
+                        tmp.add(spell.getSpellType());
+                    }
+                }
+                tmp.add(SpellType.NOT_A_SPELL);
+                spells.addAll(SpellType.randomExcept(3, tmp));
+
+                fire(new SpellSelectionEvent("Upgrade your spell / change it.", spells));
+                this.selectingSpell = true;
+            }
+        }
     }
 
     private void treatRequestEvent(CastSpellRequestEvent event) {
@@ -1592,7 +1695,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 .findAny()
                 .get()
                 .getSpells()
-                .get(event.getSpellNumber());
+                [event.getSpellNumber()];
 
         if (spell == this.currentSpell) {
             this.currentSpell = null;
@@ -1607,7 +1710,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
     }
 
     private void treatRequestEvent(CenterViewRequestEvent e) {
-        fireCenterOnTileEvent(new CenterOnTileEvent(this.currentPlayer.getPosition()));
+        fire(new CenterOnTileEvent(this.currentPlayer.getPosition()));
     }
 
     private void treatRequestEvent(DropRequestEvent e) {
@@ -1855,44 +1958,44 @@ public class Game implements RequestListener, Runnable, Stoppable {
     private void clearLevel() {
 
         /* Next block deletes all entities on the GUI */
-        this.livingsSharedLOS.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.livingsSharedLOS.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.livingsSharedLOS.clear();
 
-        this.ghostsLiving.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.ghostsLiving.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.ghostsLiving.clear();
 
-        this.ghostsStatic.forEach((id, pair) -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(id)));
+        this.ghostsStatic.forEach((id, pair) -> fire(new LivingEntityDeletionEvent(id)));
         this.ghostsStatic.clear();
 
-        this.livingSpells.forEach(l -> fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(l.getId())));
+        this.livingSpells.forEach(l -> fire(new LivingEntityDeletionEvent(l.getId())));
         this.livingSpells.clear();
 
         for (Player player : this.players) {
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(player.getId()));
+            fire(new LivingEntityDeletionEvent(player.getId()));
         }
 
         for (Mob mob : this.mobs) {
-            fireLivingEntityDeletionEvent(new LivingEntityDeletionEvent(mob.getId()));
+            fire(new LivingEntityDeletionEvent(mob.getId()));
         }
         this.mobs.clear();
 
         for (Pair<InteractiveObject> obj : this.interactiveObjects) {
-            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(obj.getId()));
+            fire(new StaticEntityDeletionEvent(obj.getId()));
         }
         this.interactiveObjects.clear();
 
         for (Pair<Vector2i> bulb : this.bulbsOff) {
-            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
+            fire(new StaticEntityDeletionEvent(bulb.getId()));
         }
         this.bulbsOff.clear();
 
         for (Pair<Vector2i> bulb : this.bulbsOn) {
-            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(bulb.getId()));
+            fire(new StaticEntityDeletionEvent(bulb.getId()));
         }
         this.bulbsOn.clear();
 
         for (javafx.util.Pair<Vector2i, Pair<StorableObject>> pair : this.objectsOnGround) {
-            fireStaticEntityDeletionEvent(new StaticEntityDeletionEvent(pair.getValue().getId()));
+            fire(new StaticEntityDeletionEvent(pair.getValue().getId()));
         }
         this.objectsOnGround.clear();
     }
@@ -1902,7 +2005,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
         List<Pair<StorableObject>> playerInventory = new ArrayList<>(player.getInventory().size());
         playerInventory.addAll(player.getInventory());
         playerInventory.forEach(player::removeFromInventory);
-        firePlayerDeletionEvent(new PlayerDeletionEvent(player.getNumber()));
+        fire(new PlayerDeletionEvent(player.getNumber()));
     }
 
     private int findMob(Vector2i position) {
@@ -1933,6 +2036,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 }
             }
         }
-        fireFogAdditionEvent(new FogAdditionEvent(fogCenterTile, los));
+        fire(new FogAdditionEvent(fogCenterTile, los));
     }
 }

@@ -24,7 +24,7 @@ import java.util.Collection;
 public class Grenade extends Spell<Player> {
 
     public Grenade(Player owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
     }
 
     @Override

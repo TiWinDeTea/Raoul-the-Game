@@ -43,7 +43,7 @@ public class Heal extends Spell<Player> {
 	 * @param owner the owner
 	 */
 	public Heal(Player owner) {
-		super(owner, owner.getSpells().size());
+		super(owner, Spell.firstNull(owner.getSpells()));
 		updateDescription();
 		fire(new SpellCreationEvent(
 		  owner.getNumber(),

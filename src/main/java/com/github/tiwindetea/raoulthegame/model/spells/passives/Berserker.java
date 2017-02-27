@@ -36,7 +36,7 @@ public class Berserker extends Spell<LivingThing> {
     private final int pid;
 
     public Berserker(LivingThing owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
         if (LivingThingType.PLAYER.equals(owner.getType())) {
             updateDescription();
             this.pid = ((Player) owner).getNumber();

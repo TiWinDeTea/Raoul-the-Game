@@ -23,7 +23,7 @@ import java.util.Collection;
  */
 public class Octopus extends Spell<Player> {
     public Octopus(Player owner) {
-        super(owner, owner.getSpells().size());
+        super(owner, Spell.firstNull(owner.getSpells()));
     }
 
     @Override
