@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 
 /**
- * Created by Maxime on 21/02/2017.
+ * The type FireBall.
  */
 public class FireBall extends Spell<Player> {
 
@@ -34,16 +34,21 @@ public class FireBall extends Spell<Player> {
 	private int cooldown = 0;
 	private double manaCost = 5;
 
+	/**
+	 * Instantiates a new FireBall.
+	 *
+	 * @param owner the owner
+	 */
 	public FireBall(Player owner) {
 		super(owner, owner.getSpells().size());
 		this.targetNumber = 1;
 		updateDescription();
 		fire(new SpellCreationEvent(
-				owner.getNumber(),
-				this.id,
-				getSpellType(),
-				this.baseCooldown,
-				this.description
+		  owner.getNumber(),
+		  this.id,
+		  getSpellType(),
+		  this.baseCooldown,
+		  this.description
 		));
 	}
 
@@ -118,14 +123,12 @@ public class FireBall extends Spell<Player> {
 					target.damage(this.damages + target.getDefensePower(), owner);
 				}
 				this.cooldown = this.baseCooldown;
-				if (owner != null) {
-					fire(new SpellCooldownUpdateEvent(
-							owner.getNumber(),
-							this.id,
-							this.baseCooldown,
-							this.cooldown
-					));
-				}
+				fire(new SpellCooldownUpdateEvent(
+				  owner.getNumber(),
+				  this.id,
+				  this.baseCooldown,
+				  this.cooldown
+				));
 				return true;
 			}
 		}
