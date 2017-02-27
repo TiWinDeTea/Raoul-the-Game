@@ -17,6 +17,8 @@ import java.util.Collection;
 
 /**
  * The type ScrollSpell.
+ *
+ * @author Maxime PINARD
  */
 public class ScrollSpell extends Spell<Player> {
 
@@ -123,17 +125,18 @@ public class ScrollSpell extends Spell<Player> {
     @Override
     public boolean cast(Collection<LivingThing> targets, Vector2i sourcePosition) {
 	    if(this.cooldown == 0) {
-		    if(!targets.isEmpty()) {
+		    Player owner = getOwner();
+		    if(owner != null && owner.useMana(this.manaCost) && !targets.isEmpty()) {
 			    this.targets = new ArrayList<>(targets);
 			    this.remainingTurns += APPLY_TURNS;
+			    this.cooldown = this.baseCooldown;
+			    fire(new SpellCooldownUpdateEvent(
+			      owner.getNumber(),
+			      this.id,
+			      this.baseCooldown,
+			      this.cooldown
+			    ));
 		    }
-		    this.cooldown = this.baseCooldown;
-		    fire(new SpellCooldownUpdateEvent(
-		      getOwner().getNumber(),
-		      this.id,
-		      this.baseCooldown,
-		      this.cooldown
-		    ));
 		    return true;
 	    }
         return false;
