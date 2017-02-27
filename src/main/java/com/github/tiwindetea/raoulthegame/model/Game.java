@@ -878,11 +878,7 @@ public class Game implements RequestListener, Runnable, Stoppable {
                 do {
                     player.setPosition(this.selectRandomGroundPosition(
                             rooms,
-                            new Random(
-                                    this.world.getAlphaSeed() * player.getPosition().x
-                                            + this.world.getBetaSeed() * player.getPosition().y
-                                            + this.level
-                            )
+                            new Random(this.world.getBetaSeed() * this.level)
                     ));
                 } while (Tile.isObstructed(this.world.getTile(player.getPosition())));
                 player.hasFallen = false;
@@ -965,7 +961,6 @@ public class Game implements RequestListener, Runnable, Stoppable {
 
         if (this.players.size() == 0 && this.playersOnNextLevel.size() > 0) {
             ++this.level;
-            this.save();
             this.clearLevel();
             this.generateLevel(); // Hot dog !
             this.treatRequestEvent((SpellSelectedRequestEvent) null);
@@ -1370,13 +1365,19 @@ public class Game implements RequestListener, Runnable, Stoppable {
         PriorityQueue<Player> playerPriorityQueue = new PriorityQueue<>(Comparator.comparingInt(Player::getNumber));
 
         playerPriorityQueue.addAll(this.playersOnNextLevel);
+        playerPriorityQueue.addAll(this.players);
         try {
             FileWriter file = new FileWriter(new File(this.gameName));
             file.write(this.seed.toString() + "\n");
             file.write("level=" + this.level + "\n");
             file.write("score=" + this.globalScore + "\n");
             while (!playerPriorityQueue.isEmpty()) {
-                file.write(playerPriorityQueue.poll().toString() + "\n");
+                Player p = playerPriorityQueue.poll();
+                if (!p.getPosition().equals(world.getStairsUpPosition())) {
+                    p.hasFallen = true;
+                }
+                file.write(p.toString() + "\n");
+                p.hasFallen = false;
             }
             file.close();
         } catch (IOException e) {
@@ -1646,7 +1647,15 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     if (s != null) {
                         s.nextSpellLevel();
                     } else {
-
+                        if (selectedSpell != SpellType.NOT_A_SPELL) {
+                            Spell[] spells = player.getSpells();
+                            for (int i = 0; i < spells.length; i++) {
+                                if (selectedSpell.equals(spells[i].getSpellType())) {
+                                    spells[i] = null;
+                                    break;
+                                }
+                            }
+                        }
                         Spell.makeSpell(event.getSpellType(), player);
                     }
                 }
@@ -1663,6 +1672,8 @@ public class Game implements RequestListener, Runnable, Stoppable {
                     }
                     fire(new SpellSelectionEvent("Select a spell to upgrade / change", upgradeableSpells));
                     this.selectingSpell = false;
+                } else {
+                    this.save();
                 }
             } else {
                 if (event != null) {

@@ -45,7 +45,7 @@ public class SummonDog extends Spell<LivingThing> {
 
         public Dog(LivingThing owner, String description, int level, int maxHp, int ap, int def, Vector2i pos) {
             super(owner, description, level, maxHp, ap, def, pos);
-            this.hitPoints = 0;
+            super.hitPoints = -100;
         }
 
         public void attackThem() {

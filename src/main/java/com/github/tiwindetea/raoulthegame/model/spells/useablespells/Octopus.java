@@ -42,6 +42,7 @@ public class Octopus extends Spell<LivingThing> {
 
 		public Octo(LivingThing owner, String description, int level, int maxHp, int ap, int def, Vector2i pos) {
 			super(owner, description, level, maxHp, ap, def, pos);
+			super.hitPoints = -100;
 		}
 
 		public void attackThem() {

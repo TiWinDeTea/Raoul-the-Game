@@ -33,7 +33,6 @@ public class Teleport extends Spell<Player> {
 	private static final double BASE_MANA_COST = 5;
 
 	private int baseCooldown = BASE_COOLDOWN;
-	private int cooldown = 0;
 	private double manaCost = BASE_MANA_COST;
 	private boolean oddLevel = true;
 

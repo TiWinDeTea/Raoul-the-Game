@@ -35,7 +35,6 @@ public class PotCreator extends Spell<Player> {
 	private static final int BASE_COOLDOWN = 20;
 
 	private int baseCooldown = BASE_COOLDOWN;
-	private int cooldown = 0;
 	private double manaCost = 5;
 
 	private Random random = new Random();

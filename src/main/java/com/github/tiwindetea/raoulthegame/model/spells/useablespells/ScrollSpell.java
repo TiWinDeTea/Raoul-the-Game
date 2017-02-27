@@ -36,7 +36,6 @@ public class ScrollSpell extends Spell<Player> {
 
 	private double damages = BASE_DAMAGES;
 	private int baseCooldown = BASE_COOLDOWN;
-	private int cooldown = 0;
 	private double manaCost = 5;
 	private int remainingTurns = 0;
 
