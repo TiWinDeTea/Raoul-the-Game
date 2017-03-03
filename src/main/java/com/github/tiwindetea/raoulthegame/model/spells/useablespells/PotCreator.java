@@ -125,7 +125,7 @@ public class PotCreator extends Spell<Player> {
 		if(this.cooldown == 0) {
 			Player owner = getOwner();
 			if(owner != null && owner.useMana(this.manaCost)) {
-				int turns = this.random.nextInt(10);
+				int turns = this.random.nextInt(10) + 1;
 				Pot pot;
 				if(this.random.nextBoolean()) {
 					pot = new Pot(turns, this.heal / (double) turns, 0, 0, 0, 0, 0);
