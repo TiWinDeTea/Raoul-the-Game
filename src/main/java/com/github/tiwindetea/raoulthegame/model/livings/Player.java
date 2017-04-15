@@ -1244,7 +1244,7 @@ public class Player extends LivingThing {
      *
      * @param armor   the armor to try to equip
      * @param canDrop True if this function should be able to drop an object of the inventory
-     * @return The previously equipped armor (if there was one)
+     * @return The dropped armor, or null if no armor is dropped
      */
     public Pair<Armor> autoEquipArmor(Pair<Armor> armor, boolean canDrop) {
         if (this.simpleAutoEquipArmor(armor)) {
@@ -1254,34 +1254,32 @@ public class Player extends LivingThing {
         int i = armor.object.getArmorType().ordinal();
         Pair<Armor> removedArmor = this.armors.get(i);
 
-        if (armor.object.powerGrade() > removedArmor.object.powerGrade()) {
-            if (this.inventory.size() < this.maxStorageCapacity) {
-                fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
-                addToInventory(new Pair<>(removedArmor));
-                fireInventoryAdditionEvent(new InventoryAdditionEvent(
-                        this.number,
-                        armor.getId(),
-                        true,
-                        armor.object.getGType(),
-                        armor.object.getDescription()
-                ));
-                this.armors.set(i, armor);
-                this.updateArmorStats();
-                return null;
-            } else if (canDrop) {
-                fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
-                fireInventoryAdditionEvent(new InventoryAdditionEvent(
-                        this.number,
-                        armor.getId(),
-                        true,
-                        armor.object.getGType(),
-                        armor.object.getDescription()
-                ));
-                this.armors.set(i, armor);
-                this.updateArmorStats();
-                return removedArmor;
-            }
+        if (this.inventory.size() < this.maxStorageCapacity) {
+            fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
+            addToInventory(new Pair<>(removedArmor));
+            fireInventoryAdditionEvent(new InventoryAdditionEvent(
+                    this.number,
+                    armor.getId(),
+                    true,
+                    armor.object.getGType(),
+                    armor.object.getDescription()
+            ));
+            this.armors.set(i, armor);
+            this.updateArmorStats();
+            return null;
+        } else if (canDrop && armor.object.powerGrade() > removedArmor.object.powerGrade()) {
+            fireInventoryDeletionEvent(new InventoryDeletionEvent(this.number, removedArmor.getId()));
+            fireInventoryAdditionEvent(new InventoryAdditionEvent(
+                    this.number,
+                    armor.getId(),
+                    true,
+                    armor.object.getGType(),
+                    armor.object.getDescription()
+            ));
+            this.armors.set(i, armor);
+            this.updateArmorStats();
+            return removedArmor;
         }
-        return new Pair<>();
+        return armor;
     }
 }

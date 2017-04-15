@@ -8,6 +8,7 @@
 
 package com.github.tiwindetea.raoulthegame.model.items;
 
+import com.github.tiwindetea.raoulthegame.Settings;
 import com.github.tiwindetea.raoulthegame.model.Descriptable;
 import com.github.tiwindetea.raoulthegame.model.Pair;
 import com.github.tiwindetea.raoulthegame.model.livings.LivingThing;
@@ -74,7 +75,31 @@ public class InteractiveObject implements Descriptable {
                 ((Player) livingThing).useMana(this.manaModifier);
             return true;
         } else if (livingThing.getType() == LivingThingType.PLAYER) {
-            return ((Player) livingThing).addToInventory(new Pair<>(this.loot));
+            Player p = ((Player) livingThing);
+            switch (this.loot.getType()) {
+                case WEAPON:
+                    Pair<Weapon> weapon = new Pair<>((Weapon) this.loot);
+                    if (Settings.autoEquip) {
+                        return p.autoEquipWeapon(weapon, false) != weapon || p.addToInventory(new Pair<>(weapon));
+                    } else if (Settings.simpleAutoEquip) {
+                        return p.simpleAutoEquipWeapon(weapon) || p.addToInventory(new Pair<>(weapon));
+                    } else {
+                        return p.addToInventory(new Pair<>(weapon));
+                    }
+                case ARMOR:
+                    Pair<Armor> armor = new Pair<>((Armor) this.loot);
+                    if (Settings.autoEquip) {
+                        return p.autoEquipArmor(new Pair<>(armor), false) != armor || p.addToInventory(new Pair<>(armor));
+                    } else if (Settings.simpleAutoEquip) {
+                        return p.simpleAutoEquipArmor(armor) || p.addToInventory(new Pair<>(armor));
+                    } else {
+                        return p.addToInventory(new Pair<>(armor));
+                    }
+                case CONSUMABLE:
+                    return p.addToInventory(new Pair<>(this.loot));
+                default:
+                    return false;
+            }
         } else {
             return false;
         }
