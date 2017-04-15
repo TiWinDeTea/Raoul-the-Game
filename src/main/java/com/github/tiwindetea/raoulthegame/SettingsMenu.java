@@ -9,15 +9,14 @@
 package com.github.tiwindetea.raoulthegame;
 
 import com.github.tiwindetea.raoulthegame.view.ViewPackage;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -25,6 +24,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+
+import java.text.DecimalFormat;
 
 /**
  * The type Settings menu.
@@ -52,6 +53,11 @@ public class SettingsMenu {
 	private final Button save = new Button();
 	private final Button cancel = new Button();
 	private final Button exit = new Button();
+
+	private final ScrollBar difficultyScroller = new ScrollBar();
+	private final Label difficultyLabel = new Label();
+	private final HBox difficultyHBox = new HBox();
+
 	private final VBox vBox = new VBox();
 
 	private final SubMenuManager manager;
@@ -69,101 +75,66 @@ public class SettingsMenu {
 		this.simpleAutoEquip.setText("Simple auto equip");
 		this.simpleAutoEquip.setTooltip(new Tooltip("Basic auto equip feature"));
 		this.simpleAutoEquip.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.simpleAutoEquip.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.simpleAutoEquip.requestFocus();
-			}
-		});
+		this.simpleAutoEquip.setOnMouseEntered(e -> SettingsMenu.this.simpleAutoEquip.requestFocus());
 		this.vBox.getChildren().add(this.simpleAutoEquip);
 
 		this.autoEquip.setText("Auto equip");
 		this.autoEquip.setTooltip(new Tooltip("Advanced auto equip feature"));
 		this.autoEquip.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.autoEquip.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.autoEquip.requestFocus();
-			}
-		});
+		this.autoEquip.setOnMouseEntered(e -> SettingsMenu.this.autoEquip.requestFocus());
 		this.vBox.getChildren().add(this.autoEquip);
 
 		this.autoEquipCanDrop.setText("Auto equip can drop");
 		this.autoEquipCanDrop.setTooltip(new Tooltip(
 		  "Advanced auto equip feature: drop items on floor when the inventory is full"));
 		this.autoEquipCanDrop.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.autoEquipCanDrop.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.autoEquipCanDrop.requestFocus();
-			}
-		});
+		this.autoEquipCanDrop.setOnMouseEntered(e -> SettingsMenu.this.autoEquipCanDrop.requestFocus());
 		this.vBox.getChildren().add(this.autoEquipCanDrop);
 
 		this.permaDeath.setText("Permanent death");
 		this.permaDeath.setTooltip(new Tooltip("Deletion of the save file upon death"));
 		this.permaDeath.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.permaDeath.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.permaDeath.requestFocus();
-			}
-		});
+		this.permaDeath.setOnMouseEntered(e -> SettingsMenu.this.permaDeath.requestFocus());
 		this.vBox.getChildren().add(this.permaDeath);
 
 		this.mouseInverted.setText("Inverted mouse");
 		this.mouseInverted.setTooltip(new Tooltip("Mouse clicks are inverted"));
 		this.mouseInverted.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.mouseInverted.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.mouseInverted.requestFocus();
-			}
-		});
+		this.mouseInverted.setOnMouseEntered(e -> SettingsMenu.this.mouseInverted.requestFocus());
 		this.vBox.getChildren().add(this.mouseInverted);
 
 		this.skipIntro.setText("Skip intro");
 		this.skipIntro.setTooltip(new Tooltip("Intro should be skipped"));
 		this.skipIntro.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.skipIntro.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.skipIntro.requestFocus();
-			}
-		});
+		this.skipIntro.setOnMouseEntered(e -> SettingsMenu.this.skipIntro.requestFocus());
 		this.vBox.getChildren().add(this.skipIntro);
+
+		DecimalFormat df = new DecimalFormat("0.0");
+		this.difficultyScroller.valueProperty().addListener(e -> this.difficultyLabel.setText("Difficulty: " + df.format(this.difficultyScroller.getValue())));
+
+		this.difficultyScroller.setMin(0);
+		this.difficultyScroller.setMax(2);
+		this.difficultyScroller.setUnitIncrement(0.1);
+		this.difficultyScroller.setValue(Settings.difficulty);
+		this.difficultyHBox.getChildren().addAll(this.difficultyScroller, this.difficultyLabel);
+
+		this.difficultyHBox.setAlignment(Pos.CENTER);
+		this.difficultyHBox.setSpacing(BUTTONS_SPACING / 2);
+		this.vBox.getChildren().add(this.difficultyHBox);
 
 		this.save.setText("Save");
 		this.save.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.save.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.save.requestFocus();
-			}
-		});
-		this.save.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				applyValues();
-				Settings.saveSettings();
-			}
+		this.save.setOnMouseEntered(e -> SettingsMenu.this.save.requestFocus());
+		this.save.setOnAction(e -> {
+			applyValues();
+			Settings.saveSettings();
 		});
 		this.buttonsHBox.getChildren().add(this.save);
 
 		this.cancel.setText("Cancel");
 		this.cancel.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.cancel.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.cancel.requestFocus();
-			}
-		});
-		this.cancel.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				refreshValues();
-			}
-		});
+		this.cancel.setOnMouseEntered(e -> SettingsMenu.this.cancel.requestFocus());
+		this.cancel.setOnAction(e -> refreshValues());
 		this.buttonsHBox.getChildren().add(this.cancel);
 		this.buttonsHBox.setAlignment(Pos.CENTER);
 		this.buttonsHBox.setSpacing(BUTTONS_SPACING);
@@ -171,17 +142,10 @@ public class SettingsMenu {
 
 		this.exit.setText("Exit");
 		this.exit.getStylesheets().add(ViewPackage.BUTTONS_STYLE_FILE_PATH);
-		this.exit.setOnMouseEntered(new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent event) {
-				SettingsMenu.this.exit.requestFocus();
-			}
-		});
-		this.exit.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				SettingsMenu.this.manager.exitSubMenu();
-			}
+		this.exit.setOnMouseEntered(e -> SettingsMenu.this.exit.requestFocus());
+		this.exit.setOnAction(e -> {
+			refreshValues();
+			SettingsMenu.this.manager.exitSubMenu();
 		});
 		this.vBox.getChildren().add(this.exit);
 
@@ -207,12 +171,13 @@ public class SettingsMenu {
 	}
 
 	private void refreshValues() {
-		this.simpleAutoEquip.selectedProperty().setValue(Settings.simpleAutoEquip);
-		this.autoEquip.selectedProperty().setValue(Settings.autoEquip);
-		this.autoEquipCanDrop.selectedProperty().setValue(Settings.autoEquipCanDrop);
-		this.permaDeath.selectedProperty().setValue(Settings.permaDeath);
-		this.mouseInverted.selectedProperty().setValue(Settings.mouseInverted);
-		this.skipIntro.selectedProperty().setValue(Settings.skipIntro);
+		this.simpleAutoEquip.setSelected(Settings.simpleAutoEquip);
+		this.autoEquip.setSelected(Settings.autoEquip);
+		this.autoEquipCanDrop.setSelected(Settings.autoEquipCanDrop);
+		this.permaDeath.setSelected(Settings.permaDeath);
+		this.mouseInverted.setSelected(Settings.mouseInverted);
+		this.skipIntro.setSelected(Settings.skipIntro);
+		this.difficultyScroller.setValue(Settings.difficulty);
 	}
 
 	private void applyValues() {
@@ -222,6 +187,7 @@ public class SettingsMenu {
 		Settings.permaDeath = this.permaDeath.selectedProperty().getValue();
 		Settings.mouseInverted = this.mouseInverted.selectedProperty().getValue();
 		Settings.skipIntro = this.skipIntro.selectedProperty().getValue();
+		Settings.difficulty = this.difficultyScroller.getValue();
 	}
 
 }
